@@ -206,50 +206,87 @@ const std::vector<int> prism_inverse_face_map = {4, 1, 2, 3, 5};
                       subdomain_id_type & subdomain_id_end,
                       int & next_block_id)
   {
-    std::map<subdomain_id_type, std::vector<unsigned int>> subdomain_map;
+    // Exodus requires every element block to contain a single element
+    // type.  Group elements first by subdomain id and then by element
+    // type, so that a subdomain containing more than one element type
+    // (for example a mix of C0POLYHEDRON and HEX8 cells) is split across
+    // multiple blocks rather than written as a single, invalid block.
+    std::map<subdomain_id_type,
+             std::map<ElemType, std::vector<unsigned int>>> elems_by_subdomain_type;
+    subdomain_id_type max_subdomain_id = 0;
+    bool have_elems = false;
 
-    // If we've been asked to add side elements, those will go in
-    // their own blocks.
-    if (add_sides)
-      {
-        std::set<subdomain_id_type> sbd_ids;
-        mesh.subdomain_ids(sbd_ids);
-        if (!sbd_ids.empty())
-          subdomain_id_end = *sbd_ids.rbegin()+1;
-      }
-
-    // Loop through element and map between block and element vector.
     for (const auto & elem : mesh.active_element_ptr_range())
       {
         // We skip writing infinite elements to the Exodus file, so
-        // don't put them in the subdomain_map. That way the number of
-        // blocks should be correct.
+        // don't put them in the map. That way the number of blocks
+        // should be correct.
         if (elem->infinite())
           continue;
 
-        subdomain_map[ elem->subdomain_id() ].push_back(elem->id());
+        const subdomain_id_type sbd_id = elem->subdomain_id();
+        elems_by_subdomain_type[sbd_id][elem->type()].push_back(elem->id());
+        max_subdomain_id = have_elems ? std::max(max_subdomain_id, sbd_id) : sbd_id;
+        have_elems = true;
+      }
 
-        // If we've been asked to add side elements, those will go in their own
-        // blocks.  We don't have any ids to list for elements that don't
-        // explicitly exist in the mesh, but we do an entry to keep
-        // track of the number of elements we'll add in each new block.
-        if (add_sides)
+    // Assign a block id to each (subdomain, element type) group.  The
+    // first element type in each subdomain keeps the subdomain id as its
+    // block id, so single-type subdomains (the common case) are written
+    // exactly as before.  Any additional element types in the same
+    // subdomain get synthesized block ids allocated above all existing
+    // subdomain ids.
+    std::map<subdomain_id_type, std::vector<unsigned int>> subdomain_map;
+    subdomain_id_type next_synth_block_id = have_elems ? max_subdomain_id + 1 : 0;
+
+    for (auto & [sbd_id, type_map] : elems_by_subdomain_type)
+      {
+        bool first_type = true;
+        for (auto & [elem_t, elem_ids] : type_map)
+          {
+            libmesh_ignore(elem_t);
+            const subdomain_id_type block_id =
+              first_type ? sbd_id : next_synth_block_id++;
+            first_type = false;
+            subdomain_map[block_id] = std::move(elem_ids);
+          }
+      }
+
+    // Real element blocks occupy the ids below subdomain_id_end; any
+    // blocks synthesized for visualization sides are numbered after them.
+    if (!subdomain_map.empty())
+      subdomain_id_end = subdomain_map.rbegin()->first + 1;
+
+    // If we've been asked to add side elements, those go in their own
+    // blocks.  We don't have any ids to list for elements that don't
+    // explicitly exist in the mesh, but we add an entry to keep track of
+    // the number of elements we'll add in each new block.
+    if (add_sides)
+      for (const auto & elem : mesh.active_element_ptr_range())
+        {
+          if (elem->infinite())
+            continue;
+
           for (auto s : elem->side_index_range())
             {
               if (EquationSystems::redundant_added_side(*elem,s))
                 continue;
 
-              auto & marker =
-                subdomain_map[subdomain_id_end + elem->side_type(s)];
+              const subdomain_id_type side_block_id =
+                cast_int<subdomain_id_type>(subdomain_id_end + elem->side_type(s));
+
+              // Guard the invariant above (also catches subdomain_id_type
+              // overflow wrapping a side block id back down onto an
+              // element block id).
+              libmesh_assert_greater_equal(side_block_id, subdomain_id_end);
+
+              auto & marker = subdomain_map[side_block_id];
               if (marker.empty())
                 marker.push_back(1);
               else
                 ++marker[0];
             }
-      }
-
-    if (!add_sides && !subdomain_map.empty())
-      subdomain_id_end = subdomain_map.rbegin()->first + 1;
+        }
 
     // Allocate optional block IDs after both mesh subdomains and any blocks
     // synthesized for visualization sides.
@@ -3021,7 +3058,43 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
           num_elem_this_blk_vec.push_back
             (cast_int<int>(element_id_vec.size()));
 
-          std::string block_name = mesh.subdomain_name(subdomain_id);
+          // A block id normally *is* a subdomain id, but a subdomain that
+          // contains more than one element type is split across several
+          // blocks by build_subdomain_map(): only its first element type
+          // keeps the subdomain id, while every other type gets a
+          // synthesized block id allocated above all subdomain ids.  We
+          // detect such synthesized blocks from the mismatch between the
+          // block id and the actual subdomain of the elements it holds.
+          const subdomain_id_type elem_subdomain_id =
+            mesh.elem_ref(element_id_vec[0]).subdomain_id();
+          const bool is_synthesized_block = (subdomain_id != elem_subdomain_id);
+
+          std::string block_name = mesh.subdomain_name(elem_subdomain_id);
+
+          if (is_synthesized_block)
+            {
+              // Prefix the (original) subdomain's name with the element
+              // type, so the synthesized block is identifiable and its
+              // name stays distinct from the block that kept the
+              // subdomain id.  This block becomes its own subdomain when
+              // the file is read back in.
+              const std::string type_suffix = Utility::enum_to_string<ElemType>(elem_t);
+              block_name = block_name.empty()
+                ? (std::to_string(elem_subdomain_id) + "_" + type_suffix)
+                : (block_name + "_" + type_suffix);
+
+              // Informational: keep it to one rank so parallel (Nemesis)
+              // writes don't repeat it once per processor.
+              // NOTE might miss logs if only occurs on other ranks
+              if (this->processor_id() == 0)
+                libMesh::out << "ExodusII_IO: subdomain " << elem_subdomain_id
+                             << " contains more than one element type; writing its "
+                             << type_suffix << " elements to a new block \"" << block_name
+                             << "\" (block id " << subdomain_id
+                             << "), which will be read back as a separate subdomain."
+                             << std::endl;
+            }
+
           if (block_name.empty() && elem_t == C0POLYGON)
             block_name = "NSIDED_" + std::to_string(counter + 1);
           if (block_name.empty() && elem_t == C0POLYHEDRON)

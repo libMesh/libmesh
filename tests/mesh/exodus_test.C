@@ -188,6 +188,7 @@ public:
   CPPUNIT_TEST(test_write_cube_header);
   CPPUNIT_TEST(test_write_hexagonal_prism_header);
   CPPUNIT_TEST(test_write_and_read_hexagonal_prism);
+  CPPUNIT_TEST(test_write_and_read_mixed_poly_hex);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -379,6 +380,91 @@ public:
           CPPUNIT_ASSERT_EQUAL(expected_nodes_on_side[s][n],
                                elem->node_id(side_nodes[n]));
       }
+  }
+
+  // A mesh with a C0POLYHEDRON and a HEX8 in the *same* subdomain.  Exodus
+  // requires a single element type per block, so the writer has to split
+  // this subdomain into two blocks (one NFACED, one HEX8).  Before that
+  // fix the whole subdomain was written as a single block of the first
+  // element's type, which errored (or, when the first element was the
+  // HEX8, crashed) instead of writing the polyhedra.
+  void test_write_and_read_mixed_poly_hex()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+
+    // A hexagonal-prism polyhedron, nodes 0..11, in subdomain 1.
+    const std::vector<Point> points =
+      { { 0, -2, 0}, {-1, -1, 0}, {-1, 1, 0}, { 0,  2, 0}, { 1,  1, 0}, { 1, -1, 0},
+        { 0, -2, 1}, {-1, -1, 1}, {-1, 1, 1}, { 0,  2, 1}, { 1,  1, 1}, { 1, -1, 1} };
+    for (auto p : index_range(points))
+      mesh.add_point(points[p], p);
+
+    const std::vector<std::vector<unsigned int>> nodes_on_side =
+      { {0, 1, 2, 3, 4, 5}, {0, 1, 7, 6}, {1, 2, 8, 7}, {2, 3, 9, 8},
+        {3, 4, 10, 9}, {4, 5, 11, 10}, {5, 0, 6, 11}, {6, 7, 8, 9, 10, 11} };
+    std::vector<std::shared_ptr<Polygon>> sides(nodes_on_side.size());
+    for (auto s : index_range(nodes_on_side))
+      {
+        sides[s] = std::make_shared<C0Polygon>(nodes_on_side[s].size());
+        for (auto i : index_range(nodes_on_side[s]))
+          sides[s]->set_node(i, mesh.node_ptr(nodes_on_side[s][i]));
+      }
+    std::unique_ptr<Node> mid_elem_node;
+    std::unique_ptr<Elem> polyhedron =
+        std::make_unique<C0Polyhedron>(sides, mid_elem_node);
+    if (mid_elem_node)
+      mesh.add_node(std::move(mid_elem_node));
+    polyhedron->set_id() = 0;
+    polyhedron->subdomain_id() = 1;
+    mesh.add_elem(std::move(polyhedron));
+
+    // A HEX8 in the *same* subdomain, nodes 12..19 (offset in x).
+    const std::vector<Point> hex_points =
+      { {5,0,0}, {6,0,0}, {6,1,0}, {5,1,0}, {5,0,1}, {6,0,1}, {6,1,1}, {5,1,1} };
+    for (auto i : index_range(hex_points))
+      mesh.add_point(hex_points[i], 12 + i);
+    std::unique_ptr<Elem> hex = Elem::build(HEX8);
+    for (unsigned int i = 0; i != 8; ++i)
+      hex->set_node(i, mesh.node_ptr(12 + i));
+    hex->set_id() = 1;
+    hex->subdomain_id() = 1;
+    mesh.add_elem(std::move(hex));
+
+    mesh.cache_elem_data();
+    mesh.prepare_for_use();
+
+    {
+      ExodusII_IO exii(mesh);
+      exii.write("write_exodus_mixed_poly_hex.e");
+    }
+
+    TestCommWorld->barrier();
+
+    Mesh input_mesh(*TestCommWorld);
+    ExodusII_IO exii_input(input_mesh);
+    if (input_mesh.processor_id() == 0)
+      exii_input.read("write_exodus_mixed_poly_hex.e");
+
+    MeshCommunication().broadcast(input_mesh);
+    input_mesh.prepare_for_use();
+
+    CPPUNIT_ASSERT_EQUAL(cast_int<dof_id_type>(2), input_mesh.n_elem());
+
+    // Both element types must survive the round trip, in their own blocks.
+    unsigned int n_poly = 0, n_hex = 0;
+    for (const auto & elem : input_mesh.active_local_element_ptr_range())
+      {
+        if (elem->type() == C0POLYHEDRON)
+          ++n_poly;
+        else if (elem->type() == HEX8)
+          ++n_hex;
+      }
+    input_mesh.comm().sum(n_poly);
+    input_mesh.comm().sum(n_hex);
+    CPPUNIT_ASSERT_EQUAL(1u, n_poly);
+    CPPUNIT_ASSERT_EQUAL(1u, n_hex);
   }
 };
 
