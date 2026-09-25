@@ -88,7 +88,6 @@ public:
         if (elem->runtime_topology())
           continue;
 
-
         const ElemType type = elem->type();
 
         for (const auto s : elem->side_index_range())
@@ -113,8 +112,9 @@ public:
               }
           }
 
-        // 1D elements have no edges, and Face::local_edge_node() makes a
-        // 2D element's edges its sides, which the loop above covered
+        // 1D elements have no edges.  A 2D element's edges are its sides,
+        // but nodes_on_edge() and local_edge_node() are not the APIs the
+        // loop above exercised, so those are checked here too.
         if (elem->infinite() || elem->dim() < 2)
           continue;
 
