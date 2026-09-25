@@ -84,10 +84,6 @@ public:
 
     for (const auto & elem : this->_mesh->active_local_element_ptr_range())
       {
-        // Polytopes have no compile-time topology to compare against
-        if (elem->runtime_topology())
-          continue;
-
         const ElemType type = elem->type();
 
         for (const auto s : elem->side_index_range())
@@ -95,9 +91,11 @@ public:
             const ElemType side_type = Elem::side_type(type, s);
             CPPUNIT_ASSERT_EQUAL(elem->side_type(s), side_type);
 
-            // The infinite elements' node maps haven't been shared with
-            // the static lookups, so only their side types are checked
-            if (elem->infinite())
+            // A polytope's side type follows from its element type even
+            // though its side count does not, but it has no static node
+            // map to check; neither are the infinite elements' maps read
+            // by these lookups, so both stop at the side type.
+            if (elem->runtime_topology() || elem->infinite())
               continue;
 
             const auto nodes = elem->nodes_on_side(s);
@@ -125,6 +123,9 @@ public:
             // edge, so compare with that instead
             CPPUNIT_ASSERT_EQUAL(elem->build_edge_ptr(e)->type(),
                                  Elem::edge_type(type));
+
+            if (elem->runtime_topology())
+              continue;
 
             const auto nodes = elem->nodes_on_edge(e);
             CPPUNIT_ASSERT_EQUAL(std::size_t(Elem::type_to_n_nodes_map[Elem::edge_type(type)]),
