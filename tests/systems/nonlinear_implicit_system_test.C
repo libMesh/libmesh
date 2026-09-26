@@ -111,7 +111,9 @@ public:
 
   CPPUNIT_TEST(testDefaultUsesSingleMatrixSolve);
   CPPUNIT_TEST(testOperatorMatrixUsesTwoMatrixSolve);
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
   CPPUNIT_TEST(testTwoMatrixSolveWithoutOverrideThrows);
+#endif // LIBMESH_ENABLE_EXCEPTIONS
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -176,6 +178,7 @@ public:
     CPPUNIT_ASSERT_EQUAL(solver_ptr->single_matrix_calls, 0u);
   }
 
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
   // NonlinearSolver's own two-matrix solve() overload has no fallback
   // implementation -- a backend (like this test's mock) that doesn't
   // override it can't honor a distinct Jacobian operator matrix, so it must
@@ -193,6 +196,7 @@ public:
 
     CPPUNIT_ASSERT_THROW(sys->solve(), libMesh::NotImplemented);
   }
+#endif // LIBMESH_ENABLE_EXCEPTIONS
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(NonlinearImplicitSystemOperatorMatrixTest);
