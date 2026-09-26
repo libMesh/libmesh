@@ -42,7 +42,6 @@ FEMContext::FEMContext (const System & sys,
   : FEMContext(sys, sys.extra_quadrature_order, active_vars,
                allocate_local_matrices)
 {
-  init_internal_data(sys);
 }
 
 FEMContext::FEMContext (const System & sys,

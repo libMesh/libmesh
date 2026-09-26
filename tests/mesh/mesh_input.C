@@ -111,6 +111,7 @@ public:
   CPPUNIT_TEST( testExodusCopyElementSolutionDistributed );
   CPPUNIT_TEST( testExodusCopyNodalSolutionReplicated );
   CPPUNIT_TEST( testExodusCopyElementSolutionReplicated );
+  CPPUNIT_TEST( testExodusCopyHighOrderElementSolution );
   CPPUNIT_TEST( testExodusReadHeader );
   CPPUNIT_TEST( testExodusSetNodeUniqueIdsFromMaps );
   CPPUNIT_TEST( testExodusSetElemUniqueIdsFromMaps );
@@ -804,6 +805,79 @@ public:
 
   void testExodusCopyElementSolutionDistributed ()
   { LOG_UNIT_TEST; testCopyElementSolutionImpl<DistributedMesh,ExodusII_IO>("dist_with_elem_soln.e"); }
+
+
+  // Tests that a FIRST order discontinuous MONOMIAL variable can be
+  // written as elemental Exodus data (via the opt-in
+  // write_discontinuous_elemental_data()) and read back.  Since
+  // six_x_plus_sixty_y is linear and the mesh elements are uniform
+  // squares, the exact quadrature average over each element equals
+  // the function's value at that element's centroid, so we can reuse
+  // the centroid-evaluation check from testCopyElementSolutionImpl
+  // without needing to hand-compute the expected quadrature average.
+  void testExodusCopyHighOrderElementSolution ()
+  {
+    LOG_UNIT_TEST;
+
+    const std::string filename("repl_with_high_order_elem_soln.e");
+
+    {
+      ReplicatedMesh mesh(*TestCommWorld);
+
+      EquationSystems es(mesh);
+      System &sys = es.add_system<System> ("SimpleSystem");
+      sys.add_variable("e", FIRST, MONOMIAL);
+
+      MeshTools::Generation::build_square (mesh,
+                                           3, 3,
+                                           0., 1., 0., 1.);
+
+      es.init();
+      sys.project_solution(six_x_plus_sixty_y, nullptr, es.parameters);
+
+      ExodusII_IO meshinput(mesh);
+      meshinput.write_discontinuous_elemental_data(true);
+
+      std::set<std::string> sys_list;
+      meshinput.write_equation_systems(filename, es, &sys_list);
+      meshinput.write_element_data(es);
+    }
+
+    {
+      ReplicatedMesh mesh(*TestCommWorld);
+      mesh.allow_renumbering(false);
+      ExodusII_IO meshinput(mesh);
+
+      EquationSystems es(mesh);
+      System &sys = es.add_system<System> ("SimpleSystem");
+      sys.add_variable("teste", CONSTANT, MONOMIAL);
+
+      if (mesh.processor_id() == 0)
+        meshinput.read(filename);
+      MeshCommunication().broadcast(mesh);
+      mesh.prepare_for_use();
+
+      es.init();
+
+#ifdef LIBMESH_USE_COMPLEX_NUMBERS
+      meshinput.copy_elemental_solution(sys, "teste", "r_e");
+#else
+      meshinput.copy_elemental_solution(sys, "teste", "e");
+#endif
+
+      // Exodus only handles double precision
+      Real exotol = std::max(TOLERANCE*TOLERANCE, Real(1e-12));
+
+      for (Real x = Real(1.L/6.L); x < 1; x += Real(1.L/3.L))
+        for (Real y = Real(1.L/6.L); y < 1; y += Real(1.L/3.L))
+          {
+            Point p(x,y);
+            LIBMESH_ASSERT_NUMBERS_EQUAL
+              (sys.point_value(0,p), 6*x+60*y, exotol);
+          }
+    }
+  }
+
 
 #if defined(LIBMESH_HAVE_NEMESIS_API)
   void testNemesisCopyElementSolutionReplicated ()
