@@ -311,9 +311,9 @@ int main (int argc, char ** argv)
   system.print_element_solutions = infile("print_element_solutions", false);
   system.print_element_residuals = infile("print_element_residuals", false);
   system.print_residuals = infile("print_residuals", false);
-  system.print_jacobians = infile("print_residuals", false);
+  system.print_jacobians = infile("print_jacobians", false);
   system.print_residual_norms = infile("print_residual_norms", false);
-  system.print_jacobian_norms = infile("print_residuals", false);
+  system.print_jacobian_norms = infile("print_jacobian_norms", false);
 
   // Print information about the system to the screen.
   equation_systems.print_info();
