@@ -20,6 +20,7 @@
 #define LIBMESH_FE_LAGRANGE_SHAPE_1D_H
 
 // Local includes
+#include "libmesh/libmesh_device.h"
 #include "libmesh/enum_order.h" // FIRST, SECOND, etc.
 #include "libmesh/point.h"
 
@@ -28,7 +29,7 @@
 namespace libMesh
 {
 
-inline
+LIBMESH_DEVICE_INLINE
 Real fe_lagrange_1D_linear_shape(const unsigned int i,
                                  const Real xi)
 {
@@ -47,7 +48,7 @@ Real fe_lagrange_1D_linear_shape(const unsigned int i,
 
 
 
-inline
+LIBMESH_DEVICE_INLINE
 Real fe_lagrange_1D_quadratic_shape(const unsigned int i,
                                     const Real xi)
 {
@@ -69,7 +70,7 @@ Real fe_lagrange_1D_quadratic_shape(const unsigned int i,
 
 
 
-inline
+LIBMESH_DEVICE_INLINE
 Real fe_lagrange_1D_cubic_shape(const unsigned int i,
                                 const Real xi)
 {
@@ -94,7 +95,7 @@ Real fe_lagrange_1D_cubic_shape(const unsigned int i,
 
 
 
-inline
+LIBMESH_DEVICE_INLINE
 Real fe_lagrange_1D_shape(const Order order,
                           const unsigned int i,
                           const Real xi)
@@ -120,7 +121,7 @@ Real fe_lagrange_1D_shape(const Order order,
 
 
 
-inline
+LIBMESH_DEVICE_INLINE
 Real fe_lagrange_1D_linear_shape_deriv(const unsigned int i,
                                        const unsigned int libmesh_dbg_var(j),
                                        const Real)
@@ -142,7 +143,7 @@ Real fe_lagrange_1D_linear_shape_deriv(const unsigned int i,
 }
 
 
-inline
+LIBMESH_DEVICE_INLINE
 Real fe_lagrange_1D_quadratic_shape_deriv(const unsigned int i,
                                           const unsigned int libmesh_dbg_var(j),
                                           const Real xi)
@@ -167,7 +168,7 @@ Real fe_lagrange_1D_quadratic_shape_deriv(const unsigned int i,
 }
 
 
-inline
+LIBMESH_DEVICE_INLINE
 Real fe_lagrange_1D_cubic_shape_deriv(const unsigned int i,
                                       const unsigned int libmesh_dbg_var(j),
                                       const Real xi)
@@ -196,7 +197,7 @@ Real fe_lagrange_1D_cubic_shape_deriv(const unsigned int i,
 
 
 
-inline
+LIBMESH_DEVICE_INLINE
 Real fe_lagrange_1D_shape_deriv(const Order order,
                                 const unsigned int i,
                                 const unsigned int j,
@@ -224,7 +225,7 @@ Real fe_lagrange_1D_shape_deriv(const Order order,
 // fe_lagrange_1D_linear_shape_second_deriv is 0
 
 
-inline
+LIBMESH_DEVICE_INLINE
 Real fe_lagrange_1D_quadratic_shape_second_deriv(const unsigned int i,
                                                  const unsigned int libmesh_dbg_var(j),
                                                  const Real)
@@ -249,7 +250,7 @@ Real fe_lagrange_1D_quadratic_shape_second_deriv(const unsigned int i,
 }
 
 
-inline
+LIBMESH_DEVICE_INLINE
 Real fe_lagrange_1D_cubic_shape_second_deriv(const unsigned int i,
                                              const unsigned int libmesh_dbg_var(j),
                                              const Real xi)
@@ -278,7 +279,7 @@ Real fe_lagrange_1D_cubic_shape_second_deriv(const unsigned int i,
 
 
 
-inline
+LIBMESH_DEVICE_INLINE
 Real fe_lagrange_1D_shape_second_deriv(const Order order,
                                        const unsigned int i,
                                        const unsigned int j,
