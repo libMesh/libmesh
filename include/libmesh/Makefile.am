@@ -82,6 +82,7 @@ BUILT_SOURCES = \
         fe_lagrange_n_dofs.h \
         fe_macro.h \
         fe_map.h \
+        fe_monomial_n_dofs.h \
         fe_reference_element_traits.h \
         fe_transformation_base.h \
         fe_type.h \
@@ -855,6 +856,9 @@ fe_macro.h: $(top_srcdir)/include/fe/fe_macro.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fe_map.h: $(top_srcdir)/include/fe/fe_map.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+fe_monomial_n_dofs.h: $(top_srcdir)/include/fe/fe_monomial_n_dofs.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 fe_reference_element_traits.h: $(top_srcdir)/include/fe/fe_reference_element_traits.h
