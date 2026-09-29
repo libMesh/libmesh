@@ -106,6 +106,8 @@ public:
   CPPUNIT_TEST( testVTKPreserveElemIds );
   CPPUNIT_TEST( testVTKPreserveSubdomainIds );
   CPPUNIT_TEST( testVTKReadPolyhedra );
+  CPPUNIT_TEST( testVTKReadWrongFileType );
+  CPPUNIT_TEST( testVTKReadNotAnXMLFile );
 #endif
 
 #ifdef LIBMESH_HAVE_EXODUS_API
@@ -395,6 +397,53 @@ public:
         {6, 7, 8, 9, 10, 11} };
 
     CPPUNIT_ASSERT(faces == expected_faces);
+  }
+
+  // VTKIO::read() always uses vtkXMLPUnstructuredGridReader, a *parallel*
+  // XML reader that requires a genuine PUnstructuredGrid (.pvtu) file.
+  // Handed the underlying serial UnstructuredGrid piece file directly --
+  // an easy mistake, since it's a perfectly valid VTK XML file, just not
+  // the type this reader needs -- it used to fail silently (producing an
+  // empty mesh with no diagnostic at all) rather than erroring clearly.
+  //
+  // We construct VTKIO directly here rather than going through
+  // mesh.read(), which would dispatch via NameBasedIO's rank-0-reads/
+  // then-broadcast pattern: throwing out of that on rank 0 before the
+  // broadcast would leave every other rank blocked on a broadcast that
+  // never arrives. Every rank hits this same, rank-independent error
+  // when calling VTKIO::read() directly, so there's no such hazard here.
+  void testVTKReadWrongFileType ()
+  {
+    LOG_UNIT_TEST;
+
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+    Mesh mesh(*TestCommWorld);
+    VTKIO vtk(mesh);
+    CPPUNIT_ASSERT_THROW_MESSAGE
+      ("Wrong VTK file type (serial UnstructuredGrid, not "
+       "PUnstructuredGrid) not detected",
+       vtk.read("meshes/hex_prism_polyhedron_0.vtu"),
+       libMesh::LogicError);
+#endif
+  }
+
+  // A file that isn't a VTK XML file at all (wrong format entirely, or a
+  // corrupted/truncated download) should also be rejected clearly.  We
+  // reuse an existing, unrelated mesh fixture here rather than adding a
+  // new one; any non-VTK-XML file demonstrates this code path.  See
+  // testVTKReadWrongFileType above for why VTKIO is constructed directly.
+  void testVTKReadNotAnXMLFile ()
+  {
+    LOG_UNIT_TEST;
+
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+    Mesh mesh(*TestCommWorld);
+    VTKIO vtk(mesh);
+    CPPUNIT_ASSERT_THROW_MESSAGE
+      ("Non-VTK-XML file not detected",
+       vtk.read("meshes/circle.msh"),
+       libMesh::LogicError);
+#endif
   }
 #endif // LIBMESH_HAVE_VTK
 
