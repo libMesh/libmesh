@@ -22,6 +22,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/enum_to_string.h"
 #include "libmesh/fe.h"
+#include "libmesh/fe_lagrange_n_dofs.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/fe_macro.h"
 #include "libmesh/remote_elem.h"
@@ -434,181 +435,29 @@ unsigned int lagrange_n_dofs(const ElemType t, const Elem * e, const Order o)
 {
   libmesh_assert(!e || e->type() == t);
 
-  switch (o)
+  // The counts live in a header so that device code, which cannot call in
+  // here, reads the same ones.  What stays is what a header cannot do:
+  // report our errors, and ask a polytope for the node count its element
+  // type does not fix, which only makes it a first-order element.
+  const unsigned int n = FECounts::lagrange_n_dofs(t, o);
+  if (n != invalid_uint)
+    return n;
+
+  if (o == FIRST && (t == C0POLYGON || t == C0POLYHEDRON))
     {
-      // lagrange can only be constant on a single node
-    case CONSTANT:
-      {
-        switch (t)
-          {
-          case NODEELEM:
-            return 1;
-
-          default:
-            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
-          }
-      }
-
-      // linear Lagrange shape functions
-    case FIRST:
-      {
-        switch (t)
-          {
-          case NODEELEM:
-            return 1;
-
-          case EDGE2:
-          case EDGE3:
-          case EDGE4:
-            return 2;
-
-          case TRI3:
-          case TRISHELL3:
-          case TRI3SUBDIVISION:
-          case TRI6:
-          case TRI7:
-            return 3;
-
-          case QUAD4:
-          case QUADSHELL4:
-          case QUAD8:
-          case QUADSHELL8:
-          case QUAD9:
-          case QUADSHELL9:
-            return 4;
-
-          case TET4:
-          case TET10:
-          case TET14:
-            return 4;
-
-          case HEX8:
-          case HEX20:
-          case HEX27:
-            return 8;
-
-          case PRISM6:
-          case PRISM15:
-          case PRISM18:
-          case PRISM20:
-          case PRISM21:
-            return 6;
-
-          case PYRAMID5:
-          case PYRAMID13:
-          case PYRAMID14:
-          case PYRAMID18:
-            return 5;
-
-          case INVALID_ELEM:
-            return 0;
-
-          case C0POLYGON:
-          case C0POLYHEDRON:
-            // Polygons and polyhedra require using newer FE APIs
-            if (!e)
-              libmesh_error_msg("Code (see stack trace) used an outdated FE function overload.\n"
-                                "n_dofs() on a polygon or polyhedron is not defined by ElemType alone.");
-            return e->n_nodes();
-
-          default:
-            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
-          }
-      }
-
-
-      // quadratic Lagrange shape functions
-    case SECOND:
-      {
-        switch (t)
-          {
-          case NODEELEM:
-            return 1;
-
-          case EDGE3:
-            return 3;
-
-          case TRI6:
-          case TRI7:
-            return 6;
-
-          case QUAD8:
-          case QUADSHELL8:
-            return 8;
-
-          case QUAD9:
-          case QUADSHELL9:
-            return 9;
-
-          case TET10:
-          case TET14:
-            return 10;
-
-          case HEX20:
-            return 20;
-
-          case HEX27:
-            return 27;
-
-          case PRISM15:
-            return 15;
-
-          case PRISM18:
-          case PRISM20:
-          case PRISM21:
-            return 18;
-
-          case PYRAMID13:
-            return 13;
-
-          case PYRAMID14:
-          case PYRAMID18:
-            return 14;
-
-          case INVALID_ELEM:
-            return 0;
-
-          default:
-            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
-          }
-      }
-
-    case THIRD:
-      {
-        switch (t)
-          {
-          case NODEELEM:
-            return 1;
-
-          case EDGE4:
-            return 4;
-
-          case PRISM20:
-            return 20;
-
-          case PRISM21:
-            return 21;
-
-          case PYRAMID18:
-            return 18;
-
-          case TRI7:
-            return 7;
-
-          case TET14:
-            return 14;
-
-          case INVALID_ELEM:
-            return 0;
-
-          default:
-            libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) << " for " << Utility::enum_to_string(o) << " order approximation!");
-          }
-      }
-
-    default:
-      libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(o) << " selected for LAGRANGE FE family!");
+      // Polygons and polyhedra require using newer FE APIs
+      if (!e)
+        libmesh_error_msg("Code (see stack trace) used an outdated FE function overload.\n"
+                          "n_dofs() on a polygon or polyhedron is not defined by ElemType alone.");
+      return e->n_nodes();
     }
+
+  libmesh_error_msg_if(o > THIRD || o < CONSTANT,
+                       "ERROR: Invalid Order " << Utility::enum_to_string(o) <<
+                       " selected for LAGRANGE FE family!");
+
+  libmesh_error_msg("ERROR: Bad ElemType = " << Utility::enum_to_string(t) <<
+                    " for " << Utility::enum_to_string(o) << " order approximation!");
 }
 
 
