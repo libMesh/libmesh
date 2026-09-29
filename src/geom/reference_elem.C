@@ -318,17 +318,26 @@ ideal_target (const ElemType type)
 
       switch (type)
         {
-            case TRI3: {
+            case TRI3:
+            case TRISHELL3: {
               // Nothing to do here, vertices already added above
               break;
             }
 
-            case TRI6: {
+            case TRI6:
+            case TRI7: {
               // Define the midpoint nodes of the equilateral triangle
               //                                         x         y                   node_id
               owned_nodes.emplace_back(Node::build(Point(0.50 * s, 0.00),              3));
               owned_nodes.emplace_back(Node::build(Point(0.75 * s, 0.25 * sqrt_3 * s), 4));
               owned_nodes.emplace_back(Node::build(Point(0.25 * s, 0.25 * sqrt_3 * s), 5));
+
+              if (type == TRI7)
+                {
+                  // Define the interior "bubble" node at the centroid
+                  const auto & on = owned_nodes;
+                  owned_nodes.emplace_back(Node::build(Point((*on[0] + *on[1] + *on[2]) / 3.), 6));
+                }
 
               break;
             }
