@@ -380,6 +380,7 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
 
   switch (t)
     {
+    case NODEELEM:
     case EDGE2:
     case EDGE3:
     case EDGE4:
@@ -491,6 +492,7 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
       }
 
     case PRISM6:
+    case PRISM15:
     case PRISM18:
     case PRISM20:
     case PRISM21:
