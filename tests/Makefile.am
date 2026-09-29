@@ -230,6 +230,8 @@ data = matrices/geom_1_extraction_op.h5 \
        meshes/quad4_tri3_smoothed.xda.gz \
        meshes/quad4_tri3_hourglass.xda.gz \
        meshes/hex8_prism6_smoothed.xda.gz \
+       meshes/hex_prism_polyhedron.pvtu \
+       meshes/hex_prism_polyhedron_0.vtu \
        solutions/lagrange_vec_solution_mesh.xda \
        solutions/lagrange_vec_solution.xda \
        solutions/nedelec_one_solution_mesh.xda \

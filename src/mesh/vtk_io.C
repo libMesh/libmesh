@@ -41,6 +41,7 @@
 #include "vtkXMLPUnstructuredGridReader.h"
 #include "vtkXMLUnstructuredGridWriter.h"
 #include "vtkXMLPUnstructuredGridWriter.h"
+#include "vtkXMLFileReadTester.h"
 #include "vtkUnstructuredGrid.h"
 #include "vtkIntArray.h"
 #include "vtkCellArray.h"
@@ -61,6 +62,7 @@
 #include "libmesh/restore_warnings.h"
 
 // C++ includes
+#include <cstring>
 #include <fstream>
 
 
@@ -263,6 +265,32 @@ void VTKIO::read (const std::string & name)
   // Keep track of what kinds of elements this file contains
   elems_of_dimension.clear();
   elems_of_dimension.resize(4, false);
+
+  // vtkXMLPUnstructuredGridReader is a *parallel*-format reader: it
+  // requires a real "PUnstructuredGrid" file (a .pvtu descriptor plus its
+  // piece file(s)), not a plain serial "UnstructuredGrid" .vtu file.  Fed
+  // the wrong format, it logs an error but otherwise fails silently,
+  // leaving us with an empty grid rather than a clear diagnostic.  Sniff
+  // the actual "type" attribute of the file's root <VTKFile> element
+  // first so we can give a useful error instead.
+  {
+    vtkSmartPointer<vtkXMLFileReadTester> tester =
+      vtkSmartPointer<vtkXMLFileReadTester>::New();
+    tester->SetFileName(name.c_str());
+
+    libmesh_error_msg_if
+      (!tester->TestReadFile(),
+       "Error: " << name << " does not appear to be a VTK XML file.");
+
+    const char * file_type = tester->GetFileDataType();
+    libmesh_error_msg_if
+      (!file_type || std::strcmp(file_type, "PUnstructuredGrid") != 0,
+       "Error: " << name << " is a VTK XML file of type \""
+       << (file_type ? file_type : "(unknown)") << "\", but libMesh's "
+       "VTKIO reader requires a *parallel* unstructured grid file "
+       "(type=\"PUnstructuredGrid\", conventionally named .pvtu), with its "
+       "accompanying piece file(s), even for a single-processor mesh.");
+  }
 
   // Use a typedef, because these names are just crazy
   typedef vtkSmartPointer<vtkXMLPUnstructuredGridReader> MyReader;

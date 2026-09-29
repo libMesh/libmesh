@@ -338,10 +338,18 @@ public:
   {
     LOG_UNIT_TEST;
 
-    // This .vtu file contains a single VTK_POLYHEDRON cell: a hexagonal
-    // prism with 12 vertices and 8 faces (two hexagons and six quads).
+    // This .pvtu (+ piece) file contains a single VTK_POLYHEDRON cell: a
+    // hexagonal prism with 12 vertices and 8 faces (two hexagons and six
+    // quads).  VTKIO::read() always uses the *parallel* XML reader, which
+    // requires a genuine PUnstructuredGrid (.pvtu) file -- a plain serial
+    // UnstructuredGrid .vtu file is not sufficient, even for one piece.
     Mesh mesh(*TestCommWorld);
-    mesh.read("meshes/hex_prism_polyhedron.vtu");
+    // Without this, prepare_for_use()'s default renumbering can reassign
+    // node ids (by local element-traversal order rather than preserving
+    // the ids we read), which would invalidate the "ids match VTK point
+    // ordering" assumption the face checks below rely on.
+    mesh.allow_renumbering(false);
+    mesh.read("meshes/hex_prism_polyhedron.pvtu");
     mesh.prepare_for_use();
 
     CPPUNIT_ASSERT_EQUAL(dof_id_type(1), mesh.n_elem());
