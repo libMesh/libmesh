@@ -334,6 +334,54 @@ public:
       }
   }
 
+  void test_quality_permutation_invariance()
+  {
+    LOG_UNIT_TEST;
+
+    // A genuine element-shape quality metric cannot depend on how the
+    // element's nodes happen to be numbered: permuting the nodes (i.e.
+    // relabeling which physical corner sits at which local index, via
+    // one of the reference element's symmetries) leaves the physical
+    // shape -- and therefore every quality metric -- unchanged.
+    for (const auto & elem :
+         this->_mesh->active_local_element_ptr_range())
+      {
+        // Permutations of infinite elements aren't well defined.
+        if (elem->infinite())
+          continue;
+
+        const std::vector<ElemQuality> valid_metrics =
+          Quality::valid(elem->type());
+
+        if (valid_metrics.empty())
+          continue;
+
+        std::vector<Real> baseline(valid_metrics.size());
+        for (std::size_t i = 0; i != valid_metrics.size(); ++i)
+          baseline[i] = elem->quality(valid_metrics[i]);
+
+        for (const auto p : IntRange<unsigned int>(0, elem->n_permutations()))
+          {
+            elem->permute(p);
+
+            for (std::size_t i = 0; i != valid_metrics.size(); ++i)
+              {
+                const Real permuted_value = elem->quality(valid_metrics[i]);
+
+                std::ostringstream msg;
+                msg << "Quality metric " << Utility::enum_to_string(valid_metrics[i])
+                    << " on a " << Utility::enum_to_string(elem->type())
+                    << " changed from " << baseline[i]
+                    << " to " << permuted_value
+                    << " after applying permutation " << p;
+
+                CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE
+                  (msg.str(), baseline[i], permuted_value, TOLERANCE);
+              }
+          }
+      }
+  }
+
   void test_maps()
   {
     LOG_UNIT_TEST;
@@ -1053,6 +1101,7 @@ public:
   CPPUNIT_TEST( test_ref_elem );                \
   CPPUNIT_TEST( test_quality );                 \
   CPPUNIT_TEST( test_quality_bounds );          \
+  CPPUNIT_TEST( test_quality_permutation_invariance ); \
   CPPUNIT_TEST( test_node_edge_map_consistency ); \
   CPPUNIT_TEST( test_maps );                    \
   CPPUNIT_TEST( test_static_data );             \
