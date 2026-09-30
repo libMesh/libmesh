@@ -686,7 +686,11 @@ void ExactSolution::_compute_error(std::string_view sys_name,
     {
       // Skip any spline nodes
       if (elem->mapping_type() == INVALID_MAP)
-        continue;
+        {
+          libmesh_assert(elem->type() == NODEELEM &&
+                         mesh.n_constraint_rows());
+          continue;
+        }
 
       // Skip this element if it is in a subdomain excluded by the user.
       const subdomain_id_type elem_subid = elem->subdomain_id();
