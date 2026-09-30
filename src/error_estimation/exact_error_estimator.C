@@ -308,7 +308,11 @@ void ExactErrorEstimator::estimate_error (const System & system,
         {
           // Skip any spline nodes
           if (elem->mapping_type() == INVALID_MAP)
-            continue;
+            {
+              libmesh_assert(elem->type() == NODEELEM &&
+                             mesh.n_constraint_rows());
+              continue;
+            }
 
           const dof_id_type e_id = elem->id();
 
