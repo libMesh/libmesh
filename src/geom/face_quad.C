@@ -585,7 +585,6 @@ std::pair<Real, Real> Quad::qual_bounds (const ElemQuality q) const
       bounds.second = 4.;
       break;
 
-    case JACOBIAN:
     case SCALED_JACOBIAN:
       bounds.first  = 0.5;
       bounds.second = 1.;

@@ -571,7 +571,6 @@ std::pair<Real, Real> Hex::qual_bounds (const ElemQuality q) const
       break;
 
     case SCALED_JACOBIAN:
-    case JACOBIAN:
       bounds.first  = 0.5;
       bounds.second = 1.;
       break;
