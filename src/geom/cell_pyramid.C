@@ -331,7 +331,7 @@ std::pair<Real, Real> Pyramid::qual_bounds (const ElemQuality) const
   // No suggested ranges have yet been established for any of the
   // metrics Quality::valid() lists for pyramids, so we always return
   // the (-1, -1) sentinel.
-  libMesh::out << "Warning: Invalid quality measure chosen." << std::endl;
+  libmesh_warning("Invalid quality measure chosen.");
   return std::make_pair(Real(-1), Real(-1));
 }
 
