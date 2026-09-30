@@ -21,6 +21,7 @@
 // Local includes
 #include "libmesh/cell_prism.h"
 #include "libmesh/cell_prism6.h"
+#include "libmesh/enum_elem_quality.h"
 #include "libmesh/face_quad4.h"
 #include "libmesh/face_tri3.h"
 
@@ -330,6 +331,17 @@ bool Prism::on_reference_element(const Point & p,
           (zeta >= -1.-eps) &&
           (zeta <=  1.+eps) &&
           ((xi + eta) <= 1.+eps));
+}
+
+
+
+std::pair<Real, Real> Prism::qual_bounds (const ElemQuality) const
+{
+  // No suggested ranges have yet been established for any of the
+  // metrics Quality::valid() lists for prisms, so we always return
+  // the (-1, -1) sentinel.
+  libMesh::out << "Warning: Invalid quality measure chosen." << std::endl;
+  return std::make_pair(Real(-1), Real(-1));
 }
 
 

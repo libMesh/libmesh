@@ -198,6 +198,15 @@ public:
    */
   virtual void retriangulate() override final;
 
+  /**
+   * \returns The suggested quality bounds for the polyhedron based on
+   * quality measure \p q.  These are the values suggested by the
+   * CUBIT User's Manual, where available; only MAX_DIHEDRAL_ANGLE and
+   * MIN_DIHEDRAL_ANGLE have established ranges for general polyhedra,
+   * so all other metrics return the (-1, -1) sentinel.
+   */
+  virtual std::pair<Real, Real> qual_bounds (const ElemQuality q) const override;
+
 protected:
 
   /**

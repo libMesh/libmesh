@@ -19,6 +19,7 @@
 #include "libmesh/face_c0polygon.h"
 
 #include "libmesh/edge_edge2.h"
+#include "libmesh/enum_elem_quality.h"
 #include "libmesh/enum_order.h"
 #include "libmesh/tensor_value.h"
 
@@ -425,6 +426,17 @@ void C0Polygon::retriangulate()
                                       remaining_nodes[(best_vertex+1)%ns]});
       remaining_nodes.erase(remaining_nodes.begin()+best_vertex);
     }
+}
+
+
+
+std::pair<Real, Real> C0Polygon::qual_bounds (const ElemQuality) const
+{
+  // No suggested ranges have yet been established for any of the
+  // metrics Quality::valid() lists for general polygons, so we always
+  // return the (-1, -1) sentinel.
+  libMesh::out << "Warning: Invalid quality measure chosen." << std::endl;
+  return std::make_pair(Real(-1), Real(-1));
 }
 
 

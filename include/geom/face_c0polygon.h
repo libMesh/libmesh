@@ -196,6 +196,15 @@ public:
    */
   virtual void retriangulate() override final;
 
+  /**
+   * \returns The suggested quality bounds for the polygon based on
+   * quality measure \p q.  These are the values suggested by the
+   * CUBIT User's Manual, where available; no such ranges are yet
+   * established for general polygons, so this always returns the
+   * (-1, -1) sentinel.
+   */
+  virtual std::pair<Real, Real> qual_bounds (const ElemQuality q) const override;
+
 protected:
 
 #ifdef LIBMESH_ENABLE_AMR
