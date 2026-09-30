@@ -106,7 +106,7 @@ public:
   CPPUNIT_TEST( testVTKPreserveElemIds );
   CPPUNIT_TEST( testVTKPreserveSubdomainIds );
   CPPUNIT_TEST( testVTKReadPolyhedra );
-  CPPUNIT_TEST( testVTKReadWrongFileType );
+  CPPUNIT_TEST( testVTKReadPolyhedraSerial );
   CPPUNIT_TEST( testVTKReadNotAnXMLFile );
 #endif
 
@@ -336,24 +336,11 @@ public:
     }
   }
 
-  void testVTKReadPolyhedra ()
+  // Shared checks for a mesh that should contain exactly the hexagonal
+  // prism polyhedron (12 vertices, 8 faces -- two hexagons and six
+  // quads) written to meshes/hex_prism_polyhedron.{pvtu,_0.vtu}.
+  void checkHexPrismPolyhedron (MeshBase & mesh)
   {
-    LOG_UNIT_TEST;
-
-    // This .pvtu (+ piece) file contains a single VTK_POLYHEDRON cell: a
-    // hexagonal prism with 12 vertices and 8 faces (two hexagons and six
-    // quads).  VTKIO::read() always uses the *parallel* XML reader, which
-    // requires a genuine PUnstructuredGrid (.pvtu) file -- a plain serial
-    // UnstructuredGrid .vtu file is not sufficient, even for one piece.
-    Mesh mesh(*TestCommWorld);
-    // Without this, prepare_for_use()'s default renumbering can reassign
-    // node ids (by local element-traversal order rather than preserving
-    // the ids we read), which would invalidate the "ids match VTK point
-    // ordering" assumption the face checks below rely on.
-    mesh.allow_renumbering(false);
-    mesh.read("meshes/hex_prism_polyhedron.pvtu");
-    mesh.prepare_for_use();
-
     CPPUNIT_ASSERT_EQUAL(dof_id_type(1), mesh.n_elem());
 
     // The element may live on a single processor when the mesh is
@@ -399,12 +386,54 @@ public:
     CPPUNIT_ASSERT(faces == expected_faces);
   }
 
-  // VTKIO::read() always uses vtkXMLPUnstructuredGridReader, a *parallel*
-  // XML reader that requires a genuine PUnstructuredGrid (.pvtu) file.
-  // Handed the underlying serial UnstructuredGrid piece file directly --
-  // an easy mistake, since it's a perfectly valid VTK XML file, just not
-  // the type this reader needs -- it used to fail silently (producing an
-  // empty mesh with no diagnostic at all) rather than erroring clearly.
+  void testVTKReadPolyhedra ()
+  {
+    LOG_UNIT_TEST;
+
+    // This .pvtu (+ piece) file contains a single VTK_POLYHEDRON cell.
+    // VTKIO::read() sniffs the file's actual root element to tell a
+    // parallel PUnstructuredGrid (.pvtu) descriptor from a plain serial
+    // UnstructuredGrid (.vtu) file and uses the matching reader class --
+    // see testVTKReadPolyhedraSerial below for the latter.
+    Mesh mesh(*TestCommWorld);
+    // Without this, prepare_for_use()'s default renumbering can reassign
+    // node ids (by local element-traversal order rather than preserving
+    // the ids we read), which would invalidate the "ids match VTK point
+    // ordering" assumption checkHexPrismPolyhedron() relies on.
+    mesh.allow_renumbering(false);
+    mesh.read("meshes/hex_prism_polyhedron.pvtu");
+    mesh.prepare_for_use();
+
+    checkHexPrismPolyhedron(mesh);
+  }
+
+  // The same polyhedron, read directly from the underlying serial
+  // UnstructuredGrid piece file rather than its .pvtu descriptor.  This
+  // is a perfectly valid, common thing to hand a mesh reader -- many
+  // external tools write only this form, with no parallel wrapper -- but
+  // VTKIO::read() briefly lost the ability to read it at all: a Jan 2024
+  // change to add .pvtu support replaced the serial reader class instead
+  // of adding the parallel one alongside it, silently regressing plain
+  // .vtu files to fail (which is what caused this CI failure in the
+  // first place).  This is the regression test for that.
+  void testVTKReadPolyhedraSerial ()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    mesh.allow_renumbering(false);
+    mesh.read("meshes/hex_prism_polyhedron_0.vtu");
+    mesh.prepare_for_use();
+
+    checkHexPrismPolyhedron(mesh);
+  }
+
+  // A file that isn't a VTK XML file at all (wrong format entirely, or a
+  // corrupted/truncated download) should be rejected clearly rather than
+  // being handed to vtkXMLFileReadTester/the VTK XML readers and failing
+  // in some less legible way.  We reuse an existing, unrelated mesh
+  // fixture here rather than adding a new one; any non-VTK-XML file
+  // demonstrates this code path.
   //
   // We construct VTKIO directly here rather than going through
   // mesh.read(), which would dispatch via NameBasedIO's rank-0-reads/
@@ -412,26 +441,6 @@ public:
   // broadcast would leave every other rank blocked on a broadcast that
   // never arrives. Every rank hits this same, rank-independent error
   // when calling VTKIO::read() directly, so there's no such hazard here.
-  void testVTKReadWrongFileType ()
-  {
-    LOG_UNIT_TEST;
-
-#ifdef LIBMESH_ENABLE_EXCEPTIONS
-    Mesh mesh(*TestCommWorld);
-    VTKIO vtk(mesh);
-    CPPUNIT_ASSERT_THROW_MESSAGE
-      ("Wrong VTK file type (serial UnstructuredGrid, not "
-       "PUnstructuredGrid) not detected",
-       vtk.read("meshes/hex_prism_polyhedron_0.vtu"),
-       libMesh::LogicError);
-#endif
-  }
-
-  // A file that isn't a VTK XML file at all (wrong format entirely, or a
-  // corrupted/truncated download) should also be rejected clearly.  We
-  // reuse an existing, unrelated mesh fixture here rather than adding a
-  // new one; any non-VTK-XML file demonstrates this code path.  See
-  // testVTKReadWrongFileType above for why VTKIO is constructed directly.
   void testVTKReadNotAnXMLFile ()
   {
     LOG_UNIT_TEST;
