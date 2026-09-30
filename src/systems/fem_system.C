@@ -41,10 +41,12 @@ typedef Threads::spin_mutex femsystem_mutex;
 femsystem_mutex assembly_mutex;
 
 bool is_spline_nodeelem(const Elem & elem,
-                        const System & sys)
+                        const System & libmesh_dbg_var(sys))
 {
-  return (elem.type() == NODEELEM &&
-          sys.get_mesh().n_constraint_rows());
+  libmesh_assert((elem.mapping_type() != INVALID_MAP) ||
+                 (elem.type() == NODEELEM &&
+                  sys.get_mesh().n_constraint_rows()));
+  return (elem.mapping_type() == INVALID_MAP);
 }
 
 
