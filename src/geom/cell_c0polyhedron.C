@@ -18,7 +18,6 @@
 // Local includes
 #include "libmesh/cell_c0polyhedron.h"
 
-#include "libmesh/enum_elem_quality.h"
 #include "libmesh/enum_io_package.h"
 #include "libmesh/enum_order.h"
 #include "libmesh/face_polygon.h"
@@ -950,35 +949,6 @@ void C0Polyhedron::retriangulate()
       }
     }
   }
-}
-
-
-
-std::pair<Real, Real> C0Polyhedron::qual_bounds (const ElemQuality q) const
-{
-  std::pair<Real, Real> bounds;
-
-  switch (q)
-    {
-    case MAX_DIHEDRAL_ANGLE:
-      bounds.first  = 60.;
-      bounds.second = 90.;
-      break;
-
-    case MIN_DIHEDRAL_ANGLE:
-      bounds.first  = 30.;
-      bounds.second = 90.;
-      break;
-
-    default:
-      // No suggested range has yet been established for this metric
-      // on general polyhedra.
-      libMesh::out << "Warning: Invalid quality measure chosen." << std::endl;
-      bounds.first  = -1;
-      bounds.second = -1;
-    }
-
-  return bounds;
 }
 
 
