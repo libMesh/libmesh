@@ -2,10 +2,13 @@
 Adapted from https://github.com/forrestchang/andrej-karpathy-skills
 Licensed under the MIT License.
 
-Section 9, and the process-narration rule in section 4, are adapted from the "Writing PETSc
-Contribution Materials" section of PETSc's AGENTS.md (https://gitlab.com/petsc/petsc).
+Section 9, and the self-explanatory-code and process-narration rules in section 4, are
+adapted from the "Writing PETSc Contribution Materials" section of PETSc's AGENTS.md
+(https://gitlab.com/petsc/petsc).
 Copyright (c) 1991-2025, UChicago Argonne, LLC and the PETSc Developers and Contributors.
 Licensed under the BSD 2-Clause License.
+
+The full license texts are in AGENTS.md.LICENSE.
 -->
 
 # AGENTS.md
@@ -77,7 +80,8 @@ that request requires.
 ## 4. Code Comments
 
 - Never delete correct preexisting code comments.
-- Add comments when the code alone does not make clear what's happening.
+- Prefer self-explanatory code. Add comments for non-obvious behavior,
+  correctness constraints, rationale, or required documentation.
 - Explain every non-obvious numeric value, including tolerances, with a nearby
   comment that records its source or rationale rather than merely restating it.
 - Add Doxygen comments for classes and class members whose purpose is not
@@ -91,12 +95,12 @@ that request requires.
 - Use `make_range` for integer range-based for loops (e.g. `for (const auto i :
   make_range(n))`) instead of raw index loops. Use `index_range(container)`
   when iterating over the indices of a container. But don't use `make_range`
-  in Kokkos functions or any other device functons.
+  in Kokkos functions or any other device functions.
 - Use `libmesh_map_find` for map lookups instead of `.at()`.
 - libMesh requires C++17, so modern C++ constructs up through that standard are
   encouraged where they increase code readability. Along those lines, when a member
   of a structured binding is unused, bind it as `_` instead of avoiding the structured
-  binding solely because a member is unused.
+  binding solely because a member is unused. C++17 allows only one `_` per scope.
 - Put multiline method implementations outside class definitions.
 
 ## 6. Tool Use
@@ -104,11 +108,19 @@ that request requires.
 - Prefer builtin tools over bash commands whenever possible in the vein of
   reducing permission prompting.
 - Before building or performing verification, including running tests or
-  invoking a pre-existing libMesh executable, ask the user whether their libMesh
-  build environment uses conda unless this has already been established in the
-  conversation. If it does, ask which conda environment to activate and wait
-  for the answer before running the command; do not use an existing binary or
-  current shell state as a shortcut around this check.
+  invoking a pre-existing example, unit-test, or utility binary, ask the user
+  how their libMesh build environment is set up (e.g. a conda environment, environment modules,
+  `PETSC_DIR`/`PETSC_ARCH`) unless this has already been established in the
+  conversation, and wait for the answer before running the command; do not use
+  an existing binary or current shell state as a shortcut around this check.
+- When adding or removing a source or header file, regenerate the
+  automatically maintained file lists by running `./rebuild_include_HEADERS.sh`
+  in `include/`, `./rebuild_makefile.sh` in `include/libmesh/`, and
+  `./rebuild_libmesh_SOURCES.sh` in `src/`, and commit the resulting
+  `include/include_HEADERS`, `include/libmesh/Makefile.am`, and
+  `src/libmesh_SOURCES` changes. Then run `./bootstrap` from the top-level
+  directory, which requires the autotools versions it checks for, and commit the
+  regenerated `Makefile.in` files in a separate "Re-bootstrap" commit.
 
 ## 7. Unit Test Coverage
 
@@ -164,8 +176,6 @@ not govern unrelated conversations or prescribe the user's conversational style.
   presenting.
 - Use the vocabulary a libMesh developer would use, and avoid stock phrasing that reads as
   machine-drafted. "bit-for-bit" is one such tell; say that results are unchanged.
-- Prefer self-explanatory code, using comments for non-obvious behavior, correctness
-  constraints, rationale, or required documentation, as described in Code Comments above.
 
 ---
 
