@@ -577,7 +577,7 @@ void DynaIO::read_mesh(std::istream & in)
   // calculated from multiple neighboring elements.
   std::map<std::vector<std::pair<dof_id_type, Real>>, Node *> local_nodes;
 
-  auto & constraint_rows = mesh.get_constraint_rows();
+  auto & constraint_rows = mesh.set_constraint_rows();
 
   for (auto block_num : make_range(n_elem_blocks))
     {

@@ -1942,6 +1942,9 @@ public:
   const constraint_rows_type & get_constraint_rows() const
   { return _constraint_rows; }
 
+  constraint_rows_type & set_constraint_rows()
+  { return _constraint_rows; }
+
   dof_id_type n_constraint_rows() const;
 
   /**
