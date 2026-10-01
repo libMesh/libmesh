@@ -677,7 +677,7 @@ void ExodusII_IO::read (const std::string & fname)
             }
           else // We have Bezier Extraction data
             {
-              auto & constraint_rows = mesh.get_constraint_rows();
+              auto & constraint_rows = mesh.set_constraint_rows();
 
               const DynaIO::ElementDefinition & dyna_elem_defn =
                 DynaIO::find_elem_definition(elem->type(),
