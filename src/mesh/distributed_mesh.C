@@ -348,6 +348,8 @@ void DistributedMesh::update_parallel_id_counts()
   this->set_next_unique_ids(this->parallel_max_unique_id());
 #endif
 
+  this->count_constraint_rows();
+
   this->_preparation.has_synched_id_counts = true;
 }
 

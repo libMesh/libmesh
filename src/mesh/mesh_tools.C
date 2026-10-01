@@ -930,7 +930,7 @@ dof_id_type n_connected_components(const MeshBase & mesh,
       }
   };
 
-  auto & constraint_rows = mesh.get_constraint_rows();
+  const auto & constraint_rows = mesh.get_constraint_rows();
 
   for (const auto & elem : mesh.element_ptr_range())
     {
@@ -1224,10 +1224,10 @@ void clear_spline_nodes(MeshBase & mesh)
 
   for (auto & elem : mesh.element_ptr_range())
     if (elem->type() == NODEELEM &&
-        elem->mapping_type() == RATIONAL_BERNSTEIN_MAP)
+        elem->mapping_type() == INVALID_MAP)
       nodeelem_to_delete.push_back(elem);
 
-  auto & constraint_rows = mesh.get_constraint_rows();
+  auto & constraint_rows = mesh.set_constraint_rows();
 
   // All our constraint_rows ought to be for spline constraints we're
   // about to get rid of.
@@ -1237,7 +1237,7 @@ void clear_spline_nodes(MeshBase & mesh)
       {
         const Elem * elem = pr.first.first;
         libmesh_assert(elem->type() == NODEELEM);
-        libmesh_assert(elem->mapping_type() == RATIONAL_BERNSTEIN_MAP);
+        libmesh_assert(elem->mapping_type() == INVALID_MAP);
       }
 #endif
 

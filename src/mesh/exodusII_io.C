@@ -418,6 +418,10 @@ void ExodusII_IO::read (const std::string & fname)
           elem->set_node(0, added_node);
           Elem * added_elem = mesh.add_elem(std::move(elem));
           spline_nodeelem_ptrs[added_node] = added_elem;
+
+          // We should never be trying to assemble on the new
+          // spline nodes!
+          added_elem->set_mapping_type(INVALID_MAP);
         }
     }
 
@@ -677,7 +681,7 @@ void ExodusII_IO::read (const std::string & fname)
             }
           else // We have Bezier Extraction data
             {
-              auto & constraint_rows = mesh.get_constraint_rows();
+              auto & constraint_rows = mesh.set_constraint_rows();
 
               const DynaIO::ElementDefinition & dyna_elem_defn =
                 DynaIO::find_elem_definition(elem->type(),

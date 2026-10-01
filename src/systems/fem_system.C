@@ -40,6 +40,16 @@ using namespace libMesh;
 typedef Threads::spin_mutex femsystem_mutex;
 femsystem_mutex assembly_mutex;
 
+bool is_spline_nodeelem(const Elem & elem,
+                        const System & libmesh_dbg_var(sys))
+{
+  libmesh_assert((elem.mapping_type() != INVALID_MAP) ||
+                 (elem.type() == NODEELEM &&
+                  sys.get_mesh().n_constraint_rows()));
+  return (elem.mapping_type() == INVALID_MAP);
+}
+
+
 void assemble_unconstrained_element_system(const FEMSystem & _sys,
                                            const bool _get_jacobian,
                                            const bool _constrain_heterogeneously,
@@ -401,11 +411,20 @@ public:
 
     for (const auto & elem : range)
       {
-        _femcontext.pre_fe_reinit(_sys, elem);
-        _femcontext.elem_fe_reinit();
+        const bool is_spline = is_spline_nodeelem(*elem, _sys);
 
-        assemble_unconstrained_element_system
-          (_sys, _get_jacobian, _constrain_heterogeneously, _femcontext);
+        _femcontext.pre_fe_reinit(_sys, elem);
+
+        // If we're on a spline node then we shouldn't be integrating,
+        // but we may have Dirichlet constraints that need to be added
+        // to the global system.
+        if (!is_spline)
+          {
+            _femcontext.elem_fe_reinit();
+
+            assemble_unconstrained_element_system
+              (_sys, _get_jacobian, _constrain_heterogeneously, _femcontext);
+          }
 
         add_element_system
           (_sys, _get_residual, _get_jacobian,
@@ -440,6 +459,9 @@ public:
 
     for (const auto & elem : range)
       {
+        if (is_spline_nodeelem(*elem, _sys))
+          continue;
+
         _femcontext.pre_fe_reinit(_sys, elem);
 
         // Optionally initialize all the interior FE objects on elem.
@@ -517,6 +539,9 @@ public:
 
     for (const auto & elem : range)
       {
+        if (is_spline_nodeelem(*elem, _sys))
+          continue;
+
         _femcontext.pre_fe_reinit(_sys, elem);
 
         // We might have some heterogenous dofs here; let's see for
@@ -654,6 +679,13 @@ public:
 
     for (const auto & elem : range)
       {
+        // Getting constraints right on spline nodes can be tricky and
+        // I don't want to just add code for the trickier QoI
+        // derivative case without having test coverage first.
+        if (is_spline_nodeelem(*elem, _sys) &&
+            _apply_constraints)
+          libmesh_not_implemented();
+
         _femcontext.pre_fe_reinit(_sys, elem);
 
         // We might have some heterogenous dofs here; let's see for
