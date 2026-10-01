@@ -1945,7 +1945,7 @@ public:
   { return _constraint_rows; }
 
   constraint_rows_type & set_constraint_rows()
-  { return _constraint_rows; }
+  { _preparation.has_cached_elem_data = false; return _constraint_rows; }
 
   /**
    * Returns how many total constraint rows we have.  This is cached data,
