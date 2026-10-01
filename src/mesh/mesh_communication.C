@@ -500,7 +500,11 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
   std::map<processor_id_type, std::vector<const Elem *>> all_elems_to_send;
 
   // We may need to send constraint rows too.
-  auto & constraint_rows = mesh.set_constraint_rows();
+  //
+  // We know we're not changing n_constraint_rows(), so we're using
+  // friend class status here rather than using the setter that
+  // invalidates caches.
+  auto & constraint_rows = mesh._constraint_rows;
   bool have_constraint_rows = !constraint_rows.empty();
   mesh.comm().broadcast(have_constraint_rows);
 
@@ -1226,7 +1230,12 @@ void MeshCommunication::broadcast (MeshBase & mesh) const
   // don't want to send these along with constrained nodes (like we
   // send boundary info for those nodes) because the associated rows'
   // elements may not exist at that point.
-  auto & constraint_rows = mesh.set_constraint_rows();
+  //
+  // We know we're not changing n_constraint_rows(), so we're using
+  // friend class status here rather than using the setter that
+  // invalidates caches.
+  auto & constraint_rows = mesh._constraint_rows;
+
   bool have_constraint_rows = !constraint_rows.empty();
   mesh.comm().broadcast(have_constraint_rows);
   if (have_constraint_rows)
@@ -1365,7 +1374,11 @@ void MeshCommunication::gather (const processor_id_type root_id, MeshBase & mesh
   // don't want to send these along with constrained nodes (like we
   // send boundary info for those nodes) because the associated rows'
   // elements may not exist at that point.
-  auto & constraint_rows = mesh.set_constraint_rows();
+  //
+  // We know we're not changing n_constraint_rows(), so we're using
+  // friend class status here rather than using the setter that
+  // invalidates caches.
+  auto & constraint_rows = mesh._constraint_rows;
   bool have_constraint_rows = !constraint_rows.empty();
   mesh.comm().max(have_constraint_rows);
   if (have_constraint_rows)
