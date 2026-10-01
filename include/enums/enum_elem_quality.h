@@ -52,7 +52,8 @@ enum ElemQuality : int {
                   EDGE_LENGTH_RATIO,
                   MAX_DIHEDRAL_ANGLE,
                   MIN_DIHEDRAL_ANGLE,
-                  SCALED_JACOBIAN};
+                  SCALED_JACOBIAN,
+                  SKEW_ANGLE};
 }
 
 #endif

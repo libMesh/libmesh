@@ -346,7 +346,6 @@ std::pair<Real, Real> Tri::qual_bounds (const ElemQuality q) const
       bounds.second = 1.3;
       break;
 
-    case JACOBIAN:
     case SCALED_JACOBIAN:
       bounds.first  = 0.5;
       bounds.second = 1.155;
@@ -364,7 +363,7 @@ std::pair<Real, Real> Tri::qual_bounds (const ElemQuality q) const
       break;
 
     default:
-      libMesh::out << "Warning: Invalid quality measure chosen." << std::endl;
+      libmesh_warning("Invalid quality measure chosen.");
       bounds.first  = -1;
       bounds.second = -1;
     }

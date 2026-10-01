@@ -303,14 +303,13 @@ std::pair<Real, Real> Tet::qual_bounds (const ElemQuality q) const
       bounds.second = 1.;
       break;
 
-    case JACOBIAN:
     case SCALED_JACOBIAN:
       bounds.first  = 0.5;
       bounds.second = 1.414;
       break;
 
     default:
-      libMesh::out << "Warning: Invalid quality measure chosen." << std::endl;
+      libmesh_warning("Invalid quality measure chosen.");
       bounds.first  = -1;
       bounds.second = -1;
     }

@@ -23,11 +23,17 @@
 // Local includes
 #include "libmesh/libmesh_common.h"
 
+// C++ includes
+#include <memory>
+#include <utility>
+#include <vector>
+
 namespace libMesh
 {
 
 // forward declarations
 class Elem;
+class Node;
 enum ElemType : int;
 
 /**
@@ -45,6 +51,21 @@ namespace ReferenceElem
  * the user-requested type.
  */
 const Elem & get (const ElemType type_in);
+
+/**
+ * \returns A freshly built "ideal" (regular) element of the given type,
+ * i.e. the optimally-shaped element that a mesh optimizer targets: an
+ * equilateral triangle, regular tetrahedron, etc., sized to the volume
+ * of the reference element. For element types that have no distinct
+ * ideal shape (e.g. quads and hexes, whose reference element is already
+ * regular), this returns a copy of the reference element.
+ *
+ * The returned Elem holds pointers into the returned Nodes, so the
+ * caller must keep the Node vector alive for at least as long as the
+ * Elem.
+ */
+std::pair<std::unique_ptr<Elem>, std::vector<std::unique_ptr<Node>>>
+ideal_target (const ElemType type);
 
 } // namespace ReferenceElem
 
