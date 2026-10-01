@@ -143,7 +143,7 @@ Node * MeshRefinement::add_node(Elem & parent,
                                 unsigned int node,
                                 processor_id_type proc_id)
 {
-  LOG_SCOPE("add_node()", "MeshRefinement");
+  LOG_SCOPE_NO_NVTX("add_node()", "MeshRefinement");
 
   unsigned int parent_n = parent.as_parent_node(child, node);
 

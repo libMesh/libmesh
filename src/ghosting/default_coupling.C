@@ -76,7 +76,7 @@ void DefaultCoupling::operator()
    processor_id_type p,
    map_type & coupled_elements)
 {
-  LOG_SCOPE("operator()", "DefaultCoupling");
+  LOG_SCOPE_NO_NVTX("operator()", "DefaultCoupling");
 
   // Let us not do assertion at this moment for API upgrade.
   // There is a functor inside of ElementSideNeighborLayers.
