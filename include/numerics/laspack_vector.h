@@ -313,13 +313,15 @@ LaspackVector<T>::~LaspackVector ()
 template <typename T>
 inline
 void LaspackVector<T>::init (const numeric_index_type n,
-                             const numeric_index_type libmesh_dbg_var(n_local),
+                             const numeric_index_type n_local,
                              const bool fast,
                              const ParallelType)
 {
   // Laspack vectors only for serial cases,
   // but can provide a "parallel" vector on one processor.
-  libmesh_assert_equal_to (n, n_local);
+  bool serial = (n == n_local);
+  this->comm().min(serial);
+  libmesh_error_msg_if(!serial, "Error: LaspackVectors can only be used in serial!");
 
   this->_type = SERIAL;
 
