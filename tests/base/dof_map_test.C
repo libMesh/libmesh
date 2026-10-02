@@ -433,7 +433,12 @@ public:
 
     // Test that computing the values constrains nothing
     CPPUNIT_ASSERT_EQUAL(n_constrained, dof_map.n_constrained_dofs());
-    CPPUNIT_ASSERT(!values.empty());
+
+    // A processor whose local elements are all interior has no values,
+    // so check the total across processors
+    std::size_t n_values = values.size();
+    mesh.comm().sum(n_values);
+    CPPUNIT_ASSERT(n_values);
 
     // Test that the values are coefficients in the hierarchic basis:
     // loading them into the solution reproduces the boundary function
