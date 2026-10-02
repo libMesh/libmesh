@@ -2397,7 +2397,7 @@ Real fe_hierarchic_3D_shape(const Elem * elem,
                 for (unsigned int n=2; n <= basisorder; ++n)
                   basisfactorial *= n;
 
-                return std::pow(edgenumerator, basisorder) / basisfactorial;
+                return flip * std::pow(edgenumerator, basisorder) / basisfactorial;
               }
 
             const Real edgeval = edgenumerator / crossval;
