@@ -466,7 +466,12 @@ void parallel_reduce (const Range & range, Body & body,
 
   // Join them all down to the original Body
   for (unsigned int i=actual_threads-1; i != 0; i--)
+  {
     bodies[i-1]->join(*bodies[i]);
+
+    // Free data ASAP lest we have O(actual_threads^2) at the end
+    managed_bodies[i].reset();
+  }
 }
 
 /**
