@@ -1576,6 +1576,21 @@ fe_hierarchic_quad_tensor_indices (const Elem * elem,
                                    const unsigned int i);
 
 /**
+ * \returns The HIERARCHIC edge function of order \p basisorder (greater than one) on edge \p e of
+ * the triangle or tetrahedron \p elem, where \p zeta0 and \p zeta1 are the barycentric coordinates
+ * of the edge's first and second vertices. With \f$c = \zeta_0 + \zeta_1\f$ and
+ * \f$n = \zeta_1 - \zeta_0\f$ this is \f$c^p L_p(n/c)\f$, \f$L_p\f$ being the one-dimensional
+ * bubble of order \f$p\f$, negated for odd \f$p\f$ on a positively oriented edge so that the
+ * elements sharing the edge agree on it.
+ */
+Real fe_hierarchic_simplex_edge_shape (const Elem & elem,
+                                       const unsigned int e,
+                                       const Real zeta0,
+                                       const Real zeta1,
+                                       const unsigned int basisorder,
+                                       const Order totalorder);
+
+/**
  * \returns The factor scaling the \p i'th (\p i > 1) one-dimensional HIERARCHIC bubble,
  * \f$\xi^i - 1\f$ for even \p i or \f$\xi^i - \xi\f$ for odd \p i, to unit \f$H^1\f$ seminorm on
  * \f$[-1,1]\f$: the reciprocal of \f$i\sqrt{2/(2i-1)}\f$ (even) or \f$(i-1)\sqrt{2/(2i-1)}\f$ (odd).
