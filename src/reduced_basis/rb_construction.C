@@ -1213,6 +1213,13 @@ Real RBConstruction::train_reduced_basis_with_greedy(const bool resize_rb_eval_d
 {
   LOG_SCOPE("train_reduced_basis_with_greedy()", "RBConstruction");
 
+  // Make sure we clear the "untransformed basis functions" if we're training
+  // a new RB basis. We need to do this here since we store the untransformed
+  // basis functions in RBConstruction, as opposed to the standard basis functions,
+  // which are stored in RBEvaluation.
+  if (store_untransformed_basis && (get_rb_evaluation().get_n_basis_functions() == 0))
+    _untransformed_basis_functions.clear();
+
   int count = 0;
 
   RBEvaluation & rbe = get_rb_evaluation();
@@ -1424,6 +1431,13 @@ void RBConstruction::enrich_basis_from_rhs_terms(const bool resize_rb_eval_data)
 
 void RBConstruction::train_reduced_basis_with_POD()
 {
+  // Make sure we clear the "untransformed basis functions" if we're training
+  // a new RB basis. We need to do this here since we store the untransformed
+  // basis functions in RBConstruction, as opposed to the standard basis functions,
+  // which are stored in RBEvaluation.
+  if (store_untransformed_basis && (get_rb_evaluation().get_n_basis_functions() == 0))
+    _untransformed_basis_functions.clear();
+
   // We need to use the same training set on all processes so that
   // the truth solves below work correctly in parallel.
   libmesh_error_msg_if(!serial_training_set, "We must use a serial training set with POD");
