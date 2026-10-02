@@ -3,6 +3,9 @@
 #ifdef LIBMESH_HAVE_EIGEN
 
 #include "numeric_vector_test.h"
+#include "test_comm.h"
+
+#include <regex>
 
 
 using namespace libMesh;
@@ -29,6 +32,35 @@ public:
 
   void tearDown() {}
 
+  void testDistributedInit()
+  {
+    LOG_UNIT_TEST;
+
+    const numeric_index_type n = 10;
+
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+    if (TestCommWorld->size() > 1)
+      {
+        const std::string expected = "EigenSparseVectors can only be used in serial";
+        bool threw = false;
+        try
+          {
+            EigenSparseVector<Number> distributed(*TestCommWorld, n, TestCommWorld->rank() ? 0 : n);
+          }
+        catch (libMesh::LogicError & e)
+          {
+            CPPUNIT_ASSERT_MESSAGE(e.what(), std::regex_search(e.what(), std::regex(expected)));
+            threw = true;
+          }
+        CPPUNIT_ASSERT_MESSAGE("Expected an error containing \"" + expected + "\"", threw);
+      }
+#endif
+
+    // A vector that every rank holds whole is serial in effect
+    EigenSparseVector<Number> replicated(*TestCommWorld, n, n);
+    CPPUNIT_ASSERT_EQUAL(n, replicated.local_size());
+  }
+
   EigenSparseVectorTest() :
     NumericVectorTest<EigenSparseVector<Number>>() {
     if (unitlog->summarized_logs_enabled())
@@ -42,6 +74,7 @@ public:
   NUMERICVECTORTEST
   CPPUNIT_TEST( testSubvectors );
   CPPUNIT_TEST( testSubvectorsBase );
+  CPPUNIT_TEST( testDistributedInit );
 
   CPPUNIT_TEST_SUITE_END();
 };
