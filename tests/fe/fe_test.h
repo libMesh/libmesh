@@ -28,7 +28,9 @@
   CPPUNIT_TEST( testRefspaceNodes );            \
   CPPUNIT_TEST( testU );                        \
   CPPUNIT_TEST( testPartitionOfUnity );         \
+  CPPUNIT_TEST( testUPastVertices );            \
   CPPUNIT_TEST( testGradU );                    \
+  CPPUNIT_TEST( testGradUPastVertices );        \
   CPPUNIT_TEST( testGradUComp );                \
   CPPUNIT_TEST( testHessU );                    \
   CPPUNIT_TEST( testHessUComp );                \
@@ -284,7 +286,7 @@ protected:
   std::unique_ptr<FEBase> _fe;
   std::unique_ptr<QGauss> _qrule;
 
-  Real _value_tol, _grad_tol, _hess_tol;
+  Real _value_tol, _grad_tol, _hess_tol, _past_vertex_tol_factor;
 
 
   static RealGradient true_gradient(Point p)
@@ -587,6 +589,10 @@ public:
 
     this->_hess_tol = sqrt(TOLERANCE); // FIXME: we see some ~1e-5 errors?!?
 
+    // Shape functions grow outside the element, and with them the rounding error in the
+    // solution there, so evaluations past the vertices get looser tolerances
+    this->_past_vertex_tol_factor = 10;
+
     // Prerequest everything we'll want to calculate later.
     _fe->get_phi();
     _fe->get_dphi();
@@ -667,6 +673,57 @@ public:
             f(p);
           }
 #endif // LIBMESH_ENABLE_EXCEPTIONS
+  }
+
+  // Evaluates at points just past each vertex, offset from it in the direction of each edge.
+  // Most of these lie outside the element, where shape functions are still evaluated by
+  // imprecise point queries and finite-difference derivatives, so the polynomial extension of
+  // the solution must still match the exact solution there. Offsets along edges away from the
+  // vertex also reach the loci where simplex edge functions switch to a limiting expression:
+  // on a triangle, the line through a vertex parallel to the opposite edge, and on a
+  // tetrahedron, the plane through an edge parallel to the opposite edge.
+  template <typename Functor>
+  void testPastVerticesLoop(Functor f)
+  {
+    // Handle the "more processors than elements" case
+    if (!this->_elem)
+      return;
+
+    // We don't have reference elements for these
+    if (this->_elem->infinite() || this->_elem->runtime_topology())
+      return;
+
+    // Reference vertices have coordinates of 0 and +/-1, so with a power of two offset the
+    // barycentric coordinates of each point, and their sums and differences, are computed
+    // exactly. A combination which vanishes on a point is then evaluated as exactly zero.
+    const Real delta = 0.25;
+
+    // An edge element is its own edge
+    std::vector<std::pair<unsigned int, unsigned int>> edges;
+    if (this->_dim == 1)
+      edges.emplace_back(0, 1);
+    for (const auto e : this->_elem->edge_index_range())
+      edges.emplace_back(this->_elem->local_edge_node(e, 0),
+                         this->_elem->local_edge_node(e, 1));
+
+    for (const auto v : make_range(this->_elem->n_vertices()))
+      {
+        // Shape functions are singular at, and on a plane through, a singular node
+        if (this->_elem->is_singular_node(v))
+          continue;
+
+        for (const auto & [a, b] : edges)
+          for (const Real sign : {Real(-1), Real(1)})
+            {
+              const Point master_p = this->_elem->master_point(v) + sign * delta *
+                (this->_elem->master_point(b) - this->_elem->master_point(a));
+
+              std::vector<Point> master_points(1, master_p);
+              this->_fe->reinit(this->_elem, &master_points);
+
+              f(FEMap::map(this->_dim, this->_elem, master_p));
+            }
+      }
   }
 
   void testRefspaceNodes()
@@ -815,11 +872,11 @@ public:
       this->_fe->is_hierarchic());
   }
 
-  void testU()
+  // Returns a functor which compares the solution value at the point reinit() was last called
+  // on with the exact value at p
+  auto checkU(const Real tol)
   {
-    LOG_UNIT_TEST;
-
-    auto f = [this](Point p)
+    return [this, tol](Point p)
       {
         Parameters dummy;
 
@@ -841,10 +898,20 @@ public:
         else
           true_u = p(0) + 0.25*p(1) + 0.0625*p(2);
 
-        LIBMESH_ASSERT_NUMBERS_EQUAL (true_u, u, this->_value_tol);
+        LIBMESH_ASSERT_NUMBERS_EQUAL (true_u, u, tol);
       };
+  }
 
-    testLoop(f);
+  void testU()
+  {
+    LOG_UNIT_TEST;
+    testLoop(checkU(this->_value_tol));
+  }
+
+  void testUPastVertices()
+  {
+    LOG_UNIT_TEST;
+    testPastVerticesLoop(checkU(this->_past_vertex_tol_factor * this->_value_tol));
   }
 
   void testDualDoesntScreamAndDie()
@@ -863,11 +930,11 @@ public:
   }
 
 
-  void testGradU()
+  // Returns a functor which compares the solution gradient at the point reinit() was last called
+  // on with the exact gradient at p
+  auto checkGradU(const Real tol)
   {
-    LOG_UNIT_TEST;
-
-    auto f = [this](Point p)
+    return [this, tol](Point p)
       {
         Parameters dummy;
 
@@ -878,16 +945,26 @@ public:
         RealGradient true_grad = this->true_gradient(p);
 
         LIBMESH_ASSERT_NUMBERS_EQUAL
-          (grad_u(0), true_grad(0), this->_grad_tol);
+          (grad_u(0), true_grad(0), tol);
         if (this->_dim > 1)
           LIBMESH_ASSERT_NUMBERS_EQUAL
-           (grad_u(1), true_grad(1), this->_grad_tol);
+           (grad_u(1), true_grad(1), tol);
         if (this->_dim > 2)
           LIBMESH_ASSERT_NUMBERS_EQUAL
-           (grad_u(2), true_grad(2), this->_grad_tol);
+           (grad_u(2), true_grad(2), tol);
       };
+  }
 
-    testLoop(f);
+  void testGradU()
+  {
+    LOG_UNIT_TEST;
+    testLoop(checkGradU(this->_grad_tol));
+  }
+
+  void testGradUPastVertices()
+  {
+    LOG_UNIT_TEST;
+    testPastVerticesLoop(checkGradU(this->_past_vertex_tol_factor * this->_grad_tol));
   }
 
   void testGradUComp()
