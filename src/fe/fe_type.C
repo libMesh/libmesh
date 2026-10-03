@@ -19,6 +19,7 @@
 #include "libmesh/fe_type.h"
 #include "libmesh/quadrature_clough.h"
 #include "libmesh/quadrature_gauss.h"
+#include "libmesh/quadrature_gauss_lobatto.h"
 
 // C++ Includes
 #include <memory>
@@ -44,6 +45,22 @@ FEType::default_quadrature_rule (const unsigned int dim,
 
   if (family == SUBDIVISION)
     return std::make_unique<QGauss>(dim, static_cast<Order>(1 + extraorder));
+
+  // The Gauss-Lobatto nodal bases interpolate at the points of the Gauss-Lobatto rule of
+  // their own order, so that rule is the one they are collocated with: it makes their mass
+  // matrix diagonal and asks nothing to evaluate their shape functions. A rule of n points
+  // is exact through degree 2n-3, so the order that yields the p+1 points a basis of degree
+  // p interpolates at is 2p-1. An extraorder carries past that, which buys accuracy on the
+  // integrands a Gauss-Lobatto rule of p+1 points does not reach and gives up collocation.
+  //
+  // A p refined element keeps the pairing: QBase raises the order of a rule by twice the
+  // p_level it is initialized with, and 2p-1 rises by two for each degree, so the rule on an
+  // element of level l carries the p+l+1 points that the basis of degree p+l interpolates at.
+  if (family == L2_LAGRANGE_GLL || family == LAGRANGE_GLL)
+    {
+      const int p = static_cast<int>(order.get_order());
+      return std::make_unique<QGaussLobatto>(dim, static_cast<Order>(2*p - 1 + extraorder));
+    }
 
   return std::make_unique<QGauss>(dim, static_cast<Order>(this->default_quadrature_order() + extraorder));
 }
