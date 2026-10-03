@@ -21,8 +21,7 @@
 #include "libmesh/elem.h"
 #include "libmesh/number_lookups.h"
 #include "libmesh/enum_to_string.h"
-#include "libmesh/cell_tet4.h" // We need edge_nodes_map + side_nodes_map
-#include "libmesh/cell_prism6.h"
+#include "libmesh/cell_tet4.h" // We need edge_nodes_map
 #include "libmesh/face_tri3.h" // Faster to construct these on the stack
 #include "libmesh/face_quad4.h"
 
@@ -36,12 +35,6 @@ using namespace libMesh;
 unsigned int cube_side(const Point & p);
 
 Point cube_side_point(unsigned int sidenum, const Point & interior_point);
-
-std::array<unsigned int, 4> oriented_prism_nodes(const Elem & elem,
-                                                 unsigned int face_num);
-
-std::array<unsigned int, 3> oriented_tet_nodes(const Elem & elem,
-                                               unsigned int face_num);
 
 template <FEFamily T>
 Real fe_hierarchic_3D_shape(const Elem * elem,
@@ -71,16 +64,6 @@ Real fe_hierarchic_3D_shape_second_deriv(const Elem * elem,
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
 #if LIBMESH_DIM > 2
-Point get_min_point(const Elem * elem,
-                    unsigned int a,
-                    unsigned int b,
-                    unsigned int c,
-                    unsigned int d)
-{
-  return std::min(std::min(elem->point(a),elem->point(b)),
-                  std::min(elem->point(c),elem->point(d)));
-}
-
 // Remap non-face-nodes based on point ordering
 template <unsigned int N_nodes>
 unsigned int remap_node(unsigned int n,
@@ -108,6 +91,8 @@ unsigned int remap_node(unsigned int n,
 
 
 void cube_remap(unsigned int & side_i,
+                const Elem & elem,
+                unsigned int sidenum,
                 const Elem & side,
                 unsigned int totalorder,
                 Point & sidep)
@@ -132,8 +117,12 @@ void cube_remap(unsigned int & side_i,
   // sides of a face!
   else
     {
-      unsigned int min_side_node = remap_node<4>(0, side, 0);
-      const bool flip = (side.point(min_side_node) < side.point((min_side_node+1)%4));
+      // The side numbers its nodes as the side node map of elem does.
+      // Rotate the least node to the origin, then flip about the
+      // diagonal through it if its lesser neighbor is its predecessor
+      const unsigned int orientation = elem.face_orientation(sidenum);
+      const unsigned int min_side_node = orientation / 2;
+      const bool flip = orientation % 2;
 
       switch (min_side_node) {
       case 0:
@@ -347,407 +336,40 @@ void cube_indices(const Elem * elem,
       if (elem->positive_edge_orientation(11))
         eta = -eta_saved;
     }
-  // Face 0
-  else if (i < 8 + 12*e + e*e)
-    {
-      unsigned int basisnum = i - 8 - 12*e;
-      i0 = square_number_row[basisnum] + 2;
-      i1 = square_number_column[basisnum] + 2;
-      i2 = 0;
-      const Point min_point = get_min_point(elem, 1, 2, 0, 3);
-
-      if (elem->point(0) == min_point)
-        if (elem->positive_face_orientation(0))
-          {
-            // Case 1
-            xi  = xi_saved;
-            eta = eta_saved;
-          }
-        else
-          {
-            // Case 2
-            xi  = eta_saved;
-            eta = xi_saved;
-          }
-
-      else if (elem->point(3) == min_point)
-        if (elem->positive_face_orientation(0))
-          {
-            // Case 3
-            xi  = -eta_saved;
-            eta = xi_saved;
-          }
-        else
-          {
-            // Case 4
-            xi  = xi_saved;
-            eta = -eta_saved;
-          }
-
-      else if (elem->point(2) == min_point)
-        if (elem->positive_face_orientation(0))
-          {
-            // Case 5
-            xi  = -xi_saved;
-            eta = -eta_saved;
-          }
-        else
-          {
-            // Case 6
-            xi  = -eta_saved;
-            eta = -xi_saved;
-          }
-
-      else if (elem->point(1) == min_point)
-        {
-          if (elem->positive_face_orientation(0))
-            {
-              // Case 7
-              xi  = eta_saved;
-              eta = -xi_saved;
-            }
-          else
-            {
-              // Case 8
-              xi  = -xi_saved;
-              eta = eta_saved;
-            }
-        }
-    }
-  // Face 1
-  else if (i < 8 + 12*e + 2*e*e)
-    {
-      unsigned int basisnum = i - 8 - 12*e - e*e;
-      i0 = square_number_row[basisnum] + 2;
-      i1 = 0;
-      i2 = square_number_column[basisnum] + 2;
-      const Point min_point = get_min_point(elem, 0, 1, 5, 4);
-
-      if (elem->point(0) == min_point)
-        if (!elem->positive_face_orientation(1))
-          {
-            // Case 1
-            xi   = xi_saved;
-            zeta = zeta_saved;
-          }
-        else
-          {
-            // Case 2
-            xi   = zeta_saved;
-            zeta = xi_saved;
-          }
-
-      else if (elem->point(1) == min_point)
-        if (!elem->positive_face_orientation(1))
-          {
-            // Case 3
-            xi   = zeta_saved;
-            zeta = -xi_saved;
-          }
-        else
-          {
-            // Case 4
-            xi   = -xi_saved;
-            zeta = zeta_saved;
-          }
-
-      else if (elem->point(5) == min_point)
-        if (!elem->positive_face_orientation(1))
-          {
-            // Case 5
-            xi   = -xi_saved;
-            zeta = -zeta_saved;
-          }
-        else
-          {
-            // Case 6
-            xi   = -zeta_saved;
-            zeta = -xi_saved;
-          }
-
-      else if (elem->point(4) == min_point)
-        {
-          if (!elem->positive_face_orientation(1))
-            {
-              // Case 7
-              xi   = -xi_saved;
-              zeta = zeta_saved;
-            }
-          else
-            {
-              // Case 8
-              xi   = xi_saved;
-              zeta = -zeta_saved;
-            }
-        }
-    }
-  // Face 2
-  else if (i < 8 + 12*e + 3*e*e)
-    {
-      unsigned int basisnum = i - 8 - 12*e - 2*e*e;
-      i0 = 1;
-      i1 = square_number_row[basisnum] + 2;
-      i2 = square_number_column[basisnum] + 2;
-      const Point min_point = get_min_point(elem, 1, 2, 6, 5);
-
-      if (elem->point(1) == min_point)
-        if (!elem->positive_face_orientation(2))
-          {
-            // Case 1
-            eta  = eta_saved;
-            zeta = zeta_saved;
-          }
-        else
-          {
-            // Case 2
-            eta  = zeta_saved;
-            zeta = eta_saved;
-          }
-
-      else if (elem->point(2) == min_point)
-        if (!elem->positive_face_orientation(2))
-          {
-            // Case 3
-            eta  = zeta_saved;
-            zeta = -eta_saved;
-          }
-        else
-          {
-            // Case 4
-            eta  = -eta_saved;
-            zeta = zeta_saved;
-          }
-
-      else if (elem->point(6) == min_point)
-        if (!elem->positive_face_orientation(2))
-          {
-            // Case 5
-            eta  = -eta_saved;
-            zeta = -zeta_saved;
-          }
-        else
-          {
-            // Case 6
-            eta  = -zeta_saved;
-            zeta = -eta_saved;
-          }
-
-      else if (elem->point(5) == min_point)
-        {
-          if (!elem->positive_face_orientation(2))
-            {
-              // Case 7
-              eta  = -zeta_saved;
-              zeta = eta_saved;
-            }
-          else
-            {
-              // Case 8
-              eta   = eta_saved;
-              zeta = -zeta_saved;
-            }
-        }
-    }
-  // Face 3
-  else if (i < 8 + 12*e + 4*e*e)
-    {
-      unsigned int basisnum = i - 8 - 12*e - 3*e*e;
-      i0 = square_number_row[basisnum] + 2;
-      i1 = 1;
-      i2 = square_number_column[basisnum] + 2;
-      const Point min_point = get_min_point(elem, 2, 3, 7, 6);
-
-      if (elem->point(3) == min_point)
-        if (elem->positive_face_orientation(3))
-          {
-            // Case 1
-            xi   = xi_saved;
-            zeta = zeta_saved;
-          }
-        else
-          {
-            // Case 2
-            xi   = zeta_saved;
-            zeta = xi_saved;
-          }
-
-      else if (elem->point(7) == min_point)
-        if (elem->positive_face_orientation(3))
-          {
-            // Case 3
-            xi   = -zeta_saved;
-            zeta = xi_saved;
-          }
-        else
-          {
-            // Case 4
-            xi   = xi_saved;
-            zeta = -zeta_saved;
-          }
-
-      else if (elem->point(6) == min_point)
-        if (elem->positive_face_orientation(3))
-          {
-            // Case 5
-            xi   = -xi_saved;
-            zeta = -zeta_saved;
-          }
-        else
-          {
-            // Case 6
-            xi   = -zeta_saved;
-            zeta = -xi_saved;
-          }
-
-      else if (elem->point(2) == min_point)
-        {
-          if (elem->positive_face_orientation(3))
-            {
-              // Case 7
-              xi   = zeta_saved;
-              zeta = -xi_saved;
-            }
-          else
-            {
-              // Case 8
-              xi   = -xi_saved;
-              zeta = zeta_saved;
-            }
-        }
-    }
-  // Face 4
-  else if (i < 8 + 12*e + 5*e*e)
-    {
-      unsigned int basisnum = i - 8 - 12*e - 4*e*e;
-      i0 = 0;
-      i1 = square_number_row[basisnum] + 2;
-      i2 = square_number_column[basisnum] + 2;
-      const Point min_point = get_min_point(elem, 3, 0, 4, 7);
-
-      if (elem->point(0) == min_point)
-        if (elem->positive_face_orientation(4))
-          {
-            // Case 1
-            eta  = eta_saved;
-            zeta = zeta_saved;
-          }
-        else
-          {
-            // Case 2
-            eta  = zeta_saved;
-            zeta = eta_saved;
-          }
-
-      else if (elem->point(4) == min_point)
-        if (elem->positive_face_orientation(4))
-          {
-            // Case 3
-            eta  = -zeta_saved;
-            zeta = eta_saved;
-          }
-        else
-          {
-            // Case 4
-            eta  = eta_saved;
-            zeta = -zeta_saved;
-          }
-
-      else if (elem->point(7) == min_point)
-        if (elem->positive_face_orientation(4))
-          {
-            // Case 5
-            eta  = -eta_saved;
-            zeta = -zeta_saved;
-          }
-        else
-          {
-            // Case 6
-            eta  = -zeta_saved;
-            zeta = -eta_saved;
-          }
-
-      else if (elem->point(3) == min_point)
-        {
-          if (elem->positive_face_orientation(4))
-            {
-              // Case 7
-              eta   = zeta_saved;
-              zeta = -eta_saved;
-            }
-          else
-            {
-              // Case 8
-              eta  = -eta_saved;
-              zeta = zeta_saved;
-            }
-        }
-    }
-  // Face 5
+  // Faces
   else if (i < 8 + 12*e + 6*e*e)
     {
-      unsigned int basisnum = i - 8 - 12*e - 5*e*e;
-      i0 = square_number_row[basisnum] + 2;
-      i1 = square_number_column[basisnum] + 2;
-      i2 = 1;
-      const Point min_point = get_min_point(elem, 4, 5, 6, 7);
+      const unsigned int face = (i - 8 - 12*e) / (e*e);
+      const unsigned int basisnum = (i - 8 - 12*e) % (e*e);
 
-      if (elem->point(4) == min_point)
-        if (!elem->positive_face_orientation(5))
+      // The face's own frame has its origin at the least vertex and its
+      // first axis toward that vertex's lesser neighbor, so every element
+      // sharing the face agrees on it. The origin sits at -1 along both
+      // axes, so the in-face coordinates are projections onto them.
+      const std::vector<unsigned int> v =
+        elem->oriented_face_vertices(face);
+      const Point origin = elem->master_point(v[0]);
+      const Point first = (elem->master_point(v[1]) - origin) / 2;
+      const Point second = (elem->master_point(v[3]) - origin) / 2;
+      const Point p_saved(xi_saved, eta_saved, zeta_saved);
+
+      Real * const coord[3] = {&xi, &eta, &zeta};
+      unsigned int * const index[3] = {&i0, &i1, &i2};
+
+      for (const auto d : make_range(3u))
+        if (first(d) != 0)
           {
-            // Case 1
-            xi  = xi_saved;
-            eta = eta_saved;
+            *index[d] = square_number_row[basisnum] + 2;
+            *coord[d] = p_saved * first;
+          }
+        else if (second(d) != 0)
+          {
+            *index[d] = square_number_column[basisnum] + 2;
+            *coord[d] = p_saved * second;
           }
         else
-          {
-            // Case 2
-            xi  = eta_saved;
-            eta = xi_saved;
-          }
-
-      else if (elem->point(5) == min_point)
-        if (!elem->positive_face_orientation(5))
-          {
-            // Case 3
-            xi  = eta_saved;
-            eta = -xi_saved;
-          }
-        else
-          {
-            // Case 4
-            xi  = -xi_saved;
-            eta = eta_saved;
-          }
-
-      else if (elem->point(6) == min_point)
-        if (!elem->positive_face_orientation(5))
-          {
-            // Case 5
-            xi  = -xi_saved;
-            eta = -eta_saved;
-          }
-        else
-          {
-            // Case 6
-            xi  = -eta_saved;
-            eta = -xi_saved;
-          }
-
-      else if (elem->point(7) == min_point)
-        {
-          if (!elem->positive_face_orientation(5))
-            {
-              // Case 7
-              xi  = -eta_saved;
-              eta = xi_saved;
-            }
-          else
-            {
-              // Case 8
-              xi  = xi_saved;
-              eta = eta_saved;
-            }
-        }
+          // The vertex mode that is 1 on this face
+          *index[d] = (origin(d) > 0);
     }
 
   // Internal DoFs
@@ -758,6 +380,27 @@ void cube_indices(const Elem * elem,
       i1 = cube_number_row[basisnum] + 2;
       i2 = cube_number_page[basisnum] + 2;
     }
+}
+
+
+// Order the barycentric coordinates of triangular prism face \p face_num
+// by the face's vertices. The triangle interior basis is not symmetric
+// in them, so both elements sharing the face must order them alike.
+void orient_triangle_coords(const Elem & elem,
+                            const unsigned int face_num,
+                            const Point & xi_eta_saved,
+                            Point & xi_eta)
+{
+  const std::vector<unsigned int> face_vertex =
+    elem.oriented_face_vertices(face_num);
+
+  const Real barycentric[3] = {1 - xi_eta_saved(0) - xi_eta_saved(1),
+                               xi_eta_saved(0),
+                               xi_eta_saved(1)};
+
+  // Face 0 holds vertices 0-2 and face 4 holds vertices 3-5
+  xi_eta(0) = barycentric[face_vertex[1] % 3];
+  xi_eta(1) = barycentric[face_vertex[2] % 3];
 }
 
 
@@ -830,310 +473,60 @@ void prism_indices(const Elem * elem,
       i01 = i - 3 - 6*e;
       i2 = 1;
     }
-  // Face 1, node 15 (*before* 0, via node 18 on prism20)
-  else if (i < 6 + 9*e + e*e)
-    {
-      unsigned int basisnum = i - 6 - 9*e;
-
-      // How wide is the stretch from one side to the other of the
-      // line in the xi-eta plane parallel to this face?
-      const Real xe_scale = 1 - xi_eta_saved(1);
-
-      // What percentage of the way along that stretch are we?
-      const Real xe_fraction = (xe_scale==0) ?
-        0 : xi_eta_saved(0)/xe_scale;
-
-      // indexes in edge numbering
-      unsigned int s0 = square_number_row[basisnum] + 2;
-      unsigned int s1 = square_number_column[basisnum] + 2;
-      const Point min_point = get_min_point(elem, 0, 1, 3, 4);
-
-      if (elem->point(0) == min_point)
-        {
-          if (!elem->positive_face_orientation(1))
-            {
-              // Case 1: no flips needed
-              i01 = s0+1; // edge to triangle side 0 numbering
-              i2 = s1;
-            }
-          else
-            {
-              // Case 2: flip about 0-4 diagonal
-              i01 = s1+1;
-              i2 = s0;
-              zeta = 2*xe_fraction-1;
-              xi_eta(0) = (zeta_saved+1)*xe_scale/2;
-            }
-        }
-      else if (elem->point(3) == min_point)
-        {
-          if (!elem->positive_face_orientation(1))
-            {
-              // Case 3: 0->3->4->1->0 rotation
-              i01 = s1+1;
-              i2 = s0;
-              zeta = 1-2*xe_fraction;
-              xi_eta(0) = (zeta_saved+1)*xe_scale/2;
-            }
-          else
-            {
-              // Case 4: flip about 9-10 midline
-              i01 = s0+1;
-              i2 = s1;
-              zeta = -zeta_saved;
-            }
-        }
-      else if (elem->point(1) == min_point)
-        {
-          if (!elem->positive_face_orientation(1))
-            {
-              // Case 5: 0->1->4->3->0 rotation
-              i01 = s1+1;
-              i2 = s0;
-              zeta = 2*xe_fraction-1;
-              xi_eta(0) = (1-zeta_saved)*xe_scale/2;
-            }
-          else
-            {
-              // Case 6: flip about 6-12 midline
-              i01 = s0+1;
-              i2 = s1;
-              xi_eta(0) = (1-xe_fraction)*xe_scale;
-            }
-        }
-      else if (elem->point(4) == min_point)
-        {
-          if (!elem->positive_face_orientation(1))
-            {
-              // Case 7: 180 degree rotation
-              i01 = s0+1;
-              i2 = s1;
-              xi_eta(0) = (1-xe_fraction)*xe_scale;
-              zeta = -zeta_saved;
-            }
-          else
-            {
-              // Case 8: flip about 1-3 diagonal
-              i01 = s1+1;
-              i2 = s0;
-              zeta = 1-2*xe_fraction;
-              xi_eta(0) = (1-zeta_saved)*xe_scale/2;
-            }
-        }
-    }
-  // Face 2, node 16
-  else if (i < 6 + 9*e + 2*e*e)
-    {
-      unsigned int basisnum = i - 6 - 9*e - e*e;
-
-      // How wide is the stretch from one side to the other of the
-      // line in the xi-eta plane parallel to this face?
-      const Real xe_scale = xi_eta_saved(0) + xi_eta_saved(1);
-
-      // What percentage of the way along that stretch are we?
-      const Real xe_fraction = (xe_scale==0) ?
-        0 : xi_eta_saved(0)/xe_scale;
-
-      // indexes in edge numbering
-      unsigned int s0 = square_number_row[basisnum] + 2;
-      unsigned int s1 = square_number_column[basisnum] + 2;
-      const Point min_point = get_min_point(elem, 1, 2, 4, 5);
-
-      if (elem->point(1) == min_point)
-        {
-          if (!elem->positive_face_orientation(2))
-            {
-              // Case 1: no flips needed
-              i01 = s0+1+3; // edge to triangle side 1 numbering
-              i2 = s1;
-            }
-          else
-            {
-              // Case 2: flip about 1-5 diagonal
-              i01 = s1+1+e;
-              i2 = s0;
-              zeta = 2*xe_fraction-1;
-              const Real xe = (zeta_saved+1)/2;
-              xi_eta(1) = xe*xe_scale;
-              xi_eta(0) = xe_scale - xi_eta(1);
-            }
-        }
-      else if (elem->point(4) == min_point)
-        {
-          if (!elem->positive_face_orientation(2))
-            {
-              // Case 3: 1->4->5->2->1 rotation
-              i01 = s1+1+e;
-              i2 = s0;
-              zeta = 1-2*xe_fraction;
-              const Real xe = (zeta_saved+1)/2;
-              xi_eta(1) = xe*xe_scale;
-              xi_eta(0) = xe_scale - xi_eta(1);
-            }
-          else
-            {
-              // Case 4: flip about 10-11 midline
-              i01 = s0+1+e;
-              i2 = s1;
-              zeta = -zeta_saved;
-            }
-        }
-      else if (elem->point(2) == min_point)
-        {
-          if (!elem->positive_face_orientation(2))
-            {
-              // Case 5: 1->2->5->4->1 rotation
-              i01 = s1+1+e;
-              i2 = s0;
-              zeta = 2*xe_fraction-1;
-              const Real xe = (1-zeta_saved)/2;
-              xi_eta(1) = xe*xe_scale;
-              xi_eta(0) = xe_scale - xi_eta(1);
-            }
-          else
-            {
-              // Case 6: flip about 7-13 midline
-              i01 = s0+1+e;
-              i2 = s1;
-              const Real xe = (1-xe_fraction);
-              xi_eta(1) = xe*xe_scale;
-              xi_eta(0) = xe_scale - xi_eta(1);
-            }
-        }
-      else if (elem->point(5) == min_point)
-        {
-          if (!elem->positive_face_orientation(2))
-            {
-              // Case 7: 180 degree rotation
-              i01 = s0+1+e;
-              i2 = s1;
-              zeta = -zeta_saved;
-              const Real xe = (1-xe_fraction);
-              xi_eta(1) = xe*xe_scale;
-              xi_eta(0) = xe_scale - xi_eta(1);
-            }
-          else
-            {
-              // Case 8: flip about 1-3 diagonal
-              i01 = s1+1+e;
-              i2 = s0;
-              zeta = 1-2*xe_fraction;
-              const Real xe = (1-zeta_saved)/2;
-              xi_eta(1) = xe*xe_scale;
-              xi_eta(0) = xe_scale - xi_eta(1);
-            }
-        }
-    }
-  // Face 3, node 17
+  // Faces 1, 2, 3 (nodes 15, 16, 17), the quadrilaterals
   else if (i < 6 + 9*e + 3*e*e)
     {
-      unsigned int basisnum = i - 6 - 9*e - 2*e*e;
-
-      // How wide is the stretch from one side to the other of the
-      // line in the xi-eta plane parallel to this face?
-      const Real xe_scale = 1 - xi_eta_saved(0);
-
-      // What percentage of the way along that stretch are we?
-      const Real xe_fraction = (xe_scale==0) ?
-        0 : (xe_scale - xi_eta_saved(1))/xe_scale;
+      const unsigned int face = (i - 6 - 9*e) / (e*e) + 1;
+      const unsigned int basisnum = (i - 6 - 9*e) % (e*e);
 
       // indexes in edge numbering
-      unsigned int s0 = square_number_row[basisnum] + 2;
-      unsigned int s1 = square_number_column[basisnum] + 2;
-      const Point min_point = get_min_point(elem, 0, 2, 3, 5);
+      const unsigned int s0 = square_number_row[basisnum] + 2;
+      const unsigned int s1 = square_number_column[basisnum] + 2;
 
-      if (elem->point(2) == min_point)
+      // The face's side node map runs along triangle edge face-1 from
+      // n0 to n1, then up to the top triangle and back. Its own frame has
+      // its origin at the least vertex and its first axis toward that
+      // vertex's lesser neighbor, so every element sharing the face
+      // agrees on it.
+      const unsigned int n0 = elem->local_side_node(face, 0),
+                         n1 = elem->local_side_node(face, 1);
+      const std::vector<unsigned int> v =
+        elem->oriented_face_vertices(face);
+
+      // The first axis runs along zeta: the edge takes the column mode
+      const bool swap = (v[0] < 3) != (v[1] < 3);
+      i01 = (swap ? s1 : s0) + 1 + (face-1)*e; // edge to triangle side numbering
+      i2 = swap ? s0 : s1;
+
+      // The origin is on the top triangle
+      if (v[0] >= 3)
+        zeta = -zeta_saved;
+
+      // The origin is at the far end of the edge: reflect the triangle by
+      // exchanging the barycentric coordinates of the edge's vertices
+      if (v[0] % 3 == n1 % 3)
         {
-          if (!elem->positive_face_orientation(3))
-            {
-              // Case 1: no flips needed
-              i01 = s0+1+2*e; // edge to triangle side 2 numbering
-              i2 = s1;
-            }
-          else
-            {
-              // Case 2: flip about 2-3 diagonal
-              i01 = s1+1+2*e;
-              i2 = s0;
-              zeta = 2*xe_fraction-1;
-              const Real xe = (zeta_saved+1)/2;
-              xi_eta(1) = xe_scale - xe*xe_scale;
-            }
-        }
-      else if (elem->point(5) == min_point)
-        {
-          if (!elem->positive_face_orientation(3))
-            {
-              // Case 3: 2->5->3->0->2 rotation
-              i01 = s1+1+2*e;
-              i2 = s0;
-              zeta = 1-2*xe_fraction;
-              const Real xe = (zeta_saved+1)/2;
-              xi_eta(1) = xe_scale - xe*xe_scale;
-            }
-          else
-            {
-              // Case 4: flip about 11-9 midline
-              i01 = s0+1+2*e;
-              i2 = s1;
-              zeta = -zeta_saved;
-            }
-        }
-      else if (elem->point(0) == min_point)
-        {
-          if (!elem->positive_face_orientation(3))
-            {
-              // Case 5: 2->0->3->5->2 rotation
-              i01 = s1+1+2*e;
-              i2 = s0;
-              zeta = 2*xe_fraction-1;
-              const Real xe = (1-zeta_saved)/2;
-              xi_eta(1) = xe_scale - xe*xe_scale;
-            }
-          else
-            {
-              // Case 6: flip about 8-14 midline
-              i01 = s0+1+2*e;
-              i2 = s1;
-              const Real xe = (1-xe_fraction);
-              xi_eta(1) = xe_scale - xe*xe_scale;
-            }
-        }
-      else if (elem->point(3) == min_point)
-        {
-          if (!elem->positive_face_orientation(3))
-            {
-              // Case 7: 180 degree rotation
-              i01 = s0+1+2*e;
-              i2 = s1;
-              zeta = -zeta_saved;
-              const Real xe = (1-xe_fraction);
-              xi_eta(1) = xe_scale - xe*xe_scale;
-            }
-          else
-            {
-              // Case 8: flip about 0-5 diagonal
-              i01 = s1+1+2*e;
-              i2 = s0;
-              zeta = 1-2*xe_fraction;
-              const Real xe = (1-zeta_saved)/2;
-              xi_eta(1) = xe_scale - xe*xe_scale;
-            }
+          Real barycentric[3] = {1 - xi_eta_saved(0) - xi_eta_saved(1),
+                                 xi_eta_saved(0),
+                                 xi_eta_saved(1)};
+          std::swap(barycentric[n0 % 3], barycentric[n1 % 3]);
+          xi_eta(0) = barycentric[1];
+          xi_eta(1) = barycentric[2];
         }
     }
   // Face 0, node 18 - node order due to hierarchic numbering
   else if (i < 6 + 9*e + 3*e*e + e*(e-1)/2)
     {
-      // The TRI code will handle any flips here
       i01 = i - 3 - 6*e - 3*e*e;
       i2 = 0;
+      orient_triangle_coords(*elem, 0, xi_eta_saved, xi_eta);
     }
   // Face 4
   else if (i < 6 + 9*e + 3*e*e + e*(e-1))
     {
-      // The TRI code will handle any flips here
       i01 = i - 3 - 6*e - 3*e*e - e*(e-1)/2;
       i2 = 1;
+      orient_triangle_coords(*elem, 4, xi_eta_saved, xi_eta);
     }
   // Internal DoFs
   else
@@ -1285,7 +678,7 @@ Real FE<3,SIDE_HIERARCHIC>::shape(const Elem * elem,
 
         Point sidep = cube_side_point(sidenum, p);
 
-        cube_remap(side_i, *side, totalorder, sidep);
+        cube_remap(side_i, *elem, sidenum, *side, totalorder, sidep);
 
         return FE<2,HIERARCHIC>::shape(side.get(), order, side_i, sidep, add_p_level);
       }
@@ -1332,8 +725,8 @@ Real FE<3,SIDE_HIERARCHIC>::shape(const Elem * elem,
         if (totalorder == 0)
           return 1;
 
-        const std::array<unsigned int, 3> face_vertex =
-          oriented_tet_nodes(*elem, face_num);
+        const std::vector<unsigned int> face_vertex =
+          elem->oriented_face_vertices(face_num);
 
         // We only need a Tri3 to evaluate L2_HIERARCHIC on the affine
         // master element
@@ -1435,13 +828,13 @@ Real FE<3,SIDE_HIERARCHIC>::shape(const Elem * elem,
         if (totalorder == 0)
           return 1;
 
-        const std::array<unsigned int, 4> face_vertex =
-          oriented_prism_nodes(*elem, face_num);
+        const std::vector<unsigned int> face_vertex =
+          elem->oriented_face_vertices(face_num);
 
         side->set_node(0, e.node_ptr(face_vertex[0]));
         side->set_node(1, e.node_ptr(face_vertex[1]));
         side->set_node(2, e.node_ptr(face_vertex[2]));
-        if (face_vertex[3] < 21)
+        if (face_vertex.size() > 3)
           side->set_node(3, e.node_ptr(face_vertex[3]));
 
         if (face_num == 0 || face_num == 4)
@@ -1640,7 +1033,7 @@ Real FE<3,SIDE_HIERARCHIC>::shape_deriv(const Elem * elem,
 
         Point sidep = cube_side_point(sidenum, p);
 
-        cube_remap(side_i, *side, totalorder, sidep);
+        cube_remap(side_i, *elem, sidenum, *side, totalorder, sidep);
 
         // What direction on the side corresponds to the derivative
         // direction we want?
@@ -1900,7 +1293,7 @@ Real FE<3,SIDE_HIERARCHIC>::shape_second_deriv(const Elem * elem,
 
         Point sidep = cube_side_point(sidenum, p);
 
-        cube_remap(side_i, *side, totalorder, sidep);
+        cube_remap(side_i, *elem, sidenum, *side, totalorder, sidep);
 
         // What second derivative or mixed derivative on the side
         // corresponds to the xi/eta/zeta mix we were asked for?
@@ -2166,84 +1559,6 @@ Point cube_side_point(unsigned int sidenum, const Point & p)
 }
 
 
-void orient_quad(const Elem & elem,
-                 std::array<unsigned int, 4> & face_vertex)
-{
-  // Sort the minimum point into face_vertex[0], the minimum of its
-  // neighbors into face_vertex[1].  Keep the other two consistent; we
-  // want to rotate or flip the quad but not to twist it.
-
-  const unsigned int min_pt =
-    std::min_element(face_vertex.begin(), face_vertex.end(),
-                     [&elem](auto v1, auto v2)
-                     {return elem.point(v1)<elem.point(v2);}) -
-    face_vertex.begin();
-
-  // Do we flip the quad?
-  if (elem.point(face_vertex[(min_pt+3)%4]) <
-      elem.point(face_vertex[(min_pt+1)%4]))
-    face_vertex = { face_vertex[min_pt], face_vertex[(min_pt+3)%4],
-                    face_vertex[(min_pt+2)%4], face_vertex[(min_pt+1)%4] };
-  else
-    face_vertex = { face_vertex[min_pt], face_vertex[(min_pt+1)%4],
-                    face_vertex[(min_pt+2)%4], face_vertex[(min_pt+3)%4] };
-}
-
-
-void orient_triangle(const Elem & elem,
-                     unsigned int * face_vertex)
-{
-  // Reorient nodes to account for flipping and rotation.
-  // We could try to identify indices with symmetric shape
-  // functions, to skip this in those cases, if we really
-  // need to optimize later.
-  //
-  // With only 3 items, we should bubble sort!
-  // Programming-for-MechE's class pays off!
-  bool lastcheck = true;
-  if (elem.point(face_vertex[0]) > elem.point(face_vertex[1]))
-    {
-      std::swap(face_vertex[0], face_vertex[1]);
-      lastcheck = true;
-    }
-  if (elem.point(face_vertex[1]) > elem.point(face_vertex[2]))
-    std::swap(face_vertex[1], face_vertex[2]);
-  if (lastcheck && elem.point(face_vertex[0]) > elem.point(face_vertex[1]))
-    std::swap(face_vertex[0], face_vertex[1]);
-}
-
-
-std::array<unsigned int, 4> oriented_prism_nodes(const Elem & elem,
-                                                 unsigned int face_num)
-{
-  std::array<unsigned int, 4> face_vertex
-    { Prism6::side_nodes_map[face_num][0],
-      Prism6::side_nodes_map[face_num][1],
-      Prism6::side_nodes_map[face_num][2],
-      Prism6::side_nodes_map[face_num][3] };
-
-  if (face_num > 0 && face_num < 4)
-    orient_quad(elem, face_vertex);
-  else
-    orient_triangle(elem, face_vertex.data());
-
-  return face_vertex;
-}
-
-
-std::array<unsigned int, 3> oriented_tet_nodes(const Elem & elem,
-                                               unsigned int face_num)
-{
-  std::array<unsigned int, 3> face_vertex
-    { Tet4::side_nodes_map[face_num][0],
-      Tet4::side_nodes_map[face_num][1],
-      Tet4::side_nodes_map[face_num][2] };
-
-  orient_triangle(elem, face_vertex.data());
-
-  return face_vertex;
-}
-
 
 template <FEFamily T>
 Real fe_hierarchic_3D_shape(const Elem * elem,
@@ -2338,7 +1653,7 @@ Real fe_hierarchic_3D_shape(const Elem * elem,
             if (i01 > 2 && i01 < 3u*totalorder)
               {
                 // %(p-1) to find the edge number, %2 for even vs odd
-                const bool odd_basis = ((i01-1)%(totalorder-1))%2;
+                const bool odd_basis = ((i01-3)%(totalorder-1))%2;
                 if (odd_basis)
                   {
                     const int tri_edge = (i01-3)/(totalorder-1);
@@ -2414,8 +1729,8 @@ Real fe_hierarchic_3D_shape(const Elem * elem,
             const int dofs_per_face = (totalorder - 1u) * (totalorder - 2u) / 2;
             const int face_num = (i - (6u*totalorder - 2u)) / dofs_per_face;
 
-            const std::array<unsigned int, 3> face_vertex =
-              oriented_tet_nodes(*elem, face_num);
+            const std::vector<unsigned int> face_vertex =
+              elem->oriented_face_vertices(face_num);
             const Real zeta0 = zeta[face_vertex[0]],
                        zeta1 = zeta[face_vertex[1]],
                        zeta2 = zeta[face_vertex[2]];
