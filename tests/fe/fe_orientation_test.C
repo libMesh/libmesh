@@ -36,10 +36,7 @@ public:
   void setUp()
   {
     _mesh = std::make_unique<Mesh>(*TestCommWorld);
-
-    const unsigned int dim = Elem::type_to_dim_map[elem_type];
-    MeshTools::Generation::build_cube(*_mesh, 2, 2, 2*(dim > 2),
-                                      0., 1., 0., 1., 0., 1., elem_type);
+    build_mesh();
 
     // An affine skew, so that no element symmetry masks a shape function following the wrong
     // entity, and so that inverse_map() is exact
@@ -49,6 +46,14 @@ public:
   }
 
   void tearDown() { _mesh.reset(); }
+
+  /// Builds the mesh the tests run on, before it is skewed
+  virtual void build_mesh()
+  {
+    const unsigned int dim = Elem::type_to_dim_map[elem_type];
+    MeshTools::Generation::build_cube(*_mesh, 2, 2, 2*(dim > 2),
+                                      0., 1., 0., 1., 0., 1., elem_type);
+  }
 
   /// The entity of \p elem that owns the degrees of freedom sitting on node \p n
   Entity node_entity(const Elem & elem, const unsigned int n)
@@ -212,7 +217,14 @@ private:
   static constexpr Real map_tolerance = TOLERANCE * TOLERANCE;
 
   /// Rounds of permutation, which vary the relative numbering of shared sides
-  unsigned int n_rounds() const { return Elem::build(elem_type)->n_permutations(); }
+  unsigned int n_rounds() const
+  {
+    unsigned int rounds = 0;
+    for (const auto * elem : _mesh->element_ptr_range())
+      rounds = std::max(rounds, elem->n_permutations());
+    _mesh->comm().max(rounds);
+    return rounds;
+  }
 
   /// The values of shape functions \p first through \p first + \p n_dofs - 1 at \p points
   std::vector<Real> shapes(const FEType & fe_type,
@@ -246,6 +258,47 @@ private:
 
     if (seen.size() > 1)
       ++n_compared;
+  }
+};
+
+/**
+ * The orientation tests on a mesh mixing element types, where each pair of neighbors shares a
+ * face that the two elements parametrize differently: a prism and a hexahedron share a
+ * quadrilateral, two prisms extruded in different directions share a quadrilateral whose axes
+ * they swap, and a prism and a tetrahedron share a triangle.
+ */
+template <Order order, FEFamily family>
+class FEHybridOrientationTest : public FEOrientationTest<INVALID_ELEM, order, family>
+{
+public:
+  void build_mesh() override
+  {
+    Mesh & mesh = *this->_mesh;
+
+    // A prism extruded along z from the triangle (0,0), (1,0), (0,1), with a hexahedron below
+    // y = 0, a prism extruded along y beyond x = 0, and a tetrahedron above z = 1
+    const std::vector<Point> points =
+      {{0,0,0}, {1,0,0}, {0,1,0}, {0,0,1}, {1,0,1}, {0,1,1},
+       {0,-1,0}, {1,-1,0}, {0,-1,1}, {1,-1,1},
+       {-1,0,0}, {-1,1,0},
+       {0.25,0.25,2}};
+    for (const auto i : index_range(points))
+      mesh.add_point(points[i], i);
+
+    const std::vector<std::pair<ElemType, std::vector<dof_id_type>>> elems =
+      {{PRISM6, {0, 1, 2, 3, 4, 5}},
+       {HEX8,   {6, 7, 1, 0, 8, 9, 4, 3}},
+       {PRISM6, {0, 10, 3, 2, 11, 5}},
+       {TET4,   {3, 4, 5, 12}}};
+    for (const auto & [type, nodes] : elems)
+      {
+        Elem * elem = mesh.add_elem(Elem::build(type));
+        for (const auto n : index_range(nodes))
+          elem->set_node(n, mesh.node_ptr(nodes[n]));
+      }
+
+    mesh.prepare_for_use();
+    mesh.all_complete_order();
   }
 };
 
@@ -303,3 +356,25 @@ INSTANTIATE_FEORIENTATIONTEST(PRISM21, FOURTH, HIERARCHIC);
 INSTANTIATE_FECONFORMITYTEST(HEX27,   THIRD,  SIDE_HIERARCHIC);
 INSTANTIATE_FECONFORMITYTEST(HEX27,   FOURTH, SIDE_HIERARCHIC);
 INSTANTIATE_FEORIENTATIONTEST(HEX27,   FIFTH,  HIERARCHIC);
+
+#define INSTANTIATE_FEHYBRIDORIENTATIONTEST(order, family)                \
+  class FEHybridOrientationTest_##family##_##order :                      \
+    public FEHybridOrientationTest<order, family> {                       \
+  public:                                                                 \
+  FEHybridOrientationTest_##family##_##order() :                          \
+    FEHybridOrientationTest<order, family>() {                            \
+    if (unitlog->summarized_logs_enabled())                               \
+      this->libmesh_suite_name = "FEHybridOrientationTest";               \
+    else                                                                  \
+      this->libmesh_suite_name =                                          \
+        "FEHybridOrientationTest_" #family "_" #order;                    \
+  }                                                                       \
+  CPPUNIT_TEST_SUITE( FEHybridOrientationTest_##family##_##order );       \
+  ORIENTATIONTEST;                                                        \
+  CPPUNIT_TEST_SUITE_END();                                               \
+  };                                                                      \
+                                                                          \
+  CPPUNIT_TEST_SUITE_REGISTRATION( FEHybridOrientationTest_##family##_##order )
+
+INSTANTIATE_FEHYBRIDORIENTATIONTEST(THIRD,  HIERARCHIC);
+INSTANTIATE_FEHYBRIDORIENTATIONTEST(FOURTH, HIERARCHIC);
