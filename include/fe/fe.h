@@ -26,7 +26,9 @@
 #include "libmesh/libmesh.h"
 
 // C++ includes
+#include <cmath>
 #include <cstddef>
+#include <tuple>
 
 namespace libMesh
 {
@@ -1557,6 +1559,59 @@ OutputShape fe_fdm_deriv(const ElemType type,
                            (const ElemType type, const Order,
                             const Elem *, const unsigned int,
                             const Point &));
+
+/**
+ * \returns The one-dimensional mode indices \f$(i_0, i_1)\f$ and sign \f$f_i\f$ that factor the
+ * \p i'th HIERARCHIC or L2_HIERARCHIC quadrilateral shape function of total order \p totalorder as
+ * \f$\phi_i(\xi,\eta) = f_i L_{i_0}(\xi) L_{i_1}(\eta)\f$, where \f$L\f$ are the \p EDGE3 shape
+ * functions of the same family and order. Sum factorization uses this to work with the
+ * one-dimensional tables.
+ *
+ * The sign \f$f_i = \pm 1\f$ depends on the element's edge orientations; it keeps odd edge modes
+ * continuous across an edge that neighboring elements traverse in opposite directions.
+ */
+std::tuple<unsigned int, unsigned int, Real>
+fe_hierarchic_quad_tensor_indices (const Elem * elem,
+                                   const unsigned int totalorder,
+                                   const unsigned int i);
+
+/**
+ * \returns The HIERARCHIC edge function of order \p basisorder (greater than one) on edge \p e of
+ * the triangle or tetrahedron \p elem, where \p zeta0 and \p zeta1 are the barycentric coordinates
+ * of the edge's first and second vertices. With \f$c = \zeta_0 + \zeta_1\f$ and
+ * \f$n = \zeta_1 - \zeta_0\f$ this is \f$c^p L_p(n/c)\f$, \f$L_p\f$ being the one-dimensional
+ * bubble of order \f$p\f$, negated for odd \f$p\f$ on a positively oriented edge so that the
+ * elements sharing the edge agree on it.
+ */
+Real fe_hierarchic_simplex_edge_shape (const Elem & elem,
+                                       const unsigned int e,
+                                       const Real zeta0,
+                                       const Real zeta1,
+                                       const unsigned int basisorder,
+                                       const Order totalorder);
+
+/**
+ * \returns The factor scaling the \p i'th (\p i > 1) one-dimensional HIERARCHIC bubble,
+ * \f$\xi^i - 1\f$ for even \p i or \f$\xi^i - \xi\f$ for odd \p i, to unit \f$H^1\f$ seminorm on
+ * \f$[-1,1]\f$: the reciprocal of \f$i\sqrt{2/(2i-1)}\f$ (even) or \f$(i-1)\sqrt{2/(2i-1)}\f$ (odd).
+ *
+ * A \f$1/i!\f$ scaling would shrink the bubbles factorially with order and spread the diagonal of
+ * an assembled operator accordingly; at order eight in two dimensions its smallest entry falls
+ * below the roundoff of its largest, leaving the system numerically singular in double precision.
+ *
+ * The vertex functions stay unscaled: they are interpolatory, so their coefficients are the
+ * solution's vertex values, on which nodal boundary conditions and nodal output rely.
+ */
+inline Real fe_hierarchic_bubble_scaling(const unsigned int i)
+{
+  libmesh_assert_greater(i, 1);
+
+  // An even bubble's derivative i xi^(i-1) squares and integrates to 2 i^2/(2i-1); an odd
+  // bubble's linear term turns i^2 into (i-1)^2.
+  const Real denominator = (i % 2) ? Real(i) - 1. : Real(i);
+
+  return std::sqrt((2. * Real(i) - 1.) / 2.) / denominator;
+}
 
 
 template <typename OutputShape>

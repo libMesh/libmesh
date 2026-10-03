@@ -2382,30 +2382,9 @@ Real fe_hierarchic_3D_shape(const Elem * elem,
             const unsigned int edgevertex0 = Tet4::edge_nodes_map[edge_num][0],
                                edgevertex1 = Tet4::edge_nodes_map[edge_num][1];
 
-            // Get factors to account for edge-flipping
-            Real flip = 1;
-            if (basisorder%2 &&
-                elem->positive_edge_orientation(edge_num))
-              flip = -1;
-
-            const Real crossval = zeta[edgevertex0] + zeta[edgevertex1];
-            const Real edgenumerator = zeta[edgevertex1] - zeta[edgevertex0];
-
-            if (crossval == 0.) // Yes, exact comparison; we seem numerically stable otherwise
-              {
-                unsigned int basisfactorial = 1.;
-                for (unsigned int n=2; n <= basisorder; ++n)
-                  basisfactorial *= n;
-
-                return flip * std::pow(edgenumerator, basisorder) / basisfactorial;
-              }
-
-            const Real edgeval = edgenumerator / crossval;
-            const Real crossfunc = std::pow(crossval, basisorder);
-
-            return flip * crossfunc *
-              FE<1,HIERARCHIC>::shape(EDGE3, totalorder,
-                                      basisorder, edgeval);
+            return fe_hierarchic_simplex_edge_shape(*elem, edge_num,
+                                                    zeta[edgevertex0], zeta[edgevertex1],
+                                                    basisorder, totalorder);
           }
 
         // Face DoFs
