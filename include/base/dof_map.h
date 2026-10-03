@@ -1077,6 +1077,33 @@ public:
    */
   void create_dof_constraints (const MeshBase &, Real time=0);
 
+#ifdef LIBMESH_ENABLE_DIRICHLET
+  /**
+   * Computes the values that the DirichletBoundary objects in \p dirichlets
+   * prescribe, using the same per-element projection as
+   * create_dof_constraints(), and stores them in \p values keyed by global
+   * degree of freedom index.  \p values is cleared first.
+   *
+   * No constraints are added, and this DofMap is left unchanged.  Each value is
+   * a coefficient in the current basis, so it is meaningful for modal bases as
+   * well as for nodal ones.
+   *
+   * A degree of freedom that this DofMap already constrains keeps its existing
+   * constraint, as in create_dof_constraints(), and is omitted from \p values.
+   *
+   * As in create_dof_constraints(), only local elements are projected, so
+   * \p values holds the degrees of freedom of those elements, which may include
+   * some owned by other processors.
+   *
+   * \p time is the time at which time-dependent Dirichlet functions are
+   * evaluated.
+   */
+  void compute_dirichlet_values (const DirichletBoundaries & dirichlets,
+                                 const MeshBase & mesh,
+                                 Real time,
+                                 DofConstraintValueMap & values) const;
+#endif // LIBMESH_ENABLE_DIRICHLET
+
   /**
    * Gathers constraint equation dependencies from other processors
    */
