@@ -934,7 +934,7 @@ Real fe_triangle_helper (const Elem & elem,
       for (unsigned int n=2; n <= basisorder; ++n)
         basisfactorial *= n;
 
-      return std::pow(edgenumerator, basisorder) / basisfactorial;
+      return flip * std::pow(edgenumerator, basisorder) / basisfactorial;
     }
   // Experimentally, as c -> 0, n propto c, I'm still seeing good
   // behavior from the default implementation below:
