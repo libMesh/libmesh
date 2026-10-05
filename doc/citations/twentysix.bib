@@ -1,5 +1,32 @@
+% libMesh
+% "All simulations are carried out using our in-house finite element code based on the libMesh library..."
+@Article{SXu_2026b,
+  author  = {Shu Xu and Liqun Cao},
+  title   = {{Optimal convergence in finite element semidiscrete error analysis of the Doyle--Fuller--Newman model beyond one dimension with a novel projection operator}},
+  journal = {IMA Journal of Numerical Analysis},
+  month   = sep,
+  year    = 2026,
+  volume  = 46,
+  number  = 5,
+  pages   = {2164--2190},
+  note    = {\url{https://doi.org/10.1093/imanum/draf065}, ArXiv e-print: \url{https://arxiv.org/abs/2411.10758}}
+}
+
+% MOOSE
+% "The equations are discretized using the cell-centered finite-volume method implemented in MOOSE..."
+% https://www.researchgate.net/publication/415165488_Toward_Transferable_Turbulence-Model_Calibration_for_Coarse-Grid_CFD
+@Misc{Leblebici_2026,
+  author       = {Deniz Leblebici and Arsen Iskhakov},
+  title        = {{Toward transferable turbulence-model calibration for coarse-grid CFD}},
+  month        = oct,
+  year         = 2026,
+  howpublished = {ResearchGate Preprint},
+  note         = {\url{https://tinyurl.com/ua7cyrhp}}
+}
+
 % MOOSE
 % "The weak forms of the governing equations were implemented in the libMesh/MOOSE finite-element framework..."
+% author:umate author:bai oxide reduction
 @Misc{Umate_2026,
   author       = {Kartik Sunil Umate and Yang Bai and Bob Svendsen and Dierk Raabe},
   title        = {Phase-field modeling of porosity formation and evolution during hydrogen-based iron oxide reduction},
@@ -38,6 +65,7 @@
 
 % MOOSE
 % "The prediction of the microstructure evolution is conducted by solving the Equation 11 with the open-source FEM software MOOSE..."
+% author:sac-morane author:olarte-garzon cemented granular material
 @Misc{SacMorane_2026b,
   author       = {Alexandre Sac-Morane and Maria Olarte-Garzon and Philipp Braun and Jean-Michel Pereira and Manolis Veveakis and Hadrien Rattez },
   title        = {Predicting the elastic properties of a cemented granular material during chemical damage (debonding)},
@@ -75,6 +103,7 @@
 
 % MOOSE
 % "We adopt the 2D coupled thermo-chemical model used in our ... (MOOSE) simulations ..."
+% author:arif author:litynski curre state estimation
 @Misc{Arif_2026,
   author       = {Ikram Arif and Grant Litynski and WaiChing Sun and Xiang Zhang},
   title        = {Cure state estimation in frontal polymerization from temperature fields via cascaded inverse-forward deep learning with uncertainty quantification},
@@ -86,6 +115,7 @@
 
 % MOOSE
 % "Grain growth simulations are conducted using the phase-field module ... of the ... (MOOSE) framework ..."
+% author:AbdulHameed author:nasr grain growth uncertainty quantification
 @Misc{AbdulHameed_2026,
   author       = {Mohamed AbdulHameed and Fadel M. Nasr and Wen Jiang and Mahmoud Yaseen and Benjamin Beeler},
   title        = {{A model of grain growth in UN integrating molecular dynamics, phase-field modeling, and uncertainty quantification}},
@@ -110,6 +140,7 @@
 
 % MOOSE
 % "The solver is implemented as a custom coupled executor in ... MOOSE ..."
+% author:hu trust-region phase-field
 @Misc{THu_2026,
   author       = {Tianchen Hu},
   title        = {Assessing nonlinear elimination preconditioning for trust-region phase-field fracture},
@@ -123,7 +154,7 @@
 % "The complete set of equations is first expressed in weak form and then implemented within the finite-element multiphysics framework MOOSE..."
 % See also: TZhang_2024b
 % https://www.researchgate.net/publication/413750002_Phase_transformation-induced_heterogeneous_delamination_and_electrolyte_cracking_in_solid-state_cathodes
-@Article{TZhang_2026,
+@Article{TaoZhang_2026,
   author  = {Tao Zhang and Jian Chen and Marc Kamlah and Robert M. McMeeking},
   title   = {{Phase transformation-induced heterogeneous delamination and electrolyte cracking in solid-state cathodes}},
   journal = {International Journal of Solids and Structures},
@@ -258,6 +289,7 @@
 
 % MOOSE/Griffin
 % "The assessment is performed by comparing PK predictions against the discrete ordinates results computed with the Griffin neutronics code."
+% author:nellis author:choi author:jaradat author:terlizzi unprotected transient
 @Misc{Nellis_2026,
   author       = {J. Alex Nellis and Namjae Choi and Mustafa Jaradat and Stefano Terlizzi},
   title        = {Assessing the validity of point kinetics for an unprotected loss-of-heat-sink transient in a heat pipe-cooled microreactor},
@@ -268,6 +300,7 @@
 }
 
 % MOOSE
+% author:manna author:sankaranarayanan automoose
 @Misc{Manna_2026,
   author       = {Sukriti Manna and Henry Chan and Subramanian Sankaranarayanan},
   title        = {{AutoMOOSE: Use case and logical views of agentic phase-field simulation software}},
@@ -279,6 +312,7 @@
 
 % MOOSE
 % "The governing equations described in Section 2 are implemented within ... MOOSE ..."
+% author:mostafavi author:yurkiv solidifying metal drops
 @Misc{Mostafavi_2026b,
   author       = {Ali Mostafavi and Vitaliy Yurkiv and Alexander L. Yarin and Farzad Mashayek},
   title        = {An improved phase-field framework for simulating impacts of solidifying metal drops},
@@ -291,6 +325,7 @@
 % MOOSE
 % "The mechanical module uses the MOOSE framework ... for solving the elastoplastic deformation equations, ..."
 % https://www.researchgate.net/publication/412828648_Risk_Assessment_of_Induced_Seismicity_and_Fluid_Leakage_in_CO_Storage_Sites_Using_Coupled_Reactive-Geomechanical_Models
+% author:brown author:samanya induced seismicity
 @Misc{Brown_2026,
   author       = {Oliver Brown and Raj Samanya and Xinchen Lyu},
   title        = {{Risk assessment of induced seismicity and fluid leakage in CO$_2$ storage sites using coupled reactive-geomechanical models}},
@@ -329,6 +364,7 @@
 
 % libMesh/GRINS
 % "... implemented as a reusable ImmersedBoundary physics kernel within the GRINS multiphysics framework, built on the libMesh finite element library."
+% author:mishra author:bauman immersed boundary method
 @Misc{Mishra_2026,
   author       = {Abhishek Mishra and Paul T. Bauman},
   title        = {{A volumetrically stabilized mixed formulation of the finite element immersed boundary method for fluid structure interaction with fully incompressible hyperelastic solids}},
@@ -392,6 +428,7 @@
 
 % MOOSE
 % "The efficiency of the GSM solver ... evaluated against the finite difference method (FDM) on a uniform mesh and the FEM-based MOOSE software on adaptive quadrilateral mesh."
+% author:mao author:xu author:stinis
 @Misc{ZMao_2026,
   author       = {Zirui Mao and Alice Xu and Shenyang Hu and Panos Stinis and Yuyan Shao and Ang Li and Yulan Li},
   title        = {An adaptive phase field framework for large-scale interface evolution problems using a strong-form gradient smoothing approach},
@@ -1219,7 +1256,7 @@
 
 % MOOSE/RACCOON
 % "The staggered scheme is implemented on an open-source and parallelized finite element code RACCOON..."
-% author:wu author:liu chemo-mechanical phase-field framework
+% author:wu author:liu brittle-to-ductile fracturing
 @Misc{FWu_2026,
   author       = {Fanyu Wu and Chong Liu and Manolis Veveakis and Manman Hu},
   title        = {{Brittle-to-ductile fracturing transition: A chemo-mechanical phase-field framework}},
@@ -1227,18 +1264,6 @@
   year         = 2026,
   howpublished = {ArXiv e-print},
   note         = {\url{https://arxiv.org/abs/2604.10184}}
-}
-
-% MOOSE
-% "Three-dimensional numerical simulations of the SPCHE were conducted using the MOOSE framework"
-% author:rahman author:ilyas novel spiral printed circuit heat exchanger
-@Misc{Rahman_2026b,
-  author       = {Habib {Ur Rahman} and Muhammad Ilyas and Khalid Waheed and Abid Hussain and Muhammad Ali Khan and Mirza Nadeem Baig and Manzoor Ahmed and Inam Ul Haq},
-  title        = {Experimental and numerical thermal-hydraulic performance analyses of a novel spiral printed circuit heat exchanger},
-  month        = apr,
-  year         = 2026,
-  howpublished = {SSRN preprint},
-  note         = {\url{https://doi.org/10.2139/ssrn.6561128}}
 }
 
 % MOOSE
