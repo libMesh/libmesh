@@ -66,20 +66,22 @@ struct PerfItem
   PerfItem(const char * label,
            const char * header,
            bool enabled=true,
-           PerfLog * my_perflog=&perflog) :
+           PerfLog * my_perflog=&perflog,
+           bool per_entity=false) :
     _label(label),
     _header(header),
     _enabled(enabled),
-    _perflog(*my_perflog)
+    _perflog(*my_perflog),
+    _per_entity(per_entity)
   {
     if (_enabled)
-      _perflog.fast_push(label, header);
+      _perflog.fast_push(label, header, _per_entity);
   }
 
   ~PerfItem()
   {
     if (_enabled)
-      _perflog.fast_pop(_label, _header);
+      _perflog.fast_pop(_label, _header, _per_entity);
   }
 
 private:
@@ -87,6 +89,12 @@ private:
   const char * _header;
   bool _enabled;
   PerfLog & _perflog;
+
+  /**
+   * Whether the event fires once per mesh entity or more often; see
+   * PerfLog::fast_push().
+   */
+  bool _per_entity;
 };
 
 
@@ -106,6 +114,9 @@ private:
 #  define LOG_SCOPE(a,b)   libMesh::PerfItem TOKENPASTE2(perf_item_, __LINE__)(a,b);
 #  define LOG_SCOPE_IF(a,b,enabled)   libMesh::PerfItem TOKENPASTE2(perf_item_, __LINE__)(a,b,enabled);
 #  define LOG_SCOPE_WITH(a,b,logger)   libMesh::PerfItem TOKENPASTE2(perf_item_, __LINE__)(a,b,true,&logger);
+// For events that fire once per mesh entity or more often; see
+// PerfLog::fast_push().
+#  define LOG_ONE_ENTITY_SCOPE(a,b)   libMesh::PerfItem TOKENPASTE2(perf_item_, __LINE__)(a,b,true,&libMesh::perflog,true);
 
 #else
 
@@ -116,6 +127,7 @@ private:
 #  define LOG_SCOPE(a,b)   {}
 #  define LOG_SCOPE_IF(a,b,enabled) {}
 #  define LOG_SCOPE_WITH(a,b,logger) {}
+#  define LOG_ONE_ENTITY_SCOPE(a,b) {}
 
 #endif
 

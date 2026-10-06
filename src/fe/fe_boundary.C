@@ -667,7 +667,7 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
   // We're calculating now!
   this->determine_calculations();
 
-  LOG_SCOPE("compute_face_map()", "FEMap");
+  LOG_ONE_ENTITY_SCOPE("compute_face_map()", "FEMap");
 
   // The number of quadrature points.
   const unsigned int n_qp = cast_int<unsigned int>(qw.size());
@@ -1046,7 +1046,7 @@ void FEMap::compute_edge_map(int dim,
 
   libmesh_assert_equal_to (dim, 3);  // 1D is unnecessary and currently unsupported
 
-  LOG_SCOPE("compute_edge_map()", "FEMap");
+  LOG_ONE_ENTITY_SCOPE("compute_edge_map()", "FEMap");
 
   // We're calculating now!
   this->determine_calculations();
