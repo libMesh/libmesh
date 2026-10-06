@@ -25,6 +25,7 @@ SUBDIRS = \
 	fem_system/fem_system_ex3 \
 	fem_system/fem_system_ex4 \
 	fem_system/fem_system_ex5 \
+	fem_system/fem_system_ex6 \
 	solution_transfer/solution_transfer_ex1 \
 	miscellaneous/miscellaneous_ex1 \
 	miscellaneous/miscellaneous_ex2 \
