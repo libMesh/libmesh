@@ -1,0 +1,12 @@
+# The number of hexagons along each direction of the coarsest mesh
+coarse_grid_size = 4
+
+# The number of times the coarse grid size is doubled
+n_refinements = 3
+
+# The diffusion coefficient
+diffusivity = 1
+
+# The components of the constant advecting velocity
+velocity_x = 1
+velocity_y = 0.5
