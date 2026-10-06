@@ -8,6 +8,7 @@
 #include <libmesh/parallel_implementation.h>
 #include <libmesh/enum_to_string.h>
 #include <libmesh/elem_quality.h>
+#include <libmesh/node.h>
 
 using namespace libMesh;
 
@@ -381,6 +382,108 @@ public:
             //              << ", jac = " << jac
             //              << ", scaled_jac = " << scaled_jac
             //              << std::endl;
+          }
+      }
+  }
+
+  void test_quality_bounds()
+  {
+    LOG_UNIT_TEST;
+
+    // Every quality metric that libMesh considers valid for a type
+    // should evaluate to a value inside its suggested qual_bounds() on
+    // a reasonably-shaped element of that type.
+    for (const auto & elem :
+         this->_mesh->active_local_element_ptr_range())
+      {
+        // qual_bounds() isn't well defined for infinite elements.
+        if (elem->infinite())
+          continue;
+
+        for (const ElemQuality q : Quality::valid(elem->type()))
+          {
+            const std::pair<Real, Real> bounds = elem->qual_bounds(q);
+
+            // A metric may be listed as valid for a type without having
+            // suggested bounds defined; qual_bounds() returns (-1, -1)
+            // as a sentinel in that case, which we skip.
+            if (bounds.first == -1. && bounds.second == -1.)
+              continue;
+
+            const Real value = elem->quality(q);
+
+            // build_cube()'s particular tet dissection (splitting each
+            // cube into 6 tets) is a bit more elongated than the
+            // "suggested" SCALED_JACOBIAN range assumes: its measured
+            // floor is ~0.408 (see the SCALED_JACOBIAN check in
+            // test_quality() above), just under the suggested 0.5.
+            // That's a real, known property of this specific mesh, not
+            // a quality regression, so widen the tolerance for exactly
+            // this combination.
+            const bool is_tet = (elem->type() == TET4 ||
+                                 elem->type() == TET10 ||
+                                 elem->type() == TET14);
+            const Real tol = (q == SCALED_JACOBIAN && is_tet) ?
+              Real(0.1) : TOLERANCE;
+
+            std::ostringstream msg;
+            msg << "Quality metric " << Utility::enum_to_string(q)
+                << " on a " << Utility::enum_to_string(elem->type())
+                << " evaluated to " << value
+                << ", outside its suggested bounds ["
+                << bounds.first << ", " << bounds.second << "]";
+
+            CPPUNIT_ASSERT_MESSAGE(msg.str(),
+                                   value >= bounds.first - tol &&
+                                   value <= bounds.second + tol);
+          }
+      }
+  }
+
+  void test_quality_permutation_invariance()
+  {
+    LOG_UNIT_TEST;
+
+    // A genuine element-shape quality metric cannot depend on how the
+    // element's nodes happen to be numbered: permuting the nodes (i.e.
+    // relabeling which physical corner sits at which local index, via
+    // one of the reference element's symmetries) leaves the physical
+    // shape -- and therefore every quality metric -- unchanged.
+    for (const auto & elem :
+         this->_mesh->active_local_element_ptr_range())
+      {
+        // Permutations of infinite elements aren't well defined.
+        if (elem->infinite())
+          continue;
+
+        const std::vector<ElemQuality> valid_metrics =
+          Quality::valid(elem->type());
+
+        if (valid_metrics.empty())
+          continue;
+
+        std::vector<Real> baseline(valid_metrics.size());
+        for (std::size_t i = 0; i != valid_metrics.size(); ++i)
+          baseline[i] = elem->quality(valid_metrics[i]);
+
+        for (const auto p : IntRange<unsigned int>(0, elem->n_permutations()))
+          {
+            elem->permute(p);
+
+            for (std::size_t i = 0; i != valid_metrics.size(); ++i)
+              {
+                const Real permuted_value = elem->quality(valid_metrics[i]);
+
+                std::ostringstream msg;
+                msg << "Quality metric " << Utility::enum_to_string(valid_metrics[i])
+                    << " on a " << Utility::enum_to_string(elem->type())
+                    << " changed from " << baseline[i]
+                    << " to " << permuted_value
+                    << " after applying permutation " << p;
+
+                CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE
+                  (msg.str(), baseline[i], permuted_value, TOLERANCE);
+              }
           }
       }
   }
@@ -1105,6 +1208,8 @@ public:
   CPPUNIT_TEST( test_static_topology );         \
   CPPUNIT_TEST( test_higher_order_node_placement ); \
   CPPUNIT_TEST( test_quality );                 \
+  CPPUNIT_TEST( test_quality_bounds );          \
+  CPPUNIT_TEST( test_quality_permutation_invariance ); \
   CPPUNIT_TEST( test_node_edge_map_consistency ); \
   CPPUNIT_TEST( test_maps );                    \
   CPPUNIT_TEST( test_static_data );             \
