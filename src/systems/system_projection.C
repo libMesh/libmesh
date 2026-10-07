@@ -2103,6 +2103,18 @@ void BoundaryProjectSolution::operator()(const ConstElemRange & range) const
 void System::solve_for_unconstrained_dofs(NumericVector<Number> & vec,
                                           int is_adjoint) const
 {
+  // We generally don't need this function if we don't have
+  // non-assembly elements, but let's make sure it's robust to
+  // pre-INVALID_MAP definitions of those, and let's make sure
+  // *that's* robust to meshes with non-spline NodeElem too.
+  //
+  // Once everything's INVALID_MAP compliant we can remove this.
+  if (!this->get_mesh().n_constraint_rows())
+    {
+      libmesh_warning("Called solve_for_unconstrained_dofs on a mesh with no constraint_rows?");
+      return;
+    }
+
   const DofMap & dof_map = this->get_dof_map();
 
   std::unique_ptr<SparseMatrix<Number>> mat =
@@ -2163,7 +2175,11 @@ void System::solve_for_unconstrained_dofs(NumericVector<Number> & vec,
 
   for (const auto & elem : this->get_mesh().active_local_element_ptr_range())
     {
-      if (elem->mapping_type() == INVALID_MAP)
+      // INVALID_MAP for the upcoming spline node change, plus
+      // NODEELEM for meshes pre-change.  If we have non-spline-node
+      // NODEELEM we should have returned early already.
+      if (elem->mapping_type() == INVALID_MAP ||
+          (elem->type() == NODEELEM))
         continue;
 
       dof_map.dof_indices(elem, di);
