@@ -394,23 +394,34 @@ void clear_spline_nodes(MeshBase &);
 
 /**
  * A function for testing whether a mesh's cached is_prepared() setting
- * is not a false positive.  If the mesh is marked as not prepared, or
- * if preparing the already-partitioned mesh (without any
- * repartitioning or renumbering) does not change it, then we return
- * true.  If the mesh believes it is prepared but prepare_for_use()
- * would change it, we return false.
+ * is not a false positive, and that its preparation() values are not
+ * false positives.  If the mesh is marked as completely not prepared, or
+ * if preparing a already-prepared mesh (without any repartitioning or
+ * renumbering) or preparing after a complete_preparation() (likewise)
+ * does not change the mesh, then we return true.  If the mesh believes it
+ * is prepared but prepare_for_use() would change it, or if the mesh
+ * believes it is partially prepared in a certain way but
+ * complete_preparation() does not completely prepare it, we return
+ * false.
  */
 bool valid_is_prepared (const MeshBase & mesh);
 
 ///@{
 
 /**
- * The following functions, only available in builds with NDEBUG
+ * The following functions, no-ops except in builds with NDEBUG
  * undefined, are for asserting internal consistency that we hope
  * should never be broken in opt
  */
 
 #ifndef NDEBUG
+
+/**
+ * Like libmesh_assert(MeshTools::valid_is_prepared(mesh)), but
+ * provides more information on preparation incompleteness in case of
+ * an error.
+ */
+void libmesh_assert_valid_is_prepared (const MeshBase & mesh);
 
 /**
  * A function for testing that all DofObjects within a mesh
@@ -643,6 +654,39 @@ namespace Private {
  */
 void globally_renumber_nodes_and_elements (MeshBase &);
 } // end namespace Private
+
+
+// Declare inline no-ops for assertions with NDEBUG defined
+#ifdef NDEBUG
+
+inline void libmesh_assert_valid_is_prepared (const MeshBase &) {}
+
+inline void libmesh_assert_equal_n_systems (const MeshBase &) {}
+
+inline void libmesh_assert_old_dof_objects (const MeshBase &) {}
+
+inline void libmesh_assert_valid_node_pointers (const MeshBase &) {}
+
+inline void libmesh_assert_valid_remote_elems (const MeshBase &) {}
+
+inline void libmesh_assert_valid_elem_ids (const MeshBase &) {}
+
+inline void libmesh_assert_valid_amr_elem_ids (const MeshBase &) {}
+
+inline void libmesh_assert_valid_amr_interior_parents (const MeshBase &) {}
+
+inline void libmesh_assert_contiguous_dof_ids (const MeshBase &, unsigned int) {}
+
+template <typename DofObjectSubclass>
+inline void libmesh_assert_topology_consistent_procids (const MeshBase &) {}
+
+inline void libmesh_assert_canonical_node_procids (const MeshBase &) {}
+
+inline void libmesh_assert_valid_refinement_tree (const MeshBase &) {}
+
+#endif // NDEBUG
+
+
 
 } // end namespace MeshTools
 
