@@ -2131,9 +2131,9 @@ void System::solve_for_unconstrained_dofs(NumericVector<Number> & vec,
             PARALLEL);
 
   // Here we start with the unconstrained (and indeterminate) linear
-  // system, K*u = f, where K is the identity matrix for constrained
-  // DoFs and 0 elsewhere, and f is the current solution values for
-  // constrained DoFs and 0 elsewhere.
+  // system, K*u = f, where K is the identity matrix for
+  // DoFs which have been evaluated and 0 elsewhere, and f is the
+  // current solution values for evaluated DoFs and 0 elsewhere.
   // We then apply the usual heterogeneous constraint matrix C and
   // offset h, where u = C*x + h,
   // to get C^T*K*C*x = C^T*f - C^T*K*h
@@ -2145,12 +2145,38 @@ void System::solve_for_unconstrained_dofs(NumericVector<Number> & vec,
   // discretization-dependent norm.  That only seems to give ~0.1%
   // excess error even in coarse unit test cases, but at some point it
   // might be reasonable to weight K and f properly.
+  //
+  // We used to do this by distinguishing "constrained" from
+  // "unconstrained" DoFs rather than "evaluated" vs "unevaluated",
+  // but that was failing for any IGA meshes where we didn't bother to
+  // duplicate spline nodes that were exactly equal to assembly
+  // element vertices.
 
-  for (dof_id_type d : IntRange<dof_id_type>(dof_map.first_dof(),
-                                             dof_map.end_dof()))
+  // Keep track of which DoFs we've added.  We have a contiguous DoF
+  // range [a,b) so we'll store a vector with indices [0,b-a) for
+  // efficiency
+  std::size_t n_local_dofs = dof_map.n_local_dofs();
+  std::vector<bool> have_added(n_local_dofs, false);
+  std::size_t first_dof = dof_map.first_dof();
+
+  std::vector<dof_id_type> di;
+
+  for (const auto & elem : this->get_mesh().active_local_element_ptr_range())
     {
-      if (dof_map.is_constrained_dof(d))
+      if (elem->mapping_type() == INVALID_MAP)
+        continue;
+
+      dof_map.dof_indices(elem, di);
+
+      for (auto d : di)
         {
+          if (d < first_dof)
+            continue;
+          std::size_t i = d - first_dof;
+          if (i > n_local_dofs ||
+              have_added[i])
+            continue;
+
           DenseMatrix<Number> K(1,1);
           DenseVector<Number> F(1);
           std::vector<dof_id_type> dof_indices(1, d);
@@ -2160,6 +2186,8 @@ void System::solve_for_unconstrained_dofs(NumericVector<Number> & vec,
             (K, F, dof_indices, false, is_adjoint);
           mat->add_matrix(K, dof_indices);
           rhs->add_vector(F, dof_indices);
+
+          have_added[i] = true;
         }
     }
 
