@@ -176,6 +176,10 @@ not govern unrelated conversations or prescribe the user's conversational style.
   presenting.
 - Use the vocabulary a libMesh developer would use, and avoid stock phrasing that reads as
   machine-drafted. "bit-for-bit" is one such tell; say that results are unchanged.
+- State comparisons directly. Write "grows more slowly", "is smaller", or "matches"
+  instead of a negated opposite such as "grows no faster", "is no larger", or "is not
+  unlike". Use bound phrasing only when a non-strict bound is the actual claim, and then
+  write it as a bound: "grows at most as fast as".
 
 ---
 
