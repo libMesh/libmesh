@@ -671,7 +671,7 @@ void ReplicatedMesh::update_parallel_id_counts()
   trim_vec(this->_nodes);
   trim_vec(this->_elements);
 
-  this->count_constraint_rows();
+  _n_constraint_rows = this->count_constraint_rows();
 
   this->_preparation.has_synched_id_counts = true;
 }

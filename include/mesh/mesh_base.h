@@ -2456,9 +2456,9 @@ protected:
   dof_id_type _n_constraint_rows;
 
   /**
-   * Helper function for subclasses to set _n_constraint_rows
+   * Helper function for subclasses to use to set _n_constraint_rows
    */
-  void count_constraint_rows();
+  dof_id_type count_constraint_rows();
 
   /**
    * If nonzero, we will call PointLocatorBase::set_close_to_point_tol()
