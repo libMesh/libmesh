@@ -2484,7 +2484,7 @@ bool MeshBase::nodes_and_elements_equal(const MeshBase & other_mesh) const
 }
 
 
-void MeshBase::count_constraint_rows()
+dof_id_type MeshBase::count_constraint_rows()
 {
   dof_id_type n_local_rows=0, n_unpartitioned_rows=0;
   for (const auto & [node, node_constraints] : _constraint_rows)
@@ -2498,7 +2498,7 @@ void MeshBase::count_constraint_rows()
 
   this->comm().sum(n_local_rows);
 
-  _n_constraint_rows = n_unpartitioned_rows + n_local_rows;
+  return n_unpartitioned_rows + n_local_rows;
 }
 
 
@@ -2796,7 +2796,7 @@ MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator,
                                      std::move(constraint_row));
     }
 
-  this->count_constraint_rows();
+  _n_constraint_rows = this->count_constraint_rows();
 }
 
 
