@@ -27,14 +27,15 @@
 // with f chosen so that u = sin(pi x) sin(pi y).
 //
 // The element residual is evaluated with MetaPhysicL dual numbers in
-// place of real numbers. Each element degree of freedom is seeded with
-// a unit derivative with respect to itself, and the derivatives then
-// propagate through the solution value, its gradient, and the
-// nonlinear diffusivity. The Jacobian is read off the derivatives of
-// the residual, so it is exact without any hand-coded linearization.
-// libMesh's numeric types, such as VectorValue, accept dual-number
-// components, so the residual is written with the same expressions
-// used for real-valued assembly.
+// place of libMesh's Number type, which is real or complex depending
+// on how libMesh was configured. Each element degree of freedom is
+// seeded with a unit derivative with respect to itself, and the
+// derivatives then propagate through the solution value, its
+// gradient, and the nonlinear diffusivity. The Jacobian is read off
+// the derivatives of the residual, so it is exact without any
+// hand-coded linearization. libMesh's numeric types, such as
+// VectorValue, accept dual-number components, so the residual is
+// written with the same expressions used for assembly with Number.
 //
 // Exactness of the Jacobian is visible in the quadratic convergence of
 // Newton's method. Setting verify_analytic_jacobians to a positive
@@ -72,12 +73,12 @@
 
 using namespace libMesh;
 
-#if defined(LIBMESH_HAVE_METAPHYSICL) && !defined(LIBMESH_USE_COMPLEX_NUMBERS)
+#ifdef LIBMESH_HAVE_METAPHYSICL
 
-// A real number together with its derivatives with respect to the
+// A Number together with its derivatives with respect to the
 // element degrees of freedom, stored sparsely by local dof index.
-typedef MetaPhysicL::DualNumber<Real, MetaPhysicL::DynamicSparseNumberArray<Real, unsigned int>>
-    ADReal;
+typedef MetaPhysicL::DualNumber<Number, MetaPhysicL::DynamicSparseNumberArray<Number, unsigned int>>
+    ADNumber;
 
 // The manufactured solution
 Number
@@ -90,18 +91,18 @@ Gradient
 exact_gradient(const Point & p, const Parameters &, const std::string &, const std::string &)
 {
   const Real pi = libMesh::pi;
-  return Gradient(pi * std::cos(pi * p(0)) * std::sin(pi * p(1)),
-                  pi * std::sin(pi * p(0)) * std::cos(pi * p(1)));
+  return RealGradient(pi * std::cos(pi * p(0)) * std::sin(pi * p(1)),
+                      pi * std::sin(pi * p(0)) * std::cos(pi * p(1)));
 }
 
 // The source term f = -div((1 + u^2) grad u) for the manufactured solution,
 // expanded as -(1 + u^2) lap(u) - 2 u |grad u|^2 with lap(u) = -2 pi^2 u.
-Real
+Number
 forcing(const Point & p)
 {
-  const Real u = libmesh_real(exact_value(p, Parameters(), "", ""));
+  const Number u = exact_value(p, Parameters(), "", "");
   const Gradient grad_u = exact_gradient(p, Parameters(), "", "");
-  return 2 * libMesh::pi * libMesh::pi * (1 + u * u) * u - 2 * u * grad_u.norm_sq();
+  return 2 * libMesh::pi * libMesh::pi * (1. + u * u) * u - 2. * u * grad_u.norm_sq();
 }
 
 /**
@@ -180,7 +181,7 @@ NonlinearDiffusionSystem::element_time_derivative(bool request_jacobian, DiffCon
   // Seed each element degree of freedom with a unit derivative with
   // respect to itself.
   const DenseSubVector<Number> & u_coefs = c.get_elem_solution(_u_var);
-  std::vector<ADReal> u_dofs(n_dofs);
+  std::vector<ADNumber> u_dofs(n_dofs);
   for (const auto j : make_range(n_dofs))
     {
       u_dofs[j] = u_coefs(j);
@@ -189,19 +190,23 @@ NonlinearDiffusionSystem::element_time_derivative(bool request_jacobian, DiffCon
 
   // FEMSystem's steady residual convention is F(u) = 0 with F the
   // weak form of div((1 + u^2) grad u) + f.
-  std::vector<ADReal> residual(n_dofs, 0);
+  std::vector<ADNumber> residual(n_dofs, 0);
   for (const auto qp : index_range(JxW))
     {
-      ADReal u = 0;
-      VectorValue<ADReal> grad_u;
+      ADNumber u = 0;
+      VectorValue<ADNumber> grad_u;
       for (const auto j : make_range(n_dofs))
         {
           u += u_dofs[j] * phi[j][qp];
           grad_u += u_dofs[j] * dphi[j][qp];
         }
 
-      const ADReal diffusivity = 1 + u * u;
-      const Real f = forcing(xyz[qp]);
+      // In complex builds the Jacobian is a complex derivative, which
+      // exists only for a holomorphic residual. The diffusivity
+      // therefore uses u^2: u * conj(u) is not holomorphic, and
+      // MetaPhysicL assigns NaN derivatives to conj() for that reason.
+      const ADNumber diffusivity = 1. + u * u;
+      const Number f = forcing(xyz[qp]);
 
       for (const auto i : make_range(n_dofs))
         residual[i] += JxW[qp] * (-diffusivity * (grad_u * dphi[i][qp]) + f * phi[i][qp]);
@@ -225,7 +230,7 @@ NonlinearDiffusionSystem::element_time_derivative(bool request_jacobian, DiffCon
   return request_jacobian;
 }
 
-#endif // LIBMESH_HAVE_METAPHYSICL && !LIBMESH_USE_COMPLEX_NUMBERS
+#endif // LIBMESH_HAVE_METAPHYSICL
 
 int
 main(int argc, char ** argv)
@@ -240,9 +245,6 @@ main(int argc, char ** argv)
   // Dual numbers are provided by MetaPhysicL.
 #ifndef LIBMESH_HAVE_METAPHYSICL
   libmesh_example_requires(false, "--enable-metaphysicl");
-#elif defined(LIBMESH_USE_COMPLEX_NUMBERS)
-  // The residual is written for real-valued dual numbers.
-  libmesh_example_requires(false, "--disable-complex");
 #else
 
   // The mesh is two-dimensional.
@@ -292,7 +294,7 @@ main(int argc, char ** argv)
   libMesh::out << "L2 error: " << exact_sol.l2_error("NonlinearDiffusion", "u") << std::endl
                << "H1 error: " << exact_sol.h1_error("NonlinearDiffusion", "u") << std::endl;
 
-#endif // LIBMESH_HAVE_METAPHYSICL && !LIBMESH_USE_COMPLEX_NUMBERS
+#endif // LIBMESH_HAVE_METAPHYSICL
 
   return 0;
 }
