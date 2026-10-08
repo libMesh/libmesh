@@ -1748,18 +1748,12 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
   MeshTools::libmesh_assert_valid_boundary_ids(mesh);
 #endif
 
-  // In a distributed mesh we might have constraint rows on some
-  // processors but not all; if we have constraint rows on *any*
-  // processor then we need to process them.
-  bool constraint_rows_empty = mesh.get_constraint_rows().empty();
-  this->comm().min(constraint_rows_empty);
-
   // We might get constraint equations from AMR hanging nodes in
   // 2D/3D, or from spline constraint rows or boundary conditions in
   // any dimension
   const bool possible_local_constraints = false
     || !mesh.n_elem()
-    || !constraint_rows_empty
+    || mesh.n_constraint_rows()
 #ifdef LIBMESH_ENABLE_AMR
     || mesh.mesh_dimension() > 1
 #endif
@@ -1889,8 +1883,7 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
 
   // Handle spline node constraints last, so we can try to move
   // existing constraints onto the spline basis if necessary.
-  if (!constraint_rows_empty)
-    this->process_mesh_constraint_rows(mesh);
+  this->process_mesh_constraint_rows(mesh);
 }
 
 
@@ -1912,8 +1905,11 @@ void DofMap::process_mesh_constraint_rows(const MeshBase & mesh)
 #ifdef DEBUG
   bool constraint_rows_empty = constraint_rows.empty();
   this->comm().min(constraint_rows_empty);
-  libmesh_assert(!constraint_rows_empty);
+  libmesh_assert_equal_to(constraint_rows_empty, !mesh.n_constraint_rows());
 #endif
+
+  if (!mesh.n_constraint_rows())
+    return;
 
   // We can't handle periodic boundary conditions on spline meshes
   // yet.
