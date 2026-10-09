@@ -63,10 +63,9 @@ Real fe_hierarchic_2D_shape_second_deriv(const Elem * elem,
 namespace libMesh
 {
 
-std::tuple<unsigned int, unsigned int, Real>
-fe_hierarchic_quad_tensor_indices(const Elem * elem,
-                                  const unsigned int totalorder,
-                                  const unsigned int i)
+std::pair<unsigned int, unsigned int>
+fe_hierarchic_quad_mode_orders(const unsigned int totalorder,
+                               const unsigned int i)
 {
   libmesh_assert_less (i, (totalorder+1u)*(totalorder+1u));
 
@@ -102,6 +101,17 @@ fe_hierarchic_quad_tensor_indices(const Elem * elem,
       i0 = square_number_column[basisnum] + 2;
       i1 = square_number_row[basisnum] + 2;
     }
+
+  return {i0, i1};
+}
+
+
+std::tuple<unsigned int, unsigned int, Real>
+fe_hierarchic_quad_tensor_indices(const Elem * elem,
+                                  const unsigned int totalorder,
+                                  const unsigned int i)
+{
+  const auto [i0, i1] = fe_hierarchic_quad_mode_orders(totalorder, i);
 
   // Flip odd degree of freedom values if necessary
   // to keep continuity on sides

@@ -29,6 +29,7 @@
 #include <cmath>
 #include <cstddef>
 #include <tuple>
+#include <utility>
 
 namespace libMesh
 {
@@ -1576,6 +1577,14 @@ fe_hierarchic_quad_tensor_indices (const Elem * elem,
                                    const unsigned int i);
 
 /**
+ * \returns The one-dimensional mode indices \f$(i_0, i_1)\f$ of
+ * fe_hierarchic_quad_tensor_indices(), which don't depend on an element.
+ */
+std::pair<unsigned int, unsigned int>
+fe_hierarchic_quad_mode_orders (const unsigned int totalorder,
+                                const unsigned int i);
+
+/**
  * \returns The HIERARCHIC edge function of order \p basisorder (greater than one) on edge \p e of
  * the triangle or tetrahedron \p elem, where \p zeta0 and \p zeta1 are the barycentric coordinates
  * of the edge's first and second vertices. With \f$c = \zeta_0 + \zeta_1\f$ and
@@ -1612,6 +1621,31 @@ inline Real fe_hierarchic_bubble_scaling(const unsigned int i)
 
   return std::sqrt((2. * Real(i) - 1.) / 2.) / denominator;
 }
+
+/**
+ * \returns Whether \p family is built from the one-dimensional HIERARCHIC bubbles, and so had its
+ * shape functions rescaled along with them: HIERARCHIC, L2_HIERARCHIC, SIDE_HIERARCHIC,
+ * HIERARCHIC_VEC and L2_HIERARCHIC_VEC.
+ */
+bool fe_hierarchic_bubble_family (const FEFamily family);
+
+/**
+ * \returns The factor converting a coefficient of the \p i'th shape function of \p family (one for
+ * which fe_hierarchic_bubble_family() holds) of total order \p totalorder on \p elem from the
+ * basis whose one-dimensional bubbles were scaled by \f$1/p!\f$ to the current basis.
+ *
+ * Each shape function is the old one multiplied by \f$p!\,s_p\f$, with \f$s_p\f$ from
+ * fe_hierarchic_bubble_scaling(), for each one-dimensional bubble of order \f$p\f$ it is built
+ * from, so its coefficient is divided by the same. The vertex functions and the simplex face and
+ * interior functions don't contain a bubble, so they are unchanged.
+ *
+ * Files whose I/O compatibility version predates 1.9.0 hold coefficients in the \f$1/p!\f$ basis,
+ * and the System readers apply this to every coefficient they read from one.
+ */
+Real fe_hierarchic_legacy_coefficient_ratio (const FEFamily family,
+                                             const Elem & elem,
+                                             const Order totalorder,
+                                             const unsigned int i);
 
 
 template <typename OutputShape>
