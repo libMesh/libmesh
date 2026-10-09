@@ -211,11 +211,7 @@ void EquationSystems::read (Xdr & io,
           }
 
         // Figure out the libMesh version that created this file
-        std::istringstream iss(version.substr(lm_pos + libMesh_label.size()));
-        int ver_major = 0, ver_minor = 0, ver_patch = 0;
-        char dot;
-        iss >> ver_major >> dot >> ver_minor >> dot >> ver_patch;
-        io.set_version(LIBMESH_VERSION_ID(ver_major, ver_minor, ver_patch));
+        io.set_version(libMesh::parse_io_compatibility_version(version));
 
 
         read_parallel_files = Utility::contains(version, " parallel");

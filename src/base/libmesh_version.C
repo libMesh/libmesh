@@ -16,9 +16,11 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 #include "libmesh/libmesh_version.h"
+#include "libmesh/libmesh_common.h"
 
 #include <iostream>
 #include <iomanip>
+#include <sstream>
 
 void libMesh::libmesh_version_stdout()
 {
@@ -81,4 +83,36 @@ std::string libMesh::get_io_compatibility_version ()
 {
   std::string retval(LIBMESH_IO_COMPATIBILITY_VERSION);
   return retval;
+}
+
+
+
+namespace
+{
+// The LIBMESH_VERSION_ID() of "major.minor.patch" at the start of \p version
+int version_id(std::string_view version)
+{
+  std::istringstream iss{std::string(version)};
+  int major = 0, minor = 0, patch = 0;
+  char dot;
+  iss >> major >> dot >> minor >> dot >> patch;
+  return LIBMESH_VERSION_ID(major, minor, patch);
+}
+}
+
+int libMesh::parse_io_compatibility_version (std::string_view version_header)
+{
+  const std::string_view label = "libMesh-";
+  const auto pos = version_header.find(label);
+  libmesh_error_msg_if(pos == std::string_view::npos,
+                       "No libMesh version in the file header \"" << version_header << "\".");
+
+  const int file_version = version_id(version_header.substr(pos + label.size()));
+
+  libmesh_error_msg_if(file_version > version_id(get_io_compatibility_version()),
+                       "The file's format version, \"" << version_header <<
+                       "\", is newer than the latest this library can read, libMesh-" <<
+                       get_io_compatibility_version() << ".");
+
+  return file_version;
 }

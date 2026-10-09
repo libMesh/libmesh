@@ -60236,7 +60236,7 @@ printf "%s\n" "#define LIB_RELEASE \"$BUILD_DEVSTATUS\"" >>confdefs.h
 printf "%s\n" "#define CXX \"$CXX\"" >>confdefs.h
 
 
-printf "%s\n" "#define IO_COMPATIBILITY_VERSION \"1.7.0\"" >>confdefs.h
+printf "%s\n" "#define IO_COMPATIBILITY_VERSION \"1.9.0\"" >>confdefs.h
 
 
 
