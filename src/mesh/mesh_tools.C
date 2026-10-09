@@ -1224,7 +1224,7 @@ void clear_spline_nodes(MeshBase & mesh)
 
   for (auto & elem : mesh.element_ptr_range())
     if (elem->type() == NODEELEM &&
-        elem->mapping_type() == RATIONAL_BERNSTEIN_MAP)
+        elem->mapping_type() == INVALID_MAP)
       nodeelem_to_delete.push_back(elem);
 
   auto & constraint_rows = mesh.set_constraint_rows();
@@ -1237,7 +1237,7 @@ void clear_spline_nodes(MeshBase & mesh)
       {
         const Elem * elem = pr.first.first;
         libmesh_assert(elem->type() == NODEELEM);
-        libmesh_assert(elem->mapping_type() == RATIONAL_BERNSTEIN_MAP);
+        libmesh_assert(elem->mapping_type() == INVALID_MAP);
       }
 #endif
 
