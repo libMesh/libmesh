@@ -1165,15 +1165,7 @@ void RBEvaluation::read_in_vectors_from_multiple_files(System & sys,
         std::string version;
         vector_data.data(version);
 
-        const std::string libMesh_label = "libMesh-";
-        std::string::size_type lm_pos = version.find(libMesh_label);
-        libmesh_error_msg_if(lm_pos == std::string::npos, "version info missing in Xdr header");
-
-        std::istringstream iss(version.substr(lm_pos + libMesh_label.size()));
-        int ver_major = 0, ver_minor = 0, ver_patch = 0;
-        char dot;
-        iss >> ver_major >> dot >> ver_minor >> dot >> ver_patch;
-        vector_data.set_version(LIBMESH_VERSION_ID(ver_major, ver_minor, ver_patch));
+        vector_data.set_version(libMesh::parse_io_compatibility_version(version));
 
         // Actually read the header data. When we do this, set read_header=false
         // so that we do not reinit sys, since we assume that it has already been

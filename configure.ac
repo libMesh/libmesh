@@ -264,7 +264,7 @@ AC_DEFINE_UNQUOTED(MICRO_VERSION,            [$LIBMESH_NUMERIC_POINT_VERSION],  
 AC_DEFINE_UNQUOTED(LIB_VERSION,              ["$VERSION"],         [libMesh version number])
 AC_DEFINE_UNQUOTED(LIB_RELEASE,              ["$BUILD_DEVSTATUS"], [libMesh source code version])
 AC_DEFINE_UNQUOTED(CXX,                      ["$CXX"],             [C++ compiler])
-AC_DEFINE_UNQUOTED(IO_COMPATIBILITY_VERSION, ["1.7.0"],            [libMesh I/O file format compatibility string])
+AC_DEFINE_UNQUOTED(IO_COMPATIBILITY_VERSION, ["1.9.0"],            [libMesh I/O file format compatibility string])
 
 
 

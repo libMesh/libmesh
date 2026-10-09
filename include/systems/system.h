@@ -1414,6 +1414,18 @@ public:
   { read_parallel_data<Number>(io, read_additional_data); }
 
   /**
+   * Converts the coefficients of every variable of this System whose family uses the HIERARCHIC
+   * bubbles (see fe_hierarchic_bubble_family()) in \p vec, from the basis in which those bubbles
+   * were scaled by \f$1/p!\f$ to the current one. The finite element function \p vec represents
+   * is unchanged.
+   *
+   * The System readers call this on each vector they read from a file whose I/O compatibility
+   * version predates 1.9.0, which is when the bubbles changed; a vector holding such coefficients
+   * from some other source can be converted the same way.
+   */
+  void convert_legacy_hierarchic_coefficients (NumericVector<Number> & vec) const;
+
+  /**
    * Writes the basic data header for this System.
    */
   void write_header (Xdr & io,
@@ -2104,6 +2116,13 @@ private:
                                  NumericVector<Number> * vec) const;
 
   /**
+   * Converts the solution, and the additional vectors when \p read_additional_data, with
+   * convert_legacy_hierarchic_coefficients() if the file they were just read from predates the
+   * current HIERARCHIC basis.
+   */
+  void convert_legacy_hierarchic_data (const bool read_additional_data);
+
+  /**
    * Reads a vector for this System.
    * This method may safely be called on a distributed-memory mesh.
    *
@@ -2323,6 +2342,13 @@ private:
    * different dof indices.
    */
   std::vector<unsigned int> _written_var_indices;
+
+  /**
+   * This flag is used only when *reading* in a system from file. It records whether the file
+   * holds HIERARCHIC coefficients in the basis that predates I/O compatibility version 1.9.0, so
+   * that the data readers convert them as they read them.
+   */
+  bool _read_legacy_hierarchic;
 
   /**
    * Has the adjoint problem already been solved?  If the user sets

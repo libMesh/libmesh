@@ -319,7 +319,7 @@ am__libmesh_dbg_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
 	src/fe/fe_hermite.C src/fe/fe_hermite_shape_0D.C \
 	src/fe/fe_hermite_shape_1D.C src/fe/fe_hermite_shape_2D.C \
 	src/fe/fe_hermite_shape_3D.C src/fe/fe_hierarchic.C \
-	src/fe/fe_hierarchic_shape_0D.C \
+	src/fe/fe_hierarchic_legacy.C src/fe/fe_hierarchic_shape_0D.C \
 	src/fe/fe_hierarchic_shape_1D.C \
 	src/fe/fe_hierarchic_shape_2D.C \
 	src/fe/fe_hierarchic_shape_3D.C src/fe/fe_hierarchic_vec.C \
@@ -664,6 +664,7 @@ am__objects_1 = src/base/libmesh_dbg_la-dirichlet_boundary.lo \
 	src/fe/libmesh_dbg_la-fe_hermite_shape_2D.lo \
 	src/fe/libmesh_dbg_la-fe_hermite_shape_3D.lo \
 	src/fe/libmesh_dbg_la-fe_hierarchic.lo \
+	src/fe/libmesh_dbg_la-fe_hierarchic_legacy.lo \
 	src/fe/libmesh_dbg_la-fe_hierarchic_shape_0D.lo \
 	src/fe/libmesh_dbg_la-fe_hierarchic_shape_1D.lo \
 	src/fe/libmesh_dbg_la-fe_hierarchic_shape_2D.lo \
@@ -1134,7 +1135,7 @@ am__libmesh_devel_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
 	src/fe/fe_hermite.C src/fe/fe_hermite_shape_0D.C \
 	src/fe/fe_hermite_shape_1D.C src/fe/fe_hermite_shape_2D.C \
 	src/fe/fe_hermite_shape_3D.C src/fe/fe_hierarchic.C \
-	src/fe/fe_hierarchic_shape_0D.C \
+	src/fe/fe_hierarchic_legacy.C src/fe/fe_hierarchic_shape_0D.C \
 	src/fe/fe_hierarchic_shape_1D.C \
 	src/fe/fe_hierarchic_shape_2D.C \
 	src/fe/fe_hierarchic_shape_3D.C src/fe/fe_hierarchic_vec.C \
@@ -1478,6 +1479,7 @@ am__objects_2 = src/base/libmesh_devel_la-dirichlet_boundary.lo \
 	src/fe/libmesh_devel_la-fe_hermite_shape_2D.lo \
 	src/fe/libmesh_devel_la-fe_hermite_shape_3D.lo \
 	src/fe/libmesh_devel_la-fe_hierarchic.lo \
+	src/fe/libmesh_devel_la-fe_hierarchic_legacy.lo \
 	src/fe/libmesh_devel_la-fe_hierarchic_shape_0D.lo \
 	src/fe/libmesh_devel_la-fe_hierarchic_shape_1D.lo \
 	src/fe/libmesh_devel_la-fe_hierarchic_shape_2D.lo \
@@ -1945,7 +1947,7 @@ am__libmesh_oprof_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
 	src/fe/fe_hermite.C src/fe/fe_hermite_shape_0D.C \
 	src/fe/fe_hermite_shape_1D.C src/fe/fe_hermite_shape_2D.C \
 	src/fe/fe_hermite_shape_3D.C src/fe/fe_hierarchic.C \
-	src/fe/fe_hierarchic_shape_0D.C \
+	src/fe/fe_hierarchic_legacy.C src/fe/fe_hierarchic_shape_0D.C \
 	src/fe/fe_hierarchic_shape_1D.C \
 	src/fe/fe_hierarchic_shape_2D.C \
 	src/fe/fe_hierarchic_shape_3D.C src/fe/fe_hierarchic_vec.C \
@@ -2289,6 +2291,7 @@ am__objects_3 = src/base/libmesh_oprof_la-dirichlet_boundary.lo \
 	src/fe/libmesh_oprof_la-fe_hermite_shape_2D.lo \
 	src/fe/libmesh_oprof_la-fe_hermite_shape_3D.lo \
 	src/fe/libmesh_oprof_la-fe_hierarchic.lo \
+	src/fe/libmesh_oprof_la-fe_hierarchic_legacy.lo \
 	src/fe/libmesh_oprof_la-fe_hierarchic_shape_0D.lo \
 	src/fe/libmesh_oprof_la-fe_hierarchic_shape_1D.lo \
 	src/fe/libmesh_oprof_la-fe_hierarchic_shape_2D.lo \
@@ -2756,7 +2759,7 @@ am__libmesh_opt_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
 	src/fe/fe_hermite.C src/fe/fe_hermite_shape_0D.C \
 	src/fe/fe_hermite_shape_1D.C src/fe/fe_hermite_shape_2D.C \
 	src/fe/fe_hermite_shape_3D.C src/fe/fe_hierarchic.C \
-	src/fe/fe_hierarchic_shape_0D.C \
+	src/fe/fe_hierarchic_legacy.C src/fe/fe_hierarchic_shape_0D.C \
 	src/fe/fe_hierarchic_shape_1D.C \
 	src/fe/fe_hierarchic_shape_2D.C \
 	src/fe/fe_hierarchic_shape_3D.C src/fe/fe_hierarchic_vec.C \
@@ -3100,6 +3103,7 @@ am__objects_4 = src/base/libmesh_opt_la-dirichlet_boundary.lo \
 	src/fe/libmesh_opt_la-fe_hermite_shape_2D.lo \
 	src/fe/libmesh_opt_la-fe_hermite_shape_3D.lo \
 	src/fe/libmesh_opt_la-fe_hierarchic.lo \
+	src/fe/libmesh_opt_la-fe_hierarchic_legacy.lo \
 	src/fe/libmesh_opt_la-fe_hierarchic_shape_0D.lo \
 	src/fe/libmesh_opt_la-fe_hierarchic_shape_1D.lo \
 	src/fe/libmesh_opt_la-fe_hierarchic_shape_2D.lo \
@@ -3566,7 +3570,7 @@ am__libmesh_prof_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
 	src/fe/fe_hermite.C src/fe/fe_hermite_shape_0D.C \
 	src/fe/fe_hermite_shape_1D.C src/fe/fe_hermite_shape_2D.C \
 	src/fe/fe_hermite_shape_3D.C src/fe/fe_hierarchic.C \
-	src/fe/fe_hierarchic_shape_0D.C \
+	src/fe/fe_hierarchic_legacy.C src/fe/fe_hierarchic_shape_0D.C \
 	src/fe/fe_hierarchic_shape_1D.C \
 	src/fe/fe_hierarchic_shape_2D.C \
 	src/fe/fe_hierarchic_shape_3D.C src/fe/fe_hierarchic_vec.C \
@@ -3910,6 +3914,7 @@ am__objects_5 = src/base/libmesh_prof_la-dirichlet_boundary.lo \
 	src/fe/libmesh_prof_la-fe_hermite_shape_2D.lo \
 	src/fe/libmesh_prof_la-fe_hermite_shape_3D.lo \
 	src/fe/libmesh_prof_la-fe_hierarchic.lo \
+	src/fe/libmesh_prof_la-fe_hierarchic_legacy.lo \
 	src/fe/libmesh_prof_la-fe_hierarchic_shape_0D.lo \
 	src/fe/libmesh_prof_la-fe_hierarchic_shape_1D.lo \
 	src/fe/libmesh_prof_la-fe_hierarchic_shape_2D.lo \
@@ -5188,6 +5193,7 @@ am__depfiles_remade = src/apps/$(DEPDIR)/amr_dbg-amr.Po \
 	src/fe/$(DEPDIR)/libmesh_dbg_la-fe_hermite_shape_2D.Plo \
 	src/fe/$(DEPDIR)/libmesh_dbg_la-fe_hermite_shape_3D.Plo \
 	src/fe/$(DEPDIR)/libmesh_dbg_la-fe_hierarchic.Plo \
+	src/fe/$(DEPDIR)/libmesh_dbg_la-fe_hierarchic_legacy.Plo \
 	src/fe/$(DEPDIR)/libmesh_dbg_la-fe_hierarchic_shape_0D.Plo \
 	src/fe/$(DEPDIR)/libmesh_dbg_la-fe_hierarchic_shape_1D.Plo \
 	src/fe/$(DEPDIR)/libmesh_dbg_la-fe_hierarchic_shape_2D.Plo \
@@ -5276,6 +5282,7 @@ am__depfiles_remade = src/apps/$(DEPDIR)/amr_dbg-amr.Po \
 	src/fe/$(DEPDIR)/libmesh_devel_la-fe_hermite_shape_2D.Plo \
 	src/fe/$(DEPDIR)/libmesh_devel_la-fe_hermite_shape_3D.Plo \
 	src/fe/$(DEPDIR)/libmesh_devel_la-fe_hierarchic.Plo \
+	src/fe/$(DEPDIR)/libmesh_devel_la-fe_hierarchic_legacy.Plo \
 	src/fe/$(DEPDIR)/libmesh_devel_la-fe_hierarchic_shape_0D.Plo \
 	src/fe/$(DEPDIR)/libmesh_devel_la-fe_hierarchic_shape_1D.Plo \
 	src/fe/$(DEPDIR)/libmesh_devel_la-fe_hierarchic_shape_2D.Plo \
@@ -5364,6 +5371,7 @@ am__depfiles_remade = src/apps/$(DEPDIR)/amr_dbg-amr.Po \
 	src/fe/$(DEPDIR)/libmesh_oprof_la-fe_hermite_shape_2D.Plo \
 	src/fe/$(DEPDIR)/libmesh_oprof_la-fe_hermite_shape_3D.Plo \
 	src/fe/$(DEPDIR)/libmesh_oprof_la-fe_hierarchic.Plo \
+	src/fe/$(DEPDIR)/libmesh_oprof_la-fe_hierarchic_legacy.Plo \
 	src/fe/$(DEPDIR)/libmesh_oprof_la-fe_hierarchic_shape_0D.Plo \
 	src/fe/$(DEPDIR)/libmesh_oprof_la-fe_hierarchic_shape_1D.Plo \
 	src/fe/$(DEPDIR)/libmesh_oprof_la-fe_hierarchic_shape_2D.Plo \
@@ -5452,6 +5460,7 @@ am__depfiles_remade = src/apps/$(DEPDIR)/amr_dbg-amr.Po \
 	src/fe/$(DEPDIR)/libmesh_opt_la-fe_hermite_shape_2D.Plo \
 	src/fe/$(DEPDIR)/libmesh_opt_la-fe_hermite_shape_3D.Plo \
 	src/fe/$(DEPDIR)/libmesh_opt_la-fe_hierarchic.Plo \
+	src/fe/$(DEPDIR)/libmesh_opt_la-fe_hierarchic_legacy.Plo \
 	src/fe/$(DEPDIR)/libmesh_opt_la-fe_hierarchic_shape_0D.Plo \
 	src/fe/$(DEPDIR)/libmesh_opt_la-fe_hierarchic_shape_1D.Plo \
 	src/fe/$(DEPDIR)/libmesh_opt_la-fe_hierarchic_shape_2D.Plo \
@@ -5540,6 +5549,7 @@ am__depfiles_remade = src/apps/$(DEPDIR)/amr_dbg-amr.Po \
 	src/fe/$(DEPDIR)/libmesh_prof_la-fe_hermite_shape_2D.Plo \
 	src/fe/$(DEPDIR)/libmesh_prof_la-fe_hermite_shape_3D.Plo \
 	src/fe/$(DEPDIR)/libmesh_prof_la-fe_hierarchic.Plo \
+	src/fe/$(DEPDIR)/libmesh_prof_la-fe_hierarchic_legacy.Plo \
 	src/fe/$(DEPDIR)/libmesh_prof_la-fe_hierarchic_shape_0D.Plo \
 	src/fe/$(DEPDIR)/libmesh_prof_la-fe_hierarchic_shape_1D.Plo \
 	src/fe/$(DEPDIR)/libmesh_prof_la-fe_hierarchic_shape_2D.Plo \
@@ -8140,6 +8150,7 @@ libmesh_SOURCES = \
         src/fe/fe_hermite_shape_2D.C \
         src/fe/fe_hermite_shape_3D.C \
         src/fe/fe_hierarchic.C \
+        src/fe/fe_hierarchic_legacy.C \
         src/fe/fe_hierarchic_shape_0D.C \
         src/fe/fe_hierarchic_shape_1D.C \
         src/fe/fe_hierarchic_shape_2D.C \
@@ -9255,6 +9266,8 @@ src/fe/libmesh_dbg_la-fe_hermite_shape_2D.lo: src/fe/$(am__dirstamp) \
 src/fe/libmesh_dbg_la-fe_hermite_shape_3D.lo: src/fe/$(am__dirstamp) \
 	src/fe/$(DEPDIR)/$(am__dirstamp)
 src/fe/libmesh_dbg_la-fe_hierarchic.lo: src/fe/$(am__dirstamp) \
+	src/fe/$(DEPDIR)/$(am__dirstamp)
+src/fe/libmesh_dbg_la-fe_hierarchic_legacy.lo: src/fe/$(am__dirstamp) \
 	src/fe/$(DEPDIR)/$(am__dirstamp)
 src/fe/libmesh_dbg_la-fe_hierarchic_shape_0D.lo:  \
 	src/fe/$(am__dirstamp) src/fe/$(DEPDIR)/$(am__dirstamp)
@@ -10505,6 +10518,8 @@ src/fe/libmesh_devel_la-fe_hermite_shape_3D.lo:  \
 	src/fe/$(am__dirstamp) src/fe/$(DEPDIR)/$(am__dirstamp)
 src/fe/libmesh_devel_la-fe_hierarchic.lo: src/fe/$(am__dirstamp) \
 	src/fe/$(DEPDIR)/$(am__dirstamp)
+src/fe/libmesh_devel_la-fe_hierarchic_legacy.lo:  \
+	src/fe/$(am__dirstamp) src/fe/$(DEPDIR)/$(am__dirstamp)
 src/fe/libmesh_devel_la-fe_hierarchic_shape_0D.lo:  \
 	src/fe/$(am__dirstamp) src/fe/$(DEPDIR)/$(am__dirstamp)
 src/fe/libmesh_devel_la-fe_hierarchic_shape_1D.lo:  \
@@ -11679,6 +11694,8 @@ src/fe/libmesh_oprof_la-fe_hermite_shape_3D.lo:  \
 	src/fe/$(am__dirstamp) src/fe/$(DEPDIR)/$(am__dirstamp)
 src/fe/libmesh_oprof_la-fe_hierarchic.lo: src/fe/$(am__dirstamp) \
 	src/fe/$(DEPDIR)/$(am__dirstamp)
+src/fe/libmesh_oprof_la-fe_hierarchic_legacy.lo:  \
+	src/fe/$(am__dirstamp) src/fe/$(DEPDIR)/$(am__dirstamp)
 src/fe/libmesh_oprof_la-fe_hierarchic_shape_0D.lo:  \
 	src/fe/$(am__dirstamp) src/fe/$(DEPDIR)/$(am__dirstamp)
 src/fe/libmesh_oprof_la-fe_hierarchic_shape_1D.lo:  \
@@ -12853,6 +12870,8 @@ src/fe/libmesh_opt_la-fe_hermite_shape_3D.lo: src/fe/$(am__dirstamp) \
 	src/fe/$(DEPDIR)/$(am__dirstamp)
 src/fe/libmesh_opt_la-fe_hierarchic.lo: src/fe/$(am__dirstamp) \
 	src/fe/$(DEPDIR)/$(am__dirstamp)
+src/fe/libmesh_opt_la-fe_hierarchic_legacy.lo: src/fe/$(am__dirstamp) \
+	src/fe/$(DEPDIR)/$(am__dirstamp)
 src/fe/libmesh_opt_la-fe_hierarchic_shape_0D.lo:  \
 	src/fe/$(am__dirstamp) src/fe/$(DEPDIR)/$(am__dirstamp)
 src/fe/libmesh_opt_la-fe_hierarchic_shape_1D.lo:  \
@@ -14024,6 +14043,8 @@ src/fe/libmesh_prof_la-fe_hermite_shape_3D.lo: src/fe/$(am__dirstamp) \
 	src/fe/$(DEPDIR)/$(am__dirstamp)
 src/fe/libmesh_prof_la-fe_hierarchic.lo: src/fe/$(am__dirstamp) \
 	src/fe/$(DEPDIR)/$(am__dirstamp)
+src/fe/libmesh_prof_la-fe_hierarchic_legacy.lo:  \
+	src/fe/$(am__dirstamp) src/fe/$(DEPDIR)/$(am__dirstamp)
 src/fe/libmesh_prof_la-fe_hierarchic_shape_0D.lo:  \
 	src/fe/$(am__dirstamp) src/fe/$(DEPDIR)/$(am__dirstamp)
 src/fe/libmesh_prof_la-fe_hierarchic_shape_1D.lo:  \
@@ -15959,6 +15980,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_dbg_la-fe_hermite_shape_2D.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_dbg_la-fe_hermite_shape_3D.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_dbg_la-fe_hierarchic.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_dbg_la-fe_hierarchic_legacy.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_dbg_la-fe_hierarchic_shape_0D.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_dbg_la-fe_hierarchic_shape_1D.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_dbg_la-fe_hierarchic_shape_2D.Plo@am__quote@ # am--include-marker
@@ -16047,6 +16069,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_devel_la-fe_hermite_shape_2D.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_devel_la-fe_hermite_shape_3D.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_devel_la-fe_hierarchic.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_devel_la-fe_hierarchic_legacy.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_devel_la-fe_hierarchic_shape_0D.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_devel_la-fe_hierarchic_shape_1D.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_devel_la-fe_hierarchic_shape_2D.Plo@am__quote@ # am--include-marker
@@ -16135,6 +16158,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_oprof_la-fe_hermite_shape_2D.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_oprof_la-fe_hermite_shape_3D.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_oprof_la-fe_hierarchic.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_oprof_la-fe_hierarchic_legacy.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_oprof_la-fe_hierarchic_shape_0D.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_oprof_la-fe_hierarchic_shape_1D.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_oprof_la-fe_hierarchic_shape_2D.Plo@am__quote@ # am--include-marker
@@ -16223,6 +16247,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_opt_la-fe_hermite_shape_2D.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_opt_la-fe_hermite_shape_3D.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_opt_la-fe_hierarchic.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_opt_la-fe_hierarchic_legacy.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_opt_la-fe_hierarchic_shape_0D.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_opt_la-fe_hierarchic_shape_1D.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_opt_la-fe_hierarchic_shape_2D.Plo@am__quote@ # am--include-marker
@@ -16311,6 +16336,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_prof_la-fe_hermite_shape_2D.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_prof_la-fe_hermite_shape_3D.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_prof_la-fe_hierarchic.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_prof_la-fe_hierarchic_legacy.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_prof_la-fe_hierarchic_shape_0D.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_prof_la-fe_hierarchic_shape_1D.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/fe/$(DEPDIR)/libmesh_prof_la-fe_hierarchic_shape_2D.Plo@am__quote@ # am--include-marker
@@ -18565,6 +18591,13 @@ src/fe/libmesh_dbg_la-fe_hierarchic.lo: src/fe/fe_hierarchic.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/fe/fe_hierarchic.C' object='src/fe/libmesh_dbg_la-fe_hierarchic.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/fe/libmesh_dbg_la-fe_hierarchic.lo `test -f 'src/fe/fe_hierarchic.C' || echo '$(srcdir)/'`src/fe/fe_hierarchic.C
+
+src/fe/libmesh_dbg_la-fe_hierarchic_legacy.lo: src/fe/fe_hierarchic_legacy.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/fe/libmesh_dbg_la-fe_hierarchic_legacy.lo -MD -MP -MF src/fe/$(DEPDIR)/libmesh_dbg_la-fe_hierarchic_legacy.Tpo -c -o src/fe/libmesh_dbg_la-fe_hierarchic_legacy.lo `test -f 'src/fe/fe_hierarchic_legacy.C' || echo '$(srcdir)/'`src/fe/fe_hierarchic_legacy.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/fe/$(DEPDIR)/libmesh_dbg_la-fe_hierarchic_legacy.Tpo src/fe/$(DEPDIR)/libmesh_dbg_la-fe_hierarchic_legacy.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/fe/fe_hierarchic_legacy.C' object='src/fe/libmesh_dbg_la-fe_hierarchic_legacy.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/fe/libmesh_dbg_la-fe_hierarchic_legacy.lo `test -f 'src/fe/fe_hierarchic_legacy.C' || echo '$(srcdir)/'`src/fe/fe_hierarchic_legacy.C
 
 src/fe/libmesh_dbg_la-fe_hierarchic_shape_0D.lo: src/fe/fe_hierarchic_shape_0D.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/fe/libmesh_dbg_la-fe_hierarchic_shape_0D.lo -MD -MP -MF src/fe/$(DEPDIR)/libmesh_dbg_la-fe_hierarchic_shape_0D.Tpo -c -o src/fe/libmesh_dbg_la-fe_hierarchic_shape_0D.lo `test -f 'src/fe/fe_hierarchic_shape_0D.C' || echo '$(srcdir)/'`src/fe/fe_hierarchic_shape_0D.C
@@ -21898,6 +21931,13 @@ src/fe/libmesh_devel_la-fe_hierarchic.lo: src/fe/fe_hierarchic.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/fe/libmesh_devel_la-fe_hierarchic.lo `test -f 'src/fe/fe_hierarchic.C' || echo '$(srcdir)/'`src/fe/fe_hierarchic.C
 
+src/fe/libmesh_devel_la-fe_hierarchic_legacy.lo: src/fe/fe_hierarchic_legacy.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/fe/libmesh_devel_la-fe_hierarchic_legacy.lo -MD -MP -MF src/fe/$(DEPDIR)/libmesh_devel_la-fe_hierarchic_legacy.Tpo -c -o src/fe/libmesh_devel_la-fe_hierarchic_legacy.lo `test -f 'src/fe/fe_hierarchic_legacy.C' || echo '$(srcdir)/'`src/fe/fe_hierarchic_legacy.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/fe/$(DEPDIR)/libmesh_devel_la-fe_hierarchic_legacy.Tpo src/fe/$(DEPDIR)/libmesh_devel_la-fe_hierarchic_legacy.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/fe/fe_hierarchic_legacy.C' object='src/fe/libmesh_devel_la-fe_hierarchic_legacy.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/fe/libmesh_devel_la-fe_hierarchic_legacy.lo `test -f 'src/fe/fe_hierarchic_legacy.C' || echo '$(srcdir)/'`src/fe/fe_hierarchic_legacy.C
+
 src/fe/libmesh_devel_la-fe_hierarchic_shape_0D.lo: src/fe/fe_hierarchic_shape_0D.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/fe/libmesh_devel_la-fe_hierarchic_shape_0D.lo -MD -MP -MF src/fe/$(DEPDIR)/libmesh_devel_la-fe_hierarchic_shape_0D.Tpo -c -o src/fe/libmesh_devel_la-fe_hierarchic_shape_0D.lo `test -f 'src/fe/fe_hierarchic_shape_0D.C' || echo '$(srcdir)/'`src/fe/fe_hierarchic_shape_0D.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/fe/$(DEPDIR)/libmesh_devel_la-fe_hierarchic_shape_0D.Tpo src/fe/$(DEPDIR)/libmesh_devel_la-fe_hierarchic_shape_0D.Plo
@@ -25229,6 +25269,13 @@ src/fe/libmesh_oprof_la-fe_hierarchic.lo: src/fe/fe_hierarchic.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/fe/fe_hierarchic.C' object='src/fe/libmesh_oprof_la-fe_hierarchic.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/fe/libmesh_oprof_la-fe_hierarchic.lo `test -f 'src/fe/fe_hierarchic.C' || echo '$(srcdir)/'`src/fe/fe_hierarchic.C
+
+src/fe/libmesh_oprof_la-fe_hierarchic_legacy.lo: src/fe/fe_hierarchic_legacy.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/fe/libmesh_oprof_la-fe_hierarchic_legacy.lo -MD -MP -MF src/fe/$(DEPDIR)/libmesh_oprof_la-fe_hierarchic_legacy.Tpo -c -o src/fe/libmesh_oprof_la-fe_hierarchic_legacy.lo `test -f 'src/fe/fe_hierarchic_legacy.C' || echo '$(srcdir)/'`src/fe/fe_hierarchic_legacy.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/fe/$(DEPDIR)/libmesh_oprof_la-fe_hierarchic_legacy.Tpo src/fe/$(DEPDIR)/libmesh_oprof_la-fe_hierarchic_legacy.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/fe/fe_hierarchic_legacy.C' object='src/fe/libmesh_oprof_la-fe_hierarchic_legacy.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/fe/libmesh_oprof_la-fe_hierarchic_legacy.lo `test -f 'src/fe/fe_hierarchic_legacy.C' || echo '$(srcdir)/'`src/fe/fe_hierarchic_legacy.C
 
 src/fe/libmesh_oprof_la-fe_hierarchic_shape_0D.lo: src/fe/fe_hierarchic_shape_0D.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/fe/libmesh_oprof_la-fe_hierarchic_shape_0D.lo -MD -MP -MF src/fe/$(DEPDIR)/libmesh_oprof_la-fe_hierarchic_shape_0D.Tpo -c -o src/fe/libmesh_oprof_la-fe_hierarchic_shape_0D.lo `test -f 'src/fe/fe_hierarchic_shape_0D.C' || echo '$(srcdir)/'`src/fe/fe_hierarchic_shape_0D.C
@@ -28562,6 +28609,13 @@ src/fe/libmesh_opt_la-fe_hierarchic.lo: src/fe/fe_hierarchic.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/fe/libmesh_opt_la-fe_hierarchic.lo `test -f 'src/fe/fe_hierarchic.C' || echo '$(srcdir)/'`src/fe/fe_hierarchic.C
 
+src/fe/libmesh_opt_la-fe_hierarchic_legacy.lo: src/fe/fe_hierarchic_legacy.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/fe/libmesh_opt_la-fe_hierarchic_legacy.lo -MD -MP -MF src/fe/$(DEPDIR)/libmesh_opt_la-fe_hierarchic_legacy.Tpo -c -o src/fe/libmesh_opt_la-fe_hierarchic_legacy.lo `test -f 'src/fe/fe_hierarchic_legacy.C' || echo '$(srcdir)/'`src/fe/fe_hierarchic_legacy.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/fe/$(DEPDIR)/libmesh_opt_la-fe_hierarchic_legacy.Tpo src/fe/$(DEPDIR)/libmesh_opt_la-fe_hierarchic_legacy.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/fe/fe_hierarchic_legacy.C' object='src/fe/libmesh_opt_la-fe_hierarchic_legacy.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/fe/libmesh_opt_la-fe_hierarchic_legacy.lo `test -f 'src/fe/fe_hierarchic_legacy.C' || echo '$(srcdir)/'`src/fe/fe_hierarchic_legacy.C
+
 src/fe/libmesh_opt_la-fe_hierarchic_shape_0D.lo: src/fe/fe_hierarchic_shape_0D.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/fe/libmesh_opt_la-fe_hierarchic_shape_0D.lo -MD -MP -MF src/fe/$(DEPDIR)/libmesh_opt_la-fe_hierarchic_shape_0D.Tpo -c -o src/fe/libmesh_opt_la-fe_hierarchic_shape_0D.lo `test -f 'src/fe/fe_hierarchic_shape_0D.C' || echo '$(srcdir)/'`src/fe/fe_hierarchic_shape_0D.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/fe/$(DEPDIR)/libmesh_opt_la-fe_hierarchic_shape_0D.Tpo src/fe/$(DEPDIR)/libmesh_opt_la-fe_hierarchic_shape_0D.Plo
@@ -31893,6 +31947,13 @@ src/fe/libmesh_prof_la-fe_hierarchic.lo: src/fe/fe_hierarchic.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/fe/fe_hierarchic.C' object='src/fe/libmesh_prof_la-fe_hierarchic.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/fe/libmesh_prof_la-fe_hierarchic.lo `test -f 'src/fe/fe_hierarchic.C' || echo '$(srcdir)/'`src/fe/fe_hierarchic.C
+
+src/fe/libmesh_prof_la-fe_hierarchic_legacy.lo: src/fe/fe_hierarchic_legacy.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/fe/libmesh_prof_la-fe_hierarchic_legacy.lo -MD -MP -MF src/fe/$(DEPDIR)/libmesh_prof_la-fe_hierarchic_legacy.Tpo -c -o src/fe/libmesh_prof_la-fe_hierarchic_legacy.lo `test -f 'src/fe/fe_hierarchic_legacy.C' || echo '$(srcdir)/'`src/fe/fe_hierarchic_legacy.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/fe/$(DEPDIR)/libmesh_prof_la-fe_hierarchic_legacy.Tpo src/fe/$(DEPDIR)/libmesh_prof_la-fe_hierarchic_legacy.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/fe/fe_hierarchic_legacy.C' object='src/fe/libmesh_prof_la-fe_hierarchic_legacy.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/fe/libmesh_prof_la-fe_hierarchic_legacy.lo `test -f 'src/fe/fe_hierarchic_legacy.C' || echo '$(srcdir)/'`src/fe/fe_hierarchic_legacy.C
 
 src/fe/libmesh_prof_la-fe_hierarchic_shape_0D.lo: src/fe/fe_hierarchic_shape_0D.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/fe/libmesh_prof_la-fe_hierarchic_shape_0D.lo -MD -MP -MF src/fe/$(DEPDIR)/libmesh_prof_la-fe_hierarchic_shape_0D.Tpo -c -o src/fe/libmesh_prof_la-fe_hierarchic_shape_0D.lo `test -f 'src/fe/fe_hierarchic_shape_0D.C' || echo '$(srcdir)/'`src/fe/fe_hierarchic_shape_0D.C
@@ -36714,6 +36775,7 @@ distclean: distclean-recursive
 	-rm -f src/fe/$(DEPDIR)/libmesh_dbg_la-fe_hermite_shape_2D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_dbg_la-fe_hermite_shape_3D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_dbg_la-fe_hierarchic.Plo
+	-rm -f src/fe/$(DEPDIR)/libmesh_dbg_la-fe_hierarchic_legacy.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_dbg_la-fe_hierarchic_shape_0D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_dbg_la-fe_hierarchic_shape_1D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_dbg_la-fe_hierarchic_shape_2D.Plo
@@ -36802,6 +36864,7 @@ distclean: distclean-recursive
 	-rm -f src/fe/$(DEPDIR)/libmesh_devel_la-fe_hermite_shape_2D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_devel_la-fe_hermite_shape_3D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_devel_la-fe_hierarchic.Plo
+	-rm -f src/fe/$(DEPDIR)/libmesh_devel_la-fe_hierarchic_legacy.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_devel_la-fe_hierarchic_shape_0D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_devel_la-fe_hierarchic_shape_1D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_devel_la-fe_hierarchic_shape_2D.Plo
@@ -36890,6 +36953,7 @@ distclean: distclean-recursive
 	-rm -f src/fe/$(DEPDIR)/libmesh_oprof_la-fe_hermite_shape_2D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_oprof_la-fe_hermite_shape_3D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_oprof_la-fe_hierarchic.Plo
+	-rm -f src/fe/$(DEPDIR)/libmesh_oprof_la-fe_hierarchic_legacy.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_oprof_la-fe_hierarchic_shape_0D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_oprof_la-fe_hierarchic_shape_1D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_oprof_la-fe_hierarchic_shape_2D.Plo
@@ -36978,6 +37042,7 @@ distclean: distclean-recursive
 	-rm -f src/fe/$(DEPDIR)/libmesh_opt_la-fe_hermite_shape_2D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_opt_la-fe_hermite_shape_3D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_opt_la-fe_hierarchic.Plo
+	-rm -f src/fe/$(DEPDIR)/libmesh_opt_la-fe_hierarchic_legacy.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_opt_la-fe_hierarchic_shape_0D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_opt_la-fe_hierarchic_shape_1D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_opt_la-fe_hierarchic_shape_2D.Plo
@@ -37066,6 +37131,7 @@ distclean: distclean-recursive
 	-rm -f src/fe/$(DEPDIR)/libmesh_prof_la-fe_hermite_shape_2D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_prof_la-fe_hermite_shape_3D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_prof_la-fe_hierarchic.Plo
+	-rm -f src/fe/$(DEPDIR)/libmesh_prof_la-fe_hierarchic_legacy.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_prof_la-fe_hierarchic_shape_0D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_prof_la-fe_hierarchic_shape_1D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_prof_la-fe_hierarchic_shape_2D.Plo
@@ -39225,6 +39291,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f src/fe/$(DEPDIR)/libmesh_dbg_la-fe_hermite_shape_2D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_dbg_la-fe_hermite_shape_3D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_dbg_la-fe_hierarchic.Plo
+	-rm -f src/fe/$(DEPDIR)/libmesh_dbg_la-fe_hierarchic_legacy.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_dbg_la-fe_hierarchic_shape_0D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_dbg_la-fe_hierarchic_shape_1D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_dbg_la-fe_hierarchic_shape_2D.Plo
@@ -39313,6 +39380,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f src/fe/$(DEPDIR)/libmesh_devel_la-fe_hermite_shape_2D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_devel_la-fe_hermite_shape_3D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_devel_la-fe_hierarchic.Plo
+	-rm -f src/fe/$(DEPDIR)/libmesh_devel_la-fe_hierarchic_legacy.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_devel_la-fe_hierarchic_shape_0D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_devel_la-fe_hierarchic_shape_1D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_devel_la-fe_hierarchic_shape_2D.Plo
@@ -39401,6 +39469,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f src/fe/$(DEPDIR)/libmesh_oprof_la-fe_hermite_shape_2D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_oprof_la-fe_hermite_shape_3D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_oprof_la-fe_hierarchic.Plo
+	-rm -f src/fe/$(DEPDIR)/libmesh_oprof_la-fe_hierarchic_legacy.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_oprof_la-fe_hierarchic_shape_0D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_oprof_la-fe_hierarchic_shape_1D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_oprof_la-fe_hierarchic_shape_2D.Plo
@@ -39489,6 +39558,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f src/fe/$(DEPDIR)/libmesh_opt_la-fe_hermite_shape_2D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_opt_la-fe_hermite_shape_3D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_opt_la-fe_hierarchic.Plo
+	-rm -f src/fe/$(DEPDIR)/libmesh_opt_la-fe_hierarchic_legacy.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_opt_la-fe_hierarchic_shape_0D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_opt_la-fe_hierarchic_shape_1D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_opt_la-fe_hierarchic_shape_2D.Plo
@@ -39577,6 +39647,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f src/fe/$(DEPDIR)/libmesh_prof_la-fe_hermite_shape_2D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_prof_la-fe_hermite_shape_3D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_prof_la-fe_hierarchic.Plo
+	-rm -f src/fe/$(DEPDIR)/libmesh_prof_la-fe_hierarchic_legacy.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_prof_la-fe_hierarchic_shape_0D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_prof_la-fe_hierarchic_shape_1D.Plo
 	-rm -f src/fe/$(DEPDIR)/libmesh_prof_la-fe_hierarchic_shape_2D.Plo
