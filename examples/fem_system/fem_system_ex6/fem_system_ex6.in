@@ -1,0 +1,13 @@
+# The number of elements along each side of the square
+grid_size = 16
+
+# Newton iteration limits and tolerances
+max_nonlinear_iterations = 10
+relative_residual_tolerance = 1.e-12
+relative_step_tolerance = 0
+absolute_residual_tolerance = 0
+
+# A positive value compares each element Jacobian against a
+# finite-difference approximation and aborts if their relative
+# difference exceeds it
+verify_analytic_jacobians = 0
