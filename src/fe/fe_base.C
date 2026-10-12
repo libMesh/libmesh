@@ -829,8 +829,9 @@ void FEGenericBase<Real>::compute_dual_shape_coeffs (const std::vector<Real> & J
   // of its adjacent mid-edge shapes. That replaces D by T^-1 diag(T d), which for this T is the sparse
   // update below. alpha = 1/5 is recommended there, and makes the weights strictly positive (QUAD8
   // 1/5 and 4/5, TRI6 1/15 and 1/10) while preserving the partition of unity. T = I elsewhere.
-  // SECOND order on TRI7 is the TRI6 basis, with no degree of freedom at the centroid node.
-  if (_elem && get_family() == LAGRANGE &&
+  // SECOND order on TRI7 is the TRI6 basis, with no degree of freedom at the centroid node, and
+  // L2_LAGRANGE shares the LAGRANGE shape functions.
+  if (_elem && (get_family() == LAGRANGE || get_family() == L2_LAGRANGE) &&
       (((_elem->type() == TRI6 || _elem->type() == TRI7) && sz == 6) ||
        (_elem->type() == QUAD8 && sz == 8)))
     {
