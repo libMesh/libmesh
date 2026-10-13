@@ -3,6 +3,7 @@
 #ifdef LIBMESH_HAVE_EXODUS_API
 
 #include "libmesh/cell_c0polyhedron.h"
+#include "libmesh/distributed_mesh.h"
 #include "libmesh/enum_to_string.h"
 #include "libmesh/exodusII_io.h"
 #include "libmesh/face_c0polygon.h"
@@ -10,6 +11,7 @@
 #include "libmesh/mesh_communication.h"
 #include "libmesh/mesh_generation.h"
 #include "libmesh/node.h"
+#include "libmesh/replicated_mesh.h"
 
 #include <memory>
 #include <set>
@@ -189,8 +191,10 @@ public:
   CPPUNIT_TEST(test_write_cube_header);
   CPPUNIT_TEST(test_write_hexagonal_prism_header);
   CPPUNIT_TEST(test_write_and_read_hexagonal_prism);
-  CPPUNIT_TEST(test_write_and_read_mixed_poly_hex);
-  CPPUNIT_TEST(test_write_and_read_mixed_hex_tet_block_names);
+  CPPUNIT_TEST(test_write_and_read_mixed_poly_hex_replicated);
+  CPPUNIT_TEST(test_write_and_read_mixed_poly_hex_distributed);
+  CPPUNIT_TEST(test_write_and_read_mixed_hex_tet_block_names_replicated);
+  CPPUNIT_TEST(test_write_and_read_mixed_hex_tet_block_names_distributed);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -207,6 +211,16 @@ public:
     Mesh header_mesh(*TestCommWorld);
     ExodusII_IO exii(header_mesh);
     return exii.read_header(filename);
+  }
+
+  // When run in parallel, check that a DistributedMesh really is
+  // distributed before we write it, so the writer is exercised on a
+  // mesh that has to be gathered to processor 0.
+  static void assert_distributed_if_parallel(const MeshBase & mesh)
+  {
+    if (mesh.n_processors() > 1 &&
+        dynamic_cast<const DistributedMesh *>(&mesh))
+      CPPUNIT_ASSERT(!mesh.is_serial());
   }
 
   void build_c0polyhedron(Mesh &mesh,
@@ -390,11 +404,10 @@ public:
   // fix the whole subdomain was written as a single block of the first
   // element's type, which errored (or, when the first element was the
   // HEX8, crashed) instead of writing the polyhedra.
-  void test_write_and_read_mixed_poly_hex()
+  template <typename MeshType>
+  void test_write_and_read_mixed_poly_hex_impl(const std::string & filename)
   {
-    LOG_UNIT_TEST;
-
-    Mesh mesh(*TestCommWorld);
+    MeshType mesh(*TestCommWorld);
 
     // A hexagonal-prism polyhedron, nodes 0..11, in subdomain 1.
     const std::vector<Point> points =
@@ -436,18 +449,19 @@ public:
 
     mesh.cache_elem_data();
     mesh.prepare_for_use();
+    assert_distributed_if_parallel(mesh);
 
     {
       ExodusII_IO exii(mesh);
-      exii.write("write_exodus_mixed_poly_hex.e");
+      exii.write(filename);
     }
 
     TestCommWorld->barrier();
 
-    Mesh input_mesh(*TestCommWorld);
+    MeshType input_mesh(*TestCommWorld);
     ExodusII_IO exii_input(input_mesh);
     if (input_mesh.processor_id() == 0)
-      exii_input.read("write_exodus_mixed_poly_hex.e");
+      exii_input.read(filename);
 
     MeshCommunication().broadcast(input_mesh);
     input_mesh.prepare_for_use();
@@ -469,6 +483,18 @@ public:
     CPPUNIT_ASSERT_EQUAL(1u, n_hex);
   }
 
+  void test_write_and_read_mixed_poly_hex_replicated()
+  {
+    LOG_UNIT_TEST;
+    test_write_and_read_mixed_poly_hex_impl<ReplicatedMesh>("write_exodus_mixed_poly_hex_repl.e");
+  }
+
+  void test_write_and_read_mixed_poly_hex_distributed()
+  {
+    LOG_UNIT_TEST;
+    test_write_and_read_mixed_poly_hex_impl<DistributedMesh>("write_exodus_mixed_poly_hex_dist.e");
+  }
+
   // A subdomain that mixes element types (here HEX8 + TET4) must be split
   // into one Exodus block per type, since Exodus allows a single element
   // type per block.  Only the lower-valued ElemType keeps the subdomain
@@ -477,11 +503,10 @@ public:
   // trips as an identifiable, separate subdomain.  This also checks the
   // add_sides path, where side blocks are numbered above the synthesized
   // element blocks and so must not collide with them.
-  void test_write_and_read_mixed_hex_tet_block_names()
+  template <typename MeshType>
+  void test_write_and_read_mixed_hex_tet_block_names_impl(const std::string & basename)
   {
-    LOG_UNIT_TEST;
-
-    Mesh mesh(*TestCommWorld);
+    MeshType mesh(*TestCommWorld);
 
     // HEX8, nodes 0..7, subdomain 1.
     const std::vector<Point> hex_points =
@@ -507,13 +532,14 @@ public:
     tet->subdomain_id() = 1;
     mesh.add_elem(std::move(tet));
 
-    mesh.subdomain_name(1) = "solid";
+    mesh.set_subdomain_name(1, "solid", /*synchronous=*/true);
 
     mesh.prepare_for_use();
+    assert_distributed_if_parallel(mesh);
 
     {
       ExodusII_IO exii(mesh);
-      exii.write("write_exodus_mixed_hex_tet.e");
+      exii.write(basename + ".e");
     }
 
     // The mixed subdomain must also survive an add_sides write: its side
@@ -522,15 +548,15 @@ public:
     {
       ExodusII_IO exii(mesh);
       exii.write_added_sides(true);
-      exii.write("write_exodus_mixed_hex_tet_sides.e");
+      exii.write(basename + "_sides.e");
     }
 
     TestCommWorld->barrier();
 
-    Mesh input_mesh(*TestCommWorld);
+    MeshType input_mesh(*TestCommWorld);
     ExodusII_IO exii_input(input_mesh);
     if (input_mesh.processor_id() == 0)
-      exii_input.read("write_exodus_mixed_hex_tet.e");
+      exii_input.read(basename + ".e");
 
     MeshCommunication().broadcast(input_mesh);
     input_mesh.prepare_for_use();
@@ -563,6 +589,18 @@ public:
       names.insert(input_mesh.subdomain_name(sid));
     CPPUNIT_ASSERT_EQUAL(std::size_t(1), names.count("solid"));
     CPPUNIT_ASSERT_EQUAL(std::size_t(1), names.count("solid_HEX8"));
+  }
+
+  void test_write_and_read_mixed_hex_tet_block_names_replicated()
+  {
+    LOG_UNIT_TEST;
+    test_write_and_read_mixed_hex_tet_block_names_impl<ReplicatedMesh>("write_exodus_mixed_hex_tet_repl");
+  }
+
+  void test_write_and_read_mixed_hex_tet_block_names_distributed()
+  {
+    LOG_UNIT_TEST;
+    test_write_and_read_mixed_hex_tet_block_names_impl<DistributedMesh>("write_exodus_mixed_hex_tet_dist");
   }
 };
 
