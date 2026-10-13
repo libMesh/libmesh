@@ -293,9 +293,10 @@ int main(int argc, char ** argv)
 
   if (!libMesh::on_command_line("--integral"))
     {
-      // Create a new mesh and a new EquationSystems
-      Mesh new_mesh(init.comm(), requested_dim);
-      new_mesh.read(meshname);
+      // Create a new mesh and a new EquationSystems.
+      // Copying the old mesh is faster than rereading it, and gets us
+      // any constraint rows from an input extraction operator matrix.
+      Mesh new_mesh(old_mesh);
 
       EquationSystems new_es(new_mesh);
 
