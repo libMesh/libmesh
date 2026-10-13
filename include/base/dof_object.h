@@ -678,9 +678,16 @@ private:
    *
    * It is hoped that by setting this to a power of two, an optimizing compiler
    * will recognize later that  #/ncv_magic is simply a bitshift
+   *
+   * I want ncv_magic to be low enough so we can still do some testing
+   * with multiphysics and 16-bit DoF indices occasionally, but high
+   * enough that we don't fail with only a few hundred components
+   * (e.g. a p=6 L2_LAGRANGE Hex has 7^3 and already exceeds 2^8).
+   * Let's make it the square root of what our indices can store,
+   * for maximum compatibility for any build.
    */
-  static const index_t ncv_magic = 256; // = 2^8, in case we want to manually bitshift
-  static const index_t ncv_magic_exp = 8; // Let's manually bitshift
+  static constexpr index_t ncv_magic_exp = sizeof(index_t)*4; // To manually bitshift
+  static constexpr index_t ncv_magic = 1 << ncv_magic_exp;    // = 2^exp, for bitshifts
 
   /**
    * The starting index for system \p s.
