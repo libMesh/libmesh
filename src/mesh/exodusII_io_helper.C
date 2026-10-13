@@ -203,8 +203,27 @@ const std::vector<int> prism_inverse_face_map = {4, 1, 2, 3, 5};
   std::map<subdomain_id_type, std::vector<unsigned int>>
   build_subdomain_map(const MeshBase & mesh,
                       bool add_sides,
+                      bool reduce,
                       subdomain_id_type & subdomain_id_end)
   {
+    // Without a reduction across ranks, the subdomain map is only
+    // complete if the whole mesh is available here.
+    libmesh_assert(reduce || mesh.is_serial_on_zero());
+    if (reduce)
+      libmesh_parallel_only(mesh.comm());
+
+    // When reducing, each rank only contributes its local elements, so
+    // that no element is counted twice on a replicated mesh.
+    auto for_each_elem = [&mesh, reduce](auto && f)
+      {
+        if (reduce)
+          for (const auto & elem : mesh.active_local_element_ptr_range())
+            f(*elem);
+        else
+          for (const auto & elem : mesh.active_element_ptr_range())
+            f(*elem);
+      };
+
     // Exodus requires every element block to contain a single element
     // type.  Group elements first by subdomain id and then by element
     // type, so that a subdomain containing more than one element type
@@ -212,26 +231,53 @@ const std::vector<int> prism_inverse_face_map = {4, 1, 2, 3, 5};
     // multiple blocks rather than written as a single, invalid block.
     std::map<subdomain_id_type,
              std::map<ElemType, std::vector<unsigned int>>> elems_by_subdomain_type;
-    subdomain_id_type max_subdomain_id = 0;
-    bool have_elems = false;
 
-    // The subdomain map will only be complete if the mesh is serial
-    // Unfortunately, there are callers that call exodus output not only on rank 0
-    libmesh_assert(mesh.is_serial_on_zero());
-
-    for (const auto & elem : mesh.active_element_ptr_range())
+    // We skip writing infinite elements to the Exodus file, so don't
+    // put them in the map. That way the number of blocks should be
+    // correct.
+    if (reduce)
       {
-        // We skip writing infinite elements to the Exodus file, so
-        // don't put them in the map. That way the number of blocks
-        // should be correct.
-        if (elem->infinite())
-          continue;
+        std::vector<dof_id_type> elem_ids;
+        std::vector<subdomain_id_type> elem_sbd_ids;
+        std::vector<int> elem_types;
+        for_each_elem([&](const Elem & elem)
+          {
+            if (elem.infinite())
+              return;
+            elem_ids.push_back(elem.id());
+            elem_sbd_ids.push_back(elem.subdomain_id());
+            elem_types.push_back(elem.type());
+          });
 
-        const subdomain_id_type sbd_id = elem->subdomain_id();
-        elems_by_subdomain_type[sbd_id][elem->type()].push_back(elem->id());
-        max_subdomain_id = have_elems ? std::max(max_subdomain_id, sbd_id) : sbd_id;
-        have_elems = true;
+        // Every rank contributes the same number of entries to each
+        // vector, so the gathered vectors stay aligned.
+        mesh.comm().allgather(elem_ids);
+        mesh.comm().allgather(elem_sbd_ids);
+        mesh.comm().allgather(elem_types);
+
+        for (auto i : index_range(elem_ids))
+          elems_by_subdomain_type[elem_sbd_ids[i]][static_cast<ElemType>(elem_types[i])]
+            .push_back(cast_int<unsigned int>(elem_ids[i]));
+
+        // Gathered ids arrive grouped by rank; sort them to match the
+        // id ordering of a serial traversal.
+        for (auto & [sbd_id, type_map] : elems_by_subdomain_type)
+          {
+            libmesh_ignore(sbd_id);
+            for (auto & [elem_t, ids] : type_map)
+              {
+                libmesh_ignore(elem_t);
+                std::sort(ids.begin(), ids.end());
+              }
+          }
       }
+    else
+      for_each_elem([&](const Elem & elem)
+        {
+          if (elem.infinite())
+            return;
+          elems_by_subdomain_type[elem.subdomain_id()][elem.type()].push_back(elem.id());
+        });
 
     // Assign a block id to each (subdomain, element type) group.  The
     // first element type in each subdomain keeps the subdomain id as its
@@ -240,13 +286,15 @@ const std::vector<int> prism_inverse_face_map = {4, 1, 2, 3, 5};
     // subdomain get synthesized block ids allocated above all existing
     // subdomain ids.
     std::map<subdomain_id_type, std::vector<unsigned int>> subdomain_map;
-    subdomain_id_type next_synth_block_id = have_elems ? max_subdomain_id + 1 : 0;
+    subdomain_id_type next_synth_block_id = elems_by_subdomain_type.empty() ?
+      0 : elems_by_subdomain_type.rbegin()->first + 1;
 
     for (auto & [sbd_id, type_map] : elems_by_subdomain_type)
       {
         bool first_type = true;
         for (auto & [elem_t, elem_ids] : type_map)
           {
+            libmesh_ignore(elem_t);
             const subdomain_id_type block_id =
               first_type ? sbd_id : next_synth_block_id++;
 
@@ -265,31 +313,36 @@ const std::vector<int> prism_inverse_face_map = {4, 1, 2, 3, 5};
     // explicitly exist in the mesh, but we add an entry to keep track of
     // the number of elements we'll add in each new block.
     if (add_sides)
-      for (const auto & elem : mesh.active_element_ptr_range())
-        {
-          if (elem->infinite())
-            continue;
+      {
+        std::map<subdomain_id_type, unsigned int> side_block_counts;
+        for_each_elem([&](const Elem & elem)
+          {
+            if (elem.infinite())
+              return;
 
-          for (auto s : elem->side_index_range())
-            {
-              if (EquationSystems::redundant_added_side(*elem,s))
-                continue;
+            for (auto s : elem.side_index_range())
+              {
+                if (EquationSystems::redundant_added_side(elem,s))
+                  continue;
 
-              const subdomain_id_type side_block_id =
-                cast_int<subdomain_id_type>(subdomain_id_end + elem->side_type(s));
+                const subdomain_id_type side_block_id =
+                  cast_int<subdomain_id_type>(subdomain_id_end + elem.side_type(s));
 
-              // Guard the invariant above (also catches subdomain_id_type
-              // overflow wrapping a side block id back down onto an
-              // element block id).
-              libmesh_assert_greater_equal(side_block_id, subdomain_id_end);
+                // Guard the invariant above (also catches subdomain_id_type
+                // overflow wrapping a side block id back down onto an
+                // element block id).
+                libmesh_assert_greater_equal(side_block_id, subdomain_id_end);
 
-              auto & marker = subdomain_map[side_block_id];
-              if (marker.empty())
-                marker.push_back(1);
-              else
-                ++marker[0];
-            }
-        }
+                ++side_block_counts[side_block_id];
+              }
+          });
+
+        if (reduce)
+          mesh.comm().sum(side_block_counts);
+
+        for (const auto & [side_block_id, count] : side_block_counts)
+          subdomain_map[side_block_id] = {count};
+      }
 
     return subdomain_map;
   }
@@ -2715,6 +2768,7 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   subdomain_id_type subdomain_id_end = 0;
   auto subdomain_map = build_subdomain_map(mesh,
                                            _add_sides,
+                                           /*reduce=*/!_run_only_on_proc0,
                                            subdomain_id_end);
 
   if (!use_discontinuous)
@@ -3001,6 +3055,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
   subdomain_id_type subdomain_id_end = 0;
   auto subdomain_map = build_subdomain_map(mesh,
                                            _add_sides,
+                                           /*reduce=*/!_run_only_on_proc0,
                                            subdomain_id_end);
 
   // Allocate the polyhedron face block ID after both mesh subdomains and
