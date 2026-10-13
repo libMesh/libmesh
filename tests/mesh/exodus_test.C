@@ -6,6 +6,7 @@
 #include "libmesh/distributed_mesh.h"
 #include "libmesh/enum_to_string.h"
 #include "libmesh/exodusII_io.h"
+#include "libmesh/exodusII_io_helper.h"
 #include "libmesh/face_c0polygon.h"
 #include "libmesh/int_range.h"
 #include "libmesh/mesh_communication.h"
@@ -195,6 +196,7 @@ public:
   CPPUNIT_TEST(test_write_and_read_mixed_poly_hex_distributed);
   CPPUNIT_TEST(test_write_and_read_mixed_hex_tet_block_names_replicated);
   CPPUNIT_TEST(test_write_and_read_mixed_hex_tet_block_names_distributed);
+  CPPUNIT_TEST(test_write_and_read_mixed_hex_tet_block_names_all_ranks);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -504,7 +506,8 @@ public:
   // add_sides path, where side blocks are numbered above the synthesized
   // element blocks and so must not collide with them.
   template <typename MeshType>
-  void test_write_and_read_mixed_hex_tet_block_names_impl(const std::string & basename)
+  void test_write_and_read_mixed_hex_tet_block_names_impl(const std::string & basename,
+                                                          bool run_only_on_proc0 = true)
   {
     MeshType mesh(*TestCommWorld);
 
@@ -537,26 +540,51 @@ public:
     mesh.prepare_for_use();
     assert_distributed_if_parallel(mesh);
 
-    {
-      ExodusII_IO exii(mesh);
-      exii.write(basename + ".e");
-    }
+    // ExodusII_IO only writes on processor 0.  A helper created with
+    // run_only_on_proc0=false instead writes on every rank (as Nemesis
+    // and MOOSE do), each to its own file, so build_subdomain_map() has
+    // to reduce the local elements across ranks.  That needs the whole
+    // mesh on every rank.
+    libmesh_assert(run_only_on_proc0 || mesh.is_serial());
+    const std::string suffix = run_only_on_proc0 ? ".e" :
+      "." + std::to_string(mesh.n_processors()) + "." +
+      std::to_string(mesh.processor_id()) + ".e";
+
+    auto write_mesh = [&mesh, run_only_on_proc0](const std::string & filename,
+                                                 bool add_sides)
+      {
+        if (run_only_on_proc0)
+          {
+            ExodusII_IO exii(mesh);
+            exii.write_added_sides(add_sides);
+            exii.write(filename);
+          }
+        else
+          {
+            ExodusII_IO_Helper helper(mesh, /*v=*/false, /*run_only_on_proc0=*/false);
+            helper.set_add_sides(add_sides);
+            helper.create(filename);
+            helper.initialize(filename, mesh);
+            helper.write_nodal_coordinates(mesh);
+            helper.write_elements(mesh);
+            helper.close();
+          }
+      };
+
+    write_mesh(basename + suffix, /*add_sides=*/false);
 
     // The mixed subdomain must also survive an add_sides write: its side
     // blocks are numbered above the synthesized element block, so the two
     // id spaces must not collide (guarded in build_subdomain_map()).
-    {
-      ExodusII_IO exii(mesh);
-      exii.write_added_sides(true);
-      exii.write(basename + "_sides.e");
-    }
+    write_mesh(basename + "_sides" + suffix, /*add_sides=*/true);
 
     TestCommWorld->barrier();
 
+    // Processor 0's file is read back either way.
     MeshType input_mesh(*TestCommWorld);
     ExodusII_IO exii_input(input_mesh);
     if (input_mesh.processor_id() == 0)
-      exii_input.read(basename + ".e");
+      exii_input.read(basename + suffix);
 
     MeshCommunication().broadcast(input_mesh);
     input_mesh.prepare_for_use();
@@ -601,6 +629,13 @@ public:
   {
     LOG_UNIT_TEST;
     test_write_and_read_mixed_hex_tet_block_names_impl<DistributedMesh>("write_exodus_mixed_hex_tet_dist");
+  }
+
+  void test_write_and_read_mixed_hex_tet_block_names_all_ranks()
+  {
+    LOG_UNIT_TEST;
+    test_write_and_read_mixed_hex_tet_block_names_impl<ReplicatedMesh>
+      ("write_exodus_mixed_hex_tet_all_ranks", /*run_only_on_proc0=*/false);
   }
 };
 
