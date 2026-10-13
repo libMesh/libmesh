@@ -216,7 +216,8 @@ const std::vector<int> prism_inverse_face_map = {4, 1, 2, 3, 5};
     bool have_elems = false;
 
     // The subdomain map will only be complete if the mesh is serial
-    libmesh_assert(mesh.is_serial());
+    // Unfortunately, there are callers that call exodus output not only on rank 0
+    libmesh_assert(mesh.is_serial_on_zero());
 
     for (const auto & elem : mesh.active_element_ptr_range())
       {
