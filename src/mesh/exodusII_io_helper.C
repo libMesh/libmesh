@@ -203,8 +203,7 @@ const std::vector<int> prism_inverse_face_map = {4, 1, 2, 3, 5};
   std::map<subdomain_id_type, std::vector<unsigned int>>
   build_subdomain_map(const MeshBase & mesh,
                       bool add_sides,
-                      subdomain_id_type & subdomain_id_end,
-                      int & next_block_id)
+                      subdomain_id_type & subdomain_id_end)
   {
     // Exodus requires every element block to contain a single element
     // type.  Group elements first by subdomain id and then by element
@@ -215,6 +214,9 @@ const std::vector<int> prism_inverse_face_map = {4, 1, 2, 3, 5};
              std::map<ElemType, std::vector<unsigned int>>> elems_by_subdomain_type;
     subdomain_id_type max_subdomain_id = 0;
     bool have_elems = false;
+
+    // The subdomain map will only be complete if the mesh is serial
+    libmesh_assert(mesh.is_serial());
 
     for (const auto & elem : mesh.active_element_ptr_range())
       {
@@ -287,11 +289,6 @@ const std::vector<int> prism_inverse_face_map = {4, 1, 2, 3, 5};
                 ++marker[0];
             }
         }
-
-    // Allocate optional block IDs after both mesh subdomains and any blocks
-    // synthesized for visualization sides.
-    if (!subdomain_map.empty())
-      next_block_id = cast_int<int>(subdomain_map.rbegin()->first) + 1;
 
     return subdomain_map;
   }
@@ -2625,14 +2622,6 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
   const BoundaryInfo & bi = mesh.get_boundary_info();
   num_edge = bi.n_edge_conds();
 
-  // We need to know about all processors' subdomains
-  subdomain_id_type subdomain_id_end = 0;
-  int c0polyhedron_face_block_id = -1;
-  auto subdomain_map = build_subdomain_map(mesh,
-                                           _add_sides,
-                                           subdomain_id_end,
-                                           c0polyhedron_face_block_id);
-
   num_elem = n_active_elem;
   num_nodes = 0;
   num_face = 0;
@@ -2720,6 +2709,12 @@ void ExodusII_IO_Helper::initialize(std::string str_title, const MeshBase & mesh
 
   if ((_run_only_on_proc0) && (this->processor_id() != 0))
     return;
+
+  // We need to know about all processors' subdomains
+  subdomain_id_type subdomain_id_end = 0;
+  auto subdomain_map = build_subdomain_map(mesh,
+                                           _add_sides,
+                                           subdomain_id_end);
 
   if (!use_discontinuous)
     {
@@ -2997,17 +2992,20 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
 {
   LOG_SCOPE("write_elements()", "ExodusII_IO_Helper");
 
+  if ((_run_only_on_proc0) && (this->processor_id() != 0))
+    return;
+
   // Map from block ID to a vector of element IDs in that block.  Element
   // IDs are now of type dof_id_type, subdomain IDs are of type subdomain_id_type.
   subdomain_id_type subdomain_id_end = 0;
-  int c0polyhedron_face_block_id = -1;
   auto subdomain_map = build_subdomain_map(mesh,
                                            _add_sides,
-                                           subdomain_id_end,
-                                           c0polyhedron_face_block_id);
+                                           subdomain_id_end);
 
-  if ((_run_only_on_proc0) && (this->processor_id() != 0))
-    return;
+  // Allocate the polyhedron face block ID after both mesh subdomains and
+  // any blocks synthesized for visualization sides.
+  const int c0polyhedron_face_block_id = subdomain_map.empty() ? 0 :
+    cast_int<int>(subdomain_map.rbegin()->first) + 1;
 
   // element map vector
   num_elem_blk = cast_int<int>(subdomain_map.size());
@@ -3084,14 +3082,14 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
                 : (block_name + "_" + type_suffix);
 
               // Informational: keep it to one rank so parallel (Nemesis)
-              // writes don't repeat it once per processor.
-              // NOTE might miss logs if only occurs on other ranks
+              // writes will not repeat it once per processor.
+              // NOTE this might miss logs if only occurs on other ranks
               if (this->processor_id() == 0)
                 libMesh::out << "ExodusII_IO: subdomain " << elem_subdomain_id
                              << " contains more than one element type; writing its "
                              << type_suffix << " elements to a new block \"" << block_name
                              << "\" (block id " << subdomain_id
-                             << "), which will be read back as a separate subdomain."
+                             << ")"
                              << std::endl;
             }
 
