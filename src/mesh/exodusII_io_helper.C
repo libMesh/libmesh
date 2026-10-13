@@ -244,9 +244,9 @@ const std::vector<int> prism_inverse_face_map = {4, 1, 2, 3, 5};
         bool first_type = true;
         for (auto & [elem_t, elem_ids] : type_map)
           {
-            libmesh_ignore(elem_t);
             const subdomain_id_type block_id =
               first_type ? sbd_id : next_synth_block_id++;
+
             first_type = false;
             subdomain_map[block_id] = std::move(elem_ids);
           }
@@ -3073,7 +3073,7 @@ void ExodusII_IO_Helper::write_elements(const MeshBase & mesh, bool use_disconti
 
           if (is_synthesized_block)
             {
-              // Prefix the (original) subdomain's name with the element
+              // Suffix the (original) subdomain's name with the element
               // type, so the synthesized block is identifiable and its
               // name stays distinct from the block that kept the
               // subdomain id.  This block becomes its own subdomain when

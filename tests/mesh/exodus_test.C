@@ -562,7 +562,7 @@ public:
     for (auto sid : sbd_ids)
       names.insert(input_mesh.subdomain_name(sid));
     CPPUNIT_ASSERT_EQUAL(std::size_t(1), names.count("solid"));
-    CPPUNIT_ASSERT_EQUAL(std::size_t(1), names.count("HEX8_solid"));
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), names.count("solid_HEX8"));
   }
 };
 
