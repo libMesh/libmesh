@@ -12,6 +12,7 @@
 #include "libmesh/node.h"
 
 #include <memory>
+#include <set>
 #include <string>
 #include <vector>
 
@@ -189,6 +190,7 @@ public:
   CPPUNIT_TEST(test_write_hexagonal_prism_header);
   CPPUNIT_TEST(test_write_and_read_hexagonal_prism);
   CPPUNIT_TEST(test_write_and_read_mixed_poly_hex);
+  CPPUNIT_TEST(test_write_and_read_mixed_hex_tet_block_names);
 
   CPPUNIT_TEST_SUITE_END();
 
@@ -465,6 +467,102 @@ public:
     input_mesh.comm().sum(n_hex);
     CPPUNIT_ASSERT_EQUAL(1u, n_poly);
     CPPUNIT_ASSERT_EQUAL(1u, n_hex);
+  }
+
+  // A subdomain that mixes element types (here HEX8 + TET4) must be split
+  // into one Exodus block per type, since Exodus allows a single element
+  // type per block.  Only the lower-valued ElemType keeps the subdomain
+  // id; the other type is written to a synthesized block whose name is the
+  // element type prefixed onto the original subdomain name, so it round
+  // trips as an identifiable, separate subdomain.  This also checks the
+  // add_sides path, where side blocks are numbered above the synthesized
+  // element blocks and so must not collide with them.
+  void test_write_and_read_mixed_hex_tet_block_names()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+
+    // HEX8, nodes 0..7, subdomain 1.
+    const std::vector<Point> hex_points =
+      { {0,0,0}, {1,0,0}, {1,1,0}, {0,1,0}, {0,0,1}, {1,0,1}, {1,1,1}, {0,1,1} };
+    for (auto i : index_range(hex_points))
+      mesh.add_point(hex_points[i], i);
+    std::unique_ptr<Elem> hex = Elem::build(HEX8);
+    for (unsigned int i = 0; i != 8; ++i)
+      hex->set_node(i, mesh.node_ptr(i));
+    hex->set_id() = 0;
+    hex->subdomain_id() = 1;
+    mesh.add_elem(std::move(hex));
+
+    // TET4 in the *same* subdomain 1, nodes 8..11 (offset in x).
+    const std::vector<Point> tet_points =
+      { {5,0,0}, {6,0,0}, {5,1,0}, {5,0,1} };
+    for (auto i : index_range(tet_points))
+      mesh.add_point(tet_points[i], 8 + i);
+    std::unique_ptr<Elem> tet = Elem::build(TET4);
+    for (unsigned int i = 0; i != 4; ++i)
+      tet->set_node(i, mesh.node_ptr(8 + i));
+    tet->set_id() = 1;
+    tet->subdomain_id() = 1;
+    mesh.add_elem(std::move(tet));
+
+    mesh.subdomain_name(1) = "solid";
+
+    mesh.prepare_for_use();
+
+    {
+      ExodusII_IO exii(mesh);
+      exii.write("write_exodus_mixed_hex_tet.e");
+    }
+
+    // The mixed subdomain must also survive an add_sides write: its side
+    // blocks are numbered above the synthesized element block, so the two
+    // id spaces must not collide (guarded in build_subdomain_map()).
+    {
+      ExodusII_IO exii(mesh);
+      exii.write_added_sides(true);
+      exii.write("write_exodus_mixed_hex_tet_sides.e");
+    }
+
+    TestCommWorld->barrier();
+
+    Mesh input_mesh(*TestCommWorld);
+    ExodusII_IO exii_input(input_mesh);
+    if (input_mesh.processor_id() == 0)
+      exii_input.read("write_exodus_mixed_hex_tet.e");
+
+    MeshCommunication().broadcast(input_mesh);
+    input_mesh.prepare_for_use();
+
+    CPPUNIT_ASSERT_EQUAL(cast_int<dof_id_type>(2), input_mesh.n_elem());
+
+    // Both element types survive the round trip.
+    unsigned int n_hex = 0, n_tet = 0;
+    for (const auto & elem : input_mesh.active_local_element_ptr_range())
+      {
+        if (elem->type() == HEX8)
+          ++n_hex;
+        else if (elem->type() == TET4)
+          ++n_tet;
+      }
+    input_mesh.comm().sum(n_hex);
+    input_mesh.comm().sum(n_tet);
+    CPPUNIT_ASSERT_EQUAL(1u, n_hex);
+    CPPUNIT_ASSERT_EQUAL(1u, n_tet);
+
+    // The single input subdomain became two: the original "solid" (which
+    // kept the TET4, the lower-valued ElemType) and a synthesized
+    // "HEX8_solid" for the HEX8.
+    std::set<subdomain_id_type> sbd_ids;
+    input_mesh.subdomain_ids(sbd_ids);
+    CPPUNIT_ASSERT_EQUAL(std::size_t(2), sbd_ids.size());
+
+    std::set<std::string> names;
+    for (auto sid : sbd_ids)
+      names.insert(input_mesh.subdomain_name(sid));
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), names.count("solid"));
+    CPPUNIT_ASSERT_EQUAL(std::size_t(1), names.count("HEX8_solid"));
   }
 };
 
