@@ -755,6 +755,10 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
               break;
             }
 
+            case QUAD16:
+              { 
+                break;
+              }
             case C0POLYGON:
             {
               // we create the nodes at the same time as the elements
