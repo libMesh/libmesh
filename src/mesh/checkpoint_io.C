@@ -928,7 +928,11 @@ void CheckpointIO::write_disjoint_neighbor_boundary_pairs (Xdr & io) const
   if (n_pairs)
     {
       io.data(pair_ids);
-      io.data(translations);
+      // data_stream, unlike the generic vector path, handles extended
+      // precision Real
+      io.data_stream(translations.data(),
+                     cast_int<unsigned int>(translations.size()),
+                     LIBMESH_DIM);
     }
 }
 
@@ -1119,6 +1123,12 @@ file_id_type CheckpointIO::read_header (const std::string & name)
   this->comm().broadcast(disjoint_translations);
 
 #ifdef LIBMESH_ENABLE_PERIODIC
+  // The file is the complete record of the pairs, so it replaces any
+  // pairs left on a reused mesh rather than merging with them
+  if (this->version_at_least_1_7())
+    if (PeriodicBoundaries * db = mesh.get_disjoint_neighbor_boundary_pairs())
+      db->clear();
+
   for (auto i : make_range(disjoint_pair_ids.size() / 2))
     {
       RealVectorValue translation;
@@ -1746,7 +1756,14 @@ void CheckpointIO::read_disjoint_neighbor_boundary_pairs
   if (n_pairs)
     {
       io.data(pair_ids);
-      io.data(translations);
+      libmesh_error_msg_if(pair_ids.size() != 2 * n_pairs,
+                           "Expected " << 2 * n_pairs << " disjoint neighbor boundary ids, found "
+                           << pair_ids.size());
+
+      translations.resize(LIBMESH_DIM * n_pairs);
+      io.data_stream(translations.data(),
+                     cast_int<unsigned int>(translations.size()),
+                     LIBMESH_DIM);
     }
 }
 

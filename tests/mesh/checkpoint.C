@@ -482,6 +482,11 @@ public:
     {
       Mesh mesh(*TestCommWorld);
       mesh.allow_renumbering(false);
+
+      // A stale pair on the mesh being read into must not survive
+      const boundary_id_type stale_id = 7;
+      mesh.add_disjoint_neighbor_boundary_pairs(left_id, stale_id, RealVectorValue(1., 0.));
+
       CheckpointIO checkpoint(mesh, binary);
       checkpoint.read(filename);
       mesh.prepare_for_use();
