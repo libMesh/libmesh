@@ -3222,7 +3222,7 @@ void DofMap::enforce_constraints_on_residual (const NonlinearImplicitSystem & sy
         {
           if (auto rhsit = _primal_constraint_values.find(constrained_dof);
               rhsit != _primal_constraint_values.end())
-            exact_value += rhsit->second;
+            exact_value -= rhsit->second;
         }
 
       rhs->set(constrained_dof, exact_value);
