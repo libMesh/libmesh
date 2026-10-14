@@ -682,11 +682,18 @@ private:
    * I want ncv_magic to be low enough so we can still do some testing
    * with multiphysics and 16-bit DoF indices occasionally, but high
    * enough that we don't fail with only a few hundred components
-   * (e.g. a p=6 L2_LAGRANGE Hex has 7^3 and already exceeds 2^8).
-   * Let's make it the square root of what our indices can store,
-   * for maximum compatibility for any build.
+   * (e.g. a p=6 L2_HIERARCIC Hex has 7^3 and already exceeds 2^8).
+   *
+   * Let's make it what our indices can store to the 3/8 power.  That
+   * leaves 5/8 for n_vars.  On a 32-bit build this lets us have
+   * n_vars up to 2^20 (good for 1M variables, passing our 100K unit
+   * test) and n_comp up to 2^12 (good for 16^3 components, so we can
+   * go up to p=15 even on an L2_HIERARCHIC hex).
+   *
+   * For a 64-bit build we instead get 2^40 and 2^24, 1T vars and
+   * p=30, which should be enough for anybody.
    */
-  static constexpr index_t ncv_magic_exp = sizeof(index_t)*4;       // To manually bitshift
+  static constexpr index_t ncv_magic_exp = sizeof(index_t)*3;       // To manually bitshift
   static constexpr index_t ncv_magic = index_t(1) << ncv_magic_exp; // = 2^exp, for bitshifts
 
   /**
