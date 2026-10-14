@@ -398,10 +398,15 @@ public:
   {
     LOG_UNIT_TEST;
 
+    // This test uses assumptions about DofObject internals, and might
+    // need to be changed when those are.
+    const dof_id_type ncv_exp = sizeof(dof_id_type)*4;
+    const dof_id_type ncv_magic = dof_id_type(1) << ncv_exp;
+
     // For more information on this bug, see the following email thread:
     // https://sourceforge.net/p/libmesh/mailman/libmesh-users/thread/50C8EE7C.8090405@gmail.com/
     DofObject & aobject(*instance);
-    dof_id_type buf0[] = {2, 8, 257, 0, 257, 96, 257, 192, 257, 0};
+    dof_id_type buf0[] = {2, 8, ncv_magic+1, 0, ncv_magic+1, 96, ncv_magic+1, 192, ncv_magic+1, 0};
     aobject.set_buffer(std::vector<dof_id_type>(buf0, buf0+10));
 
     CPPUNIT_ASSERT_EQUAL (aobject.dof_number(0,0,0), static_cast<dof_id_type>(  0));
@@ -409,7 +414,7 @@ public:
     CPPUNIT_ASSERT_EQUAL (aobject.dof_number(0,2,0), static_cast<dof_id_type>(192));
     CPPUNIT_ASSERT_EQUAL (aobject.dof_number(1,0,0), static_cast<dof_id_type>(  0));
 
-    dof_id_type buf1[] = {2, 8, 257, 1, 257, 97, 257, 193, 257, 1};
+    dof_id_type buf1[] = {2, 8, ncv_magic+1, 1, ncv_magic+1, 97, ncv_magic+1, 193, ncv_magic+1, 1};
     aobject.set_buffer(std::vector<dof_id_type>(buf1, buf1+10));
 
     CPPUNIT_ASSERT_EQUAL (aobject.dof_number(0,0,0), static_cast<dof_id_type>(  1));
