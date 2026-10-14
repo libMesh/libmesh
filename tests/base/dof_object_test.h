@@ -400,7 +400,7 @@ public:
 
     // This test uses assumptions about DofObject internals, and might
     // need to be changed when those are.
-    const dof_id_type ncv_exp = sizeof(dof_id_type)*4;
+    const dof_id_type ncv_exp = sizeof(dof_id_type)*3;
     const dof_id_type ncv_magic = dof_id_type(1) << ncv_exp;
 
     // For more information on this bug, see the following email thread:
