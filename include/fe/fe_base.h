@@ -218,10 +218,11 @@ public:
    * mortar coupling matrix diagonal, so a Lagrange multiplier can be condensed
    * with a diagonal inverse.
    *
-   * \note On QUAD8 and TRI6 these functions are biorthogonal to a locally
+   * \note For SECOND order LAGRANGE and L2_LAGRANGE on QUAD8, TRI6 and TRI7
+   * these functions are biorthogonal to a locally
    * transformed primal basis rather than to \f$ N \f$ itself: \f$ \int N_k \f$
    * is not positive on those faces (exactly 0 at a TRI6 vertex, -1/3 at a QUAD8
-   * corner), so the usual construction degenerates. For those two element types
+   * corner), so the usual construction degenerates. For those element types
    * \f$ \int \Phi_j N_k \f$ is therefore not diagonal; it factors as
    * \f$ D = \tilde{D} T^{-1} \f$ with \f$ \tilde{D} \f$ diagonal, leaving
    * \f$ D^{-1} = T \tilde{D}^{-1} \f$ sparse and cheap to apply. The functions
