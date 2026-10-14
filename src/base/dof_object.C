@@ -397,7 +397,7 @@ void DofObject::set_n_comp_group(const unsigned int s,
   if (ncomp == this->n_comp_group(s,vg)) return;
 
 #ifndef NDEBUG
-  if (ncomp >= ncv_magic)
+  if (index_t(ncomp) >= ncv_magic)
     {
       const index_t ncvm = ncv_magic;
       libmesh_error_msg("ERROR: ncomp must be less than DofObject::ncv_magic!\n" \
