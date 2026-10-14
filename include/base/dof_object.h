@@ -686,8 +686,8 @@ private:
    * Let's make it the square root of what our indices can store,
    * for maximum compatibility for any build.
    */
-  static constexpr index_t ncv_magic_exp = sizeof(index_t)*4; // To manually bitshift
-  static constexpr index_t ncv_magic = 1 << ncv_magic_exp;    // = 2^exp, for bitshifts
+  static constexpr index_t ncv_magic_exp = sizeof(index_t)*4;       // To manually bitshift
+  static constexpr index_t ncv_magic = index_t(1) << ncv_magic_exp; // = 2^exp, for bitshifts
 
   /**
    * The starting index for system \p s.
@@ -958,7 +958,7 @@ unsigned int DofObject::n_vars(const unsigned int s,
   libmesh_assert_less ((start_idx_sys + 2*vg), _idx_buf.size());
 
   return (cast_int<unsigned int>
-          (_idx_buf[start_idx_sys + 2*vg]) >> ncv_magic_exp);
+          (_idx_buf[start_idx_sys + 2*vg] >> ncv_magic_exp));
 }
 
 
