@@ -219,7 +219,7 @@ extern "C"
 
     if (rc.solver->_exact_constraint_enforcement)
       {
-        rc.sys.get_dof_map().enforce_constraints_on_residual(rc.sys, &R, rc.sys.current_local_solution.get());
+        rc.sys.get_dof_map().enforce_constraints_on_residual(rc.sys, &R, rc.sys.current_local_solution.get(), /*homogeneous=*/false);
         R.close();
       }
 
@@ -264,7 +264,7 @@ extern "C"
 
     if (rc.solver->_exact_constraint_enforcement)
       {
-        rc.sys.get_dof_map().enforce_constraints_on_residual(rc.sys, &R, rc.sys.current_local_solution.get());
+        rc.sys.get_dof_map().enforce_constraints_on_residual(rc.sys, &R, rc.sys.current_local_solution.get(), /*homogeneous=*/false);
         R.close();
       }
 
@@ -311,7 +311,7 @@ extern "C"
 
     if (rc.solver->_exact_constraint_enforcement)
       {
-        rc.sys.get_dof_map().enforce_constraints_on_residual(rc.sys, &R, rc.sys.current_local_solution.get());
+        rc.sys.get_dof_map().enforce_constraints_on_residual(rc.sys, &R, rc.sys.current_local_solution.get(), /*homogeneous=*/false);
         R.close();
       }
 
