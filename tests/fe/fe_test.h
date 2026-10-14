@@ -27,6 +27,7 @@
 #define FETEST                                  \
   CPPUNIT_TEST( testFEInterface );              \
   CPPUNIT_TEST( testRefspaceNodes );            \
+  CPPUNIT_TEST( testNodalSoln );                \
   CPPUNIT_TEST( testU );                        \
   CPPUNIT_TEST( testPartitionOfUnity );         \
   CPPUNIT_TEST( testUPastVertices );            \
@@ -764,6 +765,42 @@ public:
         LIBMESH_ASSERT_REALVEC_EQUAL(nodes[n],
                                      this->_elem->master_point(n),
                                      TOLERANCE*TOLERANCE);
+    }
+
+  void testNodalSoln()
+    {
+      LOG_UNIT_TEST;
+
+      if (!this->_elem)
+        return;
+
+      // The Lagrange nodal solution is the interpolant evaluated at
+      // each node, including nodes which carry no degree of freedom
+      if (family != LAGRANGE && family != L2_LAGRANGE)
+        return;
+
+      if (this->_elem->runtime_topology())
+        return;
+
+      const FEType fe_type = this->_sys->variable_type(0);
+      const unsigned int n_dofs = FEInterface::n_dofs(fe_type, this->_elem);
+
+      std::vector<Number> elem_soln(n_dofs, 0), nodal_soln;
+      for (auto i : make_range(n_dofs))
+        {
+          elem_soln[i] = 1;
+          FEInterface::nodal_soln(this->_dim, fe_type, this->_elem,
+                                  elem_soln, nodal_soln);
+          elem_soln[i] = 0;
+
+          CPPUNIT_ASSERT_EQUAL(std::size_t(this->_elem->n_nodes()),
+                               nodal_soln.size());
+          for (auto n : this->_elem->node_index_range())
+            LIBMESH_ASSERT_NUMBERS_EQUAL
+              (FEInterface::shape(fe_type, this->_elem, i,
+                                  this->_elem->master_point(n)),
+               nodal_soln[n], TOLERANCE*TOLERANCE);
+        }
     }
 
   void testPartitionOfUnity()
