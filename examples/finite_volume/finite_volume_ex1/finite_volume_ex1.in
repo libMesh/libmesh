@@ -1,8 +1,9 @@
 # The number of hexagons along each direction of the coarsest mesh
 coarse_grid_size = 4
 
-# The number of times the coarse grid size is doubled
-n_refinements = 3
+# The maximum number of times the coarse grid size is doubled while
+# waiting for the measured convergence rate to approach 2
+max_refinements = 6
 
 # The diffusion coefficient
 diffusivity = 1

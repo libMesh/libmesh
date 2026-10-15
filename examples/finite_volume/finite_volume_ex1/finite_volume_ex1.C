@@ -52,8 +52,10 @@
 // remote elements.
 //
 // The example solves a manufactured-solution problem on a sequence of
-// uniformly refined meshes and reports the centroid-sampled L2 error,
-// which should decrease at second order.
+// uniformly refined meshes and reports the centroid-sampled L2 error.
+// Refinement continues until a least-squares fit over the last three
+// meshes gives a convergence rate close to 2, and the example fails if
+// that does not happen within the allowed number of refinements.
 
 // libMesh includes
 #include "libmesh/libmesh.h"
@@ -344,12 +346,24 @@ main(int argc, char ** argv)
   infile.parse_command_line(argc, argv);
 
   const unsigned int coarse_grid_size = infile("coarse_grid_size", 4);
-  const unsigned int n_refinements = infile("n_refinements", 3);
+  const unsigned int max_refinements = infile("max_refinements", 6);
   const Real diffusivity = infile("diffusivity", 1.);
   const RealVectorValue velocity(infile("velocity_x", 1.), infile("velocity_y", 0.5));
 
-  Real previous_error = 0;
-  for (const auto level : make_range(n_refinements + 1))
+  // The scheme is second order, and a measured rate within this
+  // distance of 2 is taken as confirmation of that order. The bound is
+  // loose enough to absorb the pre-asymptotic behavior of the error on
+  // the coarsest grids and the round-off of any supported Real
+  // precision, and tight enough to catch a loss of second-order
+  // accuracy. Dropping the advection reconstruction reduces the scheme
+  // to first order, and dropping the non-orthogonal diffusion
+  // correction stops the error from converging at all.
+  const Real expected_rate = 2;
+  const Real rate_tolerance = 0.1;
+
+  std::vector<Real> errors;
+  bool converged = false;
+  for (const auto level : make_range(max_refinements + 1))
     {
       const unsigned int grid_size = coarse_grid_size << level;
 
@@ -374,18 +388,38 @@ main(int argc, char ** argv)
       system.solve();
 
       const Real error = centroid_l2_error(system);
+      errors.push_back(error);
       libMesh::out << "Grid size " << grid_size << ": " << mesh.n_active_elem()
                    << " cells, centroid L2 error " << error;
       if (level)
-        libMesh::out << ", convergence rate " << std::log2(previous_error / error);
-      libMesh::out << std::endl;
-      previous_error = error;
+        libMesh::out << ", convergence rate " << std::log2(errors[level - 1] / error);
 
+      // Fit a line to log2(error) against log2(h) over the last three
+      // grids. The grid spacing h halves at each level, so the sample
+      // points are equally spaced and the least-squares slope reduces
+      // to the difference between the first and last points divided by
+      // their separation of two levels.
+      if (level >= 2)
+        {
+          const Real fit_rate = std::log2(errors[level - 2] / error) / 2;
+          libMesh::out << ", three-grid fit rate " << fit_rate;
+          converged = std::abs(fit_rate - expected_rate) < rate_tolerance;
+        }
+      libMesh::out << std::endl;
+
+      if (converged)
+        {
 #ifdef LIBMESH_HAVE_EXODUS_API
-      if (level == n_refinements)
-        ExodusII_IO(mesh).write_equation_systems("out.e", equation_systems);
+          ExodusII_IO(mesh).write_equation_systems("out.e", equation_systems);
 #endif
+          break;
+        }
     }
+
+  libmesh_error_msg_if(!converged,
+                       "The three-grid fit of the L2 error convergence rate did not reach "
+                           << expected_rate << " +/- " << rate_tolerance << " within "
+                           << max_refinements << " refinements");
 
   return 0;
 }
