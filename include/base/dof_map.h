@@ -1078,6 +1078,43 @@ public:
   void create_dof_constraints (const MeshBase &, Real time=0);
 
   /**
+   * Recomputes the DirichletBoundary constraint values at a new \p
+   * time. The result is the same as that of create_dof_constraints()
+   * at \p time.
+   *
+   * Only the DirichletBoundary values change with time. The degrees
+   * of freedom that each DirichletBoundary claims depend only on the
+   * mesh. The hanging-node, periodic and p-refinement constraints also
+   * depend only on the mesh. Thus create_dof_constraints() keeps a
+   * copy of the constraints that it builds before it applies the
+   * DirichletBoundary objects. It also records the local elements that
+   * carry a DirichletBoundary id. This method restores that copy. Then
+   * it applies the DirichletBoundary objects again, on those elements
+   * only and in the same order. Thus overlapping boundaries resolve as
+   * they do in create_dof_constraints().
+   *
+   * This method calls create_dof_constraints() instead if one of these
+   * conditions is true:
+   * - No copy matches the current degrees of freedom and boundaries.
+   * - There are no DirichletBoundary objects.
+   * - The mesh has spline constraint rows. Their processing uses the
+   *   Dirichlet values.
+   *
+   * As after create_dof_constraints(), add any user constraints and
+   * then call process_constraints().
+   * System::reinit_dirichlet_constraint_values() does these steps.
+   */
+  void reinit_dirichlet_constraint_values (const MeshBase & mesh, Real time);
+
+  /**
+   * \returns Two memory estimates in bytes for this processor. The
+   * first is the memory that reinit_dirichlet_constraint_values()
+   * keeps. The second is the memory of the processed degree of
+   * freedom constraints, for comparison.
+   */
+  std::pair<std::size_t, std::size_t> dirichlet_constraint_cache_memory () const;
+
+  /**
    * Gathers constraint equation dependencies from other processors
    */
   void allgather_recursive_constraints (MeshBase &);
@@ -1664,6 +1701,20 @@ public:
    */
   void check_dirichlet_bcid_consistency (const MeshBase & mesh,
                                          const DirichletBoundary & boundary) const;
+
+private:
+  /**
+   * Adds the constraints of each primal and adjoint DirichletBoundary
+   * at \p time on the elements of \p range. If \p acted_on_elems is
+   * not null, it receives the elements that carry a DirichletBoundary
+   * id, sorted by id.
+   */
+  void apply_dirichlet_boundaries (const MeshBase & mesh,
+                                   Real time,
+                                   ConstElemRange & range,
+                                   std::vector<const Elem *> * acted_on_elems = nullptr);
+
+public:
 #endif // LIBMESH_ENABLE_DIRICHLET
 
 
@@ -2289,6 +2340,33 @@ private:
   DofConstraintValueMap      _primal_constraint_values;
 
   AdjointDofConstraintValues _adjoint_constraint_values;
+#endif
+
+#ifdef LIBMESH_ENABLE_DIRICHLET
+  /**
+   * The data from the last create_dof_constraints() call that
+   * reinit_dirichlet_constraint_values() uses at a new time.
+   */
+  struct DirichletConstraintCache
+  {
+    /// Whether the cache matches the current degrees of freedom and boundaries
+    bool valid = false;
+
+    /// The constraints that create_dof_constraints() built before it
+    /// applied the DirichletBoundary objects
+    DofConstraints dof_constraints;
+    DofConstraintValueMap primal_constraint_values;
+    AdjointDofConstraintValues adjoint_constraint_values;
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+    NodeConstraints node_constraints;
+#endif
+
+    /// The local active elements carrying any DirichletBoundary id,
+    /// sorted by id
+    std::vector<const Elem *> boundary_elems;
+  };
+
+  DirichletConstraintCache _dirichlet_cache;
 #endif
 
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
