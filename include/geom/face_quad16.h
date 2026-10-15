@@ -32,17 +32,15 @@ namespace libMesh
  * It is numbered like this:
  *
  * \verbatim
- *          3  12 11 10 2
- *   QUAD4: o--o--o--o--o
- *          |           |          
- *      13  o           o 9         
- *          |           |           eta
- *      14  o           o 8          ^
+ *          3   9   8   2
+ *   QUAD4: o---o---o---o
+ *          |   15  14  |           eta
+ *      10  o   o   o   o 7          ^ 
  *          |           |            |
- *      15  o           o 7          |
- *          |           |            o---> xi
- *          o--o--o--o--o
- *          0  4  5  6  1
+ *      11  o   o   o   o 6          |
+ *          |   12  13  |            o---> xi
+ *          o---o---o---o
+ *          0   4   5   1
  * \endverbatim
  *
  * (xi, eta) in [-1,1]^2 are the reference element coordinates associated with
@@ -148,7 +146,7 @@ public:
    * Geometric constants for Quad16.
    */
   static const int num_nodes = 16;
-  static const int nodes_per_side = 5;
+  static const int nodes_per_side = 4;
 
   /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to

@@ -34,10 +34,10 @@ const int Quad16::nodes_per_side;
 
 const unsigned int Quad16::side_nodes_map[Quad16::num_sides][Quad16::nodes_per_side] =
   {
-    {0,  4,  5,  6, 1}, // Side 0
-    {1,  7,  8,  9, 2}, // Side 1
-    {2, 10, 11, 12, 3}, // Side 2
-    {3, 13, 14, 15, 0}  // Side 3
+    {0,  4,  5, 1}, // Side 0
+    {1,  6,  7, 2}, // Side 1
+    {2,  8,  9, 3}, // Side 2
+    {3, 10, 11, 0}  // Side 3
   };
 
 #ifdef LIBMESH_ENABLE_AMR
