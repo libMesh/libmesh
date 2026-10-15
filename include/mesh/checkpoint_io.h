@@ -176,6 +176,14 @@ public:
   bool version_at_least_1_6() const;
 
   /**
+   * \returns \p true if the current file has an XDR/XDA version that
+   * matches or exceeds 1.7
+   *
+   * As of this version we encode disjoint neighbor boundary pairs.
+   */
+  bool version_at_least_1_7() const;
+
+  /**
    * Get/Set the processor id or processor ids to use.
    *
    * The default processor_id to use is the processor_id() of the
@@ -247,6 +255,11 @@ private:
    */
   void write_bc_names (Xdr & io, const BoundaryInfo & info, bool is_sideset) const;
 
+  /**
+   * Write disjoint neighbor boundary pairs
+   */
+  void write_disjoint_neighbor_boundary_pairs (Xdr & io) const;
+
 
   //---------------------------------------------------------------------------
   // Read Implementation
@@ -310,6 +323,17 @@ private:
    */
   template <typename file_id_type>
   void read_bc_names(Xdr & io, BoundaryInfo & info, bool is_sideset);
+
+  /**
+   * Read disjoint neighbor boundary pairs: the two boundary ids of
+   * each pair, and the LIBMESH_DIM translation components of each
+   * pair
+   */
+  template <typename file_id_type>
+  void read_disjoint_neighbor_boundary_pairs
+    (Xdr & io,
+     std::vector<file_id_type> & pair_ids,
+     std::vector<Real> & translations);
 
   /**
    * Read extra integers names information

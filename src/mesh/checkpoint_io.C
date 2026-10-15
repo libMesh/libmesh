@@ -31,6 +31,8 @@
 #include "libmesh/node.h"
 #include "libmesh/parallel.h"
 #include "libmesh/partitioner.h"
+#include "libmesh/periodic_boundaries.h"
+#include "libmesh/periodic_boundary.h"
 #include "libmesh/metis_partitioner.h"
 #include "libmesh/remote_elem.h"
 #include "libmesh/xdr_io.h"
@@ -197,7 +199,7 @@ CheckpointIO::CheckpointIO (MeshBase & mesh, const bool binary_in) :
   ParallelObject      (mesh),
   _binary             (binary_in),
   _parallel           (false),
-  _version            ("checkpoint-1.6"),
+  _version            ("checkpoint-1.7"),
   _my_processor_ids   (1, processor_id()),
   _my_n_processors    (mesh.is_replicated() ? 1 : n_processors())
 {
@@ -209,7 +211,7 @@ CheckpointIO::CheckpointIO (const MeshBase & mesh, const bool binary_in) :
   ParallelObject      (mesh),
   _binary             (binary_in),
   _parallel           (false),
-  _version            ("checkpoint-1.6"),
+  _version            ("checkpoint-1.7"),
   _my_processor_ids   (1, processor_id()),
   _my_n_processors    (mesh.is_replicated() ? 1 : n_processors())
 {
@@ -315,13 +317,22 @@ bool CheckpointIO::version_at_least_1_5() const
 {
   return
     (this->version().find("1.5") != std::string::npos) ||
-    (this->version().find("1.6") != std::string::npos);
+    (this->version().find("1.6") != std::string::npos) ||
+    (this->version().find("1.7") != std::string::npos);
 }
 
 
 bool CheckpointIO::version_at_least_1_6() const
 {
-  return (this->version().find("1.6") != std::string::npos);
+  return
+    (this->version().find("1.6") != std::string::npos) ||
+    (this->version().find("1.7") != std::string::npos);
+}
+
+
+bool CheckpointIO::version_at_least_1_7() const
+{
+  return (this->version().find("1.7") != std::string::npos);
 }
 
 
@@ -410,7 +421,8 @@ void CheckpointIO::write (const std::string & name)
           io.data(elem_integer_names);
         }
 
-
+      if (this->version_at_least_1_7())
+        this->write_disjoint_neighbor_boundary_pairs(io);
     }
 
   // If this is a serial mesh written to a serial file then we're only
@@ -879,6 +891,51 @@ void CheckpointIO::write_bc_names (Xdr & io, const BoundaryInfo & info, bool is_
     }
 }
 
+void CheckpointIO::write_disjoint_neighbor_boundary_pairs (Xdr & io) const
+{
+  std::vector<largest_id_type> pair_ids;
+  std::vector<Real> translations;
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+  const MeshBase & mesh = MeshOutput<MeshBase>::mesh();
+
+  // MeshBase stores each pair once per direction; write each pair once,
+  // from its smaller boundary id, and re-register both directions on read.
+  if (const PeriodicBoundaries * db = mesh.get_disjoint_neighbor_boundary_pairs())
+    for (const auto & [id, pb] : *db)
+      {
+        if (id > pb->pairedboundary)
+          continue;
+
+        // MeshBase only registers translations, which we can recover
+        // as the image of the origin.
+        libmesh_error_msg_if(!dynamic_cast<const PeriodicBoundary *>(pb.get()) ||
+                             pb->has_transformation_matrix(),
+                             "CheckpointIO can only write translational disjoint neighbor "
+                             "boundary pairs");
+
+        pair_ids.push_back(id);
+        pair_ids.push_back(pb->pairedboundary);
+
+        const Point translation = pb->get_corresponding_pos(Point(0));
+        for (auto d : make_range(LIBMESH_DIM))
+          translations.push_back(translation(d));
+      }
+#endif
+
+  largest_id_type n_pairs = pair_ids.size() / 2;
+  io.data(n_pairs, "# disjoint neighbor boundary pairs");
+  if (n_pairs)
+    {
+      io.data(pair_ids);
+      // data_stream, unlike the generic vector path, handles extended
+      // precision Real
+      io.data_stream(translations.data(),
+                     cast_int<unsigned int>(translations.size()),
+                     LIBMESH_DIM);
+    }
+}
+
 void CheckpointIO::read (const std::string & input_name)
 {
   LOG_SCOPE("read()","CheckpointIO");
@@ -979,6 +1036,8 @@ file_id_type CheckpointIO::read_header (const std::string & name)
 
   std::string input_version;
   std::vector<std::string> node_integer_names, elem_integer_names;
+  std::vector<file_id_type> disjoint_pair_ids;
+  std::vector<Real> disjoint_translations;
 
   // We'll write a header file from processor 0 and broadcast.
   if (this->processor_id() == 0)
@@ -1019,6 +1078,14 @@ file_id_type CheckpointIO::read_header (const std::string & name)
       if (read_extra_integers)
         this->read_integers_names<file_id_type>
           (io, node_integer_names, elem_integer_names);
+
+      std::swap(input_version, this->version());
+      const bool read_disjoint_pairs = this->version_at_least_1_7();
+      std::swap(input_version, this->version());
+
+      if (read_disjoint_pairs)
+        this->read_disjoint_neighbor_boundary_pairs<file_id_type>
+          (io, disjoint_pair_ids, disjoint_translations);
     }
 
   // broadcast data from processor 0, set values everywhere
@@ -1051,6 +1118,31 @@ file_id_type CheckpointIO::read_header (const std::string & name)
 
   for (auto & int_name : elem_integer_names)
     mesh.add_elem_integer(int_name);
+
+  this->comm().broadcast(disjoint_pair_ids);
+  this->comm().broadcast(disjoint_translations);
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+  // The file is the complete record of the pairs, so it replaces any
+  // pairs left on a reused mesh rather than merging with them
+  if (this->version_at_least_1_7())
+    if (PeriodicBoundaries * db = mesh.get_disjoint_neighbor_boundary_pairs())
+      db->clear();
+
+  for (auto i : make_range(disjoint_pair_ids.size() / 2))
+    {
+      RealVectorValue translation;
+      for (auto d : make_range(LIBMESH_DIM))
+        translation(d) = disjoint_translations[LIBMESH_DIM * i + d];
+      mesh.add_disjoint_neighbor_boundary_pairs
+        (cast_int<boundary_id_type>(disjoint_pair_ids[2 * i]),
+         cast_int<boundary_id_type>(disjoint_pair_ids[2 * i + 1]),
+         translation);
+    }
+#else
+  libmesh_error_msg_if(!disjoint_pair_ids.empty(),
+                       "Reading disjoint neighbor boundary pairs requires --enable-periodic");
+#endif
 
   return input_parallel ? input_n_procs : 0;
 }
@@ -1651,6 +1743,30 @@ void CheckpointIO::read_bc_names(Xdr & io, BoundaryInfo & info, bool is_sideset)
     boundary_map[cast_int<boundary_id_type>(boundary_ids[i])] =
       boundary_names[i];
 }
+
+
+template <typename file_id_type>
+void CheckpointIO::read_disjoint_neighbor_boundary_pairs
+  (Xdr & io,
+   std::vector<file_id_type> & pair_ids,
+   std::vector<Real> & translations)
+{
+  file_id_type n_pairs = 0;
+  io.data(n_pairs, "# disjoint neighbor boundary pairs");
+  if (n_pairs)
+    {
+      io.data(pair_ids);
+      libmesh_error_msg_if(pair_ids.size() != 2 * n_pairs,
+                           "Expected " << 2 * n_pairs << " disjoint neighbor boundary ids, found "
+                           << pair_ids.size());
+
+      translations.resize(LIBMESH_DIM * n_pairs);
+      io.data_stream(translations.data(),
+                     cast_int<unsigned int>(translations.size()),
+                     LIBMESH_DIM);
+    }
+}
+
 
 
 template <typename file_id_type>
