@@ -104,6 +104,11 @@ unsigned int idx(const ElemType type,
         return i + j*(2*nx+1);
       }
 
+    case QUAD16:
+      {
+        return i + j*(3*nx+1);
+      }
+
     default:
       libmesh_error_msg("ERROR: Unrecognized 2D element type == " << Utility::enum_to_string(type));
     }
