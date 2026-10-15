@@ -239,6 +239,8 @@ int main(int argc, char ** argv)
                   EquationSystems::READ_ADDITIONAL_DATA |
                   EquationSystems::READ_BASIC_ONLY);
 
+      libMesh::out << "Input system:\n\n";
+
       old_es.print_info();
 
       const unsigned int sysnum =
@@ -267,8 +269,6 @@ int main(int argc, char ** argv)
                              Utility::string_to_enum<FEFamily>(family));
 
       old_es.init();
-
-      old_es.print_info();
 
       goal_function =
         std::make_unique<WrappedFunctor<Number>>(ParsedFunction<Number>(calcfunc));
@@ -301,6 +301,24 @@ int main(int argc, char ** argv)
 
       HilbertSystem & new_sys = new_es.add_system<HilbertSystem>(current_sys_name);
 
+      if (libMesh::on_command_line("--print_solutions"))
+        new_sys.print_solutions = true;
+
+      if (libMesh::on_command_line("--print_residuals"))
+        new_sys.print_residuals = true;
+
+      if (libMesh::on_command_line("--print_jacobians"))
+        new_sys.print_jacobians = true;
+
+      if (libMesh::on_command_line("--print_element_solutions"))
+        new_sys.print_element_solutions = true;
+
+      if (libMesh::on_command_line("--print_element_residuals"))
+        new_sys.print_element_residuals = true;
+
+      if (libMesh::on_command_line("--print_element_jacobians"))
+        new_sys.print_element_jacobians = true;
+
       new_sys.hilbert_order() = libMesh::command_line_next("--hilbert", 0u);
 
       new_sys.subdomains_list() = std::move(subdomains_list);
@@ -321,6 +339,10 @@ int main(int argc, char ** argv)
         new_sys.input_system = &old_es.get_system(current_sys_name);
 
       new_es.init();
+
+      libMesh::out << "New system:\n\n";
+
+      new_es.print_info();
 
       DiffSolver & solver = *(new_sys.time_solver->diff_solver().get());
       solver.quiet = false;
