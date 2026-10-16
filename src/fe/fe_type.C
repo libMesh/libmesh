@@ -19,6 +19,7 @@
 #include "libmesh/fe_type.h"
 #include "libmesh/quadrature_clough.h"
 #include "libmesh/quadrature_gauss.h"
+#include "libmesh/quadrature_gauss_lobatto.h"
 
 // C++ Includes
 #include <memory>
@@ -44,6 +45,22 @@ FEType::default_quadrature_rule (const unsigned int dim,
 
   if (family == SUBDIVISION)
     return std::make_unique<QGauss>(dim, static_cast<Order>(1 + extraorder));
+
+  // The default rule for the Gauss-Lobatto nodal bases is the Gauss-Lobatto rule on the
+  // basis's own interpolation points. That collocation makes the mass matrix diagonal, and
+  // the shape function values at the quadrature points form the identity matrix. A basis of
+  // degree p has p+1 points, and a Gauss-Lobatto rule of n points is exact through degree
+  // 2n-3, so the matching order is 2p-1. A positive extraorder selects a rule with more
+  // points, which integrates more accurately but gives up collocation.
+  //
+  // p refinement preserves the pairing. QBase raises the order of a rule by twice the
+  // element's p_level, and 2p-1 also rises by two per degree, so on an element of p level l
+  // the rule has the p+l+1 points of the degree p+l basis.
+  if (family == L2_LAGRANGE_GLL || family == LAGRANGE_GLL)
+    {
+      const int p = static_cast<int>(order.get_order());
+      return std::make_unique<QGaussLobatto>(dim, static_cast<Order>(2*p - 1 + extraorder));
+    }
 
   return std::make_unique<QGauss>(dim, static_cast<Order>(this->default_quadrature_order() + extraorder));
 }
