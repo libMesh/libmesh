@@ -285,6 +285,17 @@ public:
   virtual void reinit_constraints ();
 
   /**
+   * Reinitializes the constraints for this system at the current \p
+   * time, with the same result as reinit_constraints(), when only
+   * time has changed since the last call to either. Reuses the
+   * constraints that do not depend on time; see
+   * DofMap::reinit_dirichlet_constraint_values().
+   *
+   * Also prepares the send_list.
+   */
+  virtual void reinit_dirichlet_constraint_values ();
+
+  /**
    * Reinitializes the system with a new mesh.
    */
   virtual void reinit_mesh();

@@ -142,7 +142,9 @@ unit_tests_sources = \
   solvers/first_order_unsteady_solver_test.C \
   solvers/second_order_unsteady_solver_test.C \
   systems/constraint_operator_test.C \
+  systems/dirichlet_constraint_values_test.C \
   systems/equation_systems_test.C \
+  systems/heterogeneous_nonlinear_constraint_test.C \
   systems/periodic_bc_test.C \
   systems/disjoint_neighbor_test.C \
   systems/systems_test.C \
