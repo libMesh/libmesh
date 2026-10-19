@@ -222,6 +222,10 @@ void ExodusII_IO::write_discontinuous_exodusII(const std::string & name,
                                                const EquationSystems & es,
                                                const std::set<std::string> * system_names)
 {
+  // See write_element_data justification for serializing
+  // Additionally, we need to serialize before building the subdomain name map
+  MeshSerializer serialize(MeshInput<MeshBase>::mesh(), !MeshOutput<MeshBase>::_is_parallel_format, true);
+
   std::vector<std::string> solution_names;
   std::vector<Number>      v;
 
