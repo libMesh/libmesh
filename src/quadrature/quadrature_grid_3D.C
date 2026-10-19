@@ -58,7 +58,16 @@ void QGrid::init_3D()
     case TET10:
     case TET14:
       {
-        const unsigned int np = (_order+1)*(_order+2)*(_order+3)/6;
+        // This is the composite centroid rule on a uniform refinement
+        // of the reference tet with order+1 intervals per edge: one
+        // point at the centroid of each of the (order+1)^3 subtets.
+        // The refinement consists of upright tets, inverted tets,
+        // and octahedra, and we split each octahedron into four tets
+        // about the same diagonal.  Every subtet has the same volume
+        // regardless of which diagonal is chosen, so the weights are
+        // equal.  The rule is exact for linears and has O(dx^2) error
+        // on smooth functions, like the midpoint grid on hexes.
+        const unsigned int np = (_order+1)*(_order+1)*(_order+1);
         // Master tet has 1x1 triangle base, height 1, so volume = 1/6
         const Real weight = Real(1)/Real(6)/np;
         const Real dx = Real(1)/static_cast<int>(_order+1);
@@ -66,20 +75,53 @@ void QGrid::init_3D()
         _weights.resize(np);
 
         unsigned int pt = 0;
+        auto add_point = [this, &pt, weight, dx](Real x, Real y, Real z)
+        {
+          _points[pt] = Point(x*dx, y*dx, z*dx);
+          _weights[pt] = weight;
+          pt++;
+        };
+
         for (int i = 0; i != _order + 1; ++i)
           {
             for (int j = 0; j != _order + 1 - i; ++j)
               {
                 for (int k = 0; k != _order + 1 - i - j; ++k)
                   {
-                    _points[pt](0) = (i+0.5)*dx;
-                    _points[pt](1) = (j+0.5)*dx;
-                    _points[pt](2) = (k+0.5)*dx;
-                    _weights[pt] = weight;
-                    pt++;
+                    // Centroid of the upright tet with vertices
+                    // (i,j,k), (i+1,j,k), (i,j+1,k), (i,j,k+1)
+                    add_point(i+Real(1)/4, j+Real(1)/4, k+Real(1)/4);
+
+                    // The octahedron with vertices (i+1,j,k),
+                    // (i,j+1,k), (i,j,k+1), (i+1,j+1,k),
+                    // (i+1,j,k+1), (i,j+1,k+1) lies inside the
+                    // reference tet only if i+j+k < order.  We split
+                    // it into four tets about the diagonal from
+                    // (i+1,j,k) to (i,j+1,k+1); their centroids are
+                    // offset from the octahedron center by
+                    // (-1/4,0,0), (1/4,0,0), (0,1/4,-1/4), and
+                    // (0,-1/4,1/4).
+                    if (i + j + k < _order)
+                      {
+                        const Real ci = i+Real(1)/2;
+                        const Real cj = j+Real(1)/2;
+                        const Real ck = k+Real(1)/2;
+                        add_point(ci-Real(1)/4, cj, ck);
+                        add_point(ci+Real(1)/4, cj, ck);
+                        add_point(ci, cj+Real(1)/4, ck-Real(1)/4);
+                        add_point(ci, cj-Real(1)/4, ck+Real(1)/4);
+                      }
+
+                    // Centroid of the inverted tet with vertices
+                    // (i+1,j+1,k), (i+1,j,k+1), (i,j+1,k+1),
+                    // (i+1,j+1,k+1), which lies inside the reference
+                    // tet only if i+j+k < order-1
+                    if (i + j + k + 1 < _order)
+                      add_point(i+Real(3)/4, j+Real(3)/4, k+Real(3)/4);
                   }
               }
           }
+        libmesh_assert_equal_to(pt, np);
         return;
       }
 
