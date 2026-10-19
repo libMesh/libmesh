@@ -61,7 +61,13 @@ void QGrid::init_2D()
     case TRI6:
     case TRI7:
       {
-        const unsigned int np = (_order + 1)*(_order + 2)/2;
+        // This is the composite centroid rule on a uniform refinement
+        // of the reference triangle with order+1 intervals per edge:
+        // one point at the centroid of each of the (order+1)^2
+        // congruent subtriangles, each weighted by the subtriangle
+        // area.  It is exact for linears and has O(dx^2) error on
+        // smooth functions, like the midpoint grid on quads.
+        const unsigned int np = (_order + 1)*(_order + 1);
         const Real weight = Real(0.5)/np;
         const Real dx = Real(1)/static_cast<int>(_order+1);
         _points.resize(np);
@@ -72,12 +78,27 @@ void QGrid::init_2D()
           {
             for (int j = 0; j != _order + 1 - i; ++j)
               {
-                _points[pt](0) = (i+0.5)*dx;
-                _points[pt](1) = (j+0.5)*dx;
+                // Centroid of the subtriangle with vertices
+                // (i,j), (i+1,j), (i,j+1), scaled by dx
+                _points[pt](0) = (i+Real(1)/3)*dx;
+                _points[pt](1) = (j+Real(1)/3)*dx;
                 _weights[pt] = weight;
                 pt++;
+
+                // Centroid of the subtriangle with vertices
+                // (i+1,j), (i,j+1), (i+1,j+1), scaled by dx, which
+                // lies inside the reference triangle only if
+                // i+j < order
+                if (i + j < _order)
+                  {
+                    _points[pt](0) = (i+Real(2)/3)*dx;
+                    _points[pt](1) = (j+Real(2)/3)*dx;
+                    _weights[pt] = weight;
+                    pt++;
+                  }
               }
           }
+        libmesh_assert_equal_to(pt, np);
         return;
       }
 
