@@ -71,11 +71,16 @@ public:
    * \returns \p QUAD16.
    */
   virtual ElemType type () const override { return QUAD16; }
+  
+  /**
+   * \returns 16.
+   */
+  virtual unsigned int n_nodes() const override { return 16; }
 
   /**
-   * \returns 1.
+   * \returns 9.
    */
-  virtual unsigned int n_sub_elem() const override { return 1; }
+  virtual unsigned int n_sub_elem() const override { return 9; }
 
   /**
    * \returns \p true if the specified (local) node number is a vertex.
