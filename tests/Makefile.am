@@ -143,6 +143,7 @@ unit_tests_sources = \
   solvers/second_order_unsteady_solver_test.C \
   systems/constraint_operator_test.C \
   systems/equation_systems_test.C \
+  systems/hierarchic_legacy_io_test.C \
   systems/periodic_bc_test.C \
   systems/disjoint_neighbor_test.C \
   systems/systems_test.C \
@@ -239,7 +240,31 @@ data = matrices/geom_1_extraction_op.h5 \
        solutions/nedelec_one_solution_mesh.xda \
        solutions/nedelec_one_solution.xda \
        solutions/raviart_thomas_solution_mesh.xda \
-       solutions/raviart_thomas_solution.xda
+       solutions/raviart_thomas_solution.xda \
+       solutions/legacy_hierarchic/hex27_hier4_mesh.xda \
+       solutions/legacy_hierarchic/hex27_hier4.xda \
+       solutions/legacy_hierarchic/hex27_hier4_values.txt \
+       solutions/legacy_hierarchic/hex27_side3_mesh.xda \
+       solutions/legacy_hierarchic/hex27_side3.xda \
+       solutions/legacy_hierarchic/hex27_side3_values.txt \
+       solutions/legacy_hierarchic/prism21_hier4_mesh.xda \
+       solutions/legacy_hierarchic/prism21_hier4.xda \
+       solutions/legacy_hierarchic/prism21_hier4_values.txt \
+       solutions/legacy_hierarchic/quad9_hier4_mesh.xda \
+       solutions/legacy_hierarchic/quad9_hier4.xda \
+       solutions/legacy_hierarchic/quad9_hier4_values.txt \
+       solutions/legacy_hierarchic/quad9_l2hier5_mesh.xda \
+       solutions/legacy_hierarchic/quad9_l2hier5.xda \
+       solutions/legacy_hierarchic/quad9_l2hier5_values.txt \
+       solutions/legacy_hierarchic/quad9_side4_mesh.xda \
+       solutions/legacy_hierarchic/quad9_side4.xda \
+       solutions/legacy_hierarchic/quad9_side4_values.txt \
+       solutions/legacy_hierarchic/tet14_hier3_mesh.xda \
+       solutions/legacy_hierarchic/tet14_hier3.xda \
+       solutions/legacy_hierarchic/tet14_hier3_values.txt \
+       solutions/legacy_hierarchic/tri6_hier5_mesh.xda \
+       solutions/legacy_hierarchic/tri6_hier5.xda \
+       solutions/legacy_hierarchic/tri6_hier5_values.txt
 
 
 unit_tests_data = $(data)

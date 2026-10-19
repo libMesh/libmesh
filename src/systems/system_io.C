@@ -28,6 +28,8 @@
 #include "libmesh/xdr_cxx.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/dof_map.h"
+#include "libmesh/fe.h"
+#include "libmesh/fe_type.h"
 
 
 // C++ Includes
@@ -252,6 +254,10 @@ void System::read_header (Xdr & io,
           _written_var_indices[var] = this->variable_number(var_name);
       }
   }
+
+  // Files written before I/O compatibility version 1.9.0 hold HIERARCHIC coefficients in the
+  // basis whose bubbles were scaled by 1/p!
+  _read_legacy_hierarchic = (io.version() < LIBMESH_VERSION_ID(1,9,0));
 
   // 8.)
   // Read the number of additional vectors.
@@ -517,6 +523,8 @@ void System::read_parallel_data (Xdr & io,
         }
     }
 
+  this->convert_legacy_hierarchic_data(read_additional_data);
+
   // const Real
   //   dt   = pl.get_elapsed_time(),
   //   rate = total_read_size*sizeof(Number)/dt;
@@ -600,6 +608,8 @@ void System::read_serialized_data (Xdr & io,
             ++pos;
         }
     }
+
+  this->convert_legacy_hierarchic_data(read_additional_data);
 
   // const Real
   //   dt   = pl.get_elapsed_time(),
@@ -2101,6 +2111,9 @@ std::size_t System::read_serialized_vectors (Xdr & io,
     {
       libmesh_assert_not_equal_to (vec, 0);
       vec->close();
+
+      if (_read_legacy_hierarchic)
+        this->convert_legacy_hierarchic_coefficients(*vec);
     }
 
   return read_length;
@@ -2167,6 +2180,82 @@ std::size_t System::write_serialized_vectors (Xdr & io,
   return written_length;
 }
 
+
+void System::convert_legacy_hierarchic_data (const bool read_additional_data)
+{
+  if (!_read_legacy_hierarchic)
+    return;
+
+  this->convert_legacy_hierarchic_coefficients(*this->solution);
+
+  if (read_additional_data && this->_additional_data_written)
+    for (auto & [vec_name, vec] : _vectors)
+      {
+        libmesh_ignore(vec_name);
+        this->convert_legacy_hierarchic_coefficients(*vec);
+      }
+}
+
+
+
+void System::convert_legacy_hierarchic_coefficients (NumericVector<Number> & vec) const
+{
+  parallel_object_only();
+
+  const DofMap & dof_map = this->get_dof_map();
+
+  // Only variables of the families whose bubbles changed need converting
+  std::vector<unsigned int> vars;
+  for (auto var : make_range(this->n_vars()))
+    if (fe_hierarchic_bubble_family(this->variable_type(var).family))
+      vars.push_back(var);
+
+  if (vars.empty())
+    return;
+
+  // A degree of freedom gets the same factor from every element that shares it, and each one
+  // a processor owns is supported on at least one of its local elements. Read from a copy, since
+  // vec changes as we go.
+  std::unique_ptr<NumericVector<Number>> old_values = vec.clone();
+
+  const dof_id_type first_dof = dof_map.first_dof(),
+                    end_dof = dof_map.end_dof();
+
+  std::vector<dof_id_type> dof_indices;
+  std::vector<numeric_index_type> indices;
+  std::vector<Number> values;
+
+  for (const auto & elem : this->get_mesh().active_local_element_ptr_range())
+    for (const auto var : vars)
+      {
+        dof_map.dof_indices(elem, dof_indices, var);
+
+        const FEType fe_type = this->variable_type(var);
+        const Order totalorder =
+          fe_type.order + (fe_type.p_refinement ? elem->p_level() : 0);
+
+        indices.clear();
+        values.clear();
+        for (auto i : index_range(dof_indices))
+          {
+            const dof_id_type dof = dof_indices[i];
+            if (dof < first_dof || dof >= end_dof)
+              continue;
+
+            const Real ratio =
+              fe_hierarchic_legacy_coefficient_ratio(fe_type.family, *elem, totalorder, i);
+            if (ratio == 1)
+              continue;
+
+            indices.push_back(dof);
+            values.push_back((*old_values)(dof) * ratio);
+          }
+
+        vec.insert(values, indices);
+      }
+
+  vec.close();
+}
 
 
 

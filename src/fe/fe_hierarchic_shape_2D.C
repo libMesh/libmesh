@@ -29,13 +29,6 @@ namespace
 {
 using namespace libMesh;
 
-Real fe_triangle_helper (const Elem & elem,
-                         const Real edgenumerator,
-                         const Real crossval,
-                         const unsigned int basisorder,
-                         const Order totalorder,
-                         const unsigned int noden);
-
 template <FEFamily T>
 Real fe_hierarchic_2D_shape(const Elem * elem,
                             const Order order,
@@ -63,11 +56,16 @@ Real fe_hierarchic_2D_shape_second_deriv(const Elem * elem,
 
 #endif // LIBMESH_ENABLE_SECOND_DERIVATIVES
 
+} // anonymous namespace
 
-std::tuple<unsigned int, unsigned int, Real>
-quad_indices(const Elem * elem,
-             const unsigned int totalorder,
-             const unsigned int i)
+
+
+namespace libMesh
+{
+
+std::pair<unsigned int, unsigned int>
+fe_hierarchic_quad_mode_orders(const unsigned int totalorder,
+                               const unsigned int i)
 {
   libmesh_assert_less (i, (totalorder+1u)*(totalorder+1u));
 
@@ -104,6 +102,17 @@ quad_indices(const Elem * elem,
       i1 = square_number_row[basisnum] + 2;
     }
 
+  return {i0, i1};
+}
+
+
+std::tuple<unsigned int, unsigned int, Real>
+fe_hierarchic_quad_tensor_indices(const Elem * elem,
+                                  const unsigned int totalorder,
+                                  const unsigned int i)
+{
+  const auto [i0, i1] = fe_hierarchic_quad_mode_orders(totalorder, i);
+
   // Flip odd degree of freedom values if necessary
   // to keep continuity on sides
   Real f = 1.;
@@ -120,12 +129,41 @@ quad_indices(const Elem * elem,
   return {i0, i1, f};
 }
 
-} // anonymous namespace
 
-
-
-namespace libMesh
+Real fe_hierarchic_simplex_edge_shape (const Elem & elem,
+                                       const unsigned int e,
+                                       const Real zeta0,
+                                       const Real zeta1,
+                                       const unsigned int basisorder,
+                                       const Order totalorder)
 {
+  // Get factors to account for edge-flipping
+  const Real flip = (basisorder%2 && elem.positive_edge_orientation(e)) ? -1. : 1.;
+
+  const Real crossval = zeta0 + zeta1;
+  const Real edgenumerator = zeta1 - zeta0;
+
+  // Avoid NaN around vertices ... but we still have to match the true
+  // function, even when we're *outside* the element (crossval==0 on
+  // a line, not just at a point!), to handle imprecise queries and
+  // FDM derivatives correctly!
+  if (crossval == 0.) // Yes, exact comparison; we seem numerically stable otherwise
+    {
+      // Limit of the general expression below: only the bubble's leading term survives, so it
+      // takes the one-dimensional bubble scaling and the same flip
+      return flip * std::pow(edgenumerator, basisorder) *
+        fe_hierarchic_bubble_scaling(basisorder);
+    }
+  // Experimentally, as c -> 0, n propto c, I'm still seeing good
+  // behavior from the default implementation below:
+
+  const Real edgeval = edgenumerator / crossval;
+  const Real crossfunc = std::pow(crossval, basisorder);
+
+  return flip * crossfunc *
+    FE<1,HIERARCHIC>::shape(EDGE3, totalorder,
+                            basisorder, edgeval);
+}
 
 
 LIBMESH_DEFAULT_VECTORIZED_FE(2,HIERARCHIC)
@@ -912,41 +950,6 @@ namespace
 {
 using namespace libMesh;
 
-Real fe_triangle_helper (const Elem & elem,
-                         const Real edgenumerator,
-                         const Real crossval,
-                         const unsigned int basisorder,
-                         const Order totalorder,
-                         const unsigned int noden)
-{
-  // Get factors to account for edge-flipping
-  Real flip = 1;
-  if (basisorder%2 && (elem.point(noden) > elem.point((noden+1)%3)))
-    flip = -1.;
-
-  // Avoid NaN around vertices ... but we still have to match the true
-  // function, even when we're *outside* the triangle (crossval==0 on
-  // a line, not just at a point!), to handle imprecise queries and
-  // FDM derivatives correctly!
-  if (crossval == 0.)
-    {
-      unsigned int basisfactorial = 1.;
-      for (unsigned int n=2; n <= basisorder; ++n)
-        basisfactorial *= n;
-
-      return flip * std::pow(edgenumerator, basisorder) / basisfactorial;
-    }
-  // Experimentally, as c -> 0, n propto c, I'm still seeing good
-  // behavior from the default implementation below:
-
-  const Real edgeval = edgenumerator / crossval;
-  const Real crossfunc = std::pow(crossval, basisorder);
-
-  return flip * crossfunc *
-    FE<1,HIERARCHIC>::shape(EDGE3, totalorder,
-                            basisorder, edgeval);
-}
-
 template <FEFamily T>
 Real fe_hierarchic_2D_shape(const Elem * elem,
                             const Order order,
@@ -983,35 +986,14 @@ Real fe_hierarchic_2D_shape(const Elem * elem,
           return zeta2;
         // Edge DoFs
         else if (i < totalorder + 2u)
-          {
-            const unsigned int basisorder = i - 1;
-
-            const Real crossval = zeta0 + zeta1;
-            const Real edgenumerator = zeta1 - zeta0;
-
-            return fe_triangle_helper(*elem, edgenumerator, crossval,
-                                      basisorder, totalorder, 0);
-          }
+          return fe_hierarchic_simplex_edge_shape(*elem, 0, zeta0, zeta1,
+                                                  i - 1, totalorder);
         else if (i < 2u*totalorder + 1)
-          {
-            const unsigned int basisorder = i - totalorder;
-
-            const Real crossval = zeta2 + zeta1;
-            const Real edgenumerator = zeta2 - zeta1;
-
-            return fe_triangle_helper(*elem, edgenumerator, crossval,
-                                      basisorder, totalorder, 1);
-          }
+          return fe_hierarchic_simplex_edge_shape(*elem, 1, zeta1, zeta2,
+                                                  i - totalorder, totalorder);
         else if (i < 3u*totalorder)
-          {
-            const unsigned int basisorder = i - (2u*totalorder) + 1;
-
-            const Real crossval = zeta0 + zeta2;
-            const Real edgenumerator = zeta0 - zeta2;
-
-            return fe_triangle_helper(*elem, edgenumerator, crossval,
-                                      basisorder, totalorder, 2);
-          }
+          return fe_hierarchic_simplex_edge_shape(*elem, 2, zeta2, zeta0,
+                                                  i - (2u*totalorder) + 1, totalorder);
         // Interior DoFs
         else
           {
@@ -1041,7 +1023,7 @@ Real fe_hierarchic_2D_shape(const Elem * elem,
     case QUADSHELL9:
       {
         // Compute quad shape functions as a tensor-product
-        auto [i0, i1, f] = quad_indices(elem, totalorder, i);
+        auto [i0, i1, f] = fe_hierarchic_quad_tensor_indices(elem, totalorder, i);
 
         return f*(FE<1,T>::shape(EDGE3, totalorder, i0, p(0))*
                   FE<1,T>::shape(EDGE3, totalorder, i1, p(1)));
@@ -1092,7 +1074,7 @@ Real fe_hierarchic_2D_shape_deriv(const Elem * elem,
     case QUADSHELL9:
       {
         // Compute quad shape functions as a tensor-product
-        auto [i0, i1, f] = quad_indices(elem, totalorder, i);
+        auto [i0, i1, f] = fe_hierarchic_quad_tensor_indices(elem, totalorder, i);
 
         switch (j)
           {

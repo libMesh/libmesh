@@ -22,6 +22,7 @@
 
 // C++ includes
 #include <string>
+#include <string_view>
 
 // You can use this macro to guard pieces of your application code
 // against use in incorrect versions of libmesh.  For example:
@@ -47,6 +48,13 @@ int         get_libmesh_version();
  * functionality is added.
  */
 std::string get_io_compatibility_version();
+
+/**
+ * \returns The I/O compatibility version in a file's version header, such as
+ * "libMesh-1.9.0 parallel", encoded by LIBMESH_VERSION_ID(). Throws an error if that version is
+ * newer than this library's get_io_compatibility_version().
+ */
+int parse_io_compatibility_version(std::string_view version_header);
 }
 
 
