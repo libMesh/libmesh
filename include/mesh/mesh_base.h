@@ -1921,11 +1921,10 @@ public:
   /**
    * \returns A reference to a cached vector copy of a range of
    * pointers to all semilocal nodes, suitable for threading.
-   *
-   * Iterating over all semilocal nodes is most useful for
-   * modifying the mesh, so we only have a non-const version for now.
    */
   const NodeRange & node_stored_range();
+
+  const ConstNodeRange & node_stored_range() const;
 
   /**
    * \returns A reference to a cached vector copy of a range of
@@ -2268,15 +2267,25 @@ protected:
   mutable std::unique_ptr<NodeRange> _node_stored_range;
 
   /**
-   * A cached \p NodeRange for threaded mutation of all local
+   * A cached \p ConstNodeRange for threaded mutation on all semilocal
    * nodes of this mesh.
    *
    * This will not actually be built unless needed. Further, since we
-   * want our \p local_node_stored_range() method to be \p const (yet
+   * want our \p const node_stored_range() method to be \p const (yet
    * do the dynamic allocating) this needs to be mutable.
+   *
+   * It is a crime that the C++ language doesn't let us just get this
+   * via casting from _node_stored_range.
    */
-  mutable std::unique_ptr<NodeRange> _local_node_stored_range;
+  mutable std::unique_ptr<ConstNodeRange> _const_node_stored_range;
 
+  /**
+   * A cached \p NodeRange for threaded mutation of all local
+   * nodes of this mesh.
+   *
+   * This will not actually be built unless needed.
+   */
+  std::unique_ptr<NodeRange> _local_node_stored_range;
 
   /**
    * A cached \p NodeRange for threaded mutation of all unpartitioned

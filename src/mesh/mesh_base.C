@@ -72,6 +72,7 @@ MeshBase::MeshBase (const Parallel::Communicator & comm_in,
   _element_stored_range (),
   _const_active_local_element_stored_range (),
   _node_stored_range (),
+  _const_node_stored_range (),
   _local_node_stored_range (),
   _unpartitioned_node_stored_range (),
   _point_locator (),
@@ -112,6 +113,7 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
   _element_stored_range (),
   _const_active_local_element_stored_range (),
   _node_stored_range (),
+  _const_node_stored_range (),
   _local_node_stored_range (),
   _unpartitioned_node_stored_range (),
   _point_locator (),
@@ -208,6 +210,7 @@ MeshBase& MeshBase::operator= (MeshBase && other_mesh)
   _element_stored_range = std::move(other_mesh._element_stored_range);
   _const_active_local_element_stored_range = std::move(other_mesh._const_active_local_element_stored_range);
   _node_stored_range = std::move(other_mesh._node_stored_range);
+  _const_node_stored_range = std::move(other_mesh._const_node_stored_range);
   _local_node_stored_range = std::move(other_mesh._local_node_stored_range);
   _unpartitioned_node_stored_range = std::move(other_mesh._unpartitioned_node_stored_range);
   _point_locator = std::move(other_mesh._point_locator);
@@ -1202,6 +1205,7 @@ void MeshBase::update_post_partitioning()
     {
       _element_stored_range.reset(nullptr);
       _node_stored_range.reset(nullptr);
+      _const_node_stored_range.reset(nullptr);
     }
 }
 
@@ -2016,6 +2020,23 @@ const NodeRange & MeshBase::node_stored_range()
 
   return *_node_stored_range;
 }
+
+
+const ConstNodeRange & MeshBase::node_stored_range() const
+{
+  if (!_const_node_stored_range)
+  {
+    // Range construction may not be safe within threads
+    libmesh_assert(!Threads::in_threads);
+
+    _const_node_stored_range =
+      std::make_unique<ConstNodeRange>(this->nodes_begin(),
+                                       this->nodes_end());
+  }
+
+  return *_const_node_stored_range;
+}
+
 
 
 const NodeRange & MeshBase::local_node_stored_range()
