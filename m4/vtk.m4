@@ -9,7 +9,9 @@ m4_define([_AX_CXX_COMPILE_VTK_preamble],
              @%:@include "vtkDoubleArray.h"
              @%:@include "vtkXMLPUnstructuredGridWriter.h"
              @%:@include "vtkImageThreshold.h"
+             @%:@ifdef HAVE_MPI
              @%:@include "vtkMPIController.h"
+             @%:@endif
           ]])
 
 dnl Declare compilation test function body to
@@ -22,7 +24,10 @@ m4_define([_AX_CXX_COMPILE_VTK_body],
              vtkSmartPointer<vtkDoubleArray> pcoords = vtkSmartPointer<vtkDoubleArray>::New();
              vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLPUnstructuredGridWriter>::New();
              vtkSmartPointer<vtkImageThreshold> threshold = vtkSmartPointer<vtkImageThreshold>::New();
+             @%:@ifdef HAVE_MPI
              vtkSmartPointer<vtkMPIController> controller = vtkSmartPointer<vtkMPIController>::New();
+             vtkMPICommunicatorOpaqueComm vtk_opaque_comm(&MPI_COMM_WORLD);
+             @%:@endif
           ]])
 
 dnl ----------------------------------------------------------------
