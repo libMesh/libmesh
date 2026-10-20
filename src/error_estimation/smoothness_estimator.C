@@ -168,9 +168,7 @@ void SmoothnessEstimator::estimate_smoothness (const System & system,
   //------------------------------------------------------------
   // Iterate over all the active elements in the mesh
   // that live on this processor.
-  Threads::parallel_for (ConstElemRange(mesh.active_local_elements_begin(),
-                                        mesh.active_local_elements_end(),
-                                        200),
+  Threads::parallel_for (mesh.active_local_element_stored_range(),
                          EstimateSmoothness(system,
                                        *this,
                                        smoothness_per_cell)

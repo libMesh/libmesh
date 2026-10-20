@@ -106,8 +106,7 @@ DofMap::build_sparsity (const MeshBase & mesh,
      calculate_constrained,
      sc);
 
-  Threads::parallel_reduce (ConstElemRange (mesh.active_local_elements_begin(),
-                                            mesh.active_local_elements_end()), *sp);
+  Threads::parallel_reduce (mesh.active_local_element_stored_range(), *sp);
 
   sp->parallel_sync();
 
