@@ -1,9 +1,9 @@
 #! /bin/sh
 # ylwrap - wrapper for lex/yacc invocations.
 
-scriptversion=2025-06-18.21; # UTC
+scriptversion=2026-05-29.23; # UTC
 
-# Copyright (C) 1996-2025 Free Software Foundation, Inc.
+# Copyright (C) 1996-2026 Free Software Foundation, Inc.
 #
 # Written by Tom Tromey <tromey@cygnus.com>.
 #
@@ -96,7 +96,7 @@ esac
 # The input.
 input=$1
 shift
-# We'll later need for a correct munging of "#line" directives.
+# We'll later need this for a correct munging of "#line" directives.
 input_sub_rx=`get_dirname "$input" | quote_for_sed`
 case $input in
   [\\/]* | ?:[\\/]*)
@@ -159,15 +159,19 @@ case $prog in
   *[\\/]*) prog=`pwd`/$prog ;;
 esac
 
+origdirname=`pwd`
 dirname=ylwrap$$
-do_exit="cd '`pwd`' && rm -rf $dirname > /dev/null 2>&1;"' (exit $ret); exit $ret'
+cleanup () {
+  cd "$origdirname" && rm -rf $dirname > /dev/null 2>&1
+}
+do_exit='cleanup; (exit $ret); exit $ret'
 trap "ret=129; $do_exit" 1
 trap "ret=130; $do_exit" 2
 trap "ret=141; $do_exit" 13
 trap "ret=143; $do_exit" 15
 mkdir $dirname || exit 1
 
-cd $dirname
+cd $dirname || exit 1
 
 case $# in
   0) "$prog" "$input" ;;
@@ -192,7 +196,7 @@ if test $ret -eq 0; then
       # destination of the .y.c rule in the Makefile.  Divert the
       # output of all other files to a temporary file so we can
       # compare them to existing versions.
-      if test $from != $parser; then
+      if test "$from" != "$parser"; then
         realtarget=$target
         target=tmp-`printf '%s\n' "$target" | sed 's|.*[\\/]||g'`
       fi
