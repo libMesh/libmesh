@@ -26,7 +26,8 @@ m4_define([_AX_CXX_COMPILE_VTK_body],
              vtkSmartPointer<vtkImageThreshold> threshold = vtkSmartPointer<vtkImageThreshold>::New();
              @%:@ifdef HAVE_MPI
              vtkSmartPointer<vtkMPIController> controller = vtkSmartPointer<vtkMPIController>::New();
-             vtkMPICommunicatorOpaqueComm vtk_opaque_comm(&MPI_COMM_WORLD);
+             MPI_Comm mpi_comm = MPI_COMM_WORLD; // something we can take an address of
+             vtkMPICommunicatorOpaqueComm vtk_opaque_comm(&mpi_comm);
              @%:@endif
           ]])
 
