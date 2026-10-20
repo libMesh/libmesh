@@ -120,13 +120,17 @@ unsigned int szabab_n_dofs(const ElemType t, const Order o)
             return 2;
 
           case TRI3:
+          case TRISHELL3:
           case TRI6:
           case TRI7:
             return 3;
 
           case QUAD4:
+          case QUADSHELL4:
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             return 4;
 
           case INVALID_ELEM:
@@ -155,8 +159,10 @@ unsigned int szabab_n_dofs(const ElemType t, const Order o)
             return 6;
 
           case QUAD8:
+          case QUADSHELL8:
             return 8;
           case QUAD9:
+          case QUADSHELL9:
             return 9;
 
           case INVALID_ELEM:
@@ -185,7 +191,9 @@ unsigned int szabab_n_dofs(const ElemType t, const Order o)
             return 10;
 
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             return 16;
 
           case INVALID_ELEM:
@@ -214,7 +222,9 @@ unsigned int szabab_n_dofs(const ElemType t, const Order o)
             return 15;
 
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             return 25;
 
           case INVALID_ELEM:
@@ -243,7 +253,9 @@ unsigned int szabab_n_dofs(const ElemType t, const Order o)
             return 21;
 
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             return 36;
 
           case INVALID_ELEM:
@@ -272,7 +284,9 @@ unsigned int szabab_n_dofs(const ElemType t, const Order o)
             return 28;
 
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             return 49;
 
           case INVALID_ELEM:
@@ -300,7 +314,9 @@ unsigned int szabab_n_dofs(const ElemType t, const Order o)
             return 36;
 
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             return 64;
 
           case INVALID_ELEM:
@@ -362,6 +378,7 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
 
             // The 2D Szabo-Babuska defined on a 6-noded triangle
           case TRI3:
+          case TRISHELL3:
           case TRI6:
           case TRI7:
             {
@@ -390,8 +407,11 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
             // The 2D tensor-product Szabo-Babuska defined on a
             // nine-noded quadrilateral.
           case QUAD4:
+          case QUADSHELL4:
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             {
               switch (n)
                 {
@@ -481,7 +501,9 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
             // The 2D tensor-product Szabo-Babuska defined on a
             // nine-noded quadrilateral.
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             {
               switch (n)
                 {
@@ -570,7 +592,9 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
             // The 2D tensor-product Szabo-Babuska defined on a
             // nine-noded quadrilateral.
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             {
               switch (n)
                 {
@@ -659,7 +683,9 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
             // The 2D tensor-product Szabo-Babuska defined on a
             // nine-noded quadrilateral.
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             {
               switch (n)
                 {
@@ -748,7 +774,9 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
             // The 2D tensor-product Szabo-Babuska defined on a
             // nine-noded quadrilateral.
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             {
               switch (n)
                 {
@@ -837,7 +865,9 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
             // The 2D tensor-product Szabo-Babuska defined on a
             // nine-noded quadrilateral.
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             {
               switch (n)
                 {
@@ -925,7 +955,9 @@ unsigned int szabab_n_dofs_at_node(const ElemType t,
             // The 2D tensor-product Szabo-Babuska defined on a
             // nine-noded quadrilateral.
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             {
               switch (n)
                 {
@@ -993,6 +1025,7 @@ unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
 
             // The 2D Szabo-Babuska defined on a triangle
           case TRI3:
+          case TRISHELL3:
           case TRI6:
           case TRI7:
             return 0;
@@ -1000,8 +1033,11 @@ unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
             // The 2D tensor-product Szabo-Babuska defined on a
             // quadrilateral.
           case QUAD4:
+          case QUADSHELL4:
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             return 0;
 
           case INVALID_ELEM:
@@ -1038,11 +1074,13 @@ unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
             // The 2D tensor-product Szabo-Babuska defined on a
             // eight-noded quadrilateral.
           case QUAD8:
+          case QUADSHELL8:
             return 0;
 
             // The 2D tensor-product Szabo-Babuska defined on a
             // nine-noded quadrilateral.
           case QUAD9:
+          case QUADSHELL9:
             return 0;
 
           case INVALID_ELEM:
@@ -1081,11 +1119,13 @@ unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
             // The 2D tensor-product Szabo-Babuska defined on a
             // eight-noded quadrilateral.
           case QUAD8:
+          case QUADSHELL8:
             return 4;
 
             // The 2D tensor-product Szabo-Babuska defined on a
             // nine-noded quadrilateral.
           case QUAD9:
+          case QUADSHELL9:
             return 0;
 
           case INVALID_ELEM:
@@ -1124,11 +1164,13 @@ unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
             // The 2D tensor-product Szabo-Babuska defined on a
             // eight-noded quadrilateral.
           case QUAD8:
+          case QUADSHELL8:
             return 9;
 
             // The 2D tensor-product Szabo-Babuska defined on a
             // nine-noded quadrilateral.
           case QUAD9:
+          case QUADSHELL9:
             return 0;
 
           case INVALID_ELEM:
@@ -1167,11 +1209,13 @@ unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
             // The 2D tensor-product Szabo-Babuska defined on a
             // eight-noded quadrilateral.
           case QUAD8:
+          case QUADSHELL8:
             return 16;
 
             // The 2D tensor-product Szabo-Babuska defined on a
             // nine-noded quadrilateral.
           case QUAD9:
+          case QUADSHELL9:
             return 0;
 
           case INVALID_ELEM:
@@ -1209,11 +1253,13 @@ unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
             // The 2D tensor-product Szabo-Babuska defined on a
             // eight-noded quadrilateral.
           case QUAD8:
+          case QUADSHELL8:
             return 25;
 
             // The 2D tensor-product Szabo-Babuska defined on a
             // nine-noded quadrilateral.
           case QUAD9:
+          case QUADSHELL9:
             return 0;
 
           case INVALID_ELEM:
@@ -1251,11 +1297,13 @@ unsigned int szabab_n_dofs_per_elem(const ElemType t, const Order o)
             // The 2D tensor-product Szabo-Babuska defined on a
             // eight-noded quadrilateral.
           case QUAD8:
+          case QUADSHELL8:
             return 36;
 
             // The 2D tensor-product Szabo-Babuska defined on a
             // nine-noded quadrilateral.
           case QUAD9:
+          case QUADSHELL9:
             return 0;
 
           case INVALID_ELEM:
