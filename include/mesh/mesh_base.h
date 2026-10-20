@@ -2239,19 +2239,17 @@ protected:
    * A cached \p ElemRange for threaded mutation of all semilocal
    * elements of this mesh.
    *
-   * This will not actually be built unless needed. Further, since we
-   * want our \p elem_stored_range() method to be \p const (yet do the
-   * dynamic allocating) this needs to be mutable.
+   * This will not actually be built unless needed.
    */
-  mutable std::unique_ptr<ElemRange> _element_stored_range;
+  std::unique_ptr<ElemRange> _element_stored_range;
 
   /**
    * A cached \p ConstElemRange for threaded calculation on all
    * local elements of this mesh.
    *
    * This will not actually be built unless needed. Further, since we
-   * want our \p elem_stored_range() method to be \p const (yet do the
-   * dynamic allocating) this needs to be mutable.
+   * want our \p activbe_local_element_stored_range() method to be \p
+   * const (yet do the dynamic allocating) this needs to be mutable.
    */
   mutable std::unique_ptr<ConstElemRange>
     _const_active_local_element_stored_range;
@@ -2260,11 +2258,9 @@ protected:
    * A cached \p NodeRange for threaded mutation of all semilocal
    * nodes of this mesh.
    *
-   * This will not actually be built unless needed. Further, since we
-   * want our \p node_stored_range() method to be \p const (yet do the
-   * dynamic allocating) this needs to be mutable.
+   * This will not actually be built unless needed.
    */
-  mutable std::unique_ptr<NodeRange> _node_stored_range;
+  std::unique_ptr<NodeRange> _node_stored_range;
 
   /**
    * A cached \p ConstNodeRange for threaded mutation on all semilocal
@@ -2291,11 +2287,9 @@ protected:
    * A cached \p NodeRange for threaded mutation of all unpartitioned
    * nodes of this mesh.
    *
-   * This will not actually be built unless needed. Further, since we
-   * want our \p unpartitioned_node_stored_range() method to be \p
-   * const (yet do the dynamic allocating) this needs to be mutable.
+   * This will not actually be built unless needed.
    */
-  mutable std::unique_ptr<NodeRange> _unpartitioned_node_stored_range;
+  std::unique_ptr<NodeRange> _unpartitioned_node_stored_range;
 
   /**
    * A \p PointLocator class for this mesh.
