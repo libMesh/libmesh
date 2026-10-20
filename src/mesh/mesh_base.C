@@ -1189,10 +1189,20 @@ void MeshBase::redistribute()
 
 void MeshBase::update_post_partitioning()
 {
-  // A range over all elements might still be fine here, but any range
-  // over local elements is obsolete if our partitioner changed the
-  // definition of "local".
+  // Any range over local objects is obsolete if our partitioner
+  // changed the definition of "local".
   _const_active_local_element_stored_range.reset(nullptr);
+  _local_node_stored_range.reset(nullptr);
+  _unpartitioned_node_stored_range.reset(nullptr);
+
+  // A range over all elements or nodes might still be fine here, but
+  // not if there's a possibility that we've remoted or gathered
+  // previously-remote objects.
+  if (!this->is_replicated())
+    {
+      _element_stored_range.reset(nullptr);
+      _node_stored_range.reset(nullptr);
+    }
 }
 
 
