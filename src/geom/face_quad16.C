@@ -32,6 +32,38 @@ namespace libMesh
 const int Quad16::num_nodes;
 const int Quad16::nodes_per_side;
 
+
+// Note: we can omit initialization of the third entry of each row because
+// static variables are automatically zero-initialized.
+// After the vertices the node locations start moving from Quad8/9
+
+static constexpr Real _third = Real(1)/3;
+const Real Quad16::_master_points[16][3] = 
+{
+  //corners
+  {-1, -1},
+  {1, -1},
+  {1, 1},
+  {-1, 1},
+  //internal edges
+  {- _third, -1},
+  {_third, -1},
+  //right
+  {1, - _third},
+  {1, _third},
+  //top
+  {_third, 1},
+  {- _third, 1},
+  // left
+  {-1, _third},
+  {-1, -_third},
+  //internal
+  {- _third, - _third},
+  {_third, - _third},
+  {_third, _third},
+  {- _third, _third}
+};
+
 const unsigned int Quad16::side_nodes_map[Quad16::num_sides][Quad16::nodes_per_side] =
   {
     {0,  4,  5, 1}, // Side 0

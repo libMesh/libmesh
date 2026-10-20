@@ -27,6 +27,8 @@
 namespace libMesh
 {
 
+
+
 /**
  * The \p QUAD16 is an element in 2D composed of 16 nodes.
  * It is numbered like this:
@@ -66,6 +68,14 @@ public:
   Quad16 & operator= (const Quad16 &) = delete;
   Quad16 & operator= (Quad16 &&) = delete;
   virtual ~Quad16() = default;
+
+  virtual Point master_point (const unsigned int i) const override final
+  {
+    libmesh_assert_less(i, this->n_nodes());
+    return Point(_master_points[i][0],
+                 _master_points[i][1],
+                 _master_points[i][2]);
+  }
 
   /**
    * \returns \p QUAD16.
@@ -152,6 +162,11 @@ public:
    */
   static const int num_nodes = 16;
   static const int nodes_per_side = 4;
+  
+  /**
+   * Master element node locations
+   */
+  static const Real _master_points[16][3];
 
   /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
