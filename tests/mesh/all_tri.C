@@ -33,6 +33,7 @@ public:
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testAllTriTri );
   CPPUNIT_TEST( testAllTriQuad );
+  CPPUNIT_TEST( testAllTriQuadShell4 );
   CPPUNIT_TEST( testAllTriQuad8 );
   CPPUNIT_TEST( testAllTriQuad9 );
   CPPUNIT_TEST( testAllTriC0Polygon );
@@ -109,6 +110,7 @@ public:
 
   // 2 quads split into 4 TRIs.
   void testAllTriQuad() { LOG_UNIT_TEST; test_helper(QUAD4, /*nelem=*/4, /*nbcs=*/6); }
+  void testAllTriQuadShell4() { LOG_UNIT_TEST; test_helper(QUADSHELL4, /*nelem=*/4, /*nbcs=*/6); }
 
   // 2 QUAD8s split into 4 TRIs.
   void testAllTriQuad8() { LOG_UNIT_TEST; test_helper(QUAD8, /*nelem=*/4, /*nbcs=*/6); }
