@@ -175,7 +175,6 @@ const unsigned int Elem::type_to_n_nodes_map [] =
     4,  // QUAD4
     8,  // QUAD8
     9,  // QUAD9
-    16, // QUAD16
 
     4,  // TET4
     10, // TET10
@@ -223,6 +222,8 @@ const unsigned int Elem::type_to_n_nodes_map [] =
 
     invalid_uint,  // C0POLYGON
     invalid_uint,  // C0POLYHEDRON
+
+    16,  //QUAD16
   };
 
 const unsigned int Elem::type_to_n_sides_map [] =
@@ -237,7 +238,6 @@ const unsigned int Elem::type_to_n_sides_map [] =
     4,  // QUAD4
     4,  // QUAD8
     4,  // QUAD9
-    4,  // QUAD16
 
     4,  // TET4
     4,  // TET10
@@ -285,6 +285,8 @@ const unsigned int Elem::type_to_n_sides_map [] =
 
     invalid_uint,  // C0POLYGON
     invalid_uint,  // C0POLYHEDRON
+
+    4,  // QUAD16
   };
 
 const unsigned int Elem::type_to_n_edges_map [] =
@@ -299,7 +301,6 @@ const unsigned int Elem::type_to_n_edges_map [] =
     4,  // QUAD4
     4,  // QUAD8
     4,  // QUAD9
-    4,  // QUAD16
 
     6,  // TET4
     6,  // TET10
@@ -347,6 +348,8 @@ const unsigned int Elem::type_to_n_edges_map [] =
 
     invalid_uint,  // C0POLYGON
     invalid_uint,  // C0POLYHEDRON
+    
+    4,   // QUAD16
   };
 
 const Order Elem::type_to_default_order_map [] =
@@ -361,7 +364,6 @@ const Order Elem::type_to_default_order_map [] =
     FIRST,    // QUAD4
     SECOND,   // QUAD8
     SECOND,   // QUAD9
-    THIRD,   // QUAD16
 
     FIRST,    // TET4
     SECOND,   // TET10
@@ -409,6 +411,8 @@ const Order Elem::type_to_default_order_map [] =
 
     FIRST,    // C0POLYGON
     FIRST,    // C0POLYHEDRON
+
+    THIRD,   // QUAD16
   };
 
 // ------------------------------------------------------------
