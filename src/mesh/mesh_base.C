@@ -73,6 +73,7 @@ MeshBase::MeshBase (const Parallel::Communicator & comm_in,
   _const_active_local_element_stored_range (),
   _node_stored_range (),
   _local_node_stored_range (),
+  _unpartitioned_node_stored_range (),
   _point_locator (),
   _count_lower_dim_elems_in_point_locator(true),
   _partitioner   (),
@@ -112,6 +113,7 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
   _const_active_local_element_stored_range (),
   _node_stored_range (),
   _local_node_stored_range (),
+  _unpartitioned_node_stored_range (),
   _point_locator (),
   _count_lower_dim_elems_in_point_locator(other_mesh._count_lower_dim_elems_in_point_locator),
   _partitioner   (),
@@ -207,6 +209,7 @@ MeshBase& MeshBase::operator= (MeshBase && other_mesh)
   _const_active_local_element_stored_range = std::move(other_mesh._const_active_local_element_stored_range);
   _node_stored_range = std::move(other_mesh._node_stored_range);
   _local_node_stored_range = std::move(other_mesh._local_node_stored_range);
+  _unpartitioned_node_stored_range = std::move(other_mesh._unpartitioned_node_stored_range);
   _point_locator = std::move(other_mesh._point_locator);
   _count_lower_dim_elems_in_point_locator = other_mesh.get_count_lower_dim_elems_in_point_locator();
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
@@ -2019,6 +2022,23 @@ const NodeRange & MeshBase::local_node_stored_range()
 
   return *_local_node_stored_range;
 }
+
+
+const NodeRange & MeshBase::unpartitioned_node_stored_range()
+{
+  if (!_unpartitioned_node_stored_range)
+  {
+    // Range construction may not be safe within threads
+    libmesh_assert(!Threads::in_threads);
+
+    _unpartitioned_node_stored_range =
+      std::make_unique<NodeRange>(this->pid_nodes_begin(DofObject::invalid_processor_id),
+                                  this->pid_nodes_end(DofObject::invalid_processor_id));
+  }
+
+  return *_unpartitioned_node_stored_range;
+}
+
 
 void MeshBase::clear_stored_ranges()
 {

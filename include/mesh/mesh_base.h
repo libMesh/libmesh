@@ -1936,6 +1936,16 @@ public:
    */
   const NodeRange & local_node_stored_range();
 
+
+  /**
+   * \returns A reference to a cached vector copy of a range of
+   * pointers to all unpartitioned nodes, suitable for threading.
+   *
+   * Iterating over all unpartitioned nodes is most useful for
+   * modifying the mesh, so we only have a non-const version for now.
+   */
+  const NodeRange & unpartitioned_node_stored_range();
+
   /**
    * Clears stored ranges, to indicate that the mesh has changed and
    * they should be regenerated when next needed.
@@ -2267,6 +2277,16 @@ protected:
    */
   mutable std::unique_ptr<NodeRange> _local_node_stored_range;
 
+
+  /**
+   * A cached \p NodeRange for threaded mutation of all unpartitioned
+   * nodes of this mesh.
+   *
+   * This will not actually be built unless needed. Further, since we
+   * want our \p unpartitioned_node_stored_range() method to be \p
+   * const (yet do the dynamic allocating) this needs to be mutable.
+   */
+  mutable std::unique_ptr<NodeRange> _unpartitioned_node_stored_range;
 
   /**
    * A \p PointLocator class for this mesh.
