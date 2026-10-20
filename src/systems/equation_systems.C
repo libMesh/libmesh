@@ -32,6 +32,7 @@
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/newmark_system.h"
+#include "libmesh/node_range.h"
 #include "libmesh/nonlinear_implicit_system.h"
 #include "libmesh/parallel.h"
 #include "libmesh/rb_construction.h"
@@ -110,8 +111,13 @@ void EquationSystems::reinit_mesh ()
 
   // Tell all the \p DofObject entities how many systems
   // there are.
-  for (auto & node : _mesh.node_ptr_range())
-    node->set_n_systems(n_sys);
+  Threads::parallel_for
+    (_mesh.node_stored_range(),
+     [n_sys](const NodeRange & range)
+     {
+       for (Node * node : range)
+         node->set_n_systems(n_sys);
+     });
 
   Threads::parallel_for
     (_mesh.element_stored_range(),
@@ -157,8 +163,13 @@ bool EquationSystems::reinit_solutions ()
   // there are.
   {
     // All the nodes
-    for (auto & node : _mesh.node_ptr_range())
-      node->set_n_systems(n_sys);
+    Threads::parallel_for
+      (_mesh.node_stored_range(),
+       [n_sys](const NodeRange & range)
+       {
+         for (Node * node : range)
+           node->set_n_systems(n_sys);
+       });
 
     // All the elements
     Threads::parallel_for
@@ -290,8 +301,13 @@ void EquationSystems::allgather ()
 
   // Tell all the \p DofObject entities how many systems
   // there are.
-  for (auto & node : _mesh.node_ptr_range())
-    node->set_n_systems(n_sys);
+  Threads::parallel_for
+    (_mesh.node_stored_range(),
+     [n_sys](const NodeRange & range)
+     {
+       for (Node * node : range)
+         node->set_n_systems(n_sys);
+     });
 
   Threads::parallel_for
     (_mesh.element_stored_range(),
@@ -1956,8 +1972,13 @@ std::size_t EquationSystems::n_active_dofs () const
 void EquationSystems::_add_system_to_nodes_and_elems()
 {
   // All the nodes
-  for (auto & node : _mesh.node_ptr_range())
-    node->add_system();
+  Threads::parallel_for
+    (_mesh.node_stored_range(),
+     [](const NodeRange & range)
+     {
+       for (Node * node : range)
+         node->add_system();
+     });
 
   // All the elements
   Threads::parallel_for

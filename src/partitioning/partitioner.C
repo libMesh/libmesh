@@ -28,6 +28,7 @@
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_tools.h"
 #include "libmesh/mesh_communication.h"
+#include "libmesh/node_range.h"
 #include "libmesh/parallel_ghost_sync.h"
 #include "libmesh/wrapped_petsc.h"
 #include "libmesh/boundary_info.h"
@@ -887,10 +888,13 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
 
   // Start from scratch here: nodes we used to own may not be
   // eligible for us to own any more.
-  for (auto & node : mesh.node_ptr_range())
-    {
-      node->processor_id() = DofObject::invalid_processor_id;
-    }
+  Threads::parallel_for
+    (mesh.node_stored_range(),
+     [](const NodeRange & range)
+     {
+       for (Node * node : range)
+         node->processor_id() = DofObject::invalid_processor_id;
+     });
 
   // Loop over all the active elements
   for (auto & elem : mesh.active_element_ptr_range())

@@ -31,6 +31,8 @@
 #include "libmesh/diff_solver.h"
 #include "libmesh/parallel_ghost_sync.h"
 #include "libmesh/libmesh_logging.h"
+#include "libmesh/node_range.h"
+#include "libmesh/threads.h"
 
 // C++ includes
 #include <time.h> // for clock_t, clock()
@@ -176,12 +178,17 @@ void VariationalMeshSmoother::smooth()
     }
 
   // Update _mesh from _mesh_copy
-  for (auto * node_copy : _mesh_copy->local_node_ptr_range())
-    {
-      auto & node = _mesh.node_ref(node_copy->id());
-      for (const auto d : make_range(_mesh_copy->mesh_dimension()))
-        node(d) = (*node_copy)(d);
-    }
+  const auto dim = _mesh_copy->mesh_dimension();
+  Threads::parallel_for
+    (_mesh_copy->local_node_stored_range(),
+     [this, dim](const NodeRange & range)
+     {
+       for (Node * node_copy : range)
+         {
+           Point & node = _mesh.node_ref(node_copy->id());
+           node = *node_copy;
+         }
+     });
 
   SyncNodalPositions sync_object(_mesh);
   Parallel::sync_dofobject_data_by_id (_mesh.comm(), _mesh.nodes_begin(), _mesh.nodes_end(), sync_object);

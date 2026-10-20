@@ -2483,8 +2483,13 @@ void MeshBase::size_elem_extra_integers()
 void MeshBase::size_node_extra_integers()
 {
   const std::size_t new_size = _node_integer_names.size();
-  for (auto node : this->node_ptr_range())
-    node->add_extra_integers(new_size, _node_integer_default_values);
+  Threads::parallel_for
+    (this->node_stored_range(),
+     [this, new_size](const NodeRange & range)
+     {
+       for (Node * node : range)
+         node->add_extra_integers(new_size, _node_integer_default_values);
+     });
 }
 
 

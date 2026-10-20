@@ -41,6 +41,7 @@
 #include "libmesh/mesh_communication.h"
 #include "libmesh/mesh_modification.h"
 #include "libmesh/mesh_tools.h"
+#include "libmesh/node_range.h"
 #include "libmesh/parallel.h"
 #include "libmesh/parallel_ghost_sync.h"
 #include "libmesh/remote_elem.h"
@@ -296,23 +297,25 @@ void MeshTools::Modification::redistribute (MeshBase & mesh,
 
   LOG_SCOPE("redistribute()", "MeshTools::Modification");
 
-  DenseVector<Real> output_vec(LIBMESH_DIM);
+  Threads::parallel_for
+    (mesh.node_stored_range(),
+     [&mapfunc](const NodeRange & range)
+     {
+       DenseVector<Real> output_vec(LIBMESH_DIM);
+       std::unique_ptr<FunctionBase<Real>> myfunc = mapfunc.clone();
+       for (Node * node : range)
+         {
+           (*myfunc)(*node, output_vec);
 
-  // FIXME - we should thread this later.
-  std::unique_ptr<FunctionBase<Real>> myfunc = mapfunc.clone();
-
-  for (auto & node : mesh.node_ptr_range())
-    {
-      (*myfunc)(*node, output_vec);
-
-      (*node)(0) = output_vec(0);
+           (*node)(0) = output_vec(0);
 #if LIBMESH_DIM > 1
-      (*node)(1) = output_vec(1);
+           (*node)(1) = output_vec(1);
 #endif
 #if LIBMESH_DIM > 2
-      (*node)(2) = output_vec(2);
+           (*node)(2) = output_vec(2);
 #endif
-    }
+         }
+     });
 
   // If we just moved a mesh in or out out of the X axis or XY plane
   // then we might have changed its spatial_dimension()
@@ -332,8 +335,13 @@ void MeshTools::Modification::translate (MeshBase & mesh,
 {
   const Point p(xt, yt, zt);
 
-  for (auto & node : mesh.node_ptr_range())
-    *node += p;
+  Threads::parallel_for
+    (mesh.node_stored_range(),
+     [p](const NodeRange & range)
+     {
+       for (Node * node : range)
+         *node += p;
+     });
 
   // If we just moved a mesh in or out out of the X axis or XY plane
   // then we might have changed its spatial_dimension()
@@ -380,11 +388,16 @@ MeshTools::Modification::rotate (MeshBase & mesh,
 #if LIBMESH_DIM == 3
   const auto R = RealTensorValue::intrinsic_rotation_matrix(phi, theta, psi);
 
-  for (auto & node : mesh.node_ptr_range())
-    {
-      Point & pt = *node;
-      pt = R * pt;
-    }
+  Threads::parallel_for
+    (mesh.node_stored_range(),
+     [R](const NodeRange & range)
+     {
+       for (Node * node : range)
+         {
+           Point & pt = *node;
+           pt = R * pt;
+         }
+     });
 
   // If we just moved a mesh in or out out of the X axis or XY plane
   // then we might have changed its spatial_dimension()
@@ -418,22 +431,29 @@ void MeshTools::Modification::scale (MeshBase & mesh,
     }
 
   // Scale the x coordinate in all dimensions
-  for (auto & node : mesh.node_ptr_range())
-    (*node)(0) *= x_scale;
-
-  // Only scale the y coordinate in 2 and 3D
-  if (LIBMESH_DIM < 2)
-    return;
-
-  for (auto & node : mesh.node_ptr_range())
-    (*node)(1) *= y_scale;
-
-  // Only scale the z coordinate in 3D
-  if (LIBMESH_DIM < 3)
-    return;
-
-  for (auto & node : mesh.node_ptr_range())
-    (*node)(2) *= z_scale;
+  Threads::parallel_for
+    (mesh.node_stored_range(),
+     [x_scale, y_scale, z_scale](const NodeRange & range)
+     {
+       if (LIBMESH_DIM < 2)
+         for (auto & node : range)
+           {
+             (*node)(0) *= x_scale;
+           }
+       else if (LIBMESH_DIM < 3)
+         for (auto & node : range)
+           {
+             (*node)(0) *= x_scale;
+             (*node)(1) *= y_scale;
+           }
+       else
+         for (auto & node : range)
+           {
+             (*node)(0) *= x_scale;
+             (*node)(1) *= y_scale;
+             (*node)(2) *= z_scale;
+           }
+     });
 
   // If we just collapsed a manifold onto the X axis or XY plane
   // then we might have changed its spatial_dimension()

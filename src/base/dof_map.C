@@ -33,6 +33,7 @@
 #include "libmesh/int_range.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_tools.h"
+#include "libmesh/node_range.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/periodic_boundary_base.h"
 #include "libmesh/periodic_boundaries.h"
@@ -518,11 +519,16 @@ void DofMap::reinit
   //------------------------------------------------------------
   // Clear the old_dof_objects for all the nodes
   // and elements so that we can overwrite them
-  for (auto & node : mesh.node_ptr_range())
-    {
-      node->clear_old_dof_object();
-      libmesh_assert (!node->get_old_dof_object());
-    }
+  Threads::parallel_for
+    (mesh.node_stored_range(),
+     [](const NodeRange & range)
+     {
+       for (Node * node : range)
+         {
+           node->clear_old_dof_object();
+           libmesh_assert (!node->get_old_dof_object());
+         }
+     });
 
   Threads::parallel_for
     (mesh.element_stored_range(),
@@ -565,8 +571,13 @@ void DofMap::reinit
   // handle new \p DofObjects that may have just been created
 
   // All the nodes
-  for (auto & node : mesh.node_ptr_range())
-    node->set_n_vars_per_group(sys_num, n_vars_per_group);
+  Threads::parallel_for
+    (mesh.node_stored_range(),
+     [sys_num, n_vars_per_group](const NodeRange & range)
+     {
+       for (Node * node : range)
+         node->set_n_vars_per_group(sys_num, n_vars_per_group);
+     });
 
   // All the elements
   Threads::parallel_for
@@ -859,12 +870,23 @@ void DofMap::invalidate_dofs(MeshBase & mesh) const
   const unsigned int sys_num = this->sys_number();
 
   // All the nodes
-  for (auto & node : mesh.node_ptr_range())
-    node->invalidate_dofs(sys_num);
+  Threads::parallel_for
+    (mesh.node_stored_range(),
+     [sys_num](const NodeRange & range)
+     {
+       for (Node * node : range)
+         node->invalidate_dofs(sys_num);
+     });
 
   // All the active elements.
-  for (auto & elem : mesh.active_element_ptr_range())
-    elem->invalidate_dofs(sys_num);
+  Threads::parallel_for
+    (mesh.element_stored_range(),
+     [sys_num](const ElemRange & range)
+     {
+       for (Elem * elem : range)
+         if (elem->active())
+           elem->invalidate_dofs(sys_num);
+     });
 }
 
 
