@@ -27,8 +27,17 @@ namespace libMesh
 {
 
 /**
- * This class creates quadrature points on a uniform grid, with
- * order+1 points on an edge.
+ * This class creates quadrature points on a uniform grid with
+ * order+1 intervals per edge.  On edges, quadrilaterals, and
+ * hexahedra, the points are the midpoints of the grid cells, giving
+ * (order+1)^dim points.  On triangles, tetrahedra, and pyramids, the
+ * element is uniformly refined into congruent or equal-volume
+ * triangles or tetrahedra, and the points are their centroids:
+ * (order+1)^2 points on triangles, (order+1)^3 on tetrahedra, and
+ * 2*(order+1)^3 on pyramids.  Prisms use the tensor product of the
+ * edge and triangle rules.  In every case all points are strictly
+ * interior and have equal weights, and linear functions are
+ * integrated exactly.
  *
  * Unlike most libMesh quadrature rules, QGrid does *not* reduce the
  * integration error exponentially on smooth functions as you increase

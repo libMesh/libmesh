@@ -598,13 +598,12 @@ public:
     if (qtype == QGAUSS_LOBATTO)
       return;
 
-    // QGrid uses equal weights on tets, so it only gets linears
-    // right.  QGrid needs to be changed to use symmetric offsets on
-    // pyramids so it can at *least* get linears right...
+    // QGrid uses equal weights on tets and pyramids, so it only gets
+    // linears right
     if (qtype == QGRID)
       {
         testPolynomials(qtype, order, TET10, tet_integrals, std::min(1u,exactorder));
-        testPolynomials(qtype, order, PYRAMID14, pyramid_integrals, 0);
+        testPolynomials(qtype, order, PYRAMID14, pyramid_integrals, std::min(1u,exactorder));
       }
     // QSimpson doesn't get all quadratics on a simplex or its extrusion
     else if (qtype == QSIMPSON)
