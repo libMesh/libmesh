@@ -69520,7 +69520,9 @@ then :
              #include "vtkDoubleArray.h"
              #include "vtkXMLPUnstructuredGridWriter.h"
              #include "vtkImageThreshold.h"
+             #ifdef HAVE_MPI
              #include "vtkMPIController.h"
+             #endif
 
 int
 main (void)
@@ -69532,7 +69534,11 @@ main (void)
              vtkSmartPointer<vtkDoubleArray> pcoords = vtkSmartPointer<vtkDoubleArray>::New();
              vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLPUnstructuredGridWriter>::New();
              vtkSmartPointer<vtkImageThreshold> threshold = vtkSmartPointer<vtkImageThreshold>::New();
+             #ifdef HAVE_MPI
              vtkSmartPointer<vtkMPIController> controller = vtkSmartPointer<vtkMPIController>::New();
+             MPI_Comm mpi_comm = MPI_COMM_WORLD; // something we can take an address of
+             vtkMPICommunicatorOpaqueComm vtk_opaque_comm(&mpi_comm);
+             #endif
 
   ;
   return 0;
@@ -69563,7 +69569,9 @@ then :
              #include "vtkDoubleArray.h"
              #include "vtkXMLPUnstructuredGridWriter.h"
              #include "vtkImageThreshold.h"
+             #ifdef HAVE_MPI
              #include "vtkMPIController.h"
+             #endif
 
 int
 main (void)
@@ -69575,7 +69583,11 @@ main (void)
              vtkSmartPointer<vtkDoubleArray> pcoords = vtkSmartPointer<vtkDoubleArray>::New();
              vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLPUnstructuredGridWriter>::New();
              vtkSmartPointer<vtkImageThreshold> threshold = vtkSmartPointer<vtkImageThreshold>::New();
+             #ifdef HAVE_MPI
              vtkSmartPointer<vtkMPIController> controller = vtkSmartPointer<vtkMPIController>::New();
+             MPI_Comm mpi_comm = MPI_COMM_WORLD; // something we can take an address of
+             vtkMPICommunicatorOpaqueComm vtk_opaque_comm(&mpi_comm);
+             #endif
 
   ;
   return 0;
@@ -69622,7 +69634,9 @@ else case e in #(
              #include "vtkDoubleArray.h"
              #include "vtkXMLPUnstructuredGridWriter.h"
              #include "vtkImageThreshold.h"
+             #ifdef HAVE_MPI
              #include "vtkMPIController.h"
+             #endif
 
 int
 main (void)
@@ -69634,7 +69648,11 @@ main (void)
              vtkSmartPointer<vtkDoubleArray> pcoords = vtkSmartPointer<vtkDoubleArray>::New();
              vtkSmartPointer<vtkXMLPUnstructuredGridWriter> writer = vtkSmartPointer<vtkXMLPUnstructuredGridWriter>::New();
              vtkSmartPointer<vtkImageThreshold> threshold = vtkSmartPointer<vtkImageThreshold>::New();
+             #ifdef HAVE_MPI
              vtkSmartPointer<vtkMPIController> controller = vtkSmartPointer<vtkMPIController>::New();
+             MPI_Comm mpi_comm = MPI_COMM_WORLD; // something we can take an address of
+             vtkMPICommunicatorOpaqueComm vtk_opaque_comm(&mpi_comm);
+             #endif
 
   ;
   return 0;
