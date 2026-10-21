@@ -1,5 +1,6 @@
 #include <libmesh/elem.h>
 #include <libmesh/enum_quadrature_type.h>
+#include <libmesh/face_c0polygon.h>
 #include <libmesh/quadrature.h>
 #include <libmesh/string_to_enum.h>
 #include <libmesh/utility.h>
@@ -174,7 +175,16 @@ private:
                        int exactorder)
   {
     auto elem = Elem::build(elem_type);
-    unsigned int dim = elem->dim();
+    testPolynomials(qtype, order, *elem, true_value, exactorder);
+  }
+
+  void testPolynomials(QuadratureType qtype, int order,
+                       const Elem & elem,
+                       const std::function<Real(int,int,int)> & true_value,
+                       int exactorder)
+  {
+    const ElemType elem_type = elem.type();
+    unsigned int dim = elem.dim();
     std::unique_ptr<QBase> qrule =
       QBase::build(qtype, dim, static_cast<Order>(order));
 
@@ -185,7 +195,7 @@ private:
         elem_type == PYRAMID14 || elem_type == PYRAMID18)
       qrule->allow_nodal_pyramid_quadrature = true;
 
-    qrule->init (*elem);
+    qrule->init (elem);
 
     const int max_y_order = dim>1 ? 0 : exactorder;
     const int max_z_order = dim>2 ? 0 : exactorder;
@@ -379,6 +389,38 @@ public:
 
           testPolynomials(QNODAL, order, elem_type, true_values[i], exactorder);
         }
+
+#if LIBMESH_DIM > 1
+    // C0Polygon nodal rules depend on the number of sides, so we test
+    // several polygons rather than just the Elem::build() default.
+    // The master polygon is the regular polygon with unit side
+    // lengths; see Polygon::master_point().
+    for (const auto ns : make_range(3u, 9u))
+      {
+        // No nodes are needed to define a master-element rule
+        const C0Polygon poly(ns);
+
+        const Real pi_over_ns = libMesh::pi / ns;
+        const Real apothem = 0.5 / std::tan(pi_over_ns);
+        const Real area = ns * 0.5 * apothem;
+        const Point centroid(0.5, apothem);
+
+        const std::function<Real(int,int,int)> poly_integrals =
+          [area, centroid](int modex, int modey, int) {
+            libmesh_assert_less_equal(modex + modey, 1);
+            if (modex)
+              return area * centroid(0);
+            if (modey)
+              return area * centroid(1);
+            return area;
+          };
+
+        // Equal weights at the vertices of a regular polygon are
+        // exact for linears, but they overweight the boundary for
+        // quadratics.
+        testPolynomials(QNODAL, FIRST, poly, poly_integrals, 1);
+      }
+#endif
   }
 
 
