@@ -48,7 +48,24 @@ public:
 
   explicit PetscMFFDMatrix(const Parallel::Communicator & comm_in);
 
+  /**
+   * Calls \p assign with \p set_context equal to \p false as generally speaking
+   * an MFFD matrix will have been created within the PETSc library, and if we
+   * are assigning ourselves to it then we are unlikely to outlive it, and we
+   * don't want to leave dangling context. If you want to set the Mat's context
+   * to \p this, then directly call \p assign with \p set_context equal to true.
+   */
   PetscMFFDMatrix & operator=(Mat m);
+
+  /**
+   * Adopt an existing, externally-owned Mat, without destroying it when this
+   * object goes out of scope. Any Mat this object currently owns is destroyed
+   * first. \p set_context controls whether we attach a context pointer to \p m
+   * allowing \p get_context() to recover this object from the Mat later; skip
+   * this when this wrapper is short-lived (e.g. a function-local variable) so
+   * we don't leave a dangling context on \p m after we're destroyed.
+   */
+  void assign(Mat m, bool set_context);
 
   virtual void init(const numeric_index_type,
                     const numeric_index_type,
@@ -101,10 +118,24 @@ PetscMFFDMatrix<T>::PetscMFFDMatrix(const Parallel::Communicator & comm_in)
 }
 
 template <typename T>
+void
+PetscMFFDMatrix<T>::assign(Mat m, bool set_context)
+{
+  if (this->_mat != m)
+    this->clear();
+
+  this->_mat = m;
+  this->_is_initialized = true;
+  this->_destroy_mat_on_exit = false;
+  if (set_context)
+    this->set_context();
+}
+
+template <typename T>
 PetscMFFDMatrix<T> &
 PetscMFFDMatrix<T>::operator=(Mat m)
 {
-  this->_mat = m;
+  this->assign(m, false);
   return *this;
 }
 

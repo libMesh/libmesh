@@ -224,6 +224,7 @@ std::map<std::string, FEFamily> fefamily_to_enum {
    {"LAGRANGE_VEC"      , LAGRANGE_VEC},
    {"L2_LAGRANGE"       , L2_LAGRANGE},
    {"L2_LAGRANGE_VEC"   , L2_LAGRANGE_VEC},
+   {"L2_LAGRANGE_GLL"   , L2_LAGRANGE_GLL},
    {"HIERARCHIC"        , HIERARCHIC},
    {"HIERARCHIC_VEC"    , HIERARCHIC_VEC},
    {"L2_HIERARCHIC"     , L2_HIERARCHIC},
@@ -411,6 +412,7 @@ std::map<SolverType, std::string> enum_to_solvertype =
 std::map<std::string, ElemQuality> elemquality_to_enum {
    {"ASPECT_RATIO"       , ASPECT_RATIO},
    {"SKEW"               , SKEW},
+   {"SKEW_ANGLE"         , SKEW_ANGLE},
    {"SHEAR"              , SHEAR},
    {"SHAPE"              , SHAPE},
    {"MAX_ANGLE"          , MAX_ANGLE},
@@ -427,7 +429,9 @@ std::map<std::string, ElemQuality> elemquality_to_enum {
    {"ASPECT_RATIO_GAMMA" , ASPECT_RATIO_GAMMA},
    {"SIZE"               , SIZE},
    {"JACOBIAN"           , JACOBIAN},
+   {"SCALED_JACOBIAN"    , SCALED_JACOBIAN},
    {"TWIST"              , TWIST},
+   {"EDGE_LENGTH_RATIO"  , EDGE_LENGTH_RATIO},
   };
 
 std::map<ElemQuality, std::string> enum_to_elemquality =

@@ -29,6 +29,8 @@ public:
     return std::make_unique<ContrivedPartitioner>(*this);
   }
 
+  virtual bool partitions_from_scratch () const override { return true; }
+
 protected:
   void _do_partition(MeshBase & mesh, const unsigned int n) override
   {

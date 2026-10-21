@@ -322,7 +322,11 @@ void parallel_for (const Range & range, const Body & body,
   // encounters this line of code when -fopenmp is not passed to the
   // compiler.
 #ifdef LIBMESH_HAVE_OPENMP
-#pragma omp parallel for schedule (static)
+// Cap the OpenMP team to the actual number of threads this dispatch uses. Without this clause the
+// team defaults to the process-wide libMesh::n_threads(), so omp_get_thread_num()
+// could exceed a reduced per-application thread count and index past
+// per-thread storage sized to that count.
+#pragma omp parallel for schedule (static) num_threads(actual_threads)
 #endif
   for (int i=0; i<static_cast<int>(actual_threads); i++)
     {
@@ -433,7 +437,11 @@ void parallel_reduce (const Range & range, Body & body,
   // warns about an "unknown pragma" if it encounters this line of
   // code when -fopenmp is not passed to the compiler.
 #ifdef LIBMESH_HAVE_OPENMP
-#pragma omp parallel for schedule (static)
+// Cap the OpenMP team to the actual number of threads this dispatch uses. Without this clause the
+// team defaults to the process-wide libMesh::n_threads(), so omp_get_thread_num()
+// could exceed a reduced per-application thread count and index past
+// per-thread storage sized to that count.
+#pragma omp parallel for schedule (static) num_threads(actual_threads)
 #endif
   // The use of 'int' instead of unsigned for the iteration variable
   // is deliberate here.  This is an OpenMP loop, and some older
@@ -458,7 +466,12 @@ void parallel_reduce (const Range & range, Body & body,
 
   // Join them all down to the original Body
   for (unsigned int i=actual_threads-1; i != 0; i--)
+  {
     bodies[i-1]->join(*bodies[i]);
+
+    // Free data ASAP lest we have O(actual_threads^2) at the end
+    managed_bodies[i].reset();
+  }
 }
 
 /**

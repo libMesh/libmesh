@@ -41,6 +41,8 @@ public:
     return std::make_unique<NonManifoldTestPartitioner>(*this);
   }
 
+  virtual bool partitions_from_scratch () const override { return true; }
+
 protected:
 
   /**

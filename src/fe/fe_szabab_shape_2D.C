@@ -109,6 +109,7 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
 
             // Szabo-Babuska shape functions on the triangle.
           case TRI3:
+          case TRISHELL3:
           case TRI6:
           case TRI7:
             {
@@ -136,8 +137,11 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
 
             // Szabo-Babuska shape functions on the quadrilateral.
           case QUAD4:
+          case QUADSHELL4:
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             {
               // Compute quad shape functions as a tensor-product
               const Real xi  = p(0);
@@ -212,7 +216,9 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
 
             // Szabo-Babuska shape functions on the quadrilateral.
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             {
               // Compute quad shape functions as a tensor-product
               const Real xi  = p(0);
@@ -295,7 +301,9 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
 
             // Szabo-Babuska shape functions on the quadrilateral.
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             {
               // Compute quad shape functions as a tensor-product
               const Real xi  = p(0);
@@ -387,7 +395,9 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
 
             // Szabo-Babuska shape functions on the quadrilateral.
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             {
               // Compute quad shape functions as a tensor-product
               const Real xi  = p(0);
@@ -489,7 +499,9 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
 
             // Szabo-Babuska shape functions on the quadrilateral.
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             {
               // Compute quad shape functions as a tensor-product
               const Real xi  = p(0);
@@ -603,7 +615,9 @@ Real FE<2,SZABAB>::shape(const Elem * elem,
 
             // Szabo-Babuska shape functions on the quadrilateral.
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             {
               // Compute quad shape functions as a tensor-product
               const Real xi  = p(0);
@@ -692,6 +706,7 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
 
             // Szabo-Babuska shape functions on the triangle.
           case TRI3:
+          case TRISHELL3:
           case TRI6:
           case TRI7:
             {
@@ -701,8 +716,11 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
 
             // Szabo-Babuska shape functions on the quadrilateral.
           case QUAD4:
+          case QUADSHELL4:
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             {
               // Compute quad shape functions as a tensor-product
               const Real xi  = p(0);
@@ -753,7 +771,9 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
 
             // Szabo-Babuska shape functions on the quadrilateral.
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             {
               // Compute quad shape functions as a tensor-product
               const Real xi  = p(0);
@@ -808,7 +828,9 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
 
             // Szabo-Babuska shape functions on the quadrilateral.
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             {
               // Compute quad shape functions as a tensor-product
               const Real xi  = p(0);
@@ -863,7 +885,9 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
 
 
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             {
               // Compute quad shape functions as a tensor-product
               const Real xi  = p(0);
@@ -916,7 +940,9 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
 
 
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             {
               // Compute quad shape functions as a tensor-product
               const Real xi  = p(0);
@@ -969,7 +995,9 @@ Real FE<2,SZABAB>::shape_deriv(const Elem * elem,
 
 
           case QUAD8:
+          case QUADSHELL8:
           case QUAD9:
+          case QUADSHELL9:
             {
               // Compute quad shape functions as a tensor-product
               const Real xi  = p(0);

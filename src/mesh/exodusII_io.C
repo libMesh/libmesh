@@ -159,7 +159,8 @@ ExodusII_IO::ExodusII_IO (MeshBase & mesh,
   _allow_empty_variables(false),
   _write_complex_abs(true),
   _set_unique_ids_from_maps(false),
-  _disc_bex(false)
+  _disc_bex(false),
+  _allow_hi_order_elemental(false)
 {
   // if !LIBMESH_HAVE_EXODUS_API, we didn't use this
   libmesh_ignore(single_precision);
@@ -183,7 +184,8 @@ ExodusII_IO::ExodusII_IO (const MeshBase & mesh,
   _allow_empty_variables(false),
   _write_complex_abs(true),
   _set_unique_ids_from_maps(false),
-  _disc_bex(false)
+  _disc_bex(false),
+  _allow_hi_order_elemental(false)
 {
   // if !LIBMESH_HAVE_EXODUS_API, we didn't use this
   libmesh_ignore(single_precision);
@@ -220,6 +222,10 @@ void ExodusII_IO::write_discontinuous_exodusII(const std::string & name,
                                                const EquationSystems & es,
                                                const std::set<std::string> * system_names)
 {
+  // See write_element_data justification for serializing
+  // Additionally, we need to serialize before building the subdomain name map
+  MeshSerializer serialize(MeshInput<MeshBase>::mesh(), !MeshOutput<MeshBase>::_is_parallel_format, true);
+
   std::vector<std::string> solution_names;
   std::vector<Number>      v;
 
@@ -675,7 +681,7 @@ void ExodusII_IO::read (const std::string & fname)
             }
           else // We have Bezier Extraction data
             {
-              auto & constraint_rows = mesh.get_constraint_rows();
+              auto & constraint_rows = mesh.set_constraint_rows();
 
               const DynaIO::ElementDefinition & dyna_elem_defn =
                 DynaIO::find_elem_definition(elem->type(),
@@ -1515,7 +1521,7 @@ void ExodusII_IO::write_element_data (const EquationSystems & es)
   // If we pass in a list of names to "build_elemental_solution_vector()"
   // it'll filter the variables coming back.
   std::vector<Number> soln;
-  es.build_elemental_solution_vector(soln, names);
+  es.build_elemental_solution_vector(soln, names, _allow_hi_order_elemental);
 
   // Also, store the list of subdomains on which each variable is active
   std::vector<std::set<subdomain_id_type>> vars_active_subdomains;
@@ -2516,6 +2522,12 @@ void ExodusII_IO::set_max_name_length(unsigned int max_length)
 void ExodusII_IO::set_discontinuous_bex(bool disc_bex)
 {
   _disc_bex = disc_bex;
+}
+
+
+void ExodusII_IO::write_discontinuous_elemental_data(bool allow_hi_order_elemental)
+{
+  _allow_hi_order_elemental = allow_hi_order_elemental;
 }
 
 

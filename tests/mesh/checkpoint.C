@@ -1,3 +1,4 @@
+#include "libmesh/boundary_info.h"
 #include "libmesh/cell_c0polyhedron.h"
 #include "libmesh/checkpoint_io.h"
 #include "libmesh/distributed_mesh.h"
@@ -8,10 +9,15 @@
 #include "libmesh/node.h"
 #include "libmesh/parallel.h"
 #include "libmesh/partitioner.h"
+#include "libmesh/periodic_boundaries.h"
+#include "libmesh/periodic_boundary_base.h"
 #include "libmesh/replicated_mesh.h"
+#include "libmesh/utility.h"
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
+
+#include <regex>
 
 
 using namespace libMesh;
@@ -37,6 +43,11 @@ public:
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST( testAsciiC0Polyhedron );
   CPPUNIT_TEST( testBinaryC0Polyhedron );
+#endif
+  CPPUNIT_TEST( testMissingSplitError );
+#ifdef LIBMESH_ENABLE_PERIODIC
+  CPPUNIT_TEST( testAsciiDisjointNeighborPairs );
+  CPPUNIT_TEST( testBinaryDisjointNeighborPairs );
 #endif
 #endif
 
@@ -312,6 +323,63 @@ public:
   }
 #endif
 
+  // Test that a read() for a split count with no matching split (and no
+  // serial fallback) reports the split counts that do exist, per #4560.
+  void testMissingSplitError()
+  {
+    LOG_UNIT_TEST;
+
+#ifdef LIBMESH_HAVE_XDR
+#ifdef LIBMESH_ENABLE_EXCEPTIONS
+    // The error message we're checking only depends on the checkpoint
+    // directory's contents, so there's no need to exercise this on more
+    // than one rank.
+    if (TestCommWorld->rank() != 0)
+      return;
+
+    Parallel::Communicator comm_self;
+    const std::string filename = "checkpoint_missing_split.cpa";
+    const processor_id_type n_procs = 2;
+
+    {
+      ReplicatedMesh mesh(comm_self);
+      MeshTools::Generation::build_square(mesh, 2, 2, 0., 1., 0., 1., QUAD4);
+      mesh.partition(n_procs);
+
+      CheckpointIO cpr(mesh);
+      cpr.current_processor_ids().clear();
+      for (processor_id_type pid = 0; pid < n_procs; pid++)
+        cpr.current_processor_ids().push_back(pid);
+      cpr.current_n_processors() = n_procs;
+      cpr.parallel() = true;
+      cpr.write(filename);
+    }
+
+    {
+      // Ask for a split count for which neither that split nor the
+      // serial fallback exists; only the split for n_procs does.
+      ReplicatedMesh mesh(comm_self);
+      CheckpointIO cpr(mesh);
+      cpr.current_n_processors() = n_procs + 1;
+
+      bool threw_desired_exception = false;
+      try {
+        cpr.read(filename);
+      }
+      catch (libMesh::LogicError & e) {
+        std::regex msg_regex("Splits that do exist in '" + filename + "': " +
+                             std::to_string(n_procs) + "\\.");
+        CPPUNIT_ASSERT(std::regex_search(e.what(), msg_regex));
+        threw_desired_exception = true;
+      }
+      CPPUNIT_ASSERT(threw_desired_exception);
+    }
+
+    CheckpointIO::cleanup(filename, n_procs);
+#endif
+#endif
+  }
+
   void testAsciiDistRepSplitter()
   {
     LOG_UNIT_TEST;
@@ -367,6 +435,103 @@ public:
 
     testSplitter<DistributedMesh, DistributedMesh>(true, true);
   }
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+  // Test that disjoint neighbor boundary pairs survive a checkpoint
+  // round trip, so neighbors across a split interface are restored.
+  void testDisjointNeighborPairsCheckpoint(bool binary)
+  {
+#ifdef LIBMESH_HAVE_XDR
+    const std::string filename =
+      std::string("checkpoint_disjoint_pairs.cp") + (binary ? "r" : "a");
+    const boundary_id_type left_id = 5, right_id = 6;
+    const RealVectorValue translation(0.25, 0.);
+    processor_id_type n_splits = 1;
+
+    {
+      // Two unit quads whose facing sides share coordinates but not
+      // nodes; only the disjoint pair makes them neighbors.
+      Mesh mesh(*TestCommWorld, 2);
+      mesh.allow_renumbering(false);
+
+      for (auto i : make_range(2))
+        {
+          const Real x0 = 1.25 * i;
+          const dof_id_type n0 = 4 * i;
+          mesh.add_point(Point(x0, 0.), n0);
+          mesh.add_point(Point(x0 + 1, 0.), n0 + 1);
+          mesh.add_point(Point(x0 + 1, 1.), n0 + 2);
+          mesh.add_point(Point(x0, 1.), n0 + 3);
+
+          Elem * elem = mesh.add_elem(Elem::build_with_id(QUAD4, i));
+          for (auto n : make_range(4))
+            elem->set_node(n, mesh.node_ptr(n0 + n));
+        }
+
+      BoundaryInfo & boundary_info = mesh.get_boundary_info();
+      boundary_info.add_side(mesh.elem_ptr(0), 1, left_id);
+      boundary_info.add_side(mesh.elem_ptr(1), 3, right_id);
+      mesh.add_disjoint_neighbor_boundary_pairs(left_id, right_id, translation);
+      mesh.prepare_for_use();
+
+      n_splits = mesh.is_serial() ? 1 : mesh.n_processors();
+      CheckpointIO checkpoint(mesh, binary);
+      checkpoint.write(filename);
+    }
+
+    {
+      Mesh mesh(*TestCommWorld);
+      mesh.allow_renumbering(false);
+
+      // A stale pair on the mesh being read into must not survive
+      const boundary_id_type stale_id = 7;
+      mesh.add_disjoint_neighbor_boundary_pairs(left_id, stale_id, RealVectorValue(1., 0.));
+
+      CheckpointIO checkpoint(mesh, binary);
+      checkpoint.read(filename);
+      mesh.prepare_for_use();
+
+      const PeriodicBoundaries * db = mesh.get_disjoint_neighbor_boundary_pairs();
+      CPPUNIT_ASSERT(db);
+      CPPUNIT_ASSERT_EQUAL(std::size_t(2), db->size());
+      CPPUNIT_ASSERT_EQUAL(right_id, libmesh_map_find(*db, left_id)->pairedboundary);
+      CPPUNIT_ASSERT_EQUAL(left_id, libmesh_map_find(*db, right_id)->pairedboundary);
+      LIBMESH_ASSERT_FP_EQUAL
+        (0., (libmesh_map_find(*db, left_id)->get_corresponding_pos(Point(0)) -
+              translation).norm(), TOLERANCE*TOLERANCE);
+
+      if (const Elem * elem = mesh.query_elem_ptr(0))
+        {
+          CPPUNIT_ASSERT(elem->neighbor_ptr(1));
+          CPPUNIT_ASSERT_EQUAL(dof_id_type(1), elem->neighbor_ptr(1)->id());
+        }
+      if (const Elem * elem = mesh.query_elem_ptr(1))
+        {
+          CPPUNIT_ASSERT(elem->neighbor_ptr(3));
+          CPPUNIT_ASSERT_EQUAL(dof_id_type(0), elem->neighbor_ptr(3)->id());
+        }
+    }
+
+    TestCommWorld->barrier();
+    if (TestCommWorld->rank() == 0)
+      CheckpointIO::cleanup(filename, n_splits);
+#endif // LIBMESH_HAVE_XDR
+  }
+
+  void testAsciiDisjointNeighborPairs()
+  {
+    LOG_UNIT_TEST;
+
+    testDisjointNeighborPairsCheckpoint(false);
+  }
+
+  void testBinaryDisjointNeighborPairs()
+  {
+    LOG_UNIT_TEST;
+
+    testDisjointNeighborPairsCheckpoint(true);
+  }
+#endif // LIBMESH_ENABLE_PERIODIC
 
   void testAsciiC0Polygon()
   {

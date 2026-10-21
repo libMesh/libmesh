@@ -21,6 +21,7 @@
 // Local includes
 #include "libmesh/cell_pyramid.h"
 #include "libmesh/cell_pyramid5.h"
+#include "libmesh/enum_elem_quality.h"
 #include "libmesh/face_tri3.h"
 #include "libmesh/face_quad4.h"
 
@@ -321,6 +322,17 @@ bool Pyramid::on_reference_element(const Point & p,
           ( eta - 1. + zeta <= 0.+eps) &&
           ( -xi - 1. + zeta <= 0.+eps) &&
           (            zeta >= 0.-eps));
+}
+
+
+
+std::pair<Real, Real> Pyramid::qual_bounds (const ElemQuality) const
+{
+  // No suggested ranges have yet been established for any of the
+  // metrics Quality::valid() lists for pyramids, so we always return
+  // the (-1, -1) sentinel.
+  libmesh_warning("Invalid quality measure chosen.");
+  return std::make_pair(Real(-1), Real(-1));
 }
 
 

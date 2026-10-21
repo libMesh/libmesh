@@ -6,8 +6,10 @@
 #include <libmesh/mesh_modification.h>
 #include <libmesh/mesh_refinement.h>
 #include <libmesh/parallel_implementation.h>
+#include <libmesh/remote_elem.h>
 #include <libmesh/enum_to_string.h>
 #include <libmesh/elem_quality.h>
+#include <libmesh/node.h>
 
 using namespace libMesh;
 
@@ -70,6 +72,138 @@ public:
           {
             LIBMESH_ASSERT_REALVEC_EQUAL(elem->master_point(i),
                                          ref_elem.point(i),
+                                         TOLERANCE*TOLERANCE);
+          }
+      }
+  }
+
+  // The Elem::side_type/local_side_node/local_edge_node overloads that
+  // take an ElemType have to agree with the virtual versions they shadow;
+  // an element of each type is the only honest way to check that.
+  void test_static_topology()
+  {
+    LOG_UNIT_TEST;
+
+    for (const auto & elem : this->_mesh->active_local_element_ptr_range())
+      {
+        const ElemType type = elem->type();
+
+        for (const auto s : elem->side_index_range())
+          {
+            const ElemType side_type = Elem::side_type(type, s);
+            CPPUNIT_ASSERT_EQUAL(elem->side_type(s), side_type);
+
+            // A polytope's side type follows from its element type even
+            // though its side count does not, but it has no static node
+            // map to check; neither are the infinite elements' maps read
+            // by these lookups, so both stop at the side type.
+            if (elem->runtime_topology() || elem->infinite())
+              continue;
+
+            const auto nodes = elem->nodes_on_side(s);
+            CPPUNIT_ASSERT_EQUAL(std::size_t(Elem::type_to_n_nodes_map[side_type]),
+                                 nodes.size());
+            for (auto n : index_range(nodes))
+              {
+                CPPUNIT_ASSERT_EQUAL(elem->local_side_node(s, n),
+                                     Elem::local_side_node(type, s, n));
+                CPPUNIT_ASSERT_EQUAL(nodes[n],
+                                     Elem::local_side_node(type, s, n));
+              }
+          }
+
+        // 1D elements have no edges.  A 2D element's edges are its sides,
+        // but nodes_on_edge() and local_edge_node() are not the APIs the
+        // loop above exercised, so those are checked here too.
+        if (elem->infinite() || elem->dim() < 2)
+          continue;
+
+        for (const auto e : elem->edge_index_range())
+          {
+            // There is no virtual edge_type() to check against, but the
+            // element classes state the same fact when they build an
+            // edge, so compare with that instead
+            CPPUNIT_ASSERT_EQUAL(elem->build_edge_ptr(e)->type(),
+                                 Elem::edge_type(type));
+
+            if (elem->runtime_topology())
+              continue;
+
+            const auto nodes = elem->nodes_on_edge(e);
+            CPPUNIT_ASSERT_EQUAL(std::size_t(Elem::type_to_n_nodes_map[Elem::edge_type(type)]),
+                                 nodes.size());
+            for (auto n : index_range(nodes))
+              {
+                CPPUNIT_ASSERT_EQUAL(elem->local_edge_node(e, n),
+                                     Elem::local_edge_node(type, e, n));
+                CPPUNIT_ASSERT_EQUAL(nodes[n],
+                                     Elem::local_edge_node(type, e, n));
+              }
+          }
+      }
+  }
+
+  void test_higher_order_node_placement()
+  {
+    LOG_UNIT_TEST;
+
+    // The side/edge map consistency is a static_assert in each element
+    // header now; what's left to check at runtime is where the
+    // higher-order nodes sit.  Every non-vertex reference node is at
+    // the centroid of the vertices of its edge, its face, or the whole
+    // element, except for EDGE4's nodes, which trisect it.
+    for (const auto & elem : this->_mesh->active_local_element_ptr_range())
+      {
+        if (elem->infinite() || elem->runtime_topology())
+          continue;
+
+        const ElemType type = elem->type();
+
+        for (const auto i : elem->node_index_range())
+          {
+            if (elem->is_vertex(i))
+              continue;
+
+            // EDGE4's interior nodes trisect it instead
+            if (type == EDGE4)
+              {
+                LIBMESH_ASSERT_REALVEC_EQUAL(Point(i == 2 ? Real(-1)/3 : Real(1)/3),
+                                             elem->master_point(i),
+                                             TOLERANCE*TOLERANCE);
+                continue;
+              }
+
+            // Find the smallest subentity the node belongs to: an edge
+            // if it sits on one, else a face, else the element itself.
+            // Its vertices are what the node should be the centroid of.
+            std::vector<unsigned int> subentity_vertices;
+            if (elem->dim() > 1)
+              for (const auto e : elem->edge_index_range())
+                {
+                  const auto nodes = elem->nodes_on_edge(e);
+                  if (std::find(nodes.begin(), nodes.end(), i) != nodes.end())
+                    subentity_vertices = {nodes[0], nodes[1]};
+                }
+            if (subentity_vertices.empty())
+              for (const auto s : elem->side_index_range())
+                {
+                  const auto nodes = elem->nodes_on_side(s);
+                  if (std::find(nodes.begin(), nodes.end(), i) != nodes.end())
+                    for (auto n : nodes)
+                      if (elem->is_vertex(n))
+                        subentity_vertices.push_back(n);
+                }
+            if (subentity_vertices.empty())
+              for (const auto n : elem->node_index_range())
+                if (elem->is_vertex(n))
+                  subentity_vertices.push_back(n);
+
+            Point centroid;
+            for (auto v : subentity_vertices)
+              centroid += elem->master_point(v);
+            centroid /= Real(subentity_vertices.size());
+
+            LIBMESH_ASSERT_REALVEC_EQUAL(centroid, elem->master_point(i),
                                          TOLERANCE*TOLERANCE);
           }
       }
@@ -249,6 +383,108 @@ public:
             //              << ", jac = " << jac
             //              << ", scaled_jac = " << scaled_jac
             //              << std::endl;
+          }
+      }
+  }
+
+  void test_quality_bounds()
+  {
+    LOG_UNIT_TEST;
+
+    // Every quality metric that libMesh considers valid for a type
+    // should evaluate to a value inside its suggested qual_bounds() on
+    // a reasonably-shaped element of that type.
+    for (const auto & elem :
+         this->_mesh->active_local_element_ptr_range())
+      {
+        // qual_bounds() isn't well defined for infinite elements.
+        if (elem->infinite())
+          continue;
+
+        for (const ElemQuality q : Quality::valid(elem->type()))
+          {
+            const std::pair<Real, Real> bounds = elem->qual_bounds(q);
+
+            // A metric may be listed as valid for a type without having
+            // suggested bounds defined; qual_bounds() returns (-1, -1)
+            // as a sentinel in that case, which we skip.
+            if (bounds.first == -1. && bounds.second == -1.)
+              continue;
+
+            const Real value = elem->quality(q);
+
+            // build_cube()'s particular tet dissection (splitting each
+            // cube into 6 tets) is a bit more elongated than the
+            // "suggested" SCALED_JACOBIAN range assumes: its measured
+            // floor is ~0.408 (see the SCALED_JACOBIAN check in
+            // test_quality() above), just under the suggested 0.5.
+            // That's a real, known property of this specific mesh, not
+            // a quality regression, so widen the tolerance for exactly
+            // this combination.
+            const bool is_tet = (elem->type() == TET4 ||
+                                 elem->type() == TET10 ||
+                                 elem->type() == TET14);
+            const Real tol = (q == SCALED_JACOBIAN && is_tet) ?
+              Real(0.1) : TOLERANCE;
+
+            std::ostringstream msg;
+            msg << "Quality metric " << Utility::enum_to_string(q)
+                << " on a " << Utility::enum_to_string(elem->type())
+                << " evaluated to " << value
+                << ", outside its suggested bounds ["
+                << bounds.first << ", " << bounds.second << "]";
+
+            CPPUNIT_ASSERT_MESSAGE(msg.str(),
+                                   value >= bounds.first - tol &&
+                                   value <= bounds.second + tol);
+          }
+      }
+  }
+
+  void test_quality_permutation_invariance()
+  {
+    LOG_UNIT_TEST;
+
+    // A genuine element-shape quality metric cannot depend on how the
+    // element's nodes happen to be numbered: permuting the nodes (i.e.
+    // relabeling which physical corner sits at which local index, via
+    // one of the reference element's symmetries) leaves the physical
+    // shape -- and therefore every quality metric -- unchanged.
+    for (const auto & elem :
+         this->_mesh->active_local_element_ptr_range())
+      {
+        // Permutations of infinite elements aren't well defined.
+        if (elem->infinite())
+          continue;
+
+        const std::vector<ElemQuality> valid_metrics =
+          Quality::valid(elem->type());
+
+        if (valid_metrics.empty())
+          continue;
+
+        std::vector<Real> baseline(valid_metrics.size());
+        for (std::size_t i = 0; i != valid_metrics.size(); ++i)
+          baseline[i] = elem->quality(valid_metrics[i]);
+
+        for (const auto p : IntRange<unsigned int>(0, elem->n_permutations()))
+          {
+            elem->permute(p);
+
+            for (std::size_t i = 0; i != valid_metrics.size(); ++i)
+              {
+                const Real permuted_value = elem->quality(valid_metrics[i]);
+
+                std::ostringstream msg;
+                msg << "Quality metric " << Utility::enum_to_string(valid_metrics[i])
+                    << " on a " << Utility::enum_to_string(elem->type())
+                    << " changed from " << baseline[i]
+                    << " to " << permuted_value
+                    << " after applying permutation " << p;
+
+                CPPUNIT_ASSERT_DOUBLES_EQUAL_MESSAGE
+                  (msg.str(), baseline[i], permuted_value, TOLERANCE);
+              }
           }
       }
   }
@@ -584,6 +820,90 @@ public:
               }
             else
               CPPUNIT_ASSERT(!old_elem.neighbor_ptr(s));
+          }
+      }
+  }
+
+  /// The nodes at the vertices of \p face, in the order Elem::oriented_face_vertices() gives
+  std::vector<const Node *> oriented_face_nodes(const Elem & elem, const unsigned int face)
+  {
+    std::vector<const Node *> sequence;
+    for (const auto v : elem.oriented_face_vertices(face))
+      sequence.push_back(elem.node_ptr(v));
+
+    return sequence;
+  }
+
+  void test_orientation()
+  {
+    LOG_UNIT_TEST;
+
+    for (const auto & elem : this->_mesh->active_local_element_ptr_range())
+      {
+        if (elem->infinite() || elem->type() == C0POLYHEDRON)
+          continue;
+
+        // Permuting renumbers the vertices without moving them
+        for (const auto p : make_range(elem->n_permutations()))
+          {
+            elem->permute(p);
+
+            for (const auto e : make_range(elem->n_edges()))
+              {
+                const bool positive = elem->point(elem->local_edge_node(e, 0)) >
+                                      elem->point(elem->local_edge_node(e, 1));
+
+                CPPUNIT_ASSERT_EQUAL(positive, elem->positive_edge_orientation(e));
+              }
+
+            for (const auto f : make_range(elem->n_faces()))
+              {
+                const unsigned int n_vertices =
+                  Elem::type_to_n_sides_map[elem->side_type(f)];
+                const std::vector<unsigned int> nodes = elem->nodes_on_side(f);
+
+                // The least vertex of the face and the direction from it
+                unsigned int least = 0;
+                for (const auto v : make_range(1u, n_vertices))
+                  if (elem->point(nodes[v]) < elem->point(nodes[least]))
+                    least = v;
+
+                const bool positive =
+                  elem->point(nodes[(least + n_vertices - 1) % n_vertices]) <
+                  elem->point(nodes[(least + 1) % n_vertices]);
+
+                const unsigned int orientation = elem->face_orientation(f);
+
+                CPPUNIT_ASSERT_LESS(2 * n_vertices, orientation);
+                CPPUNIT_ASSERT_EQUAL(2 * least + static_cast<unsigned int>(positive),
+                                     orientation);
+                CPPUNIT_ASSERT_EQUAL(positive, elem->positive_face_orientation(f));
+              }
+          }
+      }
+  }
+
+  void test_orientation_conformity()
+  {
+    LOG_UNIT_TEST;
+
+    // Elements sharing a face may have different orientation indices for it, but the indices
+    // must encode the same vertex sequence.
+    for (const auto & elem : this->_mesh->active_local_element_ptr_range())
+      {
+        if (elem->infinite() || elem->type() == C0POLYHEDRON)
+          continue;
+
+        for (const auto f : make_range(elem->n_faces()))
+          {
+            const Elem * neighbor = elem->neighbor_ptr(f);
+            if (!neighbor || neighbor == remote_elem || neighbor->infinite())
+              continue;
+
+            const unsigned int f_neighbor = neighbor->which_neighbor_am_i(elem);
+
+            CPPUNIT_ASSERT(oriented_face_nodes(*elem, f) ==
+                           oriented_face_nodes(*neighbor, f_neighbor));
           }
       }
   }
@@ -970,7 +1290,11 @@ public:
 #define ELEMTEST                                \
   CPPUNIT_TEST( test_bounding_box );            \
   CPPUNIT_TEST( test_ref_elem );                \
+  CPPUNIT_TEST( test_static_topology );         \
+  CPPUNIT_TEST( test_higher_order_node_placement ); \
   CPPUNIT_TEST( test_quality );                 \
+  CPPUNIT_TEST( test_quality_bounds );          \
+  CPPUNIT_TEST( test_quality_permutation_invariance ); \
   CPPUNIT_TEST( test_node_edge_map_consistency ); \
   CPPUNIT_TEST( test_maps );                    \
   CPPUNIT_TEST( test_static_data );             \
@@ -978,6 +1302,8 @@ public:
   CPPUNIT_TEST( test_flip );                    \
   CPPUNIT_TEST( test_orient );                  \
   CPPUNIT_TEST( test_orient_elements );         \
+  CPPUNIT_TEST( test_orientation );             \
+  CPPUNIT_TEST( test_orientation_conformity );  \
   CPPUNIT_TEST( test_contains_point_node );     \
   CPPUNIT_TEST( test_center_node_on_side );     \
   CPPUNIT_TEST( test_side_type );               \

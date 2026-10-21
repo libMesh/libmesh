@@ -1,7 +1,9 @@
 #include <libmesh/mesh.h>
+#include <libmesh/distributed_mesh.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/boundary_info.h>
 #include <libmesh/elem.h>
+#include <libmesh/remote_elem.h>
 #include <libmesh/face_quad4_shell.h>
 #include <libmesh/equation_systems.h>
 #include <libmesh/zero_function.h>
@@ -25,6 +27,7 @@ public:
   LIBMESH_CPPUNIT_TEST_SUITE( BoundaryInfoTest );
 
   CPPUNIT_TEST( testNameCopying );
+  CPPUNIT_TEST( testBuildSideListFromNodeListDistributedMesh );
 
 #if LIBMESH_DIM > 1
   CPPUNIT_TEST( testMesh );
@@ -44,6 +47,7 @@ public:
 # endif
   CPPUNIT_TEST( testBuildNodeListFromSideList );
   CPPUNIT_TEST( testBuildSideListFromNodeList );
+  CPPUNIT_TEST( testBuildSideListFromNodeListThinMesh );
 # ifdef LIBMESH_ENABLE_DIRICHLET
   CPPUNIT_TEST( testShellFaceConstraints );
 # endif
@@ -1109,6 +1113,133 @@ public:
             CPPUNIT_ASSERT(!bi.n_boundary_ids(elem, s));
           }
       }
+  }
+
+
+  void testBuildSideListFromNodeListThinMesh()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+
+    // A mesh that is only one element deep in y: every node in the
+    // mesh lies on either the bottom (y=0) or top (y=1) exterior
+    // face, so a nodeset containing "the top and bottom nodes" ends
+    // up containing *every* node, including those on the interior
+    // sides between elements.
+    MeshTools::Generation::build_square(mesh,
+                                        8, 1,
+                                        0., 1.,
+                                        0., 1.,
+                                        QUAD4);
+
+    BoundaryInfo & bi = mesh.get_boundary_info();
+
+    const boundary_id_type nodeset_id = 100;
+    for (const auto & node : mesh.node_ptr_range())
+      bi.add_node(node, nodeset_id);
+
+    // Sanity check: every node in this thin mesh is in the nodeset.
+    for (const auto & node : mesh.node_ptr_range())
+      CPPUNIT_ASSERT(bi.has_boundary_id(node, nodeset_id));
+
+    // build_side_list_from_node_list() is purely additive (it never
+    // removes a side once added), so we must run the strict
+    // skip_interior_sides = true check first, before any call adds
+    // the interior side to the sideset.
+    //
+    // Passing skip_interior_sides = true should skip the interior
+    // side, even though all of its nodes are (trivially) in the
+    // nodeset.
+    bi.build_side_list_from_node_list({nodeset_id}, /*skip_interior_sides=*/true);
+
+    // We only examine local elements here: a ghost element's neighbor
+    // may be a RemoteElem, whose subdomain_id() tells us nothing about
+    // the subdomain of the element it stands in for, so we couldn't
+    // predict the correct answer for its sides.
+    for (const auto & elem : mesh.active_local_element_ptr_range())
+      for (auto s : elem->side_index_range())
+        {
+          const Elem * neigh = elem->neighbor_ptr(s);
+          libmesh_assert(neigh != remote_elem);
+          if (neigh && neigh->subdomain_id() == elem->subdomain_id())
+            CPPUNIT_ASSERT(!bi.has_boundary_id(elem, s, nodeset_id));
+          else
+            CPPUNIT_ASSERT(bi.has_boundary_id(elem, s, nodeset_id));
+        }
+
+    // Default behavior (skip_interior_sides = false) should preserve
+    // the old, unconditional behavior, adding the interior side even
+    // though it isn't a true boundary. Since add_side() is additive,
+    // this call only needs to add the interior side; the exterior
+    // sides are already present from the call above.
+    bi.build_side_list_from_node_list({nodeset_id});
+
+    bool found_interior_side = false;
+    for (const auto & elem : mesh.active_local_element_ptr_range())
+      for (auto s : elem->side_index_range())
+        {
+          const Elem * neigh = elem->neighbor_ptr(s);
+          libmesh_assert(neigh != remote_elem);
+          if (neigh && neigh->subdomain_id() == elem->subdomain_id() &&
+              bi.has_boundary_id(elem, s, nodeset_id))
+            found_interior_side = true;
+        }
+
+    // A processor with no local elements of its own can't find one.
+    mesh.comm().max(found_interior_side);
+    CPPUNIT_ASSERT(found_interior_side);
+  }
+
+
+  // Regression test for a deadlock in build_side_list_from_node_list()
+  // (libMesh issue #4564): on a DistributedMesh, _boundary_node_id can
+  // be empty on some processors (ones that don't own or ghost any
+  // node in the nodeset) while it's non-empty on others.  The
+  // function used to return early based purely on local state, which
+  // caused processors that took the early return to skip a later
+  // collective communication call that the remaining processors still
+  // entered, deadlocking.
+  void testBuildSideListFromNodeListDistributedMesh()
+  {
+    LOG_UNIT_TEST;
+
+    DistributedMesh mesh(*TestCommWorld);
+
+    MeshTools::Generation::build_line(mesh, 40, 0., 1., EDGE2);
+
+    BoundaryInfo & bi = mesh.get_boundary_info();
+
+    // Only the two domain endpoint nodes are in the nodeset, like a
+    // Neumann-BC-at-the-ends use case.  With enough processors, most
+    // ranks won't locally own or ghost either endpoint.
+    //
+    // Pick the endpoints out geometrically rather than by node id:
+    // prepare_for_use() renumbers a DistributedMesh's nodes so that
+    // each processor's are contiguous, so the ids the line was built
+    // with don't survive, and with enough processors ids 0 and 40
+    // land on interior nodes.
+    const boundary_id_type nodeset_id = 100;
+    for (const auto & node : mesh.node_ptr_range())
+      if (std::abs((*node)(0) - 0.) < TOLERANCE ||
+          std::abs((*node)(0) - 1.) < TOLERANCE)
+        bi.add_node(node, nodeset_id);
+
+    bi.build_side_list_from_node_list({nodeset_id}, /*skip_interior_sides=*/true);
+
+    for (const auto & elem : mesh.active_local_element_ptr_range())
+      for (auto s : elem->side_index_range())
+        {
+          // Only the two exterior sides, at the physical ends of the
+          // line, should have been added to the sideset; every other
+          // side is interior to the (single) subdomain, whether or
+          // not its neighbor was a RemoteElem that had to be resolved
+          // via communication.
+          if (!elem->neighbor_ptr(s))
+            CPPUNIT_ASSERT(bi.has_boundary_id(elem, s, nodeset_id));
+          else
+            CPPUNIT_ASSERT(!bi.has_boundary_id(elem, s, nodeset_id));
+        }
   }
 
 

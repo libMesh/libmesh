@@ -24,6 +24,8 @@ public:
   CPPUNIT_TEST( testEdge2Lagrange );
   CPPUNIT_TEST( testQuad8Lagrange );
   CPPUNIT_TEST( testTri6Lagrange );
+  CPPUNIT_TEST( testTri7Lagrange );
+  CPPUNIT_TEST( testL2Lagrange );
   CPPUNIT_TEST_SUITE_END();
 
 private:
@@ -75,11 +77,13 @@ public:
   }
 
   /**
-   * Check what the transformed dual basis on QUAD8/TRI6 guarantees, none of which the untransformed
-   * construction gives: strictly positive weights, reproduction of constants, and biorthogonality
-   * against Ntilde = T N rather than N. \p vertex_over_mid pins down alpha.
+   * Check what the transformed dual basis on QUAD8/TRI6/TRI7 guarantees, none of which the
+   * untransformed construction gives: strictly positive weights, reproduction of constants, and
+   * biorthogonality against Ntilde = T N rather than N. \p vertex_over_mid pins down alpha, and
+   * \p n is the number of SECOND order shape functions on \p elem_type.
    */
-  void testTransformedDual (const ElemType elem_type, const Real vertex_over_mid)
+  void testTransformedDual (const ElemType elem_type, const unsigned int n,
+                            const Real vertex_over_mid, const FEFamily family = LAGRANGE)
   {
     Mesh mesh(*TestCommWorld);
     MeshTools::Generation::build_square(mesh, 1, 1, -1., 1., -1., 1., elem_type);
@@ -89,7 +93,7 @@ public:
       return;
     const Elem * elem = *(rng.begin());
 
-    FEType fe_type(SECOND, LAGRANGE);
+    FEType fe_type(SECOND, family);
     std::unique_ptr<FEBase> fe = FEBase::build(2, fe_type);
     const auto & JxW = fe->get_JxW();
     const auto & phi = fe->get_phi();
@@ -98,7 +102,6 @@ public:
     fe->attach_quadrature_rule(&qrule);
     fe->reinit(elem);
 
-    const unsigned int n = elem->n_nodes();
     CPPUNIT_ASSERT_EQUAL(std::size_t(n), phi.size());
     CPPUNIT_ASSERT_EQUAL(std::size_t(n), dual_phi.size());
 
@@ -165,14 +168,30 @@ public:
   {
     LOG_UNIT_TEST;
     // QUAD8 weights 1/5 (corner) and 4/5 (mid-edge) on the reference element
-    testTransformedDual(QUAD8, Real(1)/4);
+    testTransformedDual(QUAD8, 8, Real(1)/4);
   }
 
   void testTri6Lagrange ()
   {
     LOG_UNIT_TEST;
     // TRI6 weights 1/15 (vertex) and 1/10 (mid-edge) on the reference element
-    testTransformedDual(TRI6, Real(2)/3);
+    testTransformedDual(TRI6, 6, Real(2)/3);
+  }
+
+  void testTri7Lagrange ()
+  {
+    LOG_UNIT_TEST;
+    // SECOND order on TRI7 is the TRI6 basis, with no degree of freedom at the centroid node
+    testTransformedDual(TRI7, 6, Real(2)/3);
+  }
+
+  void testL2Lagrange ()
+  {
+    LOG_UNIT_TEST;
+    // L2_LAGRANGE shares the LAGRANGE shape functions
+    testTransformedDual(QUAD8, 8, Real(1)/4, L2_LAGRANGE);
+    testTransformedDual(TRI6, 6, Real(2)/3, L2_LAGRANGE);
+    testTransformedDual(TRI7, 6, Real(2)/3, L2_LAGRANGE);
   }
 
   void setUp()

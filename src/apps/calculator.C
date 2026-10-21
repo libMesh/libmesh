@@ -239,6 +239,8 @@ int main(int argc, char ** argv)
                   EquationSystems::READ_ADDITIONAL_DATA |
                   EquationSystems::READ_BASIC_ONLY);
 
+      libMesh::out << "Input system:\n\n";
+
       old_es.print_info();
 
       const unsigned int sysnum =
@@ -268,8 +270,6 @@ int main(int argc, char ** argv)
 
       old_es.init();
 
-      old_es.print_info();
-
       goal_function =
         std::make_unique<WrappedFunctor<Number>>(ParsedFunction<Number>(calcfunc));
     }
@@ -293,13 +293,32 @@ int main(int argc, char ** argv)
 
   if (!libMesh::on_command_line("--integral"))
     {
-      // Create a new mesh and a new EquationSystems
-      Mesh new_mesh(init.comm(), requested_dim);
-      new_mesh.read(meshname);
+      // Create a new mesh and a new EquationSystems.
+      // Copying the old mesh is faster than rereading it, and gets us
+      // any constraint rows from an input extraction operator matrix.
+      Mesh new_mesh(old_mesh);
 
       EquationSystems new_es(new_mesh);
 
       HilbertSystem & new_sys = new_es.add_system<HilbertSystem>(current_sys_name);
+
+      if (libMesh::on_command_line("--print_solutions"))
+        new_sys.print_solutions = true;
+
+      if (libMesh::on_command_line("--print_residuals"))
+        new_sys.print_residuals = true;
+
+      if (libMesh::on_command_line("--print_jacobians"))
+        new_sys.print_jacobians = true;
+
+      if (libMesh::on_command_line("--print_element_solutions"))
+        new_sys.print_element_solutions = true;
+
+      if (libMesh::on_command_line("--print_element_residuals"))
+        new_sys.print_element_residuals = true;
+
+      if (libMesh::on_command_line("--print_element_jacobians"))
+        new_sys.print_element_jacobians = true;
 
       new_sys.hilbert_order() = libMesh::command_line_next("--hilbert", 0u);
 
@@ -321,6 +340,10 @@ int main(int argc, char ** argv)
         new_sys.input_system = &old_es.get_system(current_sys_name);
 
       new_es.init();
+
+      libMesh::out << "New system:\n\n";
+
+      new_es.print_info();
 
       DiffSolver & solver = *(new_sys.time_solver->diff_solver().get());
       solver.quiet = false;

@@ -34,32 +34,6 @@ const int Hex20::num_nodes;
 const int Hex20::nodes_per_side;
 const int Hex20::nodes_per_edge;
 
-const unsigned int Hex20::side_nodes_map[Hex20::num_sides][Hex20::nodes_per_side] =
-  {
-    {0, 3, 2, 1, 11, 10,  9,  8}, // Side 0
-    {0, 1, 5, 4,  8, 13, 16, 12}, // Side 1
-    {1, 2, 6, 5,  9, 14, 17, 13}, // Side 2
-    {2, 3, 7, 6, 10, 15, 18, 14}, // Side 3
-    {3, 0, 4, 7, 11, 12, 19, 15}, // Side 4
-    {4, 5, 6, 7, 16, 17, 18, 19}  // Side 5
-  };
-
-const unsigned int Hex20::edge_nodes_map[Hex20::num_edges][Hex20::nodes_per_edge] =
-  {
-    {0, 1, 8},  // Edge 0
-    {1, 2, 9},  // Edge 1
-    {2, 3, 10}, // Edge 2
-    {0, 3, 11}, // Edge 3
-    {0, 4, 12}, // Edge 4
-    {1, 5, 13}, // Edge 5
-    {2, 6, 14}, // Edge 6
-    {3, 7, 15}, // Edge 7
-    {4, 5, 16}, // Edge 8
-    {5, 6, 17}, // Edge 9
-    {6, 7, 18}, // Edge 10
-    {4, 7, 19}  // Edge 11
-  };
-
 // ------------------------------------------------------------
 // Hex20 class member functions
 

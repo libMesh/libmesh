@@ -659,6 +659,17 @@ public:
   void set_discontinuous_bex(bool disc_bex);
 
   /**
+   * Set to true (false is the default) to allow elemental output of
+   * higher-order discontinuous (non-CONSTANT order MONOMIAL, MONOMIAL_VEC,
+   * or XYZ) variables.  When enabled, each such variable is written out as
+   * a quadrature-weighted average over each element rather than being
+   * excluded from elemental output.  See
+   * EquationSystems::is_elemental_data_fe_type() for the underlying
+   * eligibility check.
+   */
+  void write_discontinuous_elemental_data(bool allow_hi_order_elemental);
+
+  /**
    * This function factors out a bunch of code which is common to the
    * write_nodal_data() and write_nodal_data_discontinuous() functions
    */
@@ -740,6 +751,13 @@ private:
    * for every Bezier Extraction element.
    */
   bool _disc_bex;
+
+  /**
+   * Set to true (false is the default) to allow elemental output of
+   * higher-order discontinuous variables.  See
+   * write_discontinuous_elemental_data(bool).
+   */
+  bool _allow_hi_order_elemental;
 };
 
 

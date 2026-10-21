@@ -54,6 +54,128 @@ PetscMatrixShellMatrix<T>::init(ParallelType libmesh_dbg_var(type))
   this->set_context();
 }
 
+template <typename T>
+void
+PetscMatrixShellMatrix<T>::zero()
+{
+  // A shell matrix generally computes its action and stores no entries, so there is nothing to
+  // clear. This is reachable through System::init_matrices(), which zeroes every matrix it
+  // initializes. We elect to give this an empty implementation, as opposed to guarding the
+  // init_matrices() call with something like an is_shell() attribute, as we consider it relatively
+  // harmless to allow a user to "zero" a shell compared to attempting to add/set something
+  // nontrivial in the shell
+}
+
+template <typename T>
+std::unique_ptr<SparseMatrix<T>>
+PetscMatrixShellMatrix<T>::zero_clone() const
+{
+  libmesh_not_implemented();
+}
+
+template <typename T>
+std::unique_ptr<SparseMatrix<T>>
+PetscMatrixShellMatrix<T>::clone() const
+{
+  libmesh_not_implemented();
+}
+
+template <typename T>
+void
+PetscMatrixShellMatrix<T>::set(const numeric_index_type, const numeric_index_type, const T)
+{
+  libmesh_error_msg("Method not appropriate for arbitrary shell matrices");
+}
+
+template <typename T>
+void
+PetscMatrixShellMatrix<T>::add(const numeric_index_type, const numeric_index_type, const T)
+{
+  libmesh_error_msg("Method not appropriate for arbitrary shell matrices");
+}
+
+template <typename T>
+void
+PetscMatrixShellMatrix<T>::add_matrix(const DenseMatrix<T> &,
+                                      const std::vector<numeric_index_type> &,
+                                      const std::vector<numeric_index_type> &)
+{
+  libmesh_error_msg("Method not appropriate for arbitrary shell matrices");
+}
+
+template <typename T>
+void
+PetscMatrixShellMatrix<T>::add_matrix(const DenseMatrix<T> &,
+                                      const std::vector<numeric_index_type> &)
+{
+  libmesh_error_msg("Method not appropriate for arbitrary shell matrices");
+}
+
+template <typename T>
+void
+PetscMatrixShellMatrix<T>::add(const T, const SparseMatrix<T> &)
+{
+  libmesh_error_msg("Method not appropriate for arbitrary shell matrices");
+}
+
+template <typename T>
+T
+PetscMatrixShellMatrix<T>::operator()(const numeric_index_type, const numeric_index_type) const
+{
+  libmesh_error_msg("Method not appropriate for arbitrary shell matrices");
+}
+
+template <typename T>
+Real
+PetscMatrixShellMatrix<T>::l1_norm() const
+{
+  libmesh_error_msg("Method not appropriate for arbitrary shell matrices");
+}
+
+template <typename T>
+Real
+PetscMatrixShellMatrix<T>::linfty_norm() const
+{
+  libmesh_error_msg("Method not appropriate for arbitrary shell matrices");
+}
+
+template <typename T>
+void
+PetscMatrixShellMatrix<T>::print_personal(std::ostream &) const
+{
+  libmesh_error_msg("Method not appropriate for arbitrary shell matrices");
+}
+
+template <typename T>
+void
+PetscMatrixShellMatrix<T>::get_diagonal(NumericVector<T> &) const
+{
+  libmesh_error_msg("Method not appropriate for arbitrary shell matrices");
+}
+
+template <typename T>
+void
+PetscMatrixShellMatrix<T>::get_transpose(SparseMatrix<T> &) const
+{
+  libmesh_error_msg("Method not appropriate for arbitrary shell matrices");
+}
+
+template <typename T>
+void
+PetscMatrixShellMatrix<T>::get_row(numeric_index_type,
+                                   std::vector<numeric_index_type> &,
+                                   std::vector<T> &) const
+{
+  libmesh_error_msg("Method not appropriate for arbitrary shell matrices");
+}
+
+template <typename T>
+SparseMatrix<T> &
+PetscMatrixShellMatrix<T>::operator=(const SparseMatrix<T> &)
+{
+  libmesh_error_msg("Method not appropriate for arbitrary shell matrices");
+}
+
 template class LIBMESH_EXPORT PetscMatrixShellMatrix<Number>;
 
 } // namespace libMesh

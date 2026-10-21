@@ -31,9 +31,13 @@ unit_tests_sources = \
   fe/fe_hdiv_grad_test.C \
   fe/fe_hermite_test.C \
   fe/fe_hierarchic_test.C \
+  fe/fe_orientation_test.C \
   fe/inf_fe_radial_test.C \
   fe/fe_l2_hierarchic_test.C \
   fe/fe_l2_lagrange_test.C \
+  fe/fe_l2_lagrange_gll_test.C \
+  fe/fe_gll_collocation_test.C \
+  fe/fe_gll_lagrange_agreement_test.C \
   fe/fe_lagrange_test.C \
   fe/fe_monomial_test.C \
   fe/fe_rational_map.C \
@@ -114,6 +118,8 @@ unit_tests_sources = \
   numerics/sparse_matrix_test.h \
   numerics/dense_matrix_test.C \
   numerics/petsc_matrix_test.C \
+  numerics/petsc_matrix_shell_matrix_test.C \
+  numerics/petsc_mffd_matrix_test.C \
   numerics/diagonal_matrix_test.C \
   numerics/lumped_mass_matrix_test.C \
   numerics/eigen_sparse_matrix_test.C \
@@ -140,9 +146,11 @@ unit_tests_sources = \
   solvers/second_order_unsteady_solver_test.C \
   systems/constraint_operator_test.C \
   systems/equation_systems_test.C \
+  systems/heterogeneous_nonlinear_constraint_test.C \
   systems/periodic_bc_test.C \
   systems/disjoint_neighbor_test.C \
   systems/systems_test.C \
+  systems/nonlinear_implicit_system_test.C \
   utils/parameters_test.C \
   utils/point_locator_test.C \
   utils/rb_parameters_test.C \
@@ -230,6 +238,8 @@ data = matrices/geom_1_extraction_op.h5 \
        meshes/quad4_tri3_smoothed.xda.gz \
        meshes/quad4_tri3_hourglass.xda.gz \
        meshes/hex8_prism6_smoothed.xda.gz \
+       meshes/hex_prism_polyhedron.pvtu \
+       meshes/hex_prism_polyhedron_0.vtu \
        solutions/lagrange_vec_solution_mesh.xda \
        solutions/lagrange_vec_solution.xda \
        solutions/nedelec_one_solution_mesh.xda \

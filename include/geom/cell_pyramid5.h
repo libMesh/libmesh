@@ -167,13 +167,30 @@ public:
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
    * element node numbers.
    */
-  static const unsigned int side_nodes_map[num_sides][nodes_per_side];
+  static constexpr unsigned int side_nodes_map[num_sides][nodes_per_side] =
+    {
+      {0, 1, 4, 99}, // Side 0
+      {1, 2, 4, 99}, // Side 1
+      {2, 3, 4, 99}, // Side 2
+      {3, 0, 4, 99}, // Side 3
+      {0, 3, 2,  1}  // Side 4
+    };
 
   /**
    * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ edge to
    * element node numbers.
    */
-  static const unsigned int edge_nodes_map[num_edges][nodes_per_edge];
+  static constexpr unsigned int edge_nodes_map[num_edges][nodes_per_edge] =
+    {
+      {0, 1}, // Edge 0
+      {1, 2}, // Edge 1
+      {2, 3}, // Edge 2
+      {0, 3}, // Edge 3
+      {0, 4}, // Edge 4
+      {1, 4}, // Edge 5
+      {2, 4}, // Edge 6
+      {3, 4}  // Edge 7
+    };
 
   /**
    * We compute the centroid of the Pyramid by treating it as a

@@ -348,6 +348,8 @@ void DistributedMesh::update_parallel_id_counts()
   this->set_next_unique_ids(this->parallel_max_unique_id());
 #endif
 
+  _n_constraint_rows = this->count_constraint_rows();
+
   this->_preparation.has_synched_id_counts = true;
 }
 
@@ -1118,9 +1120,13 @@ void DistributedMesh::redistribute ()
 
       this->update_parallel_id_counts();
 
-      // We ought to still have valid neighbor links; we communicate
-      // them for newly-redistributed elements
-      // this->find_neighbors();
+      // We communicate valid neighbor links for newly-redistributed
+      // elements, but we may still have remote_elem links that should
+      // be corrected but whose correction wasn't communicated.
+      this->find_neighbors(/*reset_remote_elements*/ false,
+                           /*reset_current_list*/ false /*non-default*/,
+                           /*assert_valid*/ false,
+                           /*check_non_remote*/ false /*non-default!*/);
 
       // Is this necessary?  If we are called from prepare_for_use(), this will be called
       // anyway... but users can always call partition directly, in which case we do need

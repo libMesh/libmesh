@@ -1748,18 +1748,12 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
   MeshTools::libmesh_assert_valid_boundary_ids(mesh);
 #endif
 
-  // In a distributed mesh we might have constraint rows on some
-  // processors but not all; if we have constraint rows on *any*
-  // processor then we need to process them.
-  bool constraint_rows_empty = mesh.get_constraint_rows().empty();
-  this->comm().min(constraint_rows_empty);
-
   // We might get constraint equations from AMR hanging nodes in
   // 2D/3D, or from spline constraint rows or boundary conditions in
   // any dimension
   const bool possible_local_constraints = false
     || !mesh.n_elem()
-    || !constraint_rows_empty
+    || mesh.n_constraint_rows()
 #ifdef LIBMESH_ENABLE_AMR
     || mesh.mesh_dimension() > 1
 #endif
@@ -1889,8 +1883,7 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
 
   // Handle spline node constraints last, so we can try to move
   // existing constraints onto the spline basis if necessary.
-  if (!constraint_rows_empty)
-    this->process_mesh_constraint_rows(mesh);
+  this->process_mesh_constraint_rows(mesh);
 }
 
 
@@ -1912,8 +1905,11 @@ void DofMap::process_mesh_constraint_rows(const MeshBase & mesh)
 #ifdef DEBUG
   bool constraint_rows_empty = constraint_rows.empty();
   this->comm().min(constraint_rows_empty);
-  libmesh_assert(!constraint_rows_empty);
+  libmesh_assert_equal_to(constraint_rows_empty, !mesh.n_constraint_rows());
 #endif
+
+  if (!mesh.n_constraint_rows())
+    return;
 
   // We can't handle periodic boundary conditions on spline meshes
   // yet.
@@ -3226,7 +3222,7 @@ void DofMap::enforce_constraints_on_residual (const NonlinearImplicitSystem & sy
         {
           if (auto rhsit = _primal_constraint_values.find(constrained_dof);
               rhsit != _primal_constraint_values.end())
-            exact_value += rhsit->second;
+            exact_value -= rhsit->second;
         }
 
       rhs->set(constrained_dof, exact_value);
@@ -4495,7 +4491,7 @@ void DofMap::process_constraints (MeshBase & mesh)
 
   // Now that we have our root constraint dependencies sorted out, add
   // them to the send_list
-  this->add_constraints_to_send_list();
+  this->add_constraints_to_send_list(mesh);
 }
 
 
@@ -5308,7 +5304,7 @@ void DofMap::gather_constraints (MeshBase & /*mesh*/,
     }
 }
 
-void DofMap::add_constraints_to_send_list()
+void DofMap::add_constraints_to_send_list (const MeshBase & mesh)
 {
   // This function must be run on all processors at once
   parallel_object_only();
@@ -5344,7 +5340,7 @@ void DofMap::add_constraints_to_send_list()
 
   // If we only need constraint DoFs constraining DoFs which are
   // algebraically local, we're done.
-  if (!this->has_static_condensation())
+  if (!this->has_static_condensation() && !_need_ghost_constraints)
     return;
 
   // If we use StaticCondensation, though, we may need constraint DoFs
@@ -5352,10 +5348,16 @@ void DofMap::add_constraints_to_send_list()
   // node) but which are supported on local elements.  Let's get those
   // too if we have to.
   //
+  // Kokkos-MOOSE also requires that, because it cannot use VecSetValues
+  // and MatSetValues which can dynamically cache remote entries. Instead,
+  // it allocates ghost entries in advance based on libMesh send_list and
+  // accumulates to those, and does the assembly at once. When ghost DOFs
+  // are constrained, it has to add residual/Jacobian contributions to the
+  // dependencies of ghost DOFs locally as well.
+  //
   // We'll potentially be hitting the same constrained DoFs from
   // multiple directions.
-  std::unordered_set<dof_id_type> extra_dependencies;
-  for (auto & elem : this->get_static_condensation().mesh().active_local_element_ptr_range())
+  for (auto & elem : mesh.active_local_element_ptr_range())
     {
       std::vector<dof_id_type> di;
       this->dof_indices (elem, di);

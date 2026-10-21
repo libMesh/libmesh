@@ -31,13 +31,6 @@ namespace libMesh
 const int Tri3::num_nodes;
 const int Tri3::nodes_per_side;
 
-const unsigned int Tri3::side_nodes_map[Tri3::num_sides][Tri3::nodes_per_side] =
-  {
-    {0, 1}, // Side 0
-    {1, 2}, // Side 1
-    {2, 0}  // Side 2
-  };
-
 #ifdef LIBMESH_ENABLE_AMR
 
 const Real Tri3::_embedding_matrix[Tri3::num_children][Tri3::num_nodes][Tri3::num_nodes] =

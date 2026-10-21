@@ -38,7 +38,8 @@ NonlinearImplicitSystem::NonlinearImplicitSystem (EquationSystems & es,
   nonlinear_solver          (NonlinearSolver<Number>::build(*this)),
   diff_solver               (),
   _n_nonlinear_iterations   (0),
-  _final_nonlinear_residual (1.e20)
+  _final_nonlinear_residual (1.e20),
+  _operator_matrix          (nullptr)
 {
   // Set default parameters
   // These were chosen to match the Petsc defaults
@@ -223,10 +224,20 @@ void NonlinearImplicitSystem::solve ()
       // Solve the nonlinear system.
       // Store the number of nonlinear iterations required to
       // solve and the final residual.
-      std::tie(_n_nonlinear_iterations, _final_nonlinear_residual) =
-        nonlinear_solver->solve (*matrix, *solution, *rhs,
-                                 nonlinear_solver->relative_residual_tolerance,
-                                 nonlinear_solver->max_linear_iterations);
+      //
+      // If a distinct Jacobian operator matrix has been registered (see
+      // set_operator_matrix()), use it as Amat while *matrix remains the preconditioning matrix
+      // (Pmat); otherwise use the ordinary single-matrix solve.
+      if (_operator_matrix)
+        std::tie(_n_nonlinear_iterations, _final_nonlinear_residual) =
+          nonlinear_solver->solve (*_operator_matrix, *matrix, *solution, *rhs,
+                                   nonlinear_solver->relative_residual_tolerance,
+                                   nonlinear_solver->max_linear_iterations);
+      else
+        std::tie(_n_nonlinear_iterations, _final_nonlinear_residual) =
+          nonlinear_solver->solve (*matrix, *solution, *rhs,
+                                   nonlinear_solver->relative_residual_tolerance,
+                                   nonlinear_solver->max_linear_iterations);
     }
 
   // Update the system after the solve

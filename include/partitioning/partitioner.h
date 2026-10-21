@@ -166,6 +166,17 @@ public:
                                                 const unsigned int n);
 
   /**
+   * As above, but \p spatial_indexing selects how the elements are mapped onto the
+   * partitions.  With \p true they are ordered along a space-filling curve, so that each
+   * partition gets a spatially compact set; this costs a parallel sort.  With \p false
+   * their position in the traversal of the range is used, which is free but is only
+   * consistent across processors for a replicated mesh.
+   */
+  static void partition_unpartitioned_elements (MeshBase & mesh,
+                                                const unsigned int n,
+                                                const bool spatial_indexing);
+
+  /**
    * This function is called after partitioning to set the processor IDs
    * for the inactive parent elements.  A parent's processor ID is the same
    * as its first child.
@@ -211,6 +222,25 @@ public:
    * entries.
    */
   virtual void attach_weights(ErrorVector * /*weights*/) { libmesh_not_implemented(); }
+
+  /**
+   * \returns Whether this partitioner computes its partitioning without reference to the
+   * partitioning the mesh already carries.
+   *
+   * A partitioner that instead refines what it is handed is sensitive to the temporary
+   * assignment partition_unpartitioned_elements() gives to unpartitioned elements, and so
+   * should have that assignment be spatially coherent rather than merely consistent across
+   * processors.
+   *
+   * The base-class default is conservative, so that a sub-class partitioner which has not
+   * considered whether to override this virtual keeps a spatially coherent temporary
+   * partitioning assignment. Overriding it to return \p true buys a cheaper temporary
+   * partitioning on a replicated mesh.
+   *
+   * \todo Make this pure virtual, so that every partitioner has to state which kind it is,
+   * once the partitioners outside the library have been given an override.
+   */
+  virtual bool partitions_from_scratch () const { return false; }
 
 protected:
 

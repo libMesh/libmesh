@@ -321,7 +321,7 @@ void PetscVector<T>::add (const T a_in, const NumericVector<T> & v_in)
   // VecAXPY doesn't support &x==&y
   if (this == &v_in)
     {
-      this->scale(a_in+1);
+      this->scale(a_in + T(1));
       return;
     }
 

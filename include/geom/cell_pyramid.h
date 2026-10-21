@@ -198,6 +198,15 @@ public:
    */
   static const unsigned int edge_sides_map[8][2];
 
+  /**
+   * \returns The suggested quality bounds for the pyramid based on
+   * quality measure \p q.  These are the values suggested by the
+   * CUBIT User's Manual, where available; no such ranges are yet
+   * established for pyramids, so this always returns the (-1, -1)
+   * sentinel.
+   */
+  virtual std::pair<Real, Real> qual_bounds (const ElemQuality q) const override;
+
   virtual bool on_reference_element(const Point & p,
                                     const Real eps = TOLERANCE) const override final;
 

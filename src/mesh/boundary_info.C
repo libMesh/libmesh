@@ -2994,10 +2994,32 @@ void BoundaryInfo::parallel_sync_node_ids()
        node_id_action_functor, datum_type_ex);
 }
 
-void BoundaryInfo::build_side_list_from_node_list(const std::set<boundary_id_type> & nodeset_list)
+void BoundaryInfo::build_side_list_from_node_list(const std::set<boundary_id_type> & nodeset_list,
+                                                  bool skip_interior_sides)
 {
-  // Check for early return
-  if (_boundary_node_id.empty())
+  // Skipping interior sides on a distributed mesh means resolving the
+  // subdomain id of any neighbor we only see as a RemoteElem, which
+  // takes a collective communication below.  When we're not doing
+  // that, this function stays purely local, the way it has always
+  // been: existing callers are not required to call us in parallel
+  // (AbaqusIO, our only in-library caller, only reads on processor 0),
+  // so we must not add a collective to that path.  When we are doing
+  // it, every processor has to call us, with the same arguments.
+  const bool need_parallel_sync = skip_interior_sides && !_mesh->is_serial();
+
+  // Check for early return.  When we're going to communicate below
+  // this has to be a collective decision: on a DistributedMesh it's
+  // entirely possible for _boundary_node_id to be empty on some
+  // processors (e.g. ones that don't own or ghost any node in the
+  // nodeset) while it's non-empty on others.  Returning early based
+  // only on our own local state would leave us out of step with the
+  // processors that don't return early, causing a deadlock.  So in
+  // that case we only take the early return if *every* processor
+  // agrees there's nothing to do.
+  bool no_boundary_nodes = _boundary_node_id.empty();
+  if (need_parallel_sync)
+    this->comm().min(no_boundary_nodes);
+  if (no_boundary_nodes)
     {
       libMesh::out << "No boundary node IDs have been added: cannot build side list!" << std::endl;
       return;
@@ -3007,10 +3029,56 @@ void BoundaryInfo::build_side_list_from_node_list(const std::set<boundary_id_typ
   ElemSideBuilder side_builder;
   // Pull objects out of the loop to reduce heap operations
   const Elem * side_elem;
+  std::vector<boundary_id_type> matched_ids;
+
+  // Add elem's side to each of the given sidesets, making sure each
+  // sideset inherits its nodeset's name, if there is one.
+  auto add_matched_side =
+    [this]
+    (const Elem * elem,
+     unsigned short int side,
+     const std::vector<boundary_id_type> & bids)
+    {
+      for (const auto & bid : bids)
+        {
+          add_side(elem, side, bid);
+
+          // Let the sideset inherit any non-empty name from the nodeset
+          std::string & nset_name = nodeset_name(bid);
+
+          if (nset_name != "")
+            sideset_name(bid) = nset_name;
+        }
+    };
+
+  // Sides whose nodes are all in the nodeset, but whose neighbor is
+  // an unresolved RemoteElem: we can't tell locally whether they're
+  // truly interior to a subdomain, since RemoteElem doesn't carry a
+  // meaningful subdomain_id().  We resolve them below by asking
+  // whichever processor owns each element: since that processor owns
+  // the element, its neighbor connectivity for it is guaranteed to be
+  // fully resolved, unlike ours.  For each owning processor we keep
+  // the (elem id, side) queries and, in the same order, the sidesets
+  // each side would be added to.
+  typedef std::pair<dof_id_type, unsigned short int> elem_side_type;
+  std::unordered_map<processor_id_type, std::vector<elem_side_type>> sides_requested;
+  std::unordered_map<processor_id_type, std::vector<std::vector<boundary_id_type>>>
+    requested_boundary_ids;
 
   for (const auto & elem : _mesh->active_element_ptr_range())
     for (auto side : elem->side_index_range())
       {
+        // A side whose neighbor is in the same subdomain is interior to
+        // a block, not a true boundary or subdomain interface, even if
+        // all of its nodes happen to lie in the nodeset (e.g. on a mesh
+        // that is only one element deep in some direction).  Skip it
+        // if the caller has opted in to that behavior.
+        const Elem * neigh = skip_interior_sides ? elem->neighbor_ptr(side) : nullptr;
+
+        if (neigh && neigh != remote_elem &&
+            neigh->subdomain_id() == elem->subdomain_id())
+          continue;
+
         side_elem = &side_builder(*elem, side);
 
         // map from nodeset_id to count for that ID
@@ -3024,21 +3092,91 @@ void BoundaryInfo::build_side_list_from_node_list(const std::set<boundary_id_typ
               nodesets_node_count[pr.second]++;
 
         // Now check to see what nodeset_counts have the correct
-        // number of nodes in them.  For any that do, add this side to
-        // the sideset, making sure the sideset inherits the
-        // nodeset's name, if there is one.
+        // number of nodes in them.
+        // Note that matched_ids may have been moved from on a prior
+        // iteration, so clear() rather than assuming it's empty.
+        matched_ids.clear();
         for (const auto & pr : nodesets_node_count)
           if (pr.second == side_elem->n_nodes())
-            {
-              add_side(elem, side, pr.first);
+            matched_ids.push_back(pr.first);
 
-              // Let the sideset inherit any non-empty name from the nodeset
-              std::string & nset_name = nodeset_name(pr.first);
+        if (matched_ids.empty())
+          continue;
 
-              if (nset_name != "")
-                sideset_name(pr.first) = nset_name;
-            }
+        // We don't yet know whether this side is truly interior;
+        // defer the decision until we've resolved neigh's real
+        // subdomain id.
+        if (neigh == remote_elem)
+          {
+            const processor_id_type pid = elem->processor_id();
+            sides_requested[pid].emplace_back(elem->id(), side);
+            requested_boundary_ids[pid].push_back(std::move(matched_ids));
+            continue;
+          }
+
+        add_matched_side(elem, side, matched_ids);
       } // end for side
+
+  // If we're not resolving RemoteElem neighbors then nothing was
+  // deferred, and we must not communicate: see need_parallel_sync
+  // above.
+  if (!need_parallel_sync)
+    {
+      libmesh_assert(sides_requested.empty());
+      return;
+    }
+
+  // Even if this processor has no deferred sides of its own, it may
+  // still own elements that other processors need to query, so every
+  // processor has to participate in the collective communication
+  // below rather than skipping it when its own request list is empty.
+
+  auto neighbor_subdomain_gather_functor =
+    [this]
+    (processor_id_type,
+     const std::vector<elem_side_type> & elem_sides,
+     std::vector<subdomain_id_type> & neighbor_subdomains)
+    {
+      neighbor_subdomains.resize(elem_sides.size());
+      for (auto i : index_range(elem_sides))
+        {
+          const Elem & elem = _mesh->elem_ref(elem_sides[i].first);
+          const Elem * neigh = elem.neighbor_ptr(elem_sides[i].second);
+
+          // The requester saw a RemoteElem neighbor here, so there is
+          // a neighbor, and we own elem, so our connectivity for it is
+          // guaranteed to be fully resolved.
+          libmesh_assert(neigh);
+          libmesh_assert(neigh != remote_elem);
+
+          neighbor_subdomains[i] = neigh->subdomain_id();
+        }
+    };
+
+  auto neighbor_subdomain_action_functor =
+    [this, &requested_boundary_ids, &add_matched_side]
+    (processor_id_type pid,
+     const std::vector<elem_side_type> & elem_sides,
+     const std::vector<subdomain_id_type> & neighbor_subdomains)
+    {
+      const auto & bids = libmesh_map_find(requested_boundary_ids, pid);
+      libmesh_assert_equal_to(bids.size(), elem_sides.size());
+
+      for (auto i : index_range(elem_sides))
+        {
+          const Elem * elem = _mesh->elem_ptr(elem_sides[i].first);
+
+          // If the side turned out to be truly interior after all,
+          // skip it.
+          if (neighbor_subdomains[i] != elem->subdomain_id())
+            add_matched_side(elem, elem_sides[i].second, bids[i]);
+        }
+    };
+
+  subdomain_id_type * datum_type_ex = nullptr;
+  Parallel::pull_parallel_vector_data
+    (this->comm(), sides_requested, neighbor_subdomain_gather_functor,
+     neighbor_subdomain_action_functor, datum_type_ex);
 }
 
 

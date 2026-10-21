@@ -1169,7 +1169,7 @@ void FEMap::compute_affine_map(const unsigned int dim,
                                const Elem * elem)
 {
   // Start logging the map computation.
-  LOG_SCOPE("compute_affine_map()", "FEMap");
+  LOG_ONE_ENTITY_SCOPE("compute_affine_map()", "FEMap");
 
   libmesh_assert(elem);
 
@@ -1249,7 +1249,7 @@ void FEMap::compute_null_map(const unsigned int dim,
                              const std::vector<Real> & qw)
 {
   // Start logging the map computation.
-  LOG_SCOPE("compute_null_map()", "FEMap");
+  LOG_ONE_ENTITY_SCOPE("compute_null_map()", "FEMap");
 
   const unsigned int n_qp = cast_int<unsigned int>(qw.size());
 
@@ -1341,7 +1341,7 @@ void FEMap::compute_map(const unsigned int dim,
 #endif
 
   // Start logging the map computation.
-  LOG_SCOPE("compute_map()", "FEMap");
+  LOG_ONE_ENTITY_SCOPE("compute_map()", "FEMap");
 
   libmesh_assert(elem);
 
@@ -1533,7 +1533,7 @@ Point FEMap::inverse_map (const unsigned int dim,
 #endif
 
   // Start logging the map inversion.
-  LOG_SCOPE("inverse_map()", "FEMap");
+  LOG_ONE_ENTITY_SCOPE("inverse_map()", "FEMap");
 
   // How much did the point on the reference
   // element change by in this Newton step?

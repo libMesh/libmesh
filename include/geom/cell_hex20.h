@@ -22,6 +22,8 @@
 
 // Local includes
 #include "libmesh/cell_hex.h"
+#include "libmesh/cell_hex8.h"
+#include "libmesh/fe_reference_element_traits.h"
 
 namespace libMesh
 {
@@ -217,16 +219,18 @@ public:
   static const int nodes_per_edge = 3;
 
   /**
-   * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ side to
-   * element node numbers.
+   * These map the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ edge or
+   * side to element node numbers.  They are derived from the
+   * first-order Hex8 tables; see fe_reference_element_traits.h.
    */
-  static const unsigned int side_nodes_map[num_sides][nodes_per_side];
+  static constexpr NodeMapTable<num_edges, nodes_per_edge>
+  _edge_nodes = derived_edge_nodes<Hex8, num_edges>();
+  static constexpr const unsigned int (&edge_nodes_map)[num_edges][nodes_per_edge] = _edge_nodes.values;
 
-  /**
-   * This maps the \f$ j^{th} \f$ node of the \f$ i^{th} \f$ edge to
-   * element node numbers.
-   */
-  static const unsigned int edge_nodes_map[num_edges][nodes_per_edge];
+  static constexpr NodeMapTable<num_sides, nodes_per_side>
+  _side_nodes = derived_side_nodes<Hex8, num_sides, nodes_per_side>
+    (_edge_nodes.values, no_face_node);
+  static constexpr const unsigned int (&side_nodes_map)[num_sides][nodes_per_side] = _side_nodes.values;
 
   /**
    * A specialization for computing the volume of a Hex20.

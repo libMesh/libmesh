@@ -91,6 +91,12 @@ public:
   }
 
   /**
+   * Each subdomain group is handed to the internal partitioner as a range, so the
+   * partitioning the mesh arrives with is not used.
+   */
+  virtual bool partitions_from_scratch () const override { return true; }
+
+  /**
    * Each entry of "chunks" represents a set of subdomains which are
    * to be partitioned together.  The internal Partitioner will be
    * called once for each entry of chunks, and the resulting

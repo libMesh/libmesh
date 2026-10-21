@@ -983,10 +983,17 @@ public:
    *
    * If \p assert_valid is left as true, then in dbg mode extensive
    * consistency checking is performed before returning.
+   *
+   * If \p check_non_remote is set to false, then only sides which
+   * currently have remote neighbor_ptr links are checked for possible
+   * semilocal side-neighbors.  This is intended to handle a corner case
+   * where ancestor neighbors are redistributed to a processor only by
+   * other processors who do not see that neighbor link.
    */
   virtual void find_neighbors (const bool reset_remote_elements = false,
                                const bool reset_current_list    = true,
-                               const bool assert_valid          = true) = 0;
+                               const bool assert_valid          = true,
+                               const bool check_non_remote      = true) = 0;
 
   /**
    * Removes any orphaned nodes, nodes not connected to any elements.
@@ -1927,14 +1934,23 @@ public:
   typedef std::map<const Node *, constraint_rows_mapped_type> constraint_rows_type;
 
   /**
-   * Constraint rows accessors
+   * Constraint rows accessors.
    */
+#ifdef LIBMESH_ENABLE_DEPRECATED
   constraint_rows_type & get_constraint_rows()
-  { return _constraint_rows; }
+  { libmesh_deprecated(); return _constraint_rows; }
+#endif
 
   const constraint_rows_type & get_constraint_rows() const
   { return _constraint_rows; }
 
+  constraint_rows_type & set_constraint_rows()
+  { _preparation.has_cached_elem_data = false; return _constraint_rows; }
+
+  /**
+   * Returns how many total constraint rows we have.  This is cached data,
+   * so it can be called from individual ranks.
+   */
   dof_id_type n_constraint_rows() const;
 
   /**
@@ -2437,6 +2453,13 @@ protected:
   // constraint coefficient.
   constraint_rows_type _constraint_rows;
 
+  dof_id_type _n_constraint_rows;
+
+  /**
+   * Helper function for subclasses to use to set _n_constraint_rows
+   */
+  dof_id_type count_constraint_rows();
+
   /**
    * If nonzero, we will call PointLocatorBase::set_close_to_point_tol()
    * on any PointLocators that we create.
@@ -2662,6 +2685,16 @@ unsigned int MeshBase::spatial_dimension () const
 
   return cast_int<unsigned int>(_spatial_dimension);
 }
+
+
+inline
+dof_id_type MeshBase::n_constraint_rows () const
+{
+  libmesh_assert(_preparation.has_synched_id_counts);
+
+  return _n_constraint_rows;
+}
+
 
 template <typename T>
 inline

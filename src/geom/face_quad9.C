@@ -32,14 +32,6 @@ namespace libMesh
 const int Quad9::num_nodes;
 const int Quad9::nodes_per_side;
 
-const unsigned int Quad9::side_nodes_map[Quad9::num_sides][Quad9::nodes_per_side] =
-  {
-    {0, 1, 4}, // Side 0
-    {1, 2, 5}, // Side 1
-    {2, 3, 6}, // Side 2
-    {3, 0, 7}  // Side 3
-  };
-
 
 #ifdef LIBMESH_ENABLE_AMR
 

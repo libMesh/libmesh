@@ -110,15 +110,6 @@ const int Prism6::num_nodes;
 const int Prism6::nodes_per_side;
 const int Prism6::nodes_per_edge;
 
-const unsigned int Prism6::side_nodes_map[Prism6::num_sides][Prism6::nodes_per_side] =
-  {
-    {0, 2, 1, 99}, // Side 0
-    {0, 1, 4,  3}, // Side 1
-    {1, 2, 5,  4}, // Side 2
-    {2, 0, 3,  5}, // Side 3
-    {3, 4, 5, 99}  // Side 4
-  };
-
 const unsigned int Prism6::side_elems_map[Prism6::num_sides][Prism6::nodes_per_side] =
   {
     {0, 1, 2, 3}, // Side 0
@@ -126,19 +117,6 @@ const unsigned int Prism6::side_elems_map[Prism6::num_sides][Prism6::nodes_per_s
     {1, 2, 5, 6}, // Side 2
     {0, 2, 4, 6}, // Side 3
     {4, 5, 6, 7}  // Side 4
-  };
-
-const unsigned int Prism6::edge_nodes_map[Prism6::num_edges][Prism6::nodes_per_edge] =
-  {
-    {0, 1}, // Edge 0
-    {1, 2}, // Edge 1
-    {0, 2}, // Edge 2
-    {0, 3}, // Edge 3
-    {1, 4}, // Edge 4
-    {2, 5}, // Edge 5
-    {3, 4}, // Edge 6
-    {4, 5}, // Edge 7
-    {3, 5}  // Edge 8
   };
 
 // ------------------------------------------------------------

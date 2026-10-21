@@ -36,27 +36,6 @@ const int Pyramid18::num_nodes;
 const int Pyramid18::nodes_per_side;
 const int Pyramid18::nodes_per_edge;
 
-const unsigned int Pyramid18::side_nodes_map[Pyramid18::num_sides][Pyramid18::nodes_per_side] =
-  {
-    {0, 1, 4, 5, 10,  9, 14, 99, 99}, // Side 0 (front)
-    {1, 2, 4, 6, 11, 10, 15, 99, 99}, // Side 1 (right)
-    {2, 3, 4, 7, 12, 11, 16, 99, 99}, // Side 2 (back)
-    {3, 0, 4, 8,  9, 12, 17, 99, 99}, // Side 3 (left)
-    {0, 3, 2, 1,  8,  7,  6,  5, 13}  // Side 4 (base)
-  };
-
-const unsigned int Pyramid18::edge_nodes_map[Pyramid18::num_edges][Pyramid18::nodes_per_edge] =
-  {
-    {0, 1,  5}, // Edge 0
-    {1, 2,  6}, // Edge 1
-    {2, 3,  7}, // Edge 2
-    {0, 3,  8}, // Edge 3
-    {0, 4,  9}, // Edge 4
-    {1, 4, 10}, // Edge 5
-    {2, 4, 11}, // Edge 6
-    {3, 4, 12}  // Edge 7
-  };
-
 // ------------------------------------------------------------
 // Pyramid18 class member functions
 

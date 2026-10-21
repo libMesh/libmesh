@@ -218,8 +218,13 @@ void Partitioner::partition (MeshBase & mesh,
       return;
     }
 
-  // First assign a temporary partitioning to any unpartitioned elements
-  Partitioner::partition_unpartitioned_elements(mesh, n_parts);
+  // First assign a temporary partitioning to any unpartitioned elements.  A spatially
+  // coherent assignment is only worth its parallel sort for a partitioner that refines what
+  // it is handed; the other partitioners just need one that is consistent across processors,
+  // which the cheap traversal-order assignment already is on a replicated mesh.
+  Partitioner::partition_unpartitioned_elements
+    (mesh, n_parts,
+     /*spatial_indexing=*/!(mesh.is_replicated() && this->partitions_from_scratch()));
 
   // Call the partitioning function
   this->_do_partition(mesh,n_parts);
@@ -278,8 +283,11 @@ void Partitioner::repartition (MeshBase & mesh,
       return;
     }
 
-  // First assign a temporary partitioning to any unpartitioned elements
-  Partitioner::partition_unpartitioned_elements(mesh, n_parts);
+  // First assign a temporary partitioning to any unpartitioned elements; see partition()
+  // for why the indexing is chosen this way.
+  Partitioner::partition_unpartitioned_elements
+    (mesh, n_parts,
+     /*spatial_indexing=*/!(mesh.is_replicated() && this->partitions_from_scratch()));
 
   // Call the partitioning function
   this->_do_repartition(mesh,n_parts);
@@ -352,6 +360,16 @@ void Partitioner::partition_unpartitioned_elements (MeshBase & mesh)
 void Partitioner::partition_unpartitioned_elements (MeshBase & mesh,
                                                     const unsigned int n_subdomains)
 {
+  Partitioner::partition_unpartitioned_elements(mesh, n_subdomains,
+                                                /*spatial_indexing=*/true);
+}
+
+
+
+void Partitioner::partition_unpartitioned_elements (MeshBase & mesh,
+                                                    const unsigned int n_subdomains,
+                                                    const bool spatial_indexing)
+{
   MeshBase::element_iterator       it  = mesh.unpartitioned_elements_begin();
   const MeshBase::element_iterator end = mesh.unpartitioned_elements_end();
 
@@ -394,16 +412,22 @@ void Partitioner::partition_unpartitioned_elements (MeshBase & mesh,
 
   // Calling this on all processors a unique range in [0,n_unpartitioned_elements) is constructed.
   // Only the indices for the elements we pass in are returned in the array.
-  MeshCommunication().find_global_indices (mesh.comm(),
-                                           MeshTools::create_bounding_box(mesh), it, end,
-                                           global_indices);
+  // Without the spatial indexing an element's position in the traversal of the range is used
+  // instead, which a replicated mesh reaches in the same order on every processor and which
+  // therefore indexes [0, n_unpartitioned_elements) just as uniquely, at no cost.
+  if (spatial_indexing)
+    MeshCommunication().find_global_indices (mesh.comm(),
+                                             MeshTools::create_bounding_box(mesh), it, end,
+                                             global_indices);
+  else
+    libmesh_assert (mesh.is_replicated());
 
   dof_id_type cnt=0;
   for (auto & elem : as_range(it, end))
     {
-      libmesh_assert_less (cnt, global_indices.size());
+      libmesh_assert (!spatial_indexing || cnt < global_indices.size());
       const dof_id_type global_index =
-        global_indices[cnt++];
+        spatial_indexing ? global_indices[cnt++] : cnt++;
 
       libmesh_assert_less (global_index, subdomain_bounds.back());
       libmesh_assert_less (global_index, n_unpartitioned_elements);

@@ -10,6 +10,16 @@
 #include <set>
 #include <thread>
 
+// The OpenMP team cap these tests exercise (the num_threads(actual_threads)
+// clause on the parallel-for pragmas in threads_pthread.h) only exists in the
+// pthread threading backend's OpenMP code path. TBB provides its own
+// parallel_for/parallel_reduce and the no-threads backend never spawns a team,
+// so there is nothing to check in those configurations.
+#if defined(LIBMESH_HAVE_OPENMP) && defined(LIBMESH_HAVE_PTHREAD) && !defined(LIBMESH_HAVE_TBB_API)
+# define LIBMESH_TEST_OPENMP_TEAM_CAP 1
+# include <omp.h>
+#endif
+
 
 using namespace libMesh;
 
@@ -28,6 +38,13 @@ struct VisitTracker
 
     Threads::spin_mutex::scoped_lock lock(mutex);
     thread_ids.insert(std::this_thread::get_id());
+#ifdef LIBMESH_TEST_OPENMP_TEAM_CAP
+    // Capture the OpenMP team size and this thread's id from *inside* the
+    // parallel region, so the tests can confirm the team was capped at the
+    // requested per-dispatch count rather than the process-wide n_threads().
+    openmp_team_sizes.insert(omp_get_num_threads());
+    openmp_thread_ids.insert(omp_get_thread_num());
+#endif
   }
 
   void record_value(const unsigned int value)
@@ -43,12 +60,30 @@ struct VisitTracker
     return thread_ids.size();
   }
 
+#ifdef LIBMESH_TEST_OPENMP_TEAM_CAP
+  std::set<int> openmp_teams() const
+  {
+    Threads::spin_mutex::scoped_lock lock(mutex);
+    return openmp_team_sizes;
+  }
+
+  std::set<int> openmp_tids() const
+  {
+    Threads::spin_mutex::scoped_lock lock(mutex);
+    return openmp_thread_ids;
+  }
+#endif
+
   mutable Threads::spin_mutex mutex;
   std::set<std::thread::id> thread_ids;
   std::atomic<unsigned int> invocations{0};
   std::atomic<unsigned int> value_count{0};
   std::atomic<unsigned int> value_sum{0};
   std::atomic<unsigned int> value_sum_sq{0};
+#ifdef LIBMESH_TEST_OPENMP_TEAM_CAP
+  std::set<int> openmp_team_sizes;
+  std::set<int> openmp_thread_ids;
+#endif
 };
 
 // Compare the aggregates collected by VisitTracker against the known test
@@ -73,6 +108,37 @@ void assert_tracker_matches_values(const VisitTracker & tracker,
   CPPUNIT_ASSERT_EQUAL(expected_sum_sq,
                        tracker.value_sum_sq.load(std::memory_order_relaxed));
 }
+
+#ifdef LIBMESH_TEST_OPENMP_TEAM_CAP
+// Verify the OpenMP team the dispatch ran on was capped at the number of
+// threads that dispatch requested. Without the num_threads(actual_threads)
+// clause on the pragma, the team defaults to the process-wide
+// libMesh::n_threads(), so omp_get_num_threads() would report that larger
+// count and omp_get_thread_num() could exceed the reduced per-dispatch count
+// and index past per-thread storage sized to it.
+void assert_openmp_team_within(const VisitTracker & tracker,
+                               const unsigned int requested_threads)
+{
+  const std::set<int> teams = tracker.openmp_teams();
+  CPPUNIT_ASSERT(!teams.empty());
+
+  // The runtime is allowed to hand us fewer threads than requested (e.g. with
+  // OpenMP dynamic adjustment enabled), but it must never exceed the cap.
+  for (const int team : teams)
+    {
+      CPPUNIT_ASSERT(team >= 1);
+      CPPUNIT_ASSERT(team <= static_cast<int>(requested_threads));
+    }
+
+  // Every thread id observed must be a valid index into per-thread storage
+  // sized to the (capped) team.
+  for (const int tid : tracker.openmp_tids())
+    {
+      CPPUNIT_ASSERT(tid >= 0);
+      CPPUNIT_ASSERT(tid < static_cast<int>(requested_threads));
+    }
+}
+#endif
 
 struct ForBody
 {
@@ -161,6 +227,10 @@ public:
   CPPUNIT_TEST( testParallelReduceThreadSubset );
 #if defined(LIBMESH_ENABLE_EXCEPTIONS)
   CPPUNIT_TEST( testRequestedThreadCountExceedsGlobal );
+#endif
+#ifdef LIBMESH_TEST_OPENMP_TEAM_CAP
+  CPPUNIT_TEST( testParallelForOpenMPTeamCap );
+  CPPUNIT_TEST( testParallelReduceOpenMPTeamCap );
 #endif
 
   CPPUNIT_TEST_SUITE_END();
@@ -949,6 +1019,59 @@ public:
                                                   reduce_body,
                                                   libMesh::n_threads() + 1u),
                          libMesh::LogicError);
+  }
+#endif
+
+#ifdef LIBMESH_TEST_OPENMP_TEAM_CAP
+  void testParallelForOpenMPTeamCap ()
+  {
+    LOG_UNIT_TEST;
+
+    // parallel_for only enters the OpenMP region when it uses more than one
+    // thread; with a single global thread it short-circuits to a serial call
+    // and there is no team to inspect.
+    if (libMesh::n_threads() < 2)
+      return;
+
+    // Requesting two threads exercises a strict subset whenever the run has
+    // more than two threads available -- exactly the case in which an uncapped
+    // team (the bug) would differ from the count we asked for.
+    const unsigned int requested_threads = 2u;
+
+    // Grainsize 1 with more values than threads makes actual_threads ==
+    // requested_threads, so the team we expect is precisely requested_threads.
+    std::vector<unsigned int> values(16);
+    std::iota(values.begin(), values.end(), 0u);
+    const TestRange range(values.cbegin(), values.cend(),
+                          /* grainsize */ 1);
+    VisitTracker tracker;
+
+    Threads::parallel_for(range, ForBody(tracker), requested_threads);
+
+    assert_tracker_matches_values(tracker, values);
+    assert_openmp_team_within(tracker, requested_threads);
+  }
+
+  void testParallelReduceOpenMPTeamCap ()
+  {
+    LOG_UNIT_TEST;
+
+    if (libMesh::n_threads() < 2)
+      return;
+
+    const unsigned int requested_threads = 2u;
+
+    std::vector<unsigned int> values(16);
+    std::iota(values.begin(), values.end(), 0u);
+    const TestRange range(values.cbegin(), values.cend(),
+                          /* grainsize */ 1);
+    auto tracker = std::make_shared<VisitTracker>();
+    ReduceBody body(tracker);
+
+    Threads::parallel_reduce(range, body, requested_threads);
+
+    assert_tracker_matches_values(*tracker, values);
+    assert_openmp_team_within(*tracker, requested_threads);
   }
 #endif
 };

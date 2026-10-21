@@ -548,10 +548,12 @@ void MeshTools::Modification::all_tri (MeshBase & mesh)
 
         switch (etype)
           {
+          case QUADSHELL4:
           case QUAD4:
             {
-              subelem[0] = Elem::build(TRI3);
-              subelem[1] = Elem::build(TRI3);
+              const ElemType tri_type = (etype == QUAD4) ? TRI3 : TRISHELL3;
+              subelem[0] = Elem::build(tri_type);
+              subelem[1] = Elem::build(tri_type);
 
               // Check for possible edge swap
               if ((elem->point(0) - elem->point(2)).norm() <

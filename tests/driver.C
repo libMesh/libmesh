@@ -5,13 +5,62 @@
 #include <cppunit/BriefTestProgressListener.h>
 #include <cppunit/TestPath.h>
 #include <cppunit/TestResult.h>
+#include <cppunit/TestListener.h>
+#include <cppunit/TestFailure.h>
+#include <cppunit/Exception.h>
 #include <libmesh/restore_warnings.h>
 
 // libMesh includes
 #include <libmesh/libmesh.h>
+#include <libmesh/libmesh_abort.h>
 
 #include "libmesh_cppunit.h"
 #include "test_comm.h"
+
+// CppUnit catches the exceptions that escape a test and reports them
+// only at the end of the run, through std::cout, which libMesh
+// discards on processors other than 0 unless --keep-cout is given.
+// CppUnit distinguishes two kinds, both passed to
+// TestListener::addFailure():
+//
+// - a failure is a CppUnit::Exception, thrown when one of CppUnit's
+//   own checks such as CPPUNIT_ASSERT fails;
+// - an error is any other exception, including every exception
+//   libMesh throws, e.g. from libmesh_error_msg() or a failed
+//   libmesh_assert().
+//
+// This listener writes each failure and error to libMesh::err as soon
+// as it is caught, on every processor.
+//
+// Whether an error occurs usually depends on data that differs
+// between processors, so in a parallel run an error often happens on
+// only some of them.  Those processors move on to the next test while
+// the others are still in the current one, so the run hangs or fails
+// elsewhere; the listener therefore aborts the whole run on an error.
+// Failures typically come from checks on replicated data that fail on
+// every processor together, so the run continues past them.
+class FailureReporter : public CppUnit::TestListener
+{
+public:
+  virtual void addFailure(const CppUnit::TestFailure & failure) override;
+};
+
+void FailureReporter::addFailure(const CppUnit::TestFailure & failure)
+{
+  libMesh::err << "[" << libMesh::global_processor_id() << "] "
+               << failure.failedTestName()
+               << (failure.isError() ? " error" : " failure");
+
+  const CppUnit::SourceLine source_line = failure.sourceLine();
+  if (source_line.isValid())
+    libMesh::err << " at " << source_line.fileName()
+                 << ":" << source_line.lineNumber();
+
+  libMesh::err << ":\n" << failure.thrownException()->what() << std::endl;
+
+  if (failure.isError() && libMesh::global_n_processors() > 1)
+    libMesh::libmesh_abort();
+}
 
 #ifdef LIBMESH_HAVE_CXX11_REGEX
 
@@ -202,6 +251,9 @@ int main(int argc, char ** argv)
       listener = std::make_unique<CppUnit::BriefTestProgressListener>();
       runner.eventManager().addListener(listener.get());
     }
+
+  FailureReporter failure_reporter;
+  runner.eventManager().addListener(&failure_reporter);
 
   bool succeeded = runner.run();
 

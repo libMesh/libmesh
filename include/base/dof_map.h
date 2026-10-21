@@ -270,9 +270,16 @@ public:
   void set_constrained_sparsity_construction(bool use_constraints);
 
   /**
-   * Sets need_full_sparsity_pattern to true regardless of the requirements by matrices
+   * Sets _need_full_sparsity_pattern to true regardless of the
+   * requirements by matrices
    */
   void full_sparsity_pattern_needed();
+
+  /**
+   * Sets _need_ghost_constraints to true regardless of the requirements
+   * by static condensation
+   */
+  void ghost_constraints_needed();
 
   /**
    * Returns true iff the current policy when constructing sparsity
@@ -2066,7 +2073,7 @@ private:
    * which are dependencies for constraint equations on the current
    * processor.
    */
-  void add_constraints_to_send_list();
+  void add_constraints_to_send_list(const MeshBase & mesh);
 
   /**
    * Adds any spline constraints from the Mesh to our DoF constraints.
@@ -2242,7 +2249,13 @@ private:
    * Default false; set to true if any attached matrix requires a full
    * sparsity pattern.
    */
-  bool need_full_sparsity_pattern;
+  bool _need_full_sparsity_pattern;
+
+  /**
+   * Default false; set to true if the dependencies of constrained ghost
+   * DOFs supported by local elements should also be ghosted
+   */
+  bool _need_ghost_constraints;
 
   /**
    * The sparsity pattern of the global matrix.  If
@@ -2553,7 +2566,13 @@ void DofMap::set_constrained_sparsity_construction(bool use_constraints)
 inline
 void DofMap::full_sparsity_pattern_needed()
 {
-  need_full_sparsity_pattern = true;
+  _need_full_sparsity_pattern = true;
+}
+
+inline
+void DofMap::ghost_constraints_needed()
+{
+  _need_ghost_constraints = true;
 }
 
 inline

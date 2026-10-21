@@ -115,17 +115,18 @@ bool HilbertSystem::element_time_derivative (bool request_jacobian,
 
   unsigned int n_qpoints = c.get_element_qrule().n_points();
 
-  FEMContext & input_c = *libmesh_map_find(input_contexts, &c);
+  FEMContext * const input_c =
+    libmesh_map_find(input_contexts, &c).get();
   if (input_system)
     {
-      input_c.pre_fe_reinit(*input_system, &elem);
-      input_c.elem_fe_reinit();
+      input_c->pre_fe_reinit(*input_system, &elem);
+      input_c->elem_fe_reinit();
     }
 
   for (unsigned int qp=0; qp != n_qpoints; qp++)
     {
       const Number u = c.interior_value(0, qp);
-      const Number ufunc = (*_goal_func)(input_c, xyz[qp]);
+      const Number ufunc = (*_goal_func)(*input_c, xyz[qp]);
       const Number err_u = u - ufunc;
 
       for (unsigned int i=0; i != n_u_dofs; i++)
@@ -137,7 +138,7 @@ bool HilbertSystem::element_time_derivative (bool request_jacobian,
             c.get_element_fe(0)->get_dphi();
 
           const Gradient grad_u = c.interior_gradient(0, qp);
-          Gradient ufuncgrad = (*_goal_grad)(input_c, xyz[qp]);
+          Gradient ufuncgrad = (*_goal_grad)(*input_c, xyz[qp]);
           const Gradient err_grad_u = grad_u - ufuncgrad;
 
           for (unsigned int i=0; i != n_u_dofs; i++)

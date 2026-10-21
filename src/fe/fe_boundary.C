@@ -79,6 +79,7 @@ LIBMESH_ERRORS_IN_LOW_D(L2_HIERARCHIC_VEC)
 LIBMESH_ERRORS_IN_LOW_D(SIDE_HIERARCHIC)
 LIBMESH_ERRORS_IN_LOW_D(LAGRANGE)
 LIBMESH_ERRORS_IN_LOW_D(L2_LAGRANGE)
+LIBMESH_ERRORS_IN_LOW_D(L2_LAGRANGE_GLL)
 LIBMESH_ERRORS_IN_LOW_D(LAGRANGE_VEC)
 LIBMESH_ERRORS_IN_LOW_D(L2_LAGRANGE_VEC)
 LIBMESH_ERRORS_IN_LOW_D(MONOMIAL)
@@ -667,7 +668,7 @@ void FEMap::compute_face_map(int dim, const std::vector<Real> & qw,
   // We're calculating now!
   this->determine_calculations();
 
-  LOG_SCOPE("compute_face_map()", "FEMap");
+  LOG_ONE_ENTITY_SCOPE("compute_face_map()", "FEMap");
 
   // The number of quadrature points.
   const unsigned int n_qp = cast_int<unsigned int>(qw.size());
@@ -1046,7 +1047,7 @@ void FEMap::compute_edge_map(int dim,
 
   libmesh_assert_equal_to (dim, 3);  // 1D is unnecessary and currently unsupported
 
-  LOG_SCOPE("compute_edge_map()", "FEMap");
+  LOG_ONE_ENTITY_SCOPE("compute_edge_map()", "FEMap");
 
   // We're calculating now!
   this->determine_calculations();
@@ -1164,6 +1165,7 @@ template LIBMESH_EXPORT void FE<3,_type>::edge_reinit(Elem const *, unsigned int
 REINIT_AND_SIDE_MAPS(LAGRANGE);
 REINIT_AND_SIDE_MAPS(LAGRANGE_VEC);
 REINIT_AND_SIDE_MAPS(L2_LAGRANGE);
+REINIT_AND_SIDE_MAPS(L2_LAGRANGE_GLL);
 REINIT_AND_SIDE_MAPS(L2_LAGRANGE_VEC);
 REINIT_AND_SIDE_MAPS(HIERARCHIC);
 REINIT_AND_SIDE_MAPS(HIERARCHIC_VEC);

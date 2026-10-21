@@ -210,6 +210,9 @@ FEGenericBase<Real>::build (const unsigned int dim,
           case L2_LAGRANGE:
             return std::make_unique<FE<0,L2_LAGRANGE>>(fet);
 
+          case L2_LAGRANGE_GLL:
+            return std::make_unique<FE<0,L2_LAGRANGE_GLL>>(fet);
+
           case HIERARCHIC:
             return std::make_unique<FE<0,HIERARCHIC>>(fet);
 
@@ -259,6 +262,9 @@ FEGenericBase<Real>::build (const unsigned int dim,
 
           case L2_LAGRANGE:
             return std::make_unique<FE<1,L2_LAGRANGE>>(fet);
+
+          case L2_LAGRANGE_GLL:
+            return std::make_unique<FE<1,L2_LAGRANGE_GLL>>(fet);
 
           case HIERARCHIC:
             return std::make_unique<FE<1,HIERARCHIC>>(fet);
@@ -311,6 +317,9 @@ FEGenericBase<Real>::build (const unsigned int dim,
 
           case L2_LAGRANGE:
             return std::make_unique<FE<2,L2_LAGRANGE>>(fet);
+
+          case L2_LAGRANGE_GLL:
+            return std::make_unique<FE<2,L2_LAGRANGE_GLL>>(fet);
 
           case HIERARCHIC:
             return std::make_unique<FE<2,HIERARCHIC>>(fet);
@@ -366,6 +375,9 @@ FEGenericBase<Real>::build (const unsigned int dim,
 
           case L2_LAGRANGE:
             return std::make_unique<FE<3,L2_LAGRANGE>>(fet);
+
+          case L2_LAGRANGE_GLL:
+            return std::make_unique<FE<3,L2_LAGRANGE_GLL>>(fet);
 
           case HIERARCHIC:
             return std::make_unique<FE<3,HIERARCHIC>>(fet);
@@ -768,7 +780,7 @@ void FEGenericBase<OutputType>::compute_shape_functions (const Elem * elem,
   // have already been computed via init_shape_functions
 
   // Start logging the shape function computation
-  LOG_SCOPE("compute_shape_functions()", "FE");
+  LOG_ONE_ENTITY_SCOPE("compute_shape_functions()", "FE");
 
   this->determine_calculations();
 
@@ -829,8 +841,11 @@ void FEGenericBase<Real>::compute_dual_shape_coeffs (const std::vector<Real> & J
   // of its adjacent mid-edge shapes. That replaces D by T^-1 diag(T d), which for this T is the sparse
   // update below. alpha = 1/5 is recommended there, and makes the weights strictly positive (QUAD8
   // 1/5 and 4/5, TRI6 1/15 and 1/10) while preserving the partition of unity. T = I elsewhere.
-  if (_elem && (_elem->type() == TRI6 || _elem->type() == QUAD8) &&
-      get_family() == LAGRANGE && sz == _elem->n_nodes())
+  // SECOND order on TRI7 is the TRI6 basis, with no degree of freedom at the centroid node, and
+  // L2_LAGRANGE shares the LAGRANGE shape functions.
+  if (_elem && (get_family() == LAGRANGE || get_family() == L2_LAGRANGE) &&
+      (((_elem->type() == TRI6 || _elem->type() == TRI7) && sz == 6) ||
+       (_elem->type() == QUAD8 && sz == 8)))
     {
       const Real alpha = Real(1)/5;
       // Mid-edge nodes are the trailing indices, and only vertex entries are written, so D(m,m) here

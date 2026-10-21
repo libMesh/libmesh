@@ -67,7 +67,7 @@ FEAbstract::FEAbstract(const unsigned int d,
   qrule(nullptr),
   shapes_on_quadrature(false),
   _n_total_qp(0),
-  _add_p_level_in_reinit(true)
+  _add_p_level_in_reinit(fet.p_refinement)
 {
 }
 
@@ -99,6 +99,9 @@ std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,
 
           case L2_LAGRANGE:
             return std::make_unique<FE<0,L2_LAGRANGE>>(fet);
+
+          case L2_LAGRANGE_GLL:
+            return std::make_unique<FE<0,L2_LAGRANGE_GLL>>(fet);
 
           case L2_LAGRANGE_VEC:
             return std::make_unique<FE<0,L2_LAGRANGE_VEC>>(fet);
@@ -176,6 +179,9 @@ std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,
 
           case L2_LAGRANGE:
             return std::make_unique<FE<1,L2_LAGRANGE>>(fet);
+
+          case L2_LAGRANGE_GLL:
+            return std::make_unique<FE<1,L2_LAGRANGE_GLL>>(fet);
 
           case L2_LAGRANGE_VEC:
             return std::make_unique<FE<1,L2_LAGRANGE_VEC>>(fet);
@@ -256,6 +262,9 @@ std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,
           case L2_LAGRANGE:
             return std::make_unique<FE<2,L2_LAGRANGE>>(fet);
 
+          case L2_LAGRANGE_GLL:
+            return std::make_unique<FE<2,L2_LAGRANGE_GLL>>(fet);
+
           case L2_LAGRANGE_VEC:
             return std::make_unique<FE<2,L2_LAGRANGE_VEC>>(fet);
 
@@ -334,6 +343,9 @@ std::unique_ptr<FEAbstract> FEAbstract::build(const unsigned int dim,
 
           case L2_LAGRANGE:
             return std::make_unique<FE<3,L2_LAGRANGE>>(fet);
+
+          case L2_LAGRANGE_GLL:
+            return std::make_unique<FE<3,L2_LAGRANGE_GLL>>(fet);
 
           case L2_LAGRANGE_VEC:
             return std::make_unique<FE<3,L2_LAGRANGE_VEC>>(fet);
@@ -428,7 +440,7 @@ void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point> 
         nodes[0] = Point (-1.,0.,0.);
         nodes[1] = Point (1.,0.,0.);
         nodes[2] = Point (-1./3.,0.,0.);
-        nodes[3] - Point (1./3.,0.,0.);
+        nodes[3] = Point (1./3.,0.,0.);
         return;
       }
     case TRI7:

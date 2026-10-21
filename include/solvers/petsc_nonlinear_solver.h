@@ -107,11 +107,23 @@ public:
   SNES snes(const char * name = nullptr);
 
   /**
-   * Call the Petsc solver.  It calls the method below, using the
-   * same matrix for the system and preconditioner matrices.
+   * Call the Petsc solver, using the same matrix for the system and preconditioner matrices. Calls
+   * the two-matrix overload below with \p pre_in for both.
    */
   virtual std::pair<unsigned int, Real>
-  solve (SparseMatrix<T> &,                     // System Jacobian Matrix
+  solve (SparseMatrix<T> & pre_in,               // System Preconditioning Matrix
+         NumericVector<T> &,                    // Solution vector
+         NumericVector<T> &,                    // Residual vector
+         const double,                         // Stopping tolerance
+         const unsigned int) override; // N. Iterations
+
+  /**
+   * Call the Petsc solver, using \p jac_in as the actual SNES Jacobian operator (Amat) and
+   * \p pre_in as the preconditioning matrix (Pmat).
+   */
+  virtual std::pair<unsigned int, Real>
+  solve (SparseMatrix<T> & jac_in,               // Jacobian operator matrix (Amat)
+         SparseMatrix<T> & pre_in,               // Preconditioning matrix (Pmat)
          NumericVector<T> &,                    // Solution vector
          NumericVector<T> &,                    // Residual vector
          const double,                         // Stopping tolerance
@@ -170,6 +182,22 @@ public:
    * matrix-free approximation of the Jacobian action
    */
   bool snes_mf_reuse_base() const { return _snesmf_reuse_base; }
+
+  /**
+   * Set whether evaluating the residual twice at the same solution gives exactly the same result.
+   * This is used to decide whether to run the debug-mode check of matrix-free base vector reuse,
+   * which requires an exact match. The check is already skipped for MPI-parallel and threaded runs;
+   * applications whose assembly is non-deterministic for other reasons (e.g. due to device
+   * parallelism) should set this to false. This only disables the check; the base vector is still
+   * reused.
+   */
+  void set_reproducible_residual(bool state) { _reproducible_residual = state; }
+
+  /**
+   * @return Whether evaluating the residual twice at the same solution gives exactly the same
+   * result
+   */
+  bool reproducible_residual() const { return _reproducible_residual; }
 
   /**
    * Set whether we are computing the base vector for matrix-free finite-differencing
@@ -268,6 +296,11 @@ protected:
    */
   bool _snesmf_reuse_base;
 
+  /**
+   * Whether residual evaluation is reproducible. See set_reproducible_residual()
+   */
+  bool _reproducible_residual;
+
   void build_mat_null_space(NonlinearImplicitSystem::ComputeVectorSubspace * computeSubspaceObject,
                             void (*)(std::vector<NumericVector<Number> *> &, sys_type &),
                             MatNullSpace *);
@@ -290,9 +323,6 @@ protected:
    */
   PetscDMWrapper _dm_wrapper;
 #endif
-
-  /// Wrapper for matrix-free finite-difference Jacobians
-  PetscMFFDMatrix<Number> _mffd_jac;
 
 private:
   friend ResidualContext libmesh_petsc_snes_residual_helper (SNES snes, Vec x, void * ctx);

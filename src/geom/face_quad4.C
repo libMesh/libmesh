@@ -32,14 +32,6 @@ namespace libMesh
 const int Quad4::num_nodes;
 const int Quad4::nodes_per_side;
 
-const unsigned int Quad4::side_nodes_map[Quad4::num_sides][Quad4::nodes_per_side] =
-  {
-    {0, 1}, // Side 0
-    {1, 2}, // Side 1
-    {2, 3}, // Side 2
-    {3, 0}  // Side 3
-  };
-
 #ifdef LIBMESH_ENABLE_AMR
 
 const Real Quad4::_embedding_matrix[Quad4::num_children][Quad4::num_nodes][Quad4::num_nodes] =

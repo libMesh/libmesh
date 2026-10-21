@@ -71,6 +71,12 @@ public:
   }
 
   /**
+   * Elements are assigned from a space-filling curve computed here, with no reference to
+   * the partitioning the mesh arrives with.
+   */
+  virtual bool partitions_from_scratch () const override { return true; }
+
+  /**
    * Sets the type of space-filling curve to use.  Valid types are
    * "Hilbert" (the default) and "Morton".
    */

@@ -22,7 +22,9 @@
 #include "libmesh/eigen_system.h"
 #include "libmesh/elem.h"
 #include "libmesh/explicit_system.h"
+#include "libmesh/fe_base.h"
 #include "libmesh/fe_interface.h"
+#include "libmesh/fem_context.h"
 #include "libmesh/frequency_system.h"
 #include "libmesh/int_range.h"
 #include "libmesh/libmesh_logging.h"
@@ -34,6 +36,7 @@
 #include "libmesh/parallel.h"
 #include "libmesh/rb_construction.h"
 #include "libmesh/remote_elem.h"
+#include "libmesh/tensor_tools.h"
 #include "libmesh/transient_rb_construction.h"
 #include "libmesh/transient_system.h"
 
@@ -579,9 +582,10 @@ void EquationSystems::build_variable_names (std::vector<std::string> & var_names
   var_names.resize(var_num);
 }
 
-bool EquationSystems::is_elemental_data_fe_type (const FEType & type)
+bool EquationSystems::is_elemental_data_fe_type (const FEType & type,
+                                                 bool allow_high_order_discontinuous)
 {
-  return type.order == CONSTANT &&
+  return (type.order == CONSTANT || allow_high_order_discontinuous) &&
          (type.family == MONOMIAL ||
           type.family == MONOMIAL_VEC ||
           type.family == XYZ);
@@ -591,7 +595,8 @@ bool EquationSystems::is_elemental_data_fe_type (const FEType & type)
 
 void EquationSystems::build_elemental_data_variable_names
   (std::vector<std::string> & var_names,
-   const std::set<std::string> * system_names) const
+   const std::set<std::string> * system_names,
+   bool allow_high_order_discontinuous) const
 {
   const std::vector<std::string> name_filter = var_names;
   const bool is_names_empty = name_filter.empty();
@@ -610,7 +615,7 @@ void EquationSystems::build_elemental_data_variable_names
       for (auto var : make_range(sys_ptr->n_vars()))
         {
           const FEType & var_type = sys_ptr->variable_type(var);
-          if (!EquationSystems::is_elemental_data_fe_type(var_type))
+          if (!EquationSystems::is_elemental_data_fe_type(var_type, allow_high_order_discontinuous))
             continue;
 
           if (FEInterface::field_type(var_type) == TYPE_VECTOR)
@@ -1088,11 +1093,12 @@ void EquationSystems::get_vars_active_subdomains(const std::vector<std::string> 
 
 void
 EquationSystems::build_elemental_solution_vector (std::vector<Number> & soln,
-                                                  std::vector<std::string> & names) const
+                                                  std::vector<std::string> & names,
+                                                  bool allow_high_order_discontinuous) const
 {
   // Call the parallel version of this function
   std::unique_ptr<NumericVector<Number>> parallel_soln =
-    this->build_parallel_elemental_solution_vector(names);
+    this->build_parallel_elemental_solution_vector(names, allow_high_order_discontinuous);
 
   // Localize into 'soln', provided that parallel_soln is not empty.
   // Note: parallel_soln will be empty in the event that none of the
@@ -1129,10 +1135,13 @@ EquationSystems::find_variable_numbers
 
 
 std::vector<std::pair<unsigned int, unsigned int>>
-EquationSystems::find_elemental_data_variable_numbers (std::vector<std::string> & names) const
+EquationSystems::find_elemental_data_variable_numbers (std::vector<std::string> & names,
+                                                       bool allow_high_order_discontinuous) const
 {
   return this->find_variable_numbers_by_predicate
-    (names, EquationSystems::is_elemental_data_fe_type);
+    (names,
+     [allow_high_order_discontinuous](const FEType & type)
+     { return EquationSystems::is_elemental_data_fe_type(type, allow_high_order_discontinuous); });
 }
 
 
@@ -1234,13 +1243,14 @@ EquationSystems::find_variable_numbers_by_predicate
 
 
 std::unique_ptr<NumericVector<Number>>
-EquationSystems::build_parallel_elemental_solution_vector (std::vector<std::string> & names) const
+EquationSystems::build_parallel_elemental_solution_vector (std::vector<std::string> & names,
+                                                           bool allow_high_order_discontinuous) const
 {
   // Filter any names that aren't elemental variables and get the system indices for those that are.
   // Note that it's probably fine if the names vector is empty since we'll still filter out all
   // non-elemental-data variables. If there are none, then nothing is output here.
   std::vector<std::pair<unsigned int, unsigned int>> var_nums =
-    this->find_elemental_data_variable_numbers(names);
+    this->find_elemental_data_variable_numbers(names, allow_high_order_discontinuous);
 
   const std::size_t nv = names.size(); /*total number of vars including vector components*/
   const dof_id_type ne = _mesh.n_elem();
@@ -1307,31 +1317,98 @@ EquationSystems::build_parallel_elemental_solution_vector (std::vector<std::stri
       // Even for the case where a variable is not active on any subdomain belonging to the
       // processor, we still need to know this number to update 'var_ctr'.
       const auto & var_type = system.variable_type(var);
+      const FEFieldType field_type = FEInterface::field_type(var_type);
       const unsigned int n_comps =
-        (FEInterface::field_type(var_type) == TYPE_VECTOR) ?
+        (field_type == TYPE_VECTOR) ?
         FEInterface::n_vec_dim(_mesh, var_type) : 1;
+
+      // Elemental data variables are normally CONSTANT order, in which case
+      // there is exactly one DOF per component and we can just copy it
+      // directly.  When allow_high_order_discontinuous permits a
+      // non-CONSTANT order variable through, a single DOF no longer
+      // represents the element's value, so we instead compute a
+      // quadrature-weighted average of the FE solution over the element.
+      const bool need_quadrature_average =
+        allow_high_order_discontinuous && var_type.order != CONSTANT;
 
       // Loop over all elements in the mesh and index all components of the variable if it's active
       Threads::parallel_for
         (_mesh.active_local_element_stored_range(),
-         [&dof_map, &variable, ne, var, var_ctr, n_comps,
-         &parallel_soln, &sys_soln](const ConstElemRange & range)
+         [&system, &dof_map, &variable, ne, var, var_ctr, n_comps, field_type,
+         need_quadrature_average, &parallel_soln, &sys_soln](const ConstElemRange & range)
          {
            // The DOF indices for the finite element
            std::vector<dof_id_type> dof_indices;
+
+           // FE context for the quadrature-average path.  It is built here,
+           // inside the parallel_for lambda body, so that each range
+           // invocation (which runs single-threaded) owns its own; sharing
+           // FE objects across threads would race on reinit().
+           std::unique_ptr<FEMContext> con;
+           if (need_quadrature_average)
+             {
+               const std::vector<unsigned int> active_vars {var};
+               con = std::make_unique<FEMContext>(system, &active_vars,
+                                                  /*allocate_local_matrices=*/false);
+             }
+
+           // Quadrature-weighted average of the variable over elem.  The
+           // second argument only selects the value type: Number for
+           // scalar variables, Gradient for vector-valued ones.
+           auto element_average = [&con, &system, var](const Elem * elem, auto zero_value)
+             {
+               typedef decltype(zero_value) OutputType;
+               typedef typename TensorTools::MakeReal<OutputType>::type OutputShape;
+
+               con->pre_fe_reinit(system, elem);
+
+               // Request what interior_value() needs before reinit
+               FEGenericBase<OutputShape> * fe = nullptr;
+               con->get_element_fe(var, fe);
+               const std::vector<Real> & JxW = fe->get_JxW();
+               fe->get_phi();
+
+               con->elem_fe_reinit();
+
+               OutputType avg = zero_value;
+               Real vol = 0;
+               for (auto qp : index_range(JxW))
+                 {
+                   OutputType u_h;
+                   con->interior_value(var, qp, u_h);
+                   avg += JxW[qp] * u_h;
+                   vol += JxW[qp];
+                 }
+               avg /= vol;
+               return avg;
+             };
 
            for (const Elem * elem : range)
              {
                if (variable.active_on_subdomain(elem->subdomain_id()))
                  {
-                   dof_map.dof_indices(elem, dof_indices, var);
+                   if (need_quadrature_average)
+                     {
+                       if (field_type == TYPE_SCALAR)
+                         parallel_soln.set(ne * var_ctr + elem->id(), element_average(elem, Number()));
+                       else
+                         {
+                           const Gradient avg = element_average(elem, Gradient());
+                           for (unsigned int comp = 0; comp < n_comps; comp++)
+                             parallel_soln.set(ne * (var_ctr + comp) + elem->id(), avg(comp));
+                         }
+                     }
+                   else
+                     {
+                       dof_map.dof_indices(elem, dof_indices, var);
 
-                   // The number of DOF components needs to be equal to the expected number so that we know
-                   // where to store data to correctly correspond to variable names.
-                   libmesh_assert_equal_to(dof_indices.size(), n_comps);
+                       // The number of DOF components needs to be equal to the expected number so that we know
+                       // where to store data to correctly correspond to variable names.
+                       libmesh_assert_equal_to(dof_indices.size(), n_comps);
 
-                   for (unsigned int comp = 0; comp < n_comps; comp++)
-                     parallel_soln.set(ne * (var_ctr + comp) + elem->id(), sys_soln(dof_indices[comp]));
+                       for (unsigned int comp = 0; comp < n_comps; comp++)
+                         parallel_soln.set(ne * (var_ctr + comp) + elem->id(), sys_soln(dof_indices[comp]));
+                     }
                  }
              }
          });
