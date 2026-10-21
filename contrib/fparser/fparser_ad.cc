@@ -1150,7 +1150,7 @@ bool Compiler::run(const std::string & compiler_options)
   }).base(), command.end());
   command += ccname_cc + " " + compiler_options + " -o " + _objectname;
   status = system(command.c_str());
-#ifndef NDEBUG
+#ifdef DEBUG
   std::cerr << "Keeping file '" << ccname_cc << "' in debug mode.\n";
 #else
   std::remove(ccname_cc.c_str());
