@@ -197,8 +197,8 @@ private:
 
     qrule->init (elem);
 
-    const int max_y_order = dim>1 ? 0 : exactorder;
-    const int max_z_order = dim>2 ? 0 : exactorder;
+    const int max_y_order = dim>1 ? exactorder : 0;
+    const int max_z_order = dim>2 ? exactorder : 0;
 
     for (int xp=0; xp <= exactorder; ++xp)
       for (int yp=0; yp <= max_y_order; ++yp)
@@ -318,7 +318,7 @@ private:
   const std::function<Real(int,int,int)> pyramid_integrals =
   [](int modex, int modey, int modez) {
 
-    const int binom = Utility::binomial(modex+modey+modez+3, modez);
+    const int binom = Utility::binomial(modex+modey+modez+2, modez);
 
     if (modex%2 || modey%2)
       return Real(0);
