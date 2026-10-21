@@ -194,6 +194,7 @@ void init_ref_elem_table()
     ref_elem_file[QUAD4]    = ElemDataStrings::one_quad;
     ref_elem_file[QUAD8]    = ElemDataStrings::one_quad8;
     ref_elem_file[QUAD9]    = ElemDataStrings::one_quad9;
+    ref_elem_file[QUAD16]   = ElemDataStrings::one_quad16;
 
     // 3D elements
     ref_elem_file[HEX8]     = ElemDataStrings::one_hex;
