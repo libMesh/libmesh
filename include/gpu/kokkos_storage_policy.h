@@ -29,6 +29,8 @@
 
 #include "libmesh/libmesh_common.h"
 
+#ifdef LIBMESH_HAVE_KOKKOS
+
 #define PETSC_SKIP_CXX_COMPLEX_FIX 1
 #include "libmesh/ignore_warnings.h"
 #include <Kokkos_Core.hpp>
@@ -234,5 +236,7 @@ upload_tensor_storage(const std::vector<TensorType> & values, const char * label
 }
 
 } // namespace libMesh::Kokkos
+
+#endif // LIBMESH_HAVE_KOKKOS
 
 #endif // LIBMESH_KOKKOS_STORAGE_POLICY_H
