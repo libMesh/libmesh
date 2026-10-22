@@ -315,11 +315,17 @@ bool Partitioner::single_partition (MeshBase & mesh)
   // that rank might need to be informed of a change.
   mesh.comm().max(changed_pid);
 
-  // We may need to redistribute, in case someone (like our unit
-  // tests) is doing something silly (like moving a whole
-  // already-distributed mesh back onto rank 0).
   if (changed_pid)
+  {
+    // We may need to redistribute, in case someone (like our unit
+    // tests) is doing something silly (like moving a whole
+    // already-distributed mesh back onto rank 0).
     mesh.redistribute();
+
+    // Even single_partition can be a change, if we're starting with
+    // any unpartitioned elements or nodes
+    mesh.update_post_partitioning();
+  }
 
   return changed_pid;
 }
