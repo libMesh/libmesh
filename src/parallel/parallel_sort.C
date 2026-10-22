@@ -143,15 +143,10 @@ void Sort<Parallel::DofObjectKey,unsigned int>::binsort()
 
   if (_data.empty())
     {
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
       local_min.first.rack0 = local_min.first.rack1 = local_min.first.rack2 = static_cast<Hilbert::inttype>(-1);
       local_min.second = std::numeric_limits<unique_id_type>::max();
       local_max.first.rack0 = local_max.first.rack1 = local_max.first.rack2 = 0;
       local_max.second = 0;
-#else
-      local_min.rack0 = local_min.rack1 = local_min.rack2 = static_cast<Hilbert::inttype>(-1);
-      local_max.rack0 = local_max.rack1 = local_max.rack2 = 0;
-#endif
     }
   else
     {
