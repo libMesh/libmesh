@@ -30,6 +30,7 @@ BUILT_SOURCES = \
         periodic_boundary.h \
         periodic_boundary_base.h \
         print_trace.h \
+        reduced_dof_map.h \
         reference_counted_object.h \
         reference_counter.h \
         single_predicates.h \
@@ -701,6 +702,9 @@ periodic_boundary_base.h: $(top_srcdir)/include/base/periodic_boundary_base.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 print_trace.h: $(top_srcdir)/include/base/print_trace.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+reduced_dof_map.h: $(top_srcdir)/include/base/reduced_dof_map.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 reference_counted_object.h: $(top_srcdir)/include/base/reference_counted_object.h

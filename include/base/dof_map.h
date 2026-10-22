@@ -71,6 +71,7 @@ class PeriodicPointNeighbors;
 class System;
 class NonlinearImplicitSystem;
 class StaticCondensationDofMap;
+class ReducedDofMap;
 template <typename T> class DenseVectorBase;
 template <typename T> class DenseVector;
 template <typename T> class DenseMatrix;
@@ -1766,10 +1767,14 @@ public:
    * Can be told to calculate sparsity for the constrained matrix,
    * which may be necessary in the case of spline control node
    * constraints or sufficiently many user constraints.
+   *
+   * If \p reduced is provided, the pattern couples only the degrees
+   * of freedom that \p reduced retains, giving the nonzero counts of
+   * matrices in that reduced space.
    */
   std::unique_ptr<SparsityPattern::Build> build_sparsity(const MeshBase & mesh,
                                                          bool calculate_constrained = false,
-                                                         bool use_condensed_system = false) const;
+                                                         const ReducedDofMap * reduced = nullptr) const;
 
   /**
    * Set whether the given variable group should be p-refined on a

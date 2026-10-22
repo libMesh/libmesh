@@ -30,7 +30,7 @@
 #include "libmesh/parallel.h"
 #include "libmesh/parallel_sync.h"
 #include "libmesh/utility.h"
-#include "libmesh/static_condensation_dof_map.h"
+#include "libmesh/reduced_dof_map.h"
 
 // TIMPI includes
 #include "timpi/communicator.h"
@@ -50,7 +50,7 @@ Build::Build (const DofMap & dof_map_in,
               const bool implicit_neighbor_dofs_in,
               const bool need_full_sparsity_pattern_in,
               const bool calculate_constrained_in,
-              const StaticCondensationDofMap * const sc_in) :
+              const ReducedDofMap * const reduced_in) :
   ParallelObject(dof_map_in),
   dof_map(dof_map_in),
   dof_coupling(dof_coupling_in),
@@ -58,7 +58,7 @@ Build::Build (const DofMap & dof_map_in,
   implicit_neighbor_dofs(implicit_neighbor_dofs_in),
   need_full_sparsity_pattern(need_full_sparsity_pattern_in),
   calculate_constrained(calculate_constrained_in),
-  sc(sc_in),
+  reduced(reduced_in),
   sparsity_pattern(),
   nonlocal_pattern(),
   n_nz(),
@@ -75,7 +75,7 @@ Build::Build (Build & other, Threads::split) :
   implicit_neighbor_dofs(other.implicit_neighbor_dofs),
   need_full_sparsity_pattern(other.need_full_sparsity_pattern),
   calculate_constrained(other.calculate_constrained),
-  sc(other.sc),
+  reduced(other.reduced),
   hashed_dof_sets(other.hashed_dof_sets),
   sparsity_pattern(),
   nonlocal_pattern(),
@@ -97,13 +97,13 @@ void Build::sorted_connected_dofs(const Elem * elem,
                                   std::vector<dof_id_type> & dofs_vi,
                                   unsigned int vi)
 {
-  if (this->sc)
+  if (this->reduced)
   {
-    // We build a sparsity pattern that will match the size of the condensed system. This is so that
+    // We build a sparsity pattern that will match the size of the reduced system. This is so that
     // we have the data necessary to init the reduced system matrix
     dofs_vi.clear();
 
-    auto total_and_uncondensed_from_scalar_dofs_functor =
+    auto total_and_retained_from_scalar_dofs_functor =
         [&dofs_vi](const Elem & /*elem*/,
                    std::vector<dof_id_type> & dof_indices,
                    const std::vector<dof_id_type> & scalar_dof_indices)
@@ -112,7 +112,7 @@ void Build::sorted_connected_dofs(const Elem * elem,
       dofs_vi.insert(dofs_vi.end(), scalar_dof_indices.begin(), scalar_dof_indices.end());
     };
 
-    auto total_and_uncondensed_from_field_dofs_functor =
+    auto total_and_retained_from_field_dofs_functor =
         [&dofs_vi, this](const Elem & functor_elem,
                         const unsigned int node_num,
                         const unsigned int var_num,
@@ -120,16 +120,15 @@ void Build::sorted_connected_dofs(const Elem * elem,
                         const dof_id_type field_dof)
     {
       dof_indices.push_back(field_dof);
-      if (this->sc->uncondensed_vars().count(var_num) ||
-          (node_num != invalid_uint && !functor_elem.is_internal(node_num)))
+      if (this->reduced->retain_field_dof(functor_elem, node_num, var_num))
         dofs_vi.push_back(field_dof);
     };
 
     dof_map.dof_indices(elem,
                         dummy_vec,
                         vi,
-                        total_and_uncondensed_from_scalar_dofs_functor,
-                        total_and_uncondensed_from_field_dofs_functor,
+                        total_and_retained_from_scalar_dofs_functor,
+                        total_and_retained_from_field_dofs_functor,
                         elem->p_level());
   }
   else
