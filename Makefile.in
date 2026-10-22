@@ -290,7 +290,8 @@ am__libmesh_dbg_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
 	src/base/libmesh_exceptions.C src/base/libmesh_singleton.C \
 	src/base/libmesh_version.C src/base/periodic_boundaries.C \
 	src/base/periodic_boundary.C src/base/periodic_boundary_base.C \
-	src/base/print_trace.C src/base/reference_counted_object.C \
+	src/base/print_trace.C src/base/reduced_dof_map.C \
+	src/base/reference_counted_object.C \
 	src/base/reference_counter.C src/base/single_predicates.C \
 	src/base/sparsity_pattern.C src/base/variable.C \
 	src/error_estimation/adjoint_refinement_estimator.C \
@@ -627,6 +628,7 @@ am__objects_1 = src/base/libmesh_dbg_la-dirichlet_boundary.lo \
 	src/base/libmesh_dbg_la-periodic_boundary.lo \
 	src/base/libmesh_dbg_la-periodic_boundary_base.lo \
 	src/base/libmesh_dbg_la-print_trace.lo \
+	src/base/libmesh_dbg_la-reduced_dof_map.lo \
 	src/base/libmesh_dbg_la-reference_counted_object.lo \
 	src/base/libmesh_dbg_la-reference_counter.lo \
 	src/base/libmesh_dbg_la-single_predicates.lo \
@@ -1116,7 +1118,8 @@ am__libmesh_devel_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
 	src/base/libmesh_exceptions.C src/base/libmesh_singleton.C \
 	src/base/libmesh_version.C src/base/periodic_boundaries.C \
 	src/base/periodic_boundary.C src/base/periodic_boundary_base.C \
-	src/base/print_trace.C src/base/reference_counted_object.C \
+	src/base/print_trace.C src/base/reduced_dof_map.C \
+	src/base/reference_counted_object.C \
 	src/base/reference_counter.C src/base/single_predicates.C \
 	src/base/sparsity_pattern.C src/base/variable.C \
 	src/error_estimation/adjoint_refinement_estimator.C \
@@ -1452,6 +1455,7 @@ am__objects_2 = src/base/libmesh_devel_la-dirichlet_boundary.lo \
 	src/base/libmesh_devel_la-periodic_boundary.lo \
 	src/base/libmesh_devel_la-periodic_boundary_base.lo \
 	src/base/libmesh_devel_la-print_trace.lo \
+	src/base/libmesh_devel_la-reduced_dof_map.lo \
 	src/base/libmesh_devel_la-reference_counted_object.lo \
 	src/base/libmesh_devel_la-reference_counter.lo \
 	src/base/libmesh_devel_la-single_predicates.lo \
@@ -1938,7 +1942,8 @@ am__libmesh_oprof_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
 	src/base/libmesh_exceptions.C src/base/libmesh_singleton.C \
 	src/base/libmesh_version.C src/base/periodic_boundaries.C \
 	src/base/periodic_boundary.C src/base/periodic_boundary_base.C \
-	src/base/print_trace.C src/base/reference_counted_object.C \
+	src/base/print_trace.C src/base/reduced_dof_map.C \
+	src/base/reference_counted_object.C \
 	src/base/reference_counter.C src/base/single_predicates.C \
 	src/base/sparsity_pattern.C src/base/variable.C \
 	src/error_estimation/adjoint_refinement_estimator.C \
@@ -2274,6 +2279,7 @@ am__objects_3 = src/base/libmesh_oprof_la-dirichlet_boundary.lo \
 	src/base/libmesh_oprof_la-periodic_boundary.lo \
 	src/base/libmesh_oprof_la-periodic_boundary_base.lo \
 	src/base/libmesh_oprof_la-print_trace.lo \
+	src/base/libmesh_oprof_la-reduced_dof_map.lo \
 	src/base/libmesh_oprof_la-reference_counted_object.lo \
 	src/base/libmesh_oprof_la-reference_counter.lo \
 	src/base/libmesh_oprof_la-single_predicates.lo \
@@ -2760,7 +2766,8 @@ am__libmesh_opt_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
 	src/base/libmesh_exceptions.C src/base/libmesh_singleton.C \
 	src/base/libmesh_version.C src/base/periodic_boundaries.C \
 	src/base/periodic_boundary.C src/base/periodic_boundary_base.C \
-	src/base/print_trace.C src/base/reference_counted_object.C \
+	src/base/print_trace.C src/base/reduced_dof_map.C \
+	src/base/reference_counted_object.C \
 	src/base/reference_counter.C src/base/single_predicates.C \
 	src/base/sparsity_pattern.C src/base/variable.C \
 	src/error_estimation/adjoint_refinement_estimator.C \
@@ -3096,6 +3103,7 @@ am__objects_4 = src/base/libmesh_opt_la-dirichlet_boundary.lo \
 	src/base/libmesh_opt_la-periodic_boundary.lo \
 	src/base/libmesh_opt_la-periodic_boundary_base.lo \
 	src/base/libmesh_opt_la-print_trace.lo \
+	src/base/libmesh_opt_la-reduced_dof_map.lo \
 	src/base/libmesh_opt_la-reference_counted_object.lo \
 	src/base/libmesh_opt_la-reference_counter.lo \
 	src/base/libmesh_opt_la-single_predicates.lo \
@@ -3581,7 +3589,8 @@ am__libmesh_prof_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
 	src/base/libmesh_exceptions.C src/base/libmesh_singleton.C \
 	src/base/libmesh_version.C src/base/periodic_boundaries.C \
 	src/base/periodic_boundary.C src/base/periodic_boundary_base.C \
-	src/base/print_trace.C src/base/reference_counted_object.C \
+	src/base/print_trace.C src/base/reduced_dof_map.C \
+	src/base/reference_counted_object.C \
 	src/base/reference_counter.C src/base/single_predicates.C \
 	src/base/sparsity_pattern.C src/base/variable.C \
 	src/error_estimation/adjoint_refinement_estimator.C \
@@ -3917,6 +3926,7 @@ am__objects_5 = src/base/libmesh_prof_la-dirichlet_boundary.lo \
 	src/base/libmesh_prof_la-periodic_boundary.lo \
 	src/base/libmesh_prof_la-periodic_boundary_base.lo \
 	src/base/libmesh_prof_la-print_trace.lo \
+	src/base/libmesh_prof_la-reduced_dof_map.lo \
 	src/base/libmesh_prof_la-reference_counted_object.lo \
 	src/base/libmesh_prof_la-reference_counter.lo \
 	src/base/libmesh_prof_la-single_predicates.lo \
@@ -5061,6 +5071,7 @@ am__depfiles_remade = src/apps/$(DEPDIR)/amr_dbg-amr.Po \
 	src/base/$(DEPDIR)/libmesh_dbg_la-periodic_boundary.Plo \
 	src/base/$(DEPDIR)/libmesh_dbg_la-periodic_boundary_base.Plo \
 	src/base/$(DEPDIR)/libmesh_dbg_la-print_trace.Plo \
+	src/base/$(DEPDIR)/libmesh_dbg_la-reduced_dof_map.Plo \
 	src/base/$(DEPDIR)/libmesh_dbg_la-reference_counted_object.Plo \
 	src/base/$(DEPDIR)/libmesh_dbg_la-reference_counter.Plo \
 	src/base/$(DEPDIR)/libmesh_dbg_la-single_predicates.Plo \
@@ -5080,6 +5091,7 @@ am__depfiles_remade = src/apps/$(DEPDIR)/amr_dbg-amr.Po \
 	src/base/$(DEPDIR)/libmesh_devel_la-periodic_boundary.Plo \
 	src/base/$(DEPDIR)/libmesh_devel_la-periodic_boundary_base.Plo \
 	src/base/$(DEPDIR)/libmesh_devel_la-print_trace.Plo \
+	src/base/$(DEPDIR)/libmesh_devel_la-reduced_dof_map.Plo \
 	src/base/$(DEPDIR)/libmesh_devel_la-reference_counted_object.Plo \
 	src/base/$(DEPDIR)/libmesh_devel_la-reference_counter.Plo \
 	src/base/$(DEPDIR)/libmesh_devel_la-single_predicates.Plo \
@@ -5099,6 +5111,7 @@ am__depfiles_remade = src/apps/$(DEPDIR)/amr_dbg-amr.Po \
 	src/base/$(DEPDIR)/libmesh_oprof_la-periodic_boundary.Plo \
 	src/base/$(DEPDIR)/libmesh_oprof_la-periodic_boundary_base.Plo \
 	src/base/$(DEPDIR)/libmesh_oprof_la-print_trace.Plo \
+	src/base/$(DEPDIR)/libmesh_oprof_la-reduced_dof_map.Plo \
 	src/base/$(DEPDIR)/libmesh_oprof_la-reference_counted_object.Plo \
 	src/base/$(DEPDIR)/libmesh_oprof_la-reference_counter.Plo \
 	src/base/$(DEPDIR)/libmesh_oprof_la-single_predicates.Plo \
@@ -5118,6 +5131,7 @@ am__depfiles_remade = src/apps/$(DEPDIR)/amr_dbg-amr.Po \
 	src/base/$(DEPDIR)/libmesh_opt_la-periodic_boundary.Plo \
 	src/base/$(DEPDIR)/libmesh_opt_la-periodic_boundary_base.Plo \
 	src/base/$(DEPDIR)/libmesh_opt_la-print_trace.Plo \
+	src/base/$(DEPDIR)/libmesh_opt_la-reduced_dof_map.Plo \
 	src/base/$(DEPDIR)/libmesh_opt_la-reference_counted_object.Plo \
 	src/base/$(DEPDIR)/libmesh_opt_la-reference_counter.Plo \
 	src/base/$(DEPDIR)/libmesh_opt_la-single_predicates.Plo \
@@ -5137,6 +5151,7 @@ am__depfiles_remade = src/apps/$(DEPDIR)/amr_dbg-amr.Po \
 	src/base/$(DEPDIR)/libmesh_prof_la-periodic_boundary.Plo \
 	src/base/$(DEPDIR)/libmesh_prof_la-periodic_boundary_base.Plo \
 	src/base/$(DEPDIR)/libmesh_prof_la-print_trace.Plo \
+	src/base/$(DEPDIR)/libmesh_prof_la-reduced_dof_map.Plo \
 	src/base/$(DEPDIR)/libmesh_prof_la-reference_counted_object.Plo \
 	src/base/$(DEPDIR)/libmesh_prof_la-reference_counter.Plo \
 	src/base/$(DEPDIR)/libmesh_prof_la-single_predicates.Plo \
@@ -8183,6 +8198,7 @@ libmesh_SOURCES = \
         src/base/periodic_boundary.C \
         src/base/periodic_boundary_base.C \
         src/base/print_trace.C \
+        src/base/reduced_dof_map.C \
         src/base/reference_counted_object.C \
         src/base/reference_counter.C \
         src/base/single_predicates.C \
@@ -9234,6 +9250,8 @@ src/base/libmesh_dbg_la-periodic_boundary.lo:  \
 src/base/libmesh_dbg_la-periodic_boundary_base.lo:  \
 	src/base/$(am__dirstamp) src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_dbg_la-print_trace.lo: src/base/$(am__dirstamp) \
+	src/base/$(DEPDIR)/$(am__dirstamp)
+src/base/libmesh_dbg_la-reduced_dof_map.lo: src/base/$(am__dirstamp) \
 	src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_dbg_la-reference_counted_object.lo:  \
 	src/base/$(am__dirstamp) src/base/$(DEPDIR)/$(am__dirstamp)
@@ -10509,6 +10527,8 @@ src/base/libmesh_devel_la-periodic_boundary_base.lo:  \
 	src/base/$(am__dirstamp) src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_devel_la-print_trace.lo: src/base/$(am__dirstamp) \
 	src/base/$(DEPDIR)/$(am__dirstamp)
+src/base/libmesh_devel_la-reduced_dof_map.lo:  \
+	src/base/$(am__dirstamp) src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_devel_la-reference_counted_object.lo:  \
 	src/base/$(am__dirstamp) src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_devel_la-reference_counter.lo:  \
@@ -11696,6 +11716,8 @@ src/base/libmesh_oprof_la-periodic_boundary_base.lo:  \
 	src/base/$(am__dirstamp) src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_oprof_la-print_trace.lo: src/base/$(am__dirstamp) \
 	src/base/$(DEPDIR)/$(am__dirstamp)
+src/base/libmesh_oprof_la-reduced_dof_map.lo:  \
+	src/base/$(am__dirstamp) src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_oprof_la-reference_counted_object.lo:  \
 	src/base/$(am__dirstamp) src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_oprof_la-reference_counter.lo:  \
@@ -12883,6 +12905,8 @@ src/base/libmesh_opt_la-periodic_boundary_base.lo:  \
 	src/base/$(am__dirstamp) src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_opt_la-print_trace.lo: src/base/$(am__dirstamp) \
 	src/base/$(DEPDIR)/$(am__dirstamp)
+src/base/libmesh_opt_la-reduced_dof_map.lo: src/base/$(am__dirstamp) \
+	src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_opt_la-reference_counted_object.lo:  \
 	src/base/$(am__dirstamp) src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_opt_la-reference_counter.lo:  \
@@ -14066,6 +14090,8 @@ src/base/libmesh_prof_la-periodic_boundary.lo:  \
 src/base/libmesh_prof_la-periodic_boundary_base.lo:  \
 	src/base/$(am__dirstamp) src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_prof_la-print_trace.lo: src/base/$(am__dirstamp) \
+	src/base/$(DEPDIR)/$(am__dirstamp)
+src/base/libmesh_prof_la-reduced_dof_map.lo: src/base/$(am__dirstamp) \
 	src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_prof_la-reference_counted_object.lo:  \
 	src/base/$(am__dirstamp) src/base/$(DEPDIR)/$(am__dirstamp)
@@ -15933,6 +15959,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_dbg_la-periodic_boundary.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_dbg_la-periodic_boundary_base.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_dbg_la-print_trace.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_dbg_la-reduced_dof_map.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_dbg_la-reference_counted_object.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_dbg_la-reference_counter.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_dbg_la-single_predicates.Plo@am__quote@ # am--include-marker
@@ -15952,6 +15979,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_devel_la-periodic_boundary.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_devel_la-periodic_boundary_base.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_devel_la-print_trace.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_devel_la-reduced_dof_map.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_devel_la-reference_counted_object.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_devel_la-reference_counter.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_devel_la-single_predicates.Plo@am__quote@ # am--include-marker
@@ -15971,6 +15999,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_oprof_la-periodic_boundary.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_oprof_la-periodic_boundary_base.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_oprof_la-print_trace.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_oprof_la-reduced_dof_map.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_oprof_la-reference_counted_object.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_oprof_la-reference_counter.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_oprof_la-single_predicates.Plo@am__quote@ # am--include-marker
@@ -15990,6 +16019,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_opt_la-periodic_boundary.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_opt_la-periodic_boundary_base.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_opt_la-print_trace.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_opt_la-reduced_dof_map.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_opt_la-reference_counted_object.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_opt_la-reference_counter.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_opt_la-single_predicates.Plo@am__quote@ # am--include-marker
@@ -16009,6 +16039,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_prof_la-periodic_boundary.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_prof_la-periodic_boundary_base.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_prof_la-print_trace.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_prof_la-reduced_dof_map.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_prof_la-reference_counted_object.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_prof_la-reference_counter.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_prof_la-single_predicates.Plo@am__quote@ # am--include-marker
@@ -18457,6 +18488,13 @@ src/base/libmesh_dbg_la-print_trace.lo: src/base/print_trace.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/base/print_trace.C' object='src/base/libmesh_dbg_la-print_trace.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/base/libmesh_dbg_la-print_trace.lo `test -f 'src/base/print_trace.C' || echo '$(srcdir)/'`src/base/print_trace.C
+
+src/base/libmesh_dbg_la-reduced_dof_map.lo: src/base/reduced_dof_map.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/base/libmesh_dbg_la-reduced_dof_map.lo -MD -MP -MF src/base/$(DEPDIR)/libmesh_dbg_la-reduced_dof_map.Tpo -c -o src/base/libmesh_dbg_la-reduced_dof_map.lo `test -f 'src/base/reduced_dof_map.C' || echo '$(srcdir)/'`src/base/reduced_dof_map.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/base/$(DEPDIR)/libmesh_dbg_la-reduced_dof_map.Tpo src/base/$(DEPDIR)/libmesh_dbg_la-reduced_dof_map.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/base/reduced_dof_map.C' object='src/base/libmesh_dbg_la-reduced_dof_map.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/base/libmesh_dbg_la-reduced_dof_map.lo `test -f 'src/base/reduced_dof_map.C' || echo '$(srcdir)/'`src/base/reduced_dof_map.C
 
 src/base/libmesh_dbg_la-reference_counted_object.lo: src/base/reference_counted_object.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/base/libmesh_dbg_la-reference_counted_object.lo -MD -MP -MF src/base/$(DEPDIR)/libmesh_dbg_la-reference_counted_object.Tpo -c -o src/base/libmesh_dbg_la-reference_counted_object.lo `test -f 'src/base/reference_counted_object.C' || echo '$(srcdir)/'`src/base/reference_counted_object.C
@@ -21832,6 +21870,13 @@ src/base/libmesh_devel_la-print_trace.lo: src/base/print_trace.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/base/libmesh_devel_la-print_trace.lo `test -f 'src/base/print_trace.C' || echo '$(srcdir)/'`src/base/print_trace.C
 
+src/base/libmesh_devel_la-reduced_dof_map.lo: src/base/reduced_dof_map.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/base/libmesh_devel_la-reduced_dof_map.lo -MD -MP -MF src/base/$(DEPDIR)/libmesh_devel_la-reduced_dof_map.Tpo -c -o src/base/libmesh_devel_la-reduced_dof_map.lo `test -f 'src/base/reduced_dof_map.C' || echo '$(srcdir)/'`src/base/reduced_dof_map.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/base/$(DEPDIR)/libmesh_devel_la-reduced_dof_map.Tpo src/base/$(DEPDIR)/libmesh_devel_la-reduced_dof_map.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/base/reduced_dof_map.C' object='src/base/libmesh_devel_la-reduced_dof_map.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/base/libmesh_devel_la-reduced_dof_map.lo `test -f 'src/base/reduced_dof_map.C' || echo '$(srcdir)/'`src/base/reduced_dof_map.C
+
 src/base/libmesh_devel_la-reference_counted_object.lo: src/base/reference_counted_object.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/base/libmesh_devel_la-reference_counted_object.lo -MD -MP -MF src/base/$(DEPDIR)/libmesh_devel_la-reference_counted_object.Tpo -c -o src/base/libmesh_devel_la-reference_counted_object.lo `test -f 'src/base/reference_counted_object.C' || echo '$(srcdir)/'`src/base/reference_counted_object.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/base/$(DEPDIR)/libmesh_devel_la-reference_counted_object.Tpo src/base/$(DEPDIR)/libmesh_devel_la-reference_counted_object.Plo
@@ -25205,6 +25250,13 @@ src/base/libmesh_oprof_la-print_trace.lo: src/base/print_trace.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/base/print_trace.C' object='src/base/libmesh_oprof_la-print_trace.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/base/libmesh_oprof_la-print_trace.lo `test -f 'src/base/print_trace.C' || echo '$(srcdir)/'`src/base/print_trace.C
+
+src/base/libmesh_oprof_la-reduced_dof_map.lo: src/base/reduced_dof_map.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/base/libmesh_oprof_la-reduced_dof_map.lo -MD -MP -MF src/base/$(DEPDIR)/libmesh_oprof_la-reduced_dof_map.Tpo -c -o src/base/libmesh_oprof_la-reduced_dof_map.lo `test -f 'src/base/reduced_dof_map.C' || echo '$(srcdir)/'`src/base/reduced_dof_map.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/base/$(DEPDIR)/libmesh_oprof_la-reduced_dof_map.Tpo src/base/$(DEPDIR)/libmesh_oprof_la-reduced_dof_map.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/base/reduced_dof_map.C' object='src/base/libmesh_oprof_la-reduced_dof_map.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/base/libmesh_oprof_la-reduced_dof_map.lo `test -f 'src/base/reduced_dof_map.C' || echo '$(srcdir)/'`src/base/reduced_dof_map.C
 
 src/base/libmesh_oprof_la-reference_counted_object.lo: src/base/reference_counted_object.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/base/libmesh_oprof_la-reference_counted_object.lo -MD -MP -MF src/base/$(DEPDIR)/libmesh_oprof_la-reference_counted_object.Tpo -c -o src/base/libmesh_oprof_la-reference_counted_object.lo `test -f 'src/base/reference_counted_object.C' || echo '$(srcdir)/'`src/base/reference_counted_object.C
@@ -28580,6 +28632,13 @@ src/base/libmesh_opt_la-print_trace.lo: src/base/print_trace.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/base/libmesh_opt_la-print_trace.lo `test -f 'src/base/print_trace.C' || echo '$(srcdir)/'`src/base/print_trace.C
 
+src/base/libmesh_opt_la-reduced_dof_map.lo: src/base/reduced_dof_map.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/base/libmesh_opt_la-reduced_dof_map.lo -MD -MP -MF src/base/$(DEPDIR)/libmesh_opt_la-reduced_dof_map.Tpo -c -o src/base/libmesh_opt_la-reduced_dof_map.lo `test -f 'src/base/reduced_dof_map.C' || echo '$(srcdir)/'`src/base/reduced_dof_map.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/base/$(DEPDIR)/libmesh_opt_la-reduced_dof_map.Tpo src/base/$(DEPDIR)/libmesh_opt_la-reduced_dof_map.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/base/reduced_dof_map.C' object='src/base/libmesh_opt_la-reduced_dof_map.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/base/libmesh_opt_la-reduced_dof_map.lo `test -f 'src/base/reduced_dof_map.C' || echo '$(srcdir)/'`src/base/reduced_dof_map.C
+
 src/base/libmesh_opt_la-reference_counted_object.lo: src/base/reference_counted_object.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/base/libmesh_opt_la-reference_counted_object.lo -MD -MP -MF src/base/$(DEPDIR)/libmesh_opt_la-reference_counted_object.Tpo -c -o src/base/libmesh_opt_la-reference_counted_object.lo `test -f 'src/base/reference_counted_object.C' || echo '$(srcdir)/'`src/base/reference_counted_object.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/base/$(DEPDIR)/libmesh_opt_la-reference_counted_object.Tpo src/base/$(DEPDIR)/libmesh_opt_la-reference_counted_object.Plo
@@ -31953,6 +32012,13 @@ src/base/libmesh_prof_la-print_trace.lo: src/base/print_trace.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/base/print_trace.C' object='src/base/libmesh_prof_la-print_trace.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/base/libmesh_prof_la-print_trace.lo `test -f 'src/base/print_trace.C' || echo '$(srcdir)/'`src/base/print_trace.C
+
+src/base/libmesh_prof_la-reduced_dof_map.lo: src/base/reduced_dof_map.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/base/libmesh_prof_la-reduced_dof_map.lo -MD -MP -MF src/base/$(DEPDIR)/libmesh_prof_la-reduced_dof_map.Tpo -c -o src/base/libmesh_prof_la-reduced_dof_map.lo `test -f 'src/base/reduced_dof_map.C' || echo '$(srcdir)/'`src/base/reduced_dof_map.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/base/$(DEPDIR)/libmesh_prof_la-reduced_dof_map.Tpo src/base/$(DEPDIR)/libmesh_prof_la-reduced_dof_map.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/base/reduced_dof_map.C' object='src/base/libmesh_prof_la-reduced_dof_map.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/base/libmesh_prof_la-reduced_dof_map.lo `test -f 'src/base/reduced_dof_map.C' || echo '$(srcdir)/'`src/base/reduced_dof_map.C
 
 src/base/libmesh_prof_la-reference_counted_object.lo: src/base/reference_counted_object.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/base/libmesh_prof_la-reference_counted_object.lo -MD -MP -MF src/base/$(DEPDIR)/libmesh_prof_la-reference_counted_object.Tpo -c -o src/base/libmesh_prof_la-reference_counted_object.lo `test -f 'src/base/reference_counted_object.C' || echo '$(srcdir)/'`src/base/reference_counted_object.C
@@ -36928,6 +36994,7 @@ distclean: distclean-recursive
 	-rm -f src/base/$(DEPDIR)/libmesh_dbg_la-periodic_boundary.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_dbg_la-periodic_boundary_base.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_dbg_la-print_trace.Plo
+	-rm -f src/base/$(DEPDIR)/libmesh_dbg_la-reduced_dof_map.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_dbg_la-reference_counted_object.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_dbg_la-reference_counter.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_dbg_la-single_predicates.Plo
@@ -36947,6 +37014,7 @@ distclean: distclean-recursive
 	-rm -f src/base/$(DEPDIR)/libmesh_devel_la-periodic_boundary.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_devel_la-periodic_boundary_base.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_devel_la-print_trace.Plo
+	-rm -f src/base/$(DEPDIR)/libmesh_devel_la-reduced_dof_map.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_devel_la-reference_counted_object.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_devel_la-reference_counter.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_devel_la-single_predicates.Plo
@@ -36966,6 +37034,7 @@ distclean: distclean-recursive
 	-rm -f src/base/$(DEPDIR)/libmesh_oprof_la-periodic_boundary.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_oprof_la-periodic_boundary_base.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_oprof_la-print_trace.Plo
+	-rm -f src/base/$(DEPDIR)/libmesh_oprof_la-reduced_dof_map.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_oprof_la-reference_counted_object.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_oprof_la-reference_counter.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_oprof_la-single_predicates.Plo
@@ -36985,6 +37054,7 @@ distclean: distclean-recursive
 	-rm -f src/base/$(DEPDIR)/libmesh_opt_la-periodic_boundary.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_opt_la-periodic_boundary_base.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_opt_la-print_trace.Plo
+	-rm -f src/base/$(DEPDIR)/libmesh_opt_la-reduced_dof_map.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_opt_la-reference_counted_object.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_opt_la-reference_counter.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_opt_la-single_predicates.Plo
@@ -37004,6 +37074,7 @@ distclean: distclean-recursive
 	-rm -f src/base/$(DEPDIR)/libmesh_prof_la-periodic_boundary.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_prof_la-periodic_boundary_base.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_prof_la-print_trace.Plo
+	-rm -f src/base/$(DEPDIR)/libmesh_prof_la-reduced_dof_map.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_prof_la-reference_counted_object.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_prof_la-reference_counter.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_prof_la-single_predicates.Plo
@@ -39469,6 +39540,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f src/base/$(DEPDIR)/libmesh_dbg_la-periodic_boundary.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_dbg_la-periodic_boundary_base.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_dbg_la-print_trace.Plo
+	-rm -f src/base/$(DEPDIR)/libmesh_dbg_la-reduced_dof_map.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_dbg_la-reference_counted_object.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_dbg_la-reference_counter.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_dbg_la-single_predicates.Plo
@@ -39488,6 +39560,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f src/base/$(DEPDIR)/libmesh_devel_la-periodic_boundary.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_devel_la-periodic_boundary_base.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_devel_la-print_trace.Plo
+	-rm -f src/base/$(DEPDIR)/libmesh_devel_la-reduced_dof_map.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_devel_la-reference_counted_object.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_devel_la-reference_counter.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_devel_la-single_predicates.Plo
@@ -39507,6 +39580,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f src/base/$(DEPDIR)/libmesh_oprof_la-periodic_boundary.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_oprof_la-periodic_boundary_base.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_oprof_la-print_trace.Plo
+	-rm -f src/base/$(DEPDIR)/libmesh_oprof_la-reduced_dof_map.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_oprof_la-reference_counted_object.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_oprof_la-reference_counter.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_oprof_la-single_predicates.Plo
@@ -39526,6 +39600,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f src/base/$(DEPDIR)/libmesh_opt_la-periodic_boundary.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_opt_la-periodic_boundary_base.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_opt_la-print_trace.Plo
+	-rm -f src/base/$(DEPDIR)/libmesh_opt_la-reduced_dof_map.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_opt_la-reference_counted_object.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_opt_la-reference_counter.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_opt_la-single_predicates.Plo
@@ -39545,6 +39620,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f src/base/$(DEPDIR)/libmesh_prof_la-periodic_boundary.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_prof_la-periodic_boundary_base.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_prof_la-print_trace.Plo
+	-rm -f src/base/$(DEPDIR)/libmesh_prof_la-reduced_dof_map.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_prof_la-reference_counted_object.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_prof_la-reference_counter.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_prof_la-single_predicates.Plo

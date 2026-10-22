@@ -664,6 +664,7 @@ include_HEADERS = \
         base/periodic_boundary.h \
         base/periodic_boundary_base.h \
         base/print_trace.h \
+        base/reduced_dof_map.h \
         base/reference_counted_object.h \
         base/reference_counter.h \
         base/single_predicates.h \
