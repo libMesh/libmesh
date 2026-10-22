@@ -121,7 +121,8 @@ get_dofobject_key (const Elem & e,
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   return std::make_pair(index, e.unique_id());
 #else
-  return index;
+  // A parent and a child can share a vertex average; their levels differ
+  return std::make_pair(index, unique_id_type(e.level()));
 #endif
 }
 
@@ -145,7 +146,7 @@ get_dofobject_key (const Node & n,
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
   return std::make_pair(index, n.unique_id());
 #else
-  return index;
+  return std::make_pair(index, unique_id_type(0));
 #endif
 }
 
@@ -913,11 +914,7 @@ void MeshCommunication::find_global_indices (const Parallel::Communicator & comm
               // to BitVecType using the operator= provided by the
               // BitVecType class. BitVecType is a CBigBitVec!
               Hilbert::BitVecType input;
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
               input = hilbert_indices.first;
-#else
-              input = hilbert_indices;
-#endif
 
               // Get output in a vector of CBigBitVec
               std::vector<CBigBitVec> output(3);
