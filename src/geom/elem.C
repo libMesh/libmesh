@@ -286,7 +286,7 @@ const unsigned int Elem::type_to_n_edges_map [] =
 
     invalid_uint,  // C0POLYGON
     invalid_uint,  // C0POLYHEDRON
-    
+
     4,   // QUAD16
   };
 

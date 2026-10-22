@@ -37,7 +37,7 @@ namespace libMesh
  *          3   9   8   2
  *   QUAD4: o---o---o---o
  *          |   15  14  |           eta
- *      10  o   o   o   o 7          ^ 
+ *      10  o   o   o   o 7          ^
  *          |           |            |
  *      11  o   o   o   o 6          |
  *          |   12  13  |            o---> xi
@@ -81,7 +81,7 @@ public:
    * \returns \p QUAD16.
    */
   virtual ElemType type () const override { return QUAD16; }
-  
+
   /**
    * \returns 16.
    */
@@ -162,7 +162,7 @@ public:
    */
   static const int num_nodes = 16;
   static const int nodes_per_side = 4;
-  
+
   /**
    * Master element node locations
    */

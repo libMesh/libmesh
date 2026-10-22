@@ -670,8 +670,8 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
               mesh.reserve_nodes (4 + 3*nx*ny + 2*nx + 2*ny);
               break;
             }
-	  case QUAD16:
-	    {
+          case QUAD16:
+            {
               mesh.reserve_nodes( (3*nx+1)*(3*ny+1) );
               break;
             }

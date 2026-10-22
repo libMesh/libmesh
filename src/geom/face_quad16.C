@@ -38,7 +38,7 @@ const int Quad16::nodes_per_side;
 // After the vertices the node locations start moving from Quad8/9
 
 static constexpr Real _third = Real(1)/3;
-const Real Quad16::_master_points[16][3] = 
+const Real Quad16::_master_points[16][3] =
 {
   //corners
   {-1, -1},
