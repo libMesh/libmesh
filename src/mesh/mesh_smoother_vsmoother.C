@@ -178,10 +178,9 @@ void VariationalMeshSmoother::smooth()
     }
 
   // Update _mesh from _mesh_copy
-  const auto dim = _mesh_copy->mesh_dimension();
   Threads::parallel_for
     (_mesh_copy->local_node_stored_range(),
-     [this, dim](const NodeRange & range)
+     [this](const NodeRange & range)
      {
        for (Node * node_copy : range)
          {
