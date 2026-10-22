@@ -104,6 +104,11 @@ unsigned int idx(const ElemType type,
         return i + j*(2*nx+1);
       }
 
+    case QUAD16:
+      {
+        return i + j*(3*nx+1);
+      }
+
     default:
       libmesh_error_msg("ERROR: Unrecognized 2D element type == " << Utility::enum_to_string(type));
     }
@@ -604,6 +609,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           case QUADSHELL8:
           case QUAD9:
           case QUADSHELL9:
+          case QUAD16:
             {
               mesh.reserve_elem (nx*ny);
               break;
@@ -664,7 +670,11 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
               mesh.reserve_nodes (4 + 3*nx*ny + 2*nx + 2*ny);
               break;
             }
-
+          case QUAD16:
+            {
+              mesh.reserve_nodes( (3*nx+1)*(3*ny+1) );
+              break;
+            }
           default:
             libmesh_error_msg("ERROR: Unrecognized 2D element type == " << Utility::enum_to_string(type));
           }
@@ -749,6 +759,29 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
 
               break;
             }
+
+            case QUAD16:
+              {
+                for (unsigned int j=0; j<=(3*ny); j++)
+                  for (unsigned int i=0; i<=(3*nx); i++)
+                  {
+                    const Node * const node =
+                        mesh.add_point(Point(static_cast<Real>(i) / static_cast<Real>(3 * nx),
+                                             static_cast<Real>(j) / static_cast<Real>(3 * ny),
+                                             0),
+                                       node_id++);
+                    if (j == 0)
+                      boundary_info.add_node(node, 0);
+                    if (j == 3*ny)
+                      boundary_info.add_node(node, 2);
+                    if (i == 0)
+                      boundary_info.add_node(node, 3);
+                    if (i == 3*nx)
+                      boundary_info.add_node(node, 1);
+                  }
+                break;
+              }
+
 
             case C0POLYGON:
             {
@@ -915,6 +948,34 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                   }
               break;
             };
+
+
+          case QUAD16:
+            {
+              for (unsigned int j=0; j<(3*ny); j += 3)
+                for (unsigned int i=0; i<(3*nx); i +=3)
+                {
+                  Elem * elem = mesh.add_elem(Elem::build_with_id(type, elem_id++));
+                  elem->set_node(0, mesh.node_ptr(idx(type,nx,i,j)    ));
+                  elem->set_node(1, mesh.node_ptr(idx(type,nx,i+3,j)  ));
+                  elem->set_node(2, mesh.node_ptr(idx(type,nx,i+3,j+3)));
+                  elem->set_node(3, mesh.node_ptr(idx(type,nx,i,j+3)  ));
+                  elem->set_node(4, mesh.node_ptr(idx(type,nx,i+1,j)  ));
+                  elem->set_node(5, mesh.node_ptr(idx(type,nx,i+2,j)));
+                  elem->set_node(6, mesh.node_ptr(idx(type,nx,i+3,j+1)));
+                  elem->set_node(7, mesh.node_ptr(idx(type,nx,i+3,j+2)));
+                  elem->set_node(8, mesh.node_ptr(idx(type,nx,i+2,j+3)));
+                  elem->set_node(9, mesh.node_ptr(idx(type,nx,i+1,j+3)));
+                  elem->set_node(10, mesh.node_ptr(idx(type,nx,i,j+2)));
+                  elem->set_node(11, mesh.node_ptr(idx(type,nx,i,j+1)));
+                  elem->set_node(12, mesh.node_ptr(idx(type,nx,i+1,j+1)));
+                  elem->set_node(13, mesh.node_ptr(idx(type,nx,i+2,j+1)));
+                  elem->set_node(14, mesh.node_ptr(idx(type,nx,i+2,j+2)));
+                  elem->set_node(15, mesh.node_ptr(idx(type,nx,i+1,j+2)));
+                }
+              break;
+            };
+
 
           case C0POLYGON:
           {
@@ -2068,6 +2129,7 @@ void MeshTools::Generation::build_sphere (UnstructuredMesh & mesh,
       case QUADSHELL8:
       case QUAD9:
       case QUADSHELL9:
+      case QUAD16:
         mesh.set_mesh_dimension(2);
         break;
       case EDGE2:
