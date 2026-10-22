@@ -450,6 +450,9 @@ void Partitioner::partition_unpartitioned_elements (MeshBase & mesh,
       elem->processor_id() = subdomain_id;
       //libMesh::out << "assigning " << global_index << " to " << subdomain_id << std::endl;
     }
+
+  // Even a temporary partitioning may invalidate some mesh caches
+  mesh.update_post_partitioning();
 }
 
 
