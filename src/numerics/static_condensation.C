@@ -157,14 +157,14 @@ void StaticCondensation::init()
   _reduced_rhs->init(n, n_local);
 
   // Initialize the reduced system matrix
-  _sp = _reduced_dof_map._reduced_sp.get();
+  _sp = &_reduced_dof_map.reduced_sparsity();
   _reduced_sys_mat = SparseMatrix<Number>::build(this->comm());
   if (auto * const petsc_mat = dynamic_cast<PetscMatrix<Number> *>(_reduced_sys_mat.get()))
     {
       // Optimization for PETSc. This is critical for problems in which there are SCALAR dofs that
       // introduce dense rows to avoid allocating a dense matrix
       petsc_mat->init(
-          n, n, n_local, n_local, _reduced_dof_map._reduced_nnz, _reduced_dof_map._reduced_noz);
+          n, n, n_local, n_local, _reduced_dof_map.reduced_n_nz(), _reduced_dof_map.reduced_n_oz());
     }
   else
     {
@@ -199,7 +199,6 @@ void StaticCondensation::close()
   std::vector<dof_id_type> reduced_space_indices;
   for (auto & [elem_id, matrix_data] : _elem_to_matrix_data)
     {
-      const auto & dof_data = libmesh_map_find(_reduced_dof_map._elem_to_dof_data, elem_id);
       reduced_space_indices.clear();
 
       // The result matrix is either a Schur complement or it's simply the result of summing element
@@ -214,7 +213,7 @@ void StaticCondensation::close()
       for (const auto i : make_range(result.rows()))
         for (const auto j : make_range(result.cols()))
           shim(i, j) = result(i, j);
-      for (const auto & var_reduced_space_indices : dof_data.reduced_space_indices)
+      for (const auto & var_reduced_space_indices : _reduced_dof_map.elem_dof_indices(elem_id))
         reduced_space_indices.insert(reduced_space_indices.end(),
                                      var_reduced_space_indices.begin(),
                                      var_reduced_space_indices.end());
@@ -256,8 +255,8 @@ void StaticCondensation::set(const numeric_index_type full_i,
                              const numeric_index_type full_j,
                              const Number val)
 {
-  const auto reduced_i = _reduced_dof_map.get_reduced_from_global_constraint_dof(full_i);
-  const auto reduced_j = _reduced_dof_map.get_reduced_from_global_constraint_dof(full_j);
+  const auto reduced_i = _reduced_dof_map.reduced_dof(full_i);
+  const auto reduced_j = _reduced_dof_map.reduced_dof(full_j);
   _reduced_sys_mat->set(reduced_i, reduced_j, val);
 }
 
@@ -387,7 +386,7 @@ void StaticCondensation::forward_elimination(const NumericVector<Number> & full_
   EigenVector elem_condensed_rhs, elem_uncondensed_rhs;
 
   full_rhs.create_subvector(
-      *_reduced_rhs, _reduced_dof_map._local_uncondensed_dofs, /*all_global_entries=*/false);
+      *_reduced_rhs, _reduced_dof_map.local_retained_dofs(), /*all_global_entries=*/false);
 
   std::vector<dof_id_type> reduced_space_indices;
   for (auto elem : _mesh.active_local_element_ptr_range())
@@ -395,7 +394,7 @@ void StaticCondensation::forward_elimination(const NumericVector<Number> & full_
       auto & matrix_data = libmesh_map_find(_elem_to_matrix_data, elem->id());
       reduced_space_indices.clear();
       const auto & dof_data = libmesh_map_find(_reduced_dof_map._elem_to_dof_data, elem->id());
-      for (const auto & var_reduced_space_indices : dof_data.reduced_space_indices)
+      for (const auto & var_reduced_space_indices : _reduced_dof_map.elem_dof_indices(elem->id()))
         reduced_space_indices.insert(reduced_space_indices.end(),
                                      var_reduced_space_indices.begin(),
                                      var_reduced_space_indices.end());
@@ -462,12 +461,12 @@ void StaticCondensation::apply(const NumericVector<Number> & full_rhs,
   // initial guess for the Krylov solve as well as lead to bewildered users who expect their initial
   // residual norm to equal the norm of the RHS
   full_parallel_sol.zero();
-  _reduced_sol = full_parallel_sol.get_subvector(_reduced_dof_map._local_uncondensed_dofs);
+  _reduced_sol = full_parallel_sol.get_subvector(_reduced_dof_map.local_retained_dofs());
   _reduced_solver->solve(*_reduced_sys_mat, *_reduced_sol, *_reduced_rhs, 1e-5, 300);
   // Must restore to the full solution because during backwards substitution we will need to be able
   // to read ghosted dofs and we don't support ghosting of subvectors
   full_parallel_sol.restore_subvector(std::move(_reduced_sol),
-                                      _reduced_dof_map._local_uncondensed_dofs);
+                                      _reduced_dof_map.local_retained_dofs());
   *_ghosted_full_sol = full_parallel_sol;
   backwards_substitution(full_rhs, full_parallel_sol);
 }
