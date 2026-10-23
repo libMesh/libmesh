@@ -34,7 +34,8 @@ StaticCondensationDofMap::~StaticCondensationDofMap() = default;
 
 bool StaticCondensationDofMap::retain_field_dof(const Elem & elem,
                                                 const unsigned int node_num,
-                                                const unsigned int var_num) const
+                                                const unsigned int var_num,
+                                                dof_id_type /*field_dof*/) const
 {
   if (_uncondensed_vars.count(var_num))
     {
