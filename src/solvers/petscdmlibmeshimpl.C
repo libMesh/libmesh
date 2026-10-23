@@ -41,6 +41,7 @@
 #include "libmesh/petsc_matrix_base.h"
 #include "libmesh/petscdmlibmesh.h"
 #include "libmesh/dof_map.h"
+#include "libmesh/constraint_elimination_dof_map.h"
 #include "libmesh/preconditioner.h"
 #include "libmesh/elem.h"
 #include "libmesh/parallel.h"
@@ -605,6 +606,8 @@ static PetscErrorCode DMlibMeshFunction(DM dm, Vec x, Vec r)
   NonlinearImplicitSystem * _sys;
   LibmeshPetscCallQ(DMlibMeshGetSystem(dm, _sys));
   NonlinearImplicitSystem & sys = *_sys;
+  if (sys.has_constraint_elimination())
+    SETERRQ(((PetscObject)dm)->comm, PETSC_ERR_SUP, "DMlibMesh does not evaluate residuals of systems that eliminate constraints; PetscNonlinearSolver does");
   PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
   PetscVector<Number> & R_sys = *cast_ptr<PetscVector<Number> *>(sys.rhs);
   PetscVector<Number> X_global(x, _sys->comm()), R(r, _sys->comm());
@@ -668,6 +671,8 @@ static PetscErrorCode DMlibMeshJacobian(DM dm, Vec x, Mat jac, Mat pc)
   NonlinearImplicitSystem * _sys;
   LibmeshPetscCallQ(DMlibMeshGetSystem(dm, _sys));
   NonlinearImplicitSystem & sys = *_sys;
+  if (sys.has_constraint_elimination())
+    SETERRQ(((PetscObject)dm)->comm, PETSC_ERR_SUP, "DMlibMesh does not evaluate Jacobians of systems that eliminate constraints; PetscNonlinearSolver does");
 
   libmesh_assert(pc);
   libmesh_assert(jac);
@@ -739,19 +744,42 @@ static PetscErrorCode DMVariableBounds_libMesh(DM dm, Vec xl, Vec xu)
   NonlinearImplicitSystem * _sys;
   LibmeshPetscCallQ(DMlibMeshGetSystem(dm, _sys));
   NonlinearImplicitSystem & sys = *_sys;
-  PetscVector<Number> XL(xl, sys.comm());
-  PetscVector<Number> XU(xu, sys.comm());
   PetscFunctionBegin;
   // Workaround for nonstandard Q suffix warning with quad precision
   const PetscReal petsc_inf = std::numeric_limits<PetscReal>::max() / 4;
-  LibmeshPetscCallQ(VecSet(xl, -petsc_inf));
-  LibmeshPetscCallQ(VecSet(xu, petsc_inf));
+
+  // Users compute bounds on full vectors. When eliminating constraints, SNES's xl and xu are
+  // reduced, and they take the bounds of the unconstrained degrees of freedom
+  const bool reduced = sys.has_constraint_elimination();
+  std::unique_ptr<NumericVector<Number>> full_l, full_u;
+  if (reduced)
+    {
+      full_l = sys.solution->zero_clone();
+      full_u = sys.solution->zero_clone();
+    }
+  PetscVector<Number> XL(xl, sys.comm()), XU(xu, sys.comm());
+  NumericVector<Number> & L = reduced ? *full_l : static_cast<NumericVector<Number> &>(XL);
+  NumericVector<Number> & U = reduced ? *full_u : static_cast<NumericVector<Number> &>(XU);
+  L.add(-petsc_inf);
+  U.add(petsc_inf);
+  L.close();
+  U.close();
+
   if (sys.nonlinear_solver->bounds != nullptr)
-    sys.nonlinear_solver->bounds(XL,XU,sys);
+    sys.nonlinear_solver->bounds(L,U,sys);
   else if (sys.nonlinear_solver->bounds_object != nullptr)
-    sys.nonlinear_solver->bounds_object->bounds(XL,XU, sys);
+    sys.nonlinear_solver->bounds_object->bounds(L,U, sys);
   else
     SETERRQ(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONG, "No bounds calculation in this libMesh object");
+
+  if (reduced)
+    {
+      auto & solver = cast_ref<PetscNonlinearSolver<Number> &>(*sys.nonlinear_solver);
+      L.close();
+      U.close();
+      solver.restrict_vector(L, xl);
+      solver.restrict_vector(U, xu);
+    }
 
   PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
 }
@@ -776,12 +804,17 @@ static PetscErrorCode DMCreateGlobalVector_libMesh(DM dm, Vec *x)
   NumericVector<Number> * nv = (dlm->sys->solution).get();
   PetscVector<Number> *   pv = dynamic_cast<PetscVector<Number> *>(nv);
   Vec                    v  = pv->vec();
+  const DofMap & dof_map = dlm->sys->get_dof_map();
   /* Unfortunately, currently this does not produce a ghosted vector, so nonlinear subproblem solves aren't going to be easily available.
      Should work fine for getting vectors out for linear subproblem solvers. */
-  if (dlm->embedding) {
+  if (dlm->embedding || dof_map.has_constraint_elimination()) {
+    /* The size of an embedded subproblem, or of the reduced space SNES solves on */
     PetscInt n;
     LibmeshPetscCallQ(VecCreate(((PetscObject)v)->comm, x));
-    LibmeshPetscCallQ(ISGetLocalSize(dlm->embedding, &n));
+    if (dlm->embedding)
+      LibmeshPetscCallQ(ISGetLocalSize(dlm->embedding, &n));
+    else
+      n = cast_int<PetscInt>(dof_map.get_constraint_elimination().n_local_dofs());
     LibmeshPetscCallQ(VecSetSizes(*x,n,PETSC_DETERMINE));
     LibmeshPetscCallQ(VecSetType(*x,((PetscObject)v)->type_name));
     LibmeshPetscCallQ(VecSetFromOptions(*x));
