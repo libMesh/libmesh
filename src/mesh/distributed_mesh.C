@@ -966,6 +966,9 @@ Node * DistributedMesh::add_node (Node * n)
     }
 #endif
 
+  // A new node invalidates any cached node ranges
+  this->clear_stored_ranges();
+
   n->add_extra_integers(_node_integer_names.size(),
                         _node_integer_default_values);
 

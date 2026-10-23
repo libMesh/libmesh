@@ -492,6 +492,9 @@ Node * ReplicatedMesh::add_point (const Point & p,
                       cast_int<dof_id_type>(_nodes.size()-1) : id).release();
       n->processor_id() = proc_id;
 
+      // A new node invalidates any cached node ranges
+      this->clear_stored_ranges();
+
       n->add_extra_integers(_node_integer_names.size(),
                             _node_integer_default_values);
 
@@ -547,6 +550,9 @@ Node * ReplicatedMesh::add_node (Node * n)
   else
    _next_unique_id = std::max(_next_unique_id, n->unique_id()+1);
 #endif
+
+  // A new node invalidates any cached node ranges
+  this->clear_stored_ranges();
 
   n->add_extra_integers(_node_integer_names.size(),
                         _node_integer_default_values);
