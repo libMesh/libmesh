@@ -2076,7 +2076,9 @@ void MeshBase::clear_stored_ranges()
   _element_stored_range.reset(nullptr);
   _const_active_local_element_stored_range.reset(nullptr);
   _node_stored_range.reset(nullptr);
+  _const_node_stored_range.reset(nullptr);
   _local_node_stored_range.reset(nullptr);
+  _unpartitioned_node_stored_range.reset(nullptr);
 }
 
 
