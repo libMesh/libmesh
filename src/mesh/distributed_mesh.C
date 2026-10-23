@@ -1722,6 +1722,10 @@ void DistributedMesh::renumber_nodes_and_elements ()
   // new elements
   this->update_parallel_id_counts();
 
+  // We've probably done *some* node removal and/or renumbering; let's
+  // clear caches to be safe.
+  this->clear_stored_ranges();
+
   // Make sure our caches are up to date and our
   // DofObjects are well packed
 #ifdef DEBUG

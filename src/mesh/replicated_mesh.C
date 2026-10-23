@@ -857,6 +857,10 @@ void ReplicatedMesh::renumber_nodes_and_elements ()
       }
     }
 
+  // We've probably done *some* node removal and/or renumbering; let's
+  // clear caches to be safe.
+  this->clear_stored_ranges();
+
   this->_preparation.has_removed_orphaned_nodes = true;
 
   libmesh_assert_equal_to (next_free_elem, _elements.size());
