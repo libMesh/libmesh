@@ -42,6 +42,7 @@
 #include "libmesh/sparsity_pattern.h"
 #include "libmesh/threads.h"
 #include "libmesh/static_condensation_dof_map.h"
+#include "libmesh/constraint_elimination_dof_map.h"
 #include "libmesh/system.h"
 #include "libmesh/parallel_fe_type.h"
 
@@ -956,6 +957,8 @@ void DofMap::clear()
   _matrices.clear();
   if (_sc)
     _sc->clear();
+  if (_constraint_elimination)
+    _constraint_elimination->clear();
 }
 
 
@@ -3155,6 +3158,17 @@ void DofMap::reinit_static_condensation()
 {
   if (_sc)
     _sc->reinit();
+}
+
+void DofMap::create_constraint_elimination(MeshBase & mesh, System & sys)
+{
+  _constraint_elimination = std::make_unique<ConstraintEliminationDofMap>(mesh, sys, *this);
+}
+
+void DofMap::reinit_constraint_elimination()
+{
+  if (_constraint_elimination)
+    _constraint_elimination->reinit();
 }
 
 unsigned int DofMap::add_variable(System & sys,

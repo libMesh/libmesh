@@ -103,13 +103,19 @@ void Build::sorted_connected_dofs(const Elem * elem,
     // we have the data necessary to init the reduced system matrix
     dofs_vi.clear();
 
+    // Unretained dofs still couple their constraining dofs, which constrained element matrices
+    // and vectors act on
+    dummy_unretained.clear();
+
     auto total_and_retained_from_scalar_dofs_functor =
-        [&dofs_vi](const Elem & /*elem*/,
-                   std::vector<dof_id_type> & dof_indices,
-                   const std::vector<dof_id_type> & scalar_dof_indices)
+        [&dofs_vi, this](const Elem & /*elem*/,
+                         std::vector<dof_id_type> & dof_indices,
+                         const std::vector<dof_id_type> & scalar_dof_indices)
     {
       dof_indices.insert(dof_indices.end(), scalar_dof_indices.begin(), scalar_dof_indices.end());
-      dofs_vi.insert(dofs_vi.end(), scalar_dof_indices.begin(), scalar_dof_indices.end());
+      for (const auto scalar_dof : scalar_dof_indices)
+        (this->reduced->retain_scalar_dof(scalar_dof) ? dofs_vi : dummy_unretained)
+            .push_back(scalar_dof);
     };
 
     auto total_and_retained_from_field_dofs_functor =
@@ -120,8 +126,10 @@ void Build::sorted_connected_dofs(const Elem * elem,
                         const dof_id_type field_dof)
     {
       dof_indices.push_back(field_dof);
-      if (this->reduced->retain_field_dof(functor_elem, node_num, var_num))
-        dofs_vi.push_back(field_dof);
+      (this->reduced->retain_field_dof(functor_elem, node_num, var_num, field_dof)
+           ? dofs_vi
+           : dummy_unretained)
+          .push_back(field_dof);
     };
 
     dof_map.dof_indices(elem,
@@ -130,6 +138,18 @@ void Build::sorted_connected_dofs(const Elem * elem,
                         total_and_retained_from_scalar_dofs_functor,
                         total_and_retained_from_field_dofs_functor,
                         elem->p_level());
+
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
+    // Constraint rows reference unconstrained dofs only, so one level suffices
+    const auto & constraints = dof_map.get_dof_constraints();
+    for (const auto unretained : dummy_unretained)
+      if (const auto it = constraints.find(unretained); it != constraints.end())
+        for (const auto & [constraining_dof, weight] : it->second)
+          {
+            libmesh_ignore(weight);
+            dofs_vi.push_back(constraining_dof);
+          }
+#endif
   }
   else
     dof_map.dof_indices (elem, dofs_vi, vi);
