@@ -497,10 +497,11 @@ PetscErrorCode DMlibMeshCreateFieldDecompositionDM(DM dm, PetscInt dnumber, Pets
   LibmeshPetscCallQ(DMSetType(*ddm, DMLIBMESH));
   DM_libMesh * ddlm = (DM_libMesh *)((*ddm)->data);
   ddlm->sys = dlm->sys;
-  ddlm->varids = dlm->varids;
-  ddlm->varnames = dlm->varnames;
-  ddlm->blockids = dlm->blockids;
-  ddlm->blocknames = dlm->blocknames;
+  // Each DM owns, and DMDestroy_libMesh() deletes, its own variable and block maps
+  *ddlm->varids = *dlm->varids;
+  *ddlm->varnames = *dlm->varnames;
+  *ddlm->blockids = *dlm->blockids;
+  *ddlm->blocknames = *dlm->blocknames;
   ddlm->decomposition = new(std::vector<std::set<unsigned int>>);
   ddlm->decomposition_type = DMLIBMESH_FIELD_DECOMPOSITION;
   if (dnumber) {
@@ -552,10 +553,11 @@ PetscErrorCode DMlibMeshCreateDomainDecompositionDM(DM dm, PetscInt dnumber, Pet
   LibmeshPetscCallQ(DMSetType(*ddm, DMLIBMESH));
   DM_libMesh * ddlm = (DM_libMesh *)((*ddm)->data);
   ddlm->sys = dlm->sys;
-  ddlm->varids   = dlm->varids;
-  ddlm->varnames = dlm->varnames;
-  ddlm->blockids   = dlm->blockids;
-  ddlm->blocknames = dlm->blocknames;
+  // Each DM owns, and DMDestroy_libMesh() deletes, its own variable and block maps
+  *ddlm->varids   = *dlm->varids;
+  *ddlm->varnames = *dlm->varnames;
+  *ddlm->blockids   = *dlm->blockids;
+  *ddlm->blocknames = *dlm->blocknames;
   ddlm->decomposition = new(std::vector<std::set<unsigned int>>);
   ddlm->decomposition_type = DMLIBMESH_DOMAIN_DECOMPOSITION;
   if (dnumber) {
