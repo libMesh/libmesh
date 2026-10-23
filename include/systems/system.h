@@ -1989,6 +1989,18 @@ public:
     */
    bool has_static_condensation() const;
 
+  /**
+   * Eliminate constrained degrees of freedom from this system's matrices and from the solve, so
+   * that every remaining row is an equation in the unconstrained degrees of freedom. Call before
+   * \p init()
+   */
+  void create_constraint_elimination();
+
+  /**
+   * Whether this system eliminates constrained degrees of freedom
+   */
+  bool has_constraint_elimination() const;
+
   /*
    * If we have e.g. a element space constrained by spline values, we
    * can directly project functions only on the constrained basis; to

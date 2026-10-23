@@ -42,10 +42,12 @@ class Node;
  * DofMap, renumbered contiguously. Each retained degree of freedom keeps the rank that owns it in
  * the full space, so the reduced numbering on each rank preserves the full numbering order.
  *
- * Subclasses select the retained field degrees of freedom through \p retain_field_dof(). Static
- * condensation, for instance, retains the degrees of freedom on element boundaries. The
- * constraining degrees of freedom of every retained constrained degree of freedom are retained as
- * well, recursively, because constrained element matrices and vectors couple them.
+ * Subclasses select the retained degrees of freedom through \p retain_field_dof() and \p
+ * retain_scalar_dof(). Static condensation, for instance, retains the degrees of freedom on
+ * element boundaries, and constraint elimination retains the unconstrained ones. The constraining
+ * degrees of freedom of every constrained degree of freedom on an element are retained as well,
+ * whether or not the constrained one is, because constrained element matrices and vectors couple
+ * them.
  *
  * This class provides the reduced numbering (\p reduced_dof()), the reduced degrees of freedom of
  * each local element and variable (\p dof_indices()), the variables present in the reduced space
@@ -93,7 +95,7 @@ public:
 
   /**
    * \returns The reduced index of \p full_dof. \p full_dof must be retained and must be either
-   * local or retained on a local element
+   * local or used by a local element
    */
   dof_id_type reduced_dof(dof_id_type full_dof) const;
 
@@ -137,13 +139,25 @@ public:
   const std::vector<dof_id_type> & reduced_n_oz() const { return _reduced_noz; }
 
   /**
+   * \returns The reduced index of \p full_dof, or \p DofObject::invalid_id if \p full_dof is
+   * not retained. \p full_dof must be local or used by an active local element
+   */
+  dof_id_type find_reduced_dof(dof_id_type full_dof) const;
+
+  /**
    * Whether field degree of freedom \p field_dof of variable \p var_num on \p elem is retained.
    * \p node_num is the element-local node holding it, or \p invalid_uint for an element degree of
-   * freedom. Degrees of freedom of SCALAR variables are always retained
+   * freedom
    */
   virtual bool retain_field_dof(const Elem & elem,
                                 unsigned int node_num,
-                                unsigned int var_num) const = 0;
+                                unsigned int var_num,
+                                dof_id_type field_dof) const = 0;
+
+  /**
+   * Whether degree of freedom \p scalar_dof of a SCALAR variable is retained
+   */
+  virtual bool retain_scalar_dof(dof_id_type /*scalar_dof*/) const { return true; }
 
 protected:
   /**
@@ -182,6 +196,14 @@ private:
                                         std::vector<dof_id_type> & elem_var_dofs);
 
   /**
+   * Retain on \p elem the constraining degrees of freedom of \p full_dof, if it is constrained
+   */
+  void retain_constraining_dofs(const Elem * elem,
+                                dof_id_type full_dof,
+                                std::unordered_set<dof_id_type> & elem_seen,
+                                std::vector<dof_id_type> & elem_var_dofs);
+
+  /**
    * Record that \p full_dof is retained, on this rank or on its owner
    */
   void retain_dof(dof_id_type full_dof);
@@ -199,12 +221,15 @@ private:
   /// of freedom. Unretained degrees of freedom map to \p DofObject::invalid_id
   std::vector<dof_id_type> _local_full_to_reduced;
 
-  /// The reduced indices of the nonlocal retained degrees of freedom on local elements
+  /// The reduced indices of the nonlocal degrees of freedom on local elements, \p
+  /// DofObject::invalid_id for unretained ones
   std::unordered_map<dof_id_type, dof_id_type> _nonlocal_full_to_reduced;
 
-  /// Local retained degrees of freedom and, by owner, nonlocal ones. Only used during \p reinit()
+  /// Local retained degrees of freedom, nonlocal retained ones by owner, and nonlocal unretained
+  /// ones on local elements. Only used during \p reinit()
   std::unordered_set<dof_id_type> _local_retained_set;
   std::unordered_map<processor_id_type, std::unordered_set<dof_id_type>> _nonlocal_retained;
+  std::unordered_set<dof_id_type> _nonlocal_unretained;
 
   /// The reduced degrees of freedom of each active local element, by reduced variable number
   std::unordered_map<dof_id_type, std::vector<std::vector<dof_id_type>>> _elem_reduced_dofs;

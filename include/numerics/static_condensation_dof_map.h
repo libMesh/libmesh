@@ -83,7 +83,8 @@ public:
    */
   virtual bool retain_field_dof(const Elem & elem,
                                 unsigned int node_num,
-                                unsigned int var_num) const override;
+                                unsigned int var_num,
+                                dof_id_type field_dof) const override;
 
 protected:
   virtual void retained_dof_added(const Elem & elem, dof_id_type full_dof) override;

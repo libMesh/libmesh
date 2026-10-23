@@ -230,6 +230,9 @@ private:
   /// A dummy work vector to avoid repeated memory allocations
   std::vector<dof_id_type> dummy_vec;
 
+  /// A work vector of the unretained dofs on an element, when building a reduced space pattern
+  std::vector<dof_id_type> dummy_unretained;
+
   void handle_vi_vj(const std::vector<dof_id_type> & element_dofs_i,
                     const std::vector<dof_id_type> & element_dofs_j);
 

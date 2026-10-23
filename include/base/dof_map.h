@@ -71,6 +71,7 @@ class System;
 class NonlinearImplicitSystem;
 class StaticCondensationDofMap;
 class ReducedDofMap;
+class ConstraintEliminationDofMap;
 template <typename T> class DenseVectorBase;
 template <typename T> class DenseVector;
 template <typename T> class DenseMatrix;
@@ -1825,6 +1826,28 @@ public:
    */
   void reinit_static_condensation();
 
+  /**
+   * Add a map of the unconstrained degrees of freedom, so that solves can eliminate the
+   * constrained ones
+   */
+  void create_constraint_elimination(MeshBase & mesh, System & system);
+
+  /**
+   * Whether a user has requested (and we've built) a constraint elimination object
+   */
+  bool has_constraint_elimination() const { return _constraint_elimination.get(); }
+
+  /**
+   * @returns The map of the unconstrained degrees of freedom. The map should already have been added
+   * with \p create_constraint_elimination() before a call to this API.
+   */
+  const ConstraintEliminationDofMap & get_constraint_elimination() const;
+
+  /**
+   * Calls reinit on the constraint elimination map if it exists
+   */
+  void reinit_constraint_elimination();
+
 private:
 
   /**
@@ -2349,6 +2372,10 @@ private:
 
   /// Static condensation class
   std::unique_ptr<StaticCondensationDofMap> _sc;
+
+  /// The map of the unconstrained degrees of freedom, used for building spaces
+  /// in which the constraints of \p this object have been eliminated.
+  std::unique_ptr<ConstraintEliminationDofMap> _constraint_elimination;
 };
 
 
@@ -2891,6 +2918,13 @@ const StaticCondensationDofMap & DofMap::get_static_condensation() const
 {
   libmesh_assert(_sc);
   return *_sc;
+}
+
+inline
+const ConstraintEliminationDofMap & DofMap::get_constraint_elimination() const
+{
+  libmesh_assert(_constraint_elimination);
+  return *_constraint_elimination;
 }
 
 inline const std::pair<unsigned int, unsigned int> &
