@@ -283,15 +283,16 @@ am__DEPENDENCIES_2 = $(am__DEPENDENCIES_1) $(am__DEPENDENCIES_1)
 @LIBMESH_DBG_MODE_TRUE@libmesh_dbg_la_DEPENDENCIES =  \
 @LIBMESH_DBG_MODE_TRUE@	contrib/libcontrib_dbg.la \
 @LIBMESH_DBG_MODE_TRUE@	$(am__DEPENDENCIES_2)
-am__libmesh_dbg_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
-	src/base/dof_map.C src/base/dof_map_base.C \
-	src/base/dof_map_constraints.C src/base/dof_object.C \
-	src/base/libmesh.C src/base/libmesh_common.C \
-	src/base/libmesh_exceptions.C src/base/libmesh_singleton.C \
-	src/base/libmesh_version.C src/base/periodic_boundaries.C \
-	src/base/periodic_boundary.C src/base/periodic_boundary_base.C \
-	src/base/print_trace.C src/base/reduced_dof_map.C \
-	src/base/reference_counted_object.C \
+am__libmesh_dbg_la_SOURCES_DIST =  \
+	src/base/constraint_elimination_dof_map.C \
+	src/base/dirichlet_boundary.C src/base/dof_map.C \
+	src/base/dof_map_base.C src/base/dof_map_constraints.C \
+	src/base/dof_object.C src/base/libmesh.C \
+	src/base/libmesh_common.C src/base/libmesh_exceptions.C \
+	src/base/libmesh_singleton.C src/base/libmesh_version.C \
+	src/base/periodic_boundaries.C src/base/periodic_boundary.C \
+	src/base/periodic_boundary_base.C src/base/print_trace.C \
+	src/base/reduced_dof_map.C src/base/reference_counted_object.C \
 	src/base/reference_counter.C src/base/single_predicates.C \
 	src/base/sparsity_pattern.C src/base/variable.C \
 	src/error_estimation/adjoint_refinement_estimator.C \
@@ -449,8 +450,9 @@ am__libmesh_dbg_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
 	src/numerics/petsc_matrix_shell_matrix.C \
 	src/numerics/petsc_preconditioner.C \
 	src/numerics/petsc_shell_matrix.C src/numerics/petsc_vector.C \
-	src/numerics/preconditioner.C src/numerics/shell_matrix.C \
-	src/numerics/sparse_matrix.C \
+	src/numerics/preconditioner.C \
+	src/numerics/reduced_sparse_matrix.C \
+	src/numerics/shell_matrix.C src/numerics/sparse_matrix.C \
 	src/numerics/sparse_shell_matrix.C \
 	src/numerics/static_condensation.C \
 	src/numerics/static_condensation_dof_map.C \
@@ -614,7 +616,9 @@ am__libmesh_dbg_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
 	src/utils/tree.C src/utils/tree_node.C src/utils/utility.C \
 	src/utils/xdr_cxx.C
 am__dirstamp = $(am__leading_dot)dirstamp
-am__objects_1 = src/base/libmesh_dbg_la-dirichlet_boundary.lo \
+am__objects_1 =  \
+	src/base/libmesh_dbg_la-constraint_elimination_dof_map.lo \
+	src/base/libmesh_dbg_la-dirichlet_boundary.lo \
 	src/base/libmesh_dbg_la-dof_map.lo \
 	src/base/libmesh_dbg_la-dof_map_base.lo \
 	src/base/libmesh_dbg_la-dof_map_constraints.lo \
@@ -901,6 +905,7 @@ am__objects_1 = src/base/libmesh_dbg_la-dirichlet_boundary.lo \
 	src/numerics/libmesh_dbg_la-petsc_shell_matrix.lo \
 	src/numerics/libmesh_dbg_la-petsc_vector.lo \
 	src/numerics/libmesh_dbg_la-preconditioner.lo \
+	src/numerics/libmesh_dbg_la-reduced_sparse_matrix.lo \
 	src/numerics/libmesh_dbg_la-shell_matrix.lo \
 	src/numerics/libmesh_dbg_la-sparse_matrix.lo \
 	src/numerics/libmesh_dbg_la-sparse_shell_matrix.lo \
@@ -1111,15 +1116,16 @@ libmesh_dbg_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 @LIBMESH_DEVEL_MODE_TRUE@libmesh_devel_la_DEPENDENCIES =  \
 @LIBMESH_DEVEL_MODE_TRUE@	contrib/libcontrib_devel.la \
 @LIBMESH_DEVEL_MODE_TRUE@	$(am__DEPENDENCIES_2)
-am__libmesh_devel_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
-	src/base/dof_map.C src/base/dof_map_base.C \
-	src/base/dof_map_constraints.C src/base/dof_object.C \
-	src/base/libmesh.C src/base/libmesh_common.C \
-	src/base/libmesh_exceptions.C src/base/libmesh_singleton.C \
-	src/base/libmesh_version.C src/base/periodic_boundaries.C \
-	src/base/periodic_boundary.C src/base/periodic_boundary_base.C \
-	src/base/print_trace.C src/base/reduced_dof_map.C \
-	src/base/reference_counted_object.C \
+am__libmesh_devel_la_SOURCES_DIST =  \
+	src/base/constraint_elimination_dof_map.C \
+	src/base/dirichlet_boundary.C src/base/dof_map.C \
+	src/base/dof_map_base.C src/base/dof_map_constraints.C \
+	src/base/dof_object.C src/base/libmesh.C \
+	src/base/libmesh_common.C src/base/libmesh_exceptions.C \
+	src/base/libmesh_singleton.C src/base/libmesh_version.C \
+	src/base/periodic_boundaries.C src/base/periodic_boundary.C \
+	src/base/periodic_boundary_base.C src/base/print_trace.C \
+	src/base/reduced_dof_map.C src/base/reference_counted_object.C \
 	src/base/reference_counter.C src/base/single_predicates.C \
 	src/base/sparsity_pattern.C src/base/variable.C \
 	src/error_estimation/adjoint_refinement_estimator.C \
@@ -1277,8 +1283,9 @@ am__libmesh_devel_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
 	src/numerics/petsc_matrix_shell_matrix.C \
 	src/numerics/petsc_preconditioner.C \
 	src/numerics/petsc_shell_matrix.C src/numerics/petsc_vector.C \
-	src/numerics/preconditioner.C src/numerics/shell_matrix.C \
-	src/numerics/sparse_matrix.C \
+	src/numerics/preconditioner.C \
+	src/numerics/reduced_sparse_matrix.C \
+	src/numerics/shell_matrix.C src/numerics/sparse_matrix.C \
 	src/numerics/sparse_shell_matrix.C \
 	src/numerics/static_condensation.C \
 	src/numerics/static_condensation_dof_map.C \
@@ -1441,7 +1448,9 @@ am__libmesh_devel_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
 	src/utils/timestamp.C src/utils/topology_map.C \
 	src/utils/tree.C src/utils/tree_node.C src/utils/utility.C \
 	src/utils/xdr_cxx.C
-am__objects_2 = src/base/libmesh_devel_la-dirichlet_boundary.lo \
+am__objects_2 =  \
+	src/base/libmesh_devel_la-constraint_elimination_dof_map.lo \
+	src/base/libmesh_devel_la-dirichlet_boundary.lo \
 	src/base/libmesh_devel_la-dof_map.lo \
 	src/base/libmesh_devel_la-dof_map_base.lo \
 	src/base/libmesh_devel_la-dof_map_constraints.lo \
@@ -1728,6 +1737,7 @@ am__objects_2 = src/base/libmesh_devel_la-dirichlet_boundary.lo \
 	src/numerics/libmesh_devel_la-petsc_shell_matrix.lo \
 	src/numerics/libmesh_devel_la-petsc_vector.lo \
 	src/numerics/libmesh_devel_la-preconditioner.lo \
+	src/numerics/libmesh_devel_la-reduced_sparse_matrix.lo \
 	src/numerics/libmesh_devel_la-shell_matrix.lo \
 	src/numerics/libmesh_devel_la-sparse_matrix.lo \
 	src/numerics/libmesh_devel_la-sparse_shell_matrix.lo \
@@ -1935,15 +1945,16 @@ libmesh_devel_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 @LIBMESH_OPROF_MODE_TRUE@libmesh_oprof_la_DEPENDENCIES =  \
 @LIBMESH_OPROF_MODE_TRUE@	contrib/libcontrib_oprof.la \
 @LIBMESH_OPROF_MODE_TRUE@	$(am__DEPENDENCIES_2)
-am__libmesh_oprof_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
-	src/base/dof_map.C src/base/dof_map_base.C \
-	src/base/dof_map_constraints.C src/base/dof_object.C \
-	src/base/libmesh.C src/base/libmesh_common.C \
-	src/base/libmesh_exceptions.C src/base/libmesh_singleton.C \
-	src/base/libmesh_version.C src/base/periodic_boundaries.C \
-	src/base/periodic_boundary.C src/base/periodic_boundary_base.C \
-	src/base/print_trace.C src/base/reduced_dof_map.C \
-	src/base/reference_counted_object.C \
+am__libmesh_oprof_la_SOURCES_DIST =  \
+	src/base/constraint_elimination_dof_map.C \
+	src/base/dirichlet_boundary.C src/base/dof_map.C \
+	src/base/dof_map_base.C src/base/dof_map_constraints.C \
+	src/base/dof_object.C src/base/libmesh.C \
+	src/base/libmesh_common.C src/base/libmesh_exceptions.C \
+	src/base/libmesh_singleton.C src/base/libmesh_version.C \
+	src/base/periodic_boundaries.C src/base/periodic_boundary.C \
+	src/base/periodic_boundary_base.C src/base/print_trace.C \
+	src/base/reduced_dof_map.C src/base/reference_counted_object.C \
 	src/base/reference_counter.C src/base/single_predicates.C \
 	src/base/sparsity_pattern.C src/base/variable.C \
 	src/error_estimation/adjoint_refinement_estimator.C \
@@ -2101,8 +2112,9 @@ am__libmesh_oprof_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
 	src/numerics/petsc_matrix_shell_matrix.C \
 	src/numerics/petsc_preconditioner.C \
 	src/numerics/petsc_shell_matrix.C src/numerics/petsc_vector.C \
-	src/numerics/preconditioner.C src/numerics/shell_matrix.C \
-	src/numerics/sparse_matrix.C \
+	src/numerics/preconditioner.C \
+	src/numerics/reduced_sparse_matrix.C \
+	src/numerics/shell_matrix.C src/numerics/sparse_matrix.C \
 	src/numerics/sparse_shell_matrix.C \
 	src/numerics/static_condensation.C \
 	src/numerics/static_condensation_dof_map.C \
@@ -2265,7 +2277,9 @@ am__libmesh_oprof_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
 	src/utils/timestamp.C src/utils/topology_map.C \
 	src/utils/tree.C src/utils/tree_node.C src/utils/utility.C \
 	src/utils/xdr_cxx.C
-am__objects_3 = src/base/libmesh_oprof_la-dirichlet_boundary.lo \
+am__objects_3 =  \
+	src/base/libmesh_oprof_la-constraint_elimination_dof_map.lo \
+	src/base/libmesh_oprof_la-dirichlet_boundary.lo \
 	src/base/libmesh_oprof_la-dof_map.lo \
 	src/base/libmesh_oprof_la-dof_map_base.lo \
 	src/base/libmesh_oprof_la-dof_map_constraints.lo \
@@ -2552,6 +2566,7 @@ am__objects_3 = src/base/libmesh_oprof_la-dirichlet_boundary.lo \
 	src/numerics/libmesh_oprof_la-petsc_shell_matrix.lo \
 	src/numerics/libmesh_oprof_la-petsc_vector.lo \
 	src/numerics/libmesh_oprof_la-preconditioner.lo \
+	src/numerics/libmesh_oprof_la-reduced_sparse_matrix.lo \
 	src/numerics/libmesh_oprof_la-shell_matrix.lo \
 	src/numerics/libmesh_oprof_la-sparse_matrix.lo \
 	src/numerics/libmesh_oprof_la-sparse_shell_matrix.lo \
@@ -2759,15 +2774,16 @@ libmesh_oprof_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 @LIBMESH_OPT_MODE_TRUE@libmesh_opt_la_DEPENDENCIES =  \
 @LIBMESH_OPT_MODE_TRUE@	contrib/libcontrib_opt.la \
 @LIBMESH_OPT_MODE_TRUE@	$(am__DEPENDENCIES_2)
-am__libmesh_opt_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
-	src/base/dof_map.C src/base/dof_map_base.C \
-	src/base/dof_map_constraints.C src/base/dof_object.C \
-	src/base/libmesh.C src/base/libmesh_common.C \
-	src/base/libmesh_exceptions.C src/base/libmesh_singleton.C \
-	src/base/libmesh_version.C src/base/periodic_boundaries.C \
-	src/base/periodic_boundary.C src/base/periodic_boundary_base.C \
-	src/base/print_trace.C src/base/reduced_dof_map.C \
-	src/base/reference_counted_object.C \
+am__libmesh_opt_la_SOURCES_DIST =  \
+	src/base/constraint_elimination_dof_map.C \
+	src/base/dirichlet_boundary.C src/base/dof_map.C \
+	src/base/dof_map_base.C src/base/dof_map_constraints.C \
+	src/base/dof_object.C src/base/libmesh.C \
+	src/base/libmesh_common.C src/base/libmesh_exceptions.C \
+	src/base/libmesh_singleton.C src/base/libmesh_version.C \
+	src/base/periodic_boundaries.C src/base/periodic_boundary.C \
+	src/base/periodic_boundary_base.C src/base/print_trace.C \
+	src/base/reduced_dof_map.C src/base/reference_counted_object.C \
 	src/base/reference_counter.C src/base/single_predicates.C \
 	src/base/sparsity_pattern.C src/base/variable.C \
 	src/error_estimation/adjoint_refinement_estimator.C \
@@ -2925,8 +2941,9 @@ am__libmesh_opt_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
 	src/numerics/petsc_matrix_shell_matrix.C \
 	src/numerics/petsc_preconditioner.C \
 	src/numerics/petsc_shell_matrix.C src/numerics/petsc_vector.C \
-	src/numerics/preconditioner.C src/numerics/shell_matrix.C \
-	src/numerics/sparse_matrix.C \
+	src/numerics/preconditioner.C \
+	src/numerics/reduced_sparse_matrix.C \
+	src/numerics/shell_matrix.C src/numerics/sparse_matrix.C \
 	src/numerics/sparse_shell_matrix.C \
 	src/numerics/static_condensation.C \
 	src/numerics/static_condensation_dof_map.C \
@@ -3089,7 +3106,9 @@ am__libmesh_opt_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
 	src/utils/timestamp.C src/utils/topology_map.C \
 	src/utils/tree.C src/utils/tree_node.C src/utils/utility.C \
 	src/utils/xdr_cxx.C
-am__objects_4 = src/base/libmesh_opt_la-dirichlet_boundary.lo \
+am__objects_4 =  \
+	src/base/libmesh_opt_la-constraint_elimination_dof_map.lo \
+	src/base/libmesh_opt_la-dirichlet_boundary.lo \
 	src/base/libmesh_opt_la-dof_map.lo \
 	src/base/libmesh_opt_la-dof_map_base.lo \
 	src/base/libmesh_opt_la-dof_map_constraints.lo \
@@ -3376,6 +3395,7 @@ am__objects_4 = src/base/libmesh_opt_la-dirichlet_boundary.lo \
 	src/numerics/libmesh_opt_la-petsc_shell_matrix.lo \
 	src/numerics/libmesh_opt_la-petsc_vector.lo \
 	src/numerics/libmesh_opt_la-preconditioner.lo \
+	src/numerics/libmesh_opt_la-reduced_sparse_matrix.lo \
 	src/numerics/libmesh_opt_la-shell_matrix.lo \
 	src/numerics/libmesh_opt_la-sparse_matrix.lo \
 	src/numerics/libmesh_opt_la-sparse_shell_matrix.lo \
@@ -3582,15 +3602,16 @@ libmesh_opt_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 @LIBMESH_PROF_MODE_TRUE@libmesh_prof_la_DEPENDENCIES =  \
 @LIBMESH_PROF_MODE_TRUE@	contrib/libcontrib_prof.la \
 @LIBMESH_PROF_MODE_TRUE@	$(am__DEPENDENCIES_2)
-am__libmesh_prof_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
-	src/base/dof_map.C src/base/dof_map_base.C \
-	src/base/dof_map_constraints.C src/base/dof_object.C \
-	src/base/libmesh.C src/base/libmesh_common.C \
-	src/base/libmesh_exceptions.C src/base/libmesh_singleton.C \
-	src/base/libmesh_version.C src/base/periodic_boundaries.C \
-	src/base/periodic_boundary.C src/base/periodic_boundary_base.C \
-	src/base/print_trace.C src/base/reduced_dof_map.C \
-	src/base/reference_counted_object.C \
+am__libmesh_prof_la_SOURCES_DIST =  \
+	src/base/constraint_elimination_dof_map.C \
+	src/base/dirichlet_boundary.C src/base/dof_map.C \
+	src/base/dof_map_base.C src/base/dof_map_constraints.C \
+	src/base/dof_object.C src/base/libmesh.C \
+	src/base/libmesh_common.C src/base/libmesh_exceptions.C \
+	src/base/libmesh_singleton.C src/base/libmesh_version.C \
+	src/base/periodic_boundaries.C src/base/periodic_boundary.C \
+	src/base/periodic_boundary_base.C src/base/print_trace.C \
+	src/base/reduced_dof_map.C src/base/reference_counted_object.C \
 	src/base/reference_counter.C src/base/single_predicates.C \
 	src/base/sparsity_pattern.C src/base/variable.C \
 	src/error_estimation/adjoint_refinement_estimator.C \
@@ -3748,8 +3769,9 @@ am__libmesh_prof_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
 	src/numerics/petsc_matrix_shell_matrix.C \
 	src/numerics/petsc_preconditioner.C \
 	src/numerics/petsc_shell_matrix.C src/numerics/petsc_vector.C \
-	src/numerics/preconditioner.C src/numerics/shell_matrix.C \
-	src/numerics/sparse_matrix.C \
+	src/numerics/preconditioner.C \
+	src/numerics/reduced_sparse_matrix.C \
+	src/numerics/shell_matrix.C src/numerics/sparse_matrix.C \
 	src/numerics/sparse_shell_matrix.C \
 	src/numerics/static_condensation.C \
 	src/numerics/static_condensation_dof_map.C \
@@ -3912,7 +3934,9 @@ am__libmesh_prof_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
 	src/utils/timestamp.C src/utils/topology_map.C \
 	src/utils/tree.C src/utils/tree_node.C src/utils/utility.C \
 	src/utils/xdr_cxx.C
-am__objects_5 = src/base/libmesh_prof_la-dirichlet_boundary.lo \
+am__objects_5 =  \
+	src/base/libmesh_prof_la-constraint_elimination_dof_map.lo \
+	src/base/libmesh_prof_la-dirichlet_boundary.lo \
 	src/base/libmesh_prof_la-dof_map.lo \
 	src/base/libmesh_prof_la-dof_map_base.lo \
 	src/base/libmesh_prof_la-dof_map_constraints.lo \
@@ -4199,6 +4223,7 @@ am__objects_5 = src/base/libmesh_prof_la-dirichlet_boundary.lo \
 	src/numerics/libmesh_prof_la-petsc_shell_matrix.lo \
 	src/numerics/libmesh_prof_la-petsc_vector.lo \
 	src/numerics/libmesh_prof_la-preconditioner.lo \
+	src/numerics/libmesh_prof_la-reduced_sparse_matrix.lo \
 	src/numerics/libmesh_prof_la-shell_matrix.lo \
 	src/numerics/libmesh_prof_la-sparse_matrix.lo \
 	src/numerics/libmesh_prof_la-sparse_shell_matrix.lo \
@@ -5057,6 +5082,7 @@ am__depfiles_remade = src/apps/$(DEPDIR)/amr_dbg-amr.Po \
 	src/apps/$(DEPDIR)/splitter_devel-splitter.Po \
 	src/apps/$(DEPDIR)/splitter_oprof-splitter.Po \
 	src/apps/$(DEPDIR)/splitter_opt-splitter.Po \
+	src/base/$(DEPDIR)/libmesh_dbg_la-constraint_elimination_dof_map.Plo \
 	src/base/$(DEPDIR)/libmesh_dbg_la-dirichlet_boundary.Plo \
 	src/base/$(DEPDIR)/libmesh_dbg_la-dof_map.Plo \
 	src/base/$(DEPDIR)/libmesh_dbg_la-dof_map_base.Plo \
@@ -5077,6 +5103,7 @@ am__depfiles_remade = src/apps/$(DEPDIR)/amr_dbg-amr.Po \
 	src/base/$(DEPDIR)/libmesh_dbg_la-single_predicates.Plo \
 	src/base/$(DEPDIR)/libmesh_dbg_la-sparsity_pattern.Plo \
 	src/base/$(DEPDIR)/libmesh_dbg_la-variable.Plo \
+	src/base/$(DEPDIR)/libmesh_devel_la-constraint_elimination_dof_map.Plo \
 	src/base/$(DEPDIR)/libmesh_devel_la-dirichlet_boundary.Plo \
 	src/base/$(DEPDIR)/libmesh_devel_la-dof_map.Plo \
 	src/base/$(DEPDIR)/libmesh_devel_la-dof_map_base.Plo \
@@ -5097,6 +5124,7 @@ am__depfiles_remade = src/apps/$(DEPDIR)/amr_dbg-amr.Po \
 	src/base/$(DEPDIR)/libmesh_devel_la-single_predicates.Plo \
 	src/base/$(DEPDIR)/libmesh_devel_la-sparsity_pattern.Plo \
 	src/base/$(DEPDIR)/libmesh_devel_la-variable.Plo \
+	src/base/$(DEPDIR)/libmesh_oprof_la-constraint_elimination_dof_map.Plo \
 	src/base/$(DEPDIR)/libmesh_oprof_la-dirichlet_boundary.Plo \
 	src/base/$(DEPDIR)/libmesh_oprof_la-dof_map.Plo \
 	src/base/$(DEPDIR)/libmesh_oprof_la-dof_map_base.Plo \
@@ -5117,6 +5145,7 @@ am__depfiles_remade = src/apps/$(DEPDIR)/amr_dbg-amr.Po \
 	src/base/$(DEPDIR)/libmesh_oprof_la-single_predicates.Plo \
 	src/base/$(DEPDIR)/libmesh_oprof_la-sparsity_pattern.Plo \
 	src/base/$(DEPDIR)/libmesh_oprof_la-variable.Plo \
+	src/base/$(DEPDIR)/libmesh_opt_la-constraint_elimination_dof_map.Plo \
 	src/base/$(DEPDIR)/libmesh_opt_la-dirichlet_boundary.Plo \
 	src/base/$(DEPDIR)/libmesh_opt_la-dof_map.Plo \
 	src/base/$(DEPDIR)/libmesh_opt_la-dof_map_base.Plo \
@@ -5137,6 +5166,7 @@ am__depfiles_remade = src/apps/$(DEPDIR)/amr_dbg-amr.Po \
 	src/base/$(DEPDIR)/libmesh_opt_la-single_predicates.Plo \
 	src/base/$(DEPDIR)/libmesh_opt_la-sparsity_pattern.Plo \
 	src/base/$(DEPDIR)/libmesh_opt_la-variable.Plo \
+	src/base/$(DEPDIR)/libmesh_prof_la-constraint_elimination_dof_map.Plo \
 	src/base/$(DEPDIR)/libmesh_prof_la-dirichlet_boundary.Plo \
 	src/base/$(DEPDIR)/libmesh_prof_la-dof_map.Plo \
 	src/base/$(DEPDIR)/libmesh_prof_la-dof_map_base.Plo \
@@ -6396,6 +6426,7 @@ am__depfiles_remade = src/apps/$(DEPDIR)/amr_dbg-amr.Po \
 	src/numerics/$(DEPDIR)/libmesh_dbg_la-petsc_shell_matrix.Plo \
 	src/numerics/$(DEPDIR)/libmesh_dbg_la-petsc_vector.Plo \
 	src/numerics/$(DEPDIR)/libmesh_dbg_la-preconditioner.Plo \
+	src/numerics/$(DEPDIR)/libmesh_dbg_la-reduced_sparse_matrix.Plo \
 	src/numerics/$(DEPDIR)/libmesh_dbg_la-shell_matrix.Plo \
 	src/numerics/$(DEPDIR)/libmesh_dbg_la-sparse_matrix.Plo \
 	src/numerics/$(DEPDIR)/libmesh_dbg_la-sparse_shell_matrix.Plo \
@@ -6434,6 +6465,7 @@ am__depfiles_remade = src/apps/$(DEPDIR)/amr_dbg-amr.Po \
 	src/numerics/$(DEPDIR)/libmesh_devel_la-petsc_shell_matrix.Plo \
 	src/numerics/$(DEPDIR)/libmesh_devel_la-petsc_vector.Plo \
 	src/numerics/$(DEPDIR)/libmesh_devel_la-preconditioner.Plo \
+	src/numerics/$(DEPDIR)/libmesh_devel_la-reduced_sparse_matrix.Plo \
 	src/numerics/$(DEPDIR)/libmesh_devel_la-shell_matrix.Plo \
 	src/numerics/$(DEPDIR)/libmesh_devel_la-sparse_matrix.Plo \
 	src/numerics/$(DEPDIR)/libmesh_devel_la-sparse_shell_matrix.Plo \
@@ -6472,6 +6504,7 @@ am__depfiles_remade = src/apps/$(DEPDIR)/amr_dbg-amr.Po \
 	src/numerics/$(DEPDIR)/libmesh_oprof_la-petsc_shell_matrix.Plo \
 	src/numerics/$(DEPDIR)/libmesh_oprof_la-petsc_vector.Plo \
 	src/numerics/$(DEPDIR)/libmesh_oprof_la-preconditioner.Plo \
+	src/numerics/$(DEPDIR)/libmesh_oprof_la-reduced_sparse_matrix.Plo \
 	src/numerics/$(DEPDIR)/libmesh_oprof_la-shell_matrix.Plo \
 	src/numerics/$(DEPDIR)/libmesh_oprof_la-sparse_matrix.Plo \
 	src/numerics/$(DEPDIR)/libmesh_oprof_la-sparse_shell_matrix.Plo \
@@ -6510,6 +6543,7 @@ am__depfiles_remade = src/apps/$(DEPDIR)/amr_dbg-amr.Po \
 	src/numerics/$(DEPDIR)/libmesh_opt_la-petsc_shell_matrix.Plo \
 	src/numerics/$(DEPDIR)/libmesh_opt_la-petsc_vector.Plo \
 	src/numerics/$(DEPDIR)/libmesh_opt_la-preconditioner.Plo \
+	src/numerics/$(DEPDIR)/libmesh_opt_la-reduced_sparse_matrix.Plo \
 	src/numerics/$(DEPDIR)/libmesh_opt_la-shell_matrix.Plo \
 	src/numerics/$(DEPDIR)/libmesh_opt_la-sparse_matrix.Plo \
 	src/numerics/$(DEPDIR)/libmesh_opt_la-sparse_shell_matrix.Plo \
@@ -6548,6 +6582,7 @@ am__depfiles_remade = src/apps/$(DEPDIR)/amr_dbg-amr.Po \
 	src/numerics/$(DEPDIR)/libmesh_prof_la-petsc_shell_matrix.Plo \
 	src/numerics/$(DEPDIR)/libmesh_prof_la-petsc_vector.Plo \
 	src/numerics/$(DEPDIR)/libmesh_prof_la-preconditioner.Plo \
+	src/numerics/$(DEPDIR)/libmesh_prof_la-reduced_sparse_matrix.Plo \
 	src/numerics/$(DEPDIR)/libmesh_prof_la-shell_matrix.Plo \
 	src/numerics/$(DEPDIR)/libmesh_prof_la-sparse_matrix.Plo \
 	src/numerics/$(DEPDIR)/libmesh_prof_la-sparse_shell_matrix.Plo \
@@ -8184,6 +8219,7 @@ DISTCLEANFILES = \
 
 # Do not edit - automatically generated from ./rebuild_libmesh_SOURCES.sh
 libmesh_SOURCES = \
+        src/base/constraint_elimination_dof_map.C \
         src/base/dirichlet_boundary.C \
         src/base/dof_map.C \
         src/base/dof_map_base.C \
@@ -8472,6 +8508,7 @@ libmesh_SOURCES = \
         src/numerics/petsc_shell_matrix.C \
         src/numerics/petsc_vector.C \
         src/numerics/preconditioner.C \
+        src/numerics/reduced_sparse_matrix.C \
         src/numerics/shell_matrix.C \
         src/numerics/sparse_matrix.C \
         src/numerics/sparse_shell_matrix.C \
@@ -9223,6 +9260,8 @@ src/base/$(am__dirstamp):
 src/base/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) src/base/$(DEPDIR)
 	@: >>src/base/$(DEPDIR)/$(am__dirstamp)
+src/base/libmesh_dbg_la-constraint_elimination_dof_map.lo:  \
+	src/base/$(am__dirstamp) src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_dbg_la-dirichlet_boundary.lo:  \
 	src/base/$(am__dirstamp) src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_dbg_la-dof_map.lo: src/base/$(am__dirstamp) \
@@ -9880,6 +9919,9 @@ src/numerics/libmesh_dbg_la-petsc_vector.lo:  \
 src/numerics/libmesh_dbg_la-preconditioner.lo:  \
 	src/numerics/$(am__dirstamp) \
 	src/numerics/$(DEPDIR)/$(am__dirstamp)
+src/numerics/libmesh_dbg_la-reduced_sparse_matrix.lo:  \
+	src/numerics/$(am__dirstamp) \
+	src/numerics/$(DEPDIR)/$(am__dirstamp)
 src/numerics/libmesh_dbg_la-shell_matrix.lo:  \
 	src/numerics/$(am__dirstamp) \
 	src/numerics/$(DEPDIR)/$(am__dirstamp)
@@ -10499,6 +10541,8 @@ src/utils/libmesh_dbg_la-xdr_cxx.lo: src/utils/$(am__dirstamp) \
 
 libmesh_dbg.la: $(libmesh_dbg_la_OBJECTS) $(libmesh_dbg_la_DEPENDENCIES) $(EXTRA_libmesh_dbg_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(libmesh_dbg_la_LINK) $(am_libmesh_dbg_la_rpath) $(libmesh_dbg_la_OBJECTS) $(libmesh_dbg_la_LIBADD) $(LIBS)
+src/base/libmesh_devel_la-constraint_elimination_dof_map.lo:  \
+	src/base/$(am__dirstamp) src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_devel_la-dirichlet_boundary.lo:  \
 	src/base/$(am__dirstamp) src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_devel_la-dof_map.lo: src/base/$(am__dirstamp) \
@@ -11120,6 +11164,9 @@ src/numerics/libmesh_devel_la-petsc_vector.lo:  \
 src/numerics/libmesh_devel_la-preconditioner.lo:  \
 	src/numerics/$(am__dirstamp) \
 	src/numerics/$(DEPDIR)/$(am__dirstamp)
+src/numerics/libmesh_devel_la-reduced_sparse_matrix.lo:  \
+	src/numerics/$(am__dirstamp) \
+	src/numerics/$(DEPDIR)/$(am__dirstamp)
 src/numerics/libmesh_devel_la-shell_matrix.lo:  \
 	src/numerics/$(am__dirstamp) \
 	src/numerics/$(DEPDIR)/$(am__dirstamp)
@@ -11688,6 +11735,8 @@ src/utils/libmesh_devel_la-xdr_cxx.lo: src/utils/$(am__dirstamp) \
 
 libmesh_devel.la: $(libmesh_devel_la_OBJECTS) $(libmesh_devel_la_DEPENDENCIES) $(EXTRA_libmesh_devel_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(libmesh_devel_la_LINK) $(am_libmesh_devel_la_rpath) $(libmesh_devel_la_OBJECTS) $(libmesh_devel_la_LIBADD) $(LIBS)
+src/base/libmesh_oprof_la-constraint_elimination_dof_map.lo:  \
+	src/base/$(am__dirstamp) src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_oprof_la-dirichlet_boundary.lo:  \
 	src/base/$(am__dirstamp) src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_oprof_la-dof_map.lo: src/base/$(am__dirstamp) \
@@ -12309,6 +12358,9 @@ src/numerics/libmesh_oprof_la-petsc_vector.lo:  \
 src/numerics/libmesh_oprof_la-preconditioner.lo:  \
 	src/numerics/$(am__dirstamp) \
 	src/numerics/$(DEPDIR)/$(am__dirstamp)
+src/numerics/libmesh_oprof_la-reduced_sparse_matrix.lo:  \
+	src/numerics/$(am__dirstamp) \
+	src/numerics/$(DEPDIR)/$(am__dirstamp)
 src/numerics/libmesh_oprof_la-shell_matrix.lo:  \
 	src/numerics/$(am__dirstamp) \
 	src/numerics/$(DEPDIR)/$(am__dirstamp)
@@ -12877,6 +12929,8 @@ src/utils/libmesh_oprof_la-xdr_cxx.lo: src/utils/$(am__dirstamp) \
 
 libmesh_oprof.la: $(libmesh_oprof_la_OBJECTS) $(libmesh_oprof_la_DEPENDENCIES) $(EXTRA_libmesh_oprof_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(libmesh_oprof_la_LINK) $(am_libmesh_oprof_la_rpath) $(libmesh_oprof_la_OBJECTS) $(libmesh_oprof_la_LIBADD) $(LIBS)
+src/base/libmesh_opt_la-constraint_elimination_dof_map.lo:  \
+	src/base/$(am__dirstamp) src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_opt_la-dirichlet_boundary.lo:  \
 	src/base/$(am__dirstamp) src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_opt_la-dof_map.lo: src/base/$(am__dirstamp) \
@@ -13498,6 +13552,9 @@ src/numerics/libmesh_opt_la-petsc_vector.lo:  \
 src/numerics/libmesh_opt_la-preconditioner.lo:  \
 	src/numerics/$(am__dirstamp) \
 	src/numerics/$(DEPDIR)/$(am__dirstamp)
+src/numerics/libmesh_opt_la-reduced_sparse_matrix.lo:  \
+	src/numerics/$(am__dirstamp) \
+	src/numerics/$(DEPDIR)/$(am__dirstamp)
 src/numerics/libmesh_opt_la-shell_matrix.lo:  \
 	src/numerics/$(am__dirstamp) \
 	src/numerics/$(DEPDIR)/$(am__dirstamp)
@@ -14063,6 +14120,8 @@ src/utils/libmesh_opt_la-xdr_cxx.lo: src/utils/$(am__dirstamp) \
 
 libmesh_opt.la: $(libmesh_opt_la_OBJECTS) $(libmesh_opt_la_DEPENDENCIES) $(EXTRA_libmesh_opt_la_DEPENDENCIES) 
 	$(AM_V_CXXLD)$(libmesh_opt_la_LINK) $(am_libmesh_opt_la_rpath) $(libmesh_opt_la_OBJECTS) $(libmesh_opt_la_LIBADD) $(LIBS)
+src/base/libmesh_prof_la-constraint_elimination_dof_map.lo:  \
+	src/base/$(am__dirstamp) src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_prof_la-dirichlet_boundary.lo:  \
 	src/base/$(am__dirstamp) src/base/$(DEPDIR)/$(am__dirstamp)
 src/base/libmesh_prof_la-dof_map.lo: src/base/$(am__dirstamp) \
@@ -14682,6 +14741,9 @@ src/numerics/libmesh_prof_la-petsc_vector.lo:  \
 	src/numerics/$(am__dirstamp) \
 	src/numerics/$(DEPDIR)/$(am__dirstamp)
 src/numerics/libmesh_prof_la-preconditioner.lo:  \
+	src/numerics/$(am__dirstamp) \
+	src/numerics/$(DEPDIR)/$(am__dirstamp)
+src/numerics/libmesh_prof_la-reduced_sparse_matrix.lo:  \
 	src/numerics/$(am__dirstamp) \
 	src/numerics/$(DEPDIR)/$(am__dirstamp)
 src/numerics/libmesh_prof_la-shell_matrix.lo:  \
@@ -15945,6 +16007,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/splitter_devel-splitter.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/splitter_oprof-splitter.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/apps/$(DEPDIR)/splitter_opt-splitter.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_dbg_la-constraint_elimination_dof_map.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_dbg_la-dirichlet_boundary.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_dbg_la-dof_map.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_dbg_la-dof_map_base.Plo@am__quote@ # am--include-marker
@@ -15965,6 +16028,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_dbg_la-single_predicates.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_dbg_la-sparsity_pattern.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_dbg_la-variable.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_devel_la-constraint_elimination_dof_map.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_devel_la-dirichlet_boundary.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_devel_la-dof_map.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_devel_la-dof_map_base.Plo@am__quote@ # am--include-marker
@@ -15985,6 +16049,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_devel_la-single_predicates.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_devel_la-sparsity_pattern.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_devel_la-variable.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_oprof_la-constraint_elimination_dof_map.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_oprof_la-dirichlet_boundary.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_oprof_la-dof_map.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_oprof_la-dof_map_base.Plo@am__quote@ # am--include-marker
@@ -16005,6 +16070,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_oprof_la-single_predicates.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_oprof_la-sparsity_pattern.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_oprof_la-variable.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_opt_la-constraint_elimination_dof_map.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_opt_la-dirichlet_boundary.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_opt_la-dof_map.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_opt_la-dof_map_base.Plo@am__quote@ # am--include-marker
@@ -16025,6 +16091,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_opt_la-single_predicates.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_opt_la-sparsity_pattern.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_opt_la-variable.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_prof_la-constraint_elimination_dof_map.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_prof_la-dirichlet_boundary.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_prof_la-dof_map.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/base/$(DEPDIR)/libmesh_prof_la-dof_map_base.Plo@am__quote@ # am--include-marker
@@ -17284,6 +17351,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_dbg_la-petsc_shell_matrix.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_dbg_la-petsc_vector.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_dbg_la-preconditioner.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_dbg_la-reduced_sparse_matrix.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_dbg_la-shell_matrix.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_dbg_la-sparse_matrix.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_dbg_la-sparse_shell_matrix.Plo@am__quote@ # am--include-marker
@@ -17322,6 +17390,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_devel_la-petsc_shell_matrix.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_devel_la-petsc_vector.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_devel_la-preconditioner.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_devel_la-reduced_sparse_matrix.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_devel_la-shell_matrix.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_devel_la-sparse_matrix.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_devel_la-sparse_shell_matrix.Plo@am__quote@ # am--include-marker
@@ -17360,6 +17429,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_oprof_la-petsc_shell_matrix.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_oprof_la-petsc_vector.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_oprof_la-preconditioner.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_oprof_la-reduced_sparse_matrix.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_oprof_la-shell_matrix.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_oprof_la-sparse_matrix.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_oprof_la-sparse_shell_matrix.Plo@am__quote@ # am--include-marker
@@ -17398,6 +17468,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_opt_la-petsc_shell_matrix.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_opt_la-petsc_vector.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_opt_la-preconditioner.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_opt_la-reduced_sparse_matrix.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_opt_la-shell_matrix.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_opt_la-sparse_matrix.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_opt_la-sparse_shell_matrix.Plo@am__quote@ # am--include-marker
@@ -17436,6 +17507,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_prof_la-petsc_shell_matrix.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_prof_la-petsc_vector.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_prof_la-preconditioner.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_prof_la-reduced_sparse_matrix.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_prof_la-shell_matrix.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_prof_la-sparse_matrix.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/numerics/$(DEPDIR)/libmesh_prof_la-sparse_shell_matrix.Plo@am__quote@ # am--include-marker
@@ -18390,6 +18462,13 @@ am--depfiles: $(am__depfiles_remade)
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
+
+src/base/libmesh_dbg_la-constraint_elimination_dof_map.lo: src/base/constraint_elimination_dof_map.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/base/libmesh_dbg_la-constraint_elimination_dof_map.lo -MD -MP -MF src/base/$(DEPDIR)/libmesh_dbg_la-constraint_elimination_dof_map.Tpo -c -o src/base/libmesh_dbg_la-constraint_elimination_dof_map.lo `test -f 'src/base/constraint_elimination_dof_map.C' || echo '$(srcdir)/'`src/base/constraint_elimination_dof_map.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/base/$(DEPDIR)/libmesh_dbg_la-constraint_elimination_dof_map.Tpo src/base/$(DEPDIR)/libmesh_dbg_la-constraint_elimination_dof_map.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/base/constraint_elimination_dof_map.C' object='src/base/libmesh_dbg_la-constraint_elimination_dof_map.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/base/libmesh_dbg_la-constraint_elimination_dof_map.lo `test -f 'src/base/constraint_elimination_dof_map.C' || echo '$(srcdir)/'`src/base/constraint_elimination_dof_map.C
 
 src/base/libmesh_dbg_la-dirichlet_boundary.lo: src/base/dirichlet_boundary.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/base/libmesh_dbg_la-dirichlet_boundary.lo -MD -MP -MF src/base/$(DEPDIR)/libmesh_dbg_la-dirichlet_boundary.Tpo -c -o src/base/libmesh_dbg_la-dirichlet_boundary.lo `test -f 'src/base/dirichlet_boundary.C' || echo '$(srcdir)/'`src/base/dirichlet_boundary.C
@@ -20400,6 +20479,13 @@ src/numerics/libmesh_dbg_la-preconditioner.lo: src/numerics/preconditioner.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/numerics/libmesh_dbg_la-preconditioner.lo `test -f 'src/numerics/preconditioner.C' || echo '$(srcdir)/'`src/numerics/preconditioner.C
 
+src/numerics/libmesh_dbg_la-reduced_sparse_matrix.lo: src/numerics/reduced_sparse_matrix.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/numerics/libmesh_dbg_la-reduced_sparse_matrix.lo -MD -MP -MF src/numerics/$(DEPDIR)/libmesh_dbg_la-reduced_sparse_matrix.Tpo -c -o src/numerics/libmesh_dbg_la-reduced_sparse_matrix.lo `test -f 'src/numerics/reduced_sparse_matrix.C' || echo '$(srcdir)/'`src/numerics/reduced_sparse_matrix.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/numerics/$(DEPDIR)/libmesh_dbg_la-reduced_sparse_matrix.Tpo src/numerics/$(DEPDIR)/libmesh_dbg_la-reduced_sparse_matrix.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/numerics/reduced_sparse_matrix.C' object='src/numerics/libmesh_dbg_la-reduced_sparse_matrix.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/numerics/libmesh_dbg_la-reduced_sparse_matrix.lo `test -f 'src/numerics/reduced_sparse_matrix.C' || echo '$(srcdir)/'`src/numerics/reduced_sparse_matrix.C
+
 src/numerics/libmesh_dbg_la-shell_matrix.lo: src/numerics/shell_matrix.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/numerics/libmesh_dbg_la-shell_matrix.lo -MD -MP -MF src/numerics/$(DEPDIR)/libmesh_dbg_la-shell_matrix.Tpo -c -o src/numerics/libmesh_dbg_la-shell_matrix.lo `test -f 'src/numerics/shell_matrix.C' || echo '$(srcdir)/'`src/numerics/shell_matrix.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/numerics/$(DEPDIR)/libmesh_dbg_la-shell_matrix.Tpo src/numerics/$(DEPDIR)/libmesh_dbg_la-shell_matrix.Plo
@@ -21771,6 +21857,13 @@ src/utils/libmesh_dbg_la-xdr_cxx.lo: src/utils/xdr_cxx.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/xdr_cxx.C' object='src/utils/libmesh_dbg_la-xdr_cxx.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_dbg_la-xdr_cxx.lo `test -f 'src/utils/xdr_cxx.C' || echo '$(srcdir)/'`src/utils/xdr_cxx.C
+
+src/base/libmesh_devel_la-constraint_elimination_dof_map.lo: src/base/constraint_elimination_dof_map.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/base/libmesh_devel_la-constraint_elimination_dof_map.lo -MD -MP -MF src/base/$(DEPDIR)/libmesh_devel_la-constraint_elimination_dof_map.Tpo -c -o src/base/libmesh_devel_la-constraint_elimination_dof_map.lo `test -f 'src/base/constraint_elimination_dof_map.C' || echo '$(srcdir)/'`src/base/constraint_elimination_dof_map.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/base/$(DEPDIR)/libmesh_devel_la-constraint_elimination_dof_map.Tpo src/base/$(DEPDIR)/libmesh_devel_la-constraint_elimination_dof_map.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/base/constraint_elimination_dof_map.C' object='src/base/libmesh_devel_la-constraint_elimination_dof_map.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/base/libmesh_devel_la-constraint_elimination_dof_map.lo `test -f 'src/base/constraint_elimination_dof_map.C' || echo '$(srcdir)/'`src/base/constraint_elimination_dof_map.C
 
 src/base/libmesh_devel_la-dirichlet_boundary.lo: src/base/dirichlet_boundary.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/base/libmesh_devel_la-dirichlet_boundary.lo -MD -MP -MF src/base/$(DEPDIR)/libmesh_devel_la-dirichlet_boundary.Tpo -c -o src/base/libmesh_devel_la-dirichlet_boundary.lo `test -f 'src/base/dirichlet_boundary.C' || echo '$(srcdir)/'`src/base/dirichlet_boundary.C
@@ -23781,6 +23874,13 @@ src/numerics/libmesh_devel_la-preconditioner.lo: src/numerics/preconditioner.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/numerics/libmesh_devel_la-preconditioner.lo `test -f 'src/numerics/preconditioner.C' || echo '$(srcdir)/'`src/numerics/preconditioner.C
 
+src/numerics/libmesh_devel_la-reduced_sparse_matrix.lo: src/numerics/reduced_sparse_matrix.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/numerics/libmesh_devel_la-reduced_sparse_matrix.lo -MD -MP -MF src/numerics/$(DEPDIR)/libmesh_devel_la-reduced_sparse_matrix.Tpo -c -o src/numerics/libmesh_devel_la-reduced_sparse_matrix.lo `test -f 'src/numerics/reduced_sparse_matrix.C' || echo '$(srcdir)/'`src/numerics/reduced_sparse_matrix.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/numerics/$(DEPDIR)/libmesh_devel_la-reduced_sparse_matrix.Tpo src/numerics/$(DEPDIR)/libmesh_devel_la-reduced_sparse_matrix.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/numerics/reduced_sparse_matrix.C' object='src/numerics/libmesh_devel_la-reduced_sparse_matrix.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/numerics/libmesh_devel_la-reduced_sparse_matrix.lo `test -f 'src/numerics/reduced_sparse_matrix.C' || echo '$(srcdir)/'`src/numerics/reduced_sparse_matrix.C
+
 src/numerics/libmesh_devel_la-shell_matrix.lo: src/numerics/shell_matrix.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/numerics/libmesh_devel_la-shell_matrix.lo -MD -MP -MF src/numerics/$(DEPDIR)/libmesh_devel_la-shell_matrix.Tpo -c -o src/numerics/libmesh_devel_la-shell_matrix.lo `test -f 'src/numerics/shell_matrix.C' || echo '$(srcdir)/'`src/numerics/shell_matrix.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/numerics/$(DEPDIR)/libmesh_devel_la-shell_matrix.Tpo src/numerics/$(DEPDIR)/libmesh_devel_la-shell_matrix.Plo
@@ -25152,6 +25252,13 @@ src/utils/libmesh_devel_la-xdr_cxx.lo: src/utils/xdr_cxx.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/xdr_cxx.C' object='src/utils/libmesh_devel_la-xdr_cxx.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_devel_la-xdr_cxx.lo `test -f 'src/utils/xdr_cxx.C' || echo '$(srcdir)/'`src/utils/xdr_cxx.C
+
+src/base/libmesh_oprof_la-constraint_elimination_dof_map.lo: src/base/constraint_elimination_dof_map.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/base/libmesh_oprof_la-constraint_elimination_dof_map.lo -MD -MP -MF src/base/$(DEPDIR)/libmesh_oprof_la-constraint_elimination_dof_map.Tpo -c -o src/base/libmesh_oprof_la-constraint_elimination_dof_map.lo `test -f 'src/base/constraint_elimination_dof_map.C' || echo '$(srcdir)/'`src/base/constraint_elimination_dof_map.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/base/$(DEPDIR)/libmesh_oprof_la-constraint_elimination_dof_map.Tpo src/base/$(DEPDIR)/libmesh_oprof_la-constraint_elimination_dof_map.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/base/constraint_elimination_dof_map.C' object='src/base/libmesh_oprof_la-constraint_elimination_dof_map.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/base/libmesh_oprof_la-constraint_elimination_dof_map.lo `test -f 'src/base/constraint_elimination_dof_map.C' || echo '$(srcdir)/'`src/base/constraint_elimination_dof_map.C
 
 src/base/libmesh_oprof_la-dirichlet_boundary.lo: src/base/dirichlet_boundary.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/base/libmesh_oprof_la-dirichlet_boundary.lo -MD -MP -MF src/base/$(DEPDIR)/libmesh_oprof_la-dirichlet_boundary.Tpo -c -o src/base/libmesh_oprof_la-dirichlet_boundary.lo `test -f 'src/base/dirichlet_boundary.C' || echo '$(srcdir)/'`src/base/dirichlet_boundary.C
@@ -27162,6 +27269,13 @@ src/numerics/libmesh_oprof_la-preconditioner.lo: src/numerics/preconditioner.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/numerics/libmesh_oprof_la-preconditioner.lo `test -f 'src/numerics/preconditioner.C' || echo '$(srcdir)/'`src/numerics/preconditioner.C
 
+src/numerics/libmesh_oprof_la-reduced_sparse_matrix.lo: src/numerics/reduced_sparse_matrix.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/numerics/libmesh_oprof_la-reduced_sparse_matrix.lo -MD -MP -MF src/numerics/$(DEPDIR)/libmesh_oprof_la-reduced_sparse_matrix.Tpo -c -o src/numerics/libmesh_oprof_la-reduced_sparse_matrix.lo `test -f 'src/numerics/reduced_sparse_matrix.C' || echo '$(srcdir)/'`src/numerics/reduced_sparse_matrix.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/numerics/$(DEPDIR)/libmesh_oprof_la-reduced_sparse_matrix.Tpo src/numerics/$(DEPDIR)/libmesh_oprof_la-reduced_sparse_matrix.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/numerics/reduced_sparse_matrix.C' object='src/numerics/libmesh_oprof_la-reduced_sparse_matrix.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/numerics/libmesh_oprof_la-reduced_sparse_matrix.lo `test -f 'src/numerics/reduced_sparse_matrix.C' || echo '$(srcdir)/'`src/numerics/reduced_sparse_matrix.C
+
 src/numerics/libmesh_oprof_la-shell_matrix.lo: src/numerics/shell_matrix.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/numerics/libmesh_oprof_la-shell_matrix.lo -MD -MP -MF src/numerics/$(DEPDIR)/libmesh_oprof_la-shell_matrix.Tpo -c -o src/numerics/libmesh_oprof_la-shell_matrix.lo `test -f 'src/numerics/shell_matrix.C' || echo '$(srcdir)/'`src/numerics/shell_matrix.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/numerics/$(DEPDIR)/libmesh_oprof_la-shell_matrix.Tpo src/numerics/$(DEPDIR)/libmesh_oprof_la-shell_matrix.Plo
@@ -28533,6 +28647,13 @@ src/utils/libmesh_oprof_la-xdr_cxx.lo: src/utils/xdr_cxx.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/xdr_cxx.C' object='src/utils/libmesh_oprof_la-xdr_cxx.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_oprof_la-xdr_cxx.lo `test -f 'src/utils/xdr_cxx.C' || echo '$(srcdir)/'`src/utils/xdr_cxx.C
+
+src/base/libmesh_opt_la-constraint_elimination_dof_map.lo: src/base/constraint_elimination_dof_map.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/base/libmesh_opt_la-constraint_elimination_dof_map.lo -MD -MP -MF src/base/$(DEPDIR)/libmesh_opt_la-constraint_elimination_dof_map.Tpo -c -o src/base/libmesh_opt_la-constraint_elimination_dof_map.lo `test -f 'src/base/constraint_elimination_dof_map.C' || echo '$(srcdir)/'`src/base/constraint_elimination_dof_map.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/base/$(DEPDIR)/libmesh_opt_la-constraint_elimination_dof_map.Tpo src/base/$(DEPDIR)/libmesh_opt_la-constraint_elimination_dof_map.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/base/constraint_elimination_dof_map.C' object='src/base/libmesh_opt_la-constraint_elimination_dof_map.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/base/libmesh_opt_la-constraint_elimination_dof_map.lo `test -f 'src/base/constraint_elimination_dof_map.C' || echo '$(srcdir)/'`src/base/constraint_elimination_dof_map.C
 
 src/base/libmesh_opt_la-dirichlet_boundary.lo: src/base/dirichlet_boundary.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/base/libmesh_opt_la-dirichlet_boundary.lo -MD -MP -MF src/base/$(DEPDIR)/libmesh_opt_la-dirichlet_boundary.Tpo -c -o src/base/libmesh_opt_la-dirichlet_boundary.lo `test -f 'src/base/dirichlet_boundary.C' || echo '$(srcdir)/'`src/base/dirichlet_boundary.C
@@ -30543,6 +30664,13 @@ src/numerics/libmesh_opt_la-preconditioner.lo: src/numerics/preconditioner.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/numerics/libmesh_opt_la-preconditioner.lo `test -f 'src/numerics/preconditioner.C' || echo '$(srcdir)/'`src/numerics/preconditioner.C
 
+src/numerics/libmesh_opt_la-reduced_sparse_matrix.lo: src/numerics/reduced_sparse_matrix.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/numerics/libmesh_opt_la-reduced_sparse_matrix.lo -MD -MP -MF src/numerics/$(DEPDIR)/libmesh_opt_la-reduced_sparse_matrix.Tpo -c -o src/numerics/libmesh_opt_la-reduced_sparse_matrix.lo `test -f 'src/numerics/reduced_sparse_matrix.C' || echo '$(srcdir)/'`src/numerics/reduced_sparse_matrix.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/numerics/$(DEPDIR)/libmesh_opt_la-reduced_sparse_matrix.Tpo src/numerics/$(DEPDIR)/libmesh_opt_la-reduced_sparse_matrix.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/numerics/reduced_sparse_matrix.C' object='src/numerics/libmesh_opt_la-reduced_sparse_matrix.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/numerics/libmesh_opt_la-reduced_sparse_matrix.lo `test -f 'src/numerics/reduced_sparse_matrix.C' || echo '$(srcdir)/'`src/numerics/reduced_sparse_matrix.C
+
 src/numerics/libmesh_opt_la-shell_matrix.lo: src/numerics/shell_matrix.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/numerics/libmesh_opt_la-shell_matrix.lo -MD -MP -MF src/numerics/$(DEPDIR)/libmesh_opt_la-shell_matrix.Tpo -c -o src/numerics/libmesh_opt_la-shell_matrix.lo `test -f 'src/numerics/shell_matrix.C' || echo '$(srcdir)/'`src/numerics/shell_matrix.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/numerics/$(DEPDIR)/libmesh_opt_la-shell_matrix.Tpo src/numerics/$(DEPDIR)/libmesh_opt_la-shell_matrix.Plo
@@ -31914,6 +32042,13 @@ src/utils/libmesh_opt_la-xdr_cxx.lo: src/utils/xdr_cxx.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/utils/xdr_cxx.C' object='src/utils/libmesh_opt_la-xdr_cxx.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/utils/libmesh_opt_la-xdr_cxx.lo `test -f 'src/utils/xdr_cxx.C' || echo '$(srcdir)/'`src/utils/xdr_cxx.C
+
+src/base/libmesh_prof_la-constraint_elimination_dof_map.lo: src/base/constraint_elimination_dof_map.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/base/libmesh_prof_la-constraint_elimination_dof_map.lo -MD -MP -MF src/base/$(DEPDIR)/libmesh_prof_la-constraint_elimination_dof_map.Tpo -c -o src/base/libmesh_prof_la-constraint_elimination_dof_map.lo `test -f 'src/base/constraint_elimination_dof_map.C' || echo '$(srcdir)/'`src/base/constraint_elimination_dof_map.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/base/$(DEPDIR)/libmesh_prof_la-constraint_elimination_dof_map.Tpo src/base/$(DEPDIR)/libmesh_prof_la-constraint_elimination_dof_map.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/base/constraint_elimination_dof_map.C' object='src/base/libmesh_prof_la-constraint_elimination_dof_map.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/base/libmesh_prof_la-constraint_elimination_dof_map.lo `test -f 'src/base/constraint_elimination_dof_map.C' || echo '$(srcdir)/'`src/base/constraint_elimination_dof_map.C
 
 src/base/libmesh_prof_la-dirichlet_boundary.lo: src/base/dirichlet_boundary.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/base/libmesh_prof_la-dirichlet_boundary.lo -MD -MP -MF src/base/$(DEPDIR)/libmesh_prof_la-dirichlet_boundary.Tpo -c -o src/base/libmesh_prof_la-dirichlet_boundary.lo `test -f 'src/base/dirichlet_boundary.C' || echo '$(srcdir)/'`src/base/dirichlet_boundary.C
@@ -33923,6 +34058,13 @@ src/numerics/libmesh_prof_la-preconditioner.lo: src/numerics/preconditioner.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/numerics/preconditioner.C' object='src/numerics/libmesh_prof_la-preconditioner.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/numerics/libmesh_prof_la-preconditioner.lo `test -f 'src/numerics/preconditioner.C' || echo '$(srcdir)/'`src/numerics/preconditioner.C
+
+src/numerics/libmesh_prof_la-reduced_sparse_matrix.lo: src/numerics/reduced_sparse_matrix.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/numerics/libmesh_prof_la-reduced_sparse_matrix.lo -MD -MP -MF src/numerics/$(DEPDIR)/libmesh_prof_la-reduced_sparse_matrix.Tpo -c -o src/numerics/libmesh_prof_la-reduced_sparse_matrix.lo `test -f 'src/numerics/reduced_sparse_matrix.C' || echo '$(srcdir)/'`src/numerics/reduced_sparse_matrix.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/numerics/$(DEPDIR)/libmesh_prof_la-reduced_sparse_matrix.Tpo src/numerics/$(DEPDIR)/libmesh_prof_la-reduced_sparse_matrix.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/numerics/reduced_sparse_matrix.C' object='src/numerics/libmesh_prof_la-reduced_sparse_matrix.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/numerics/libmesh_prof_la-reduced_sparse_matrix.lo `test -f 'src/numerics/reduced_sparse_matrix.C' || echo '$(srcdir)/'`src/numerics/reduced_sparse_matrix.C
 
 src/numerics/libmesh_prof_la-shell_matrix.lo: src/numerics/shell_matrix.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/numerics/libmesh_prof_la-shell_matrix.lo -MD -MP -MF src/numerics/$(DEPDIR)/libmesh_prof_la-shell_matrix.Tpo -c -o src/numerics/libmesh_prof_la-shell_matrix.lo `test -f 'src/numerics/shell_matrix.C' || echo '$(srcdir)/'`src/numerics/shell_matrix.C
@@ -36980,6 +37122,7 @@ distclean: distclean-recursive
 	-rm -f src/apps/$(DEPDIR)/splitter_devel-splitter.Po
 	-rm -f src/apps/$(DEPDIR)/splitter_oprof-splitter.Po
 	-rm -f src/apps/$(DEPDIR)/splitter_opt-splitter.Po
+	-rm -f src/base/$(DEPDIR)/libmesh_dbg_la-constraint_elimination_dof_map.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_dbg_la-dirichlet_boundary.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_dbg_la-dof_map.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_dbg_la-dof_map_base.Plo
@@ -37000,6 +37143,7 @@ distclean: distclean-recursive
 	-rm -f src/base/$(DEPDIR)/libmesh_dbg_la-single_predicates.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_dbg_la-sparsity_pattern.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_dbg_la-variable.Plo
+	-rm -f src/base/$(DEPDIR)/libmesh_devel_la-constraint_elimination_dof_map.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_devel_la-dirichlet_boundary.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_devel_la-dof_map.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_devel_la-dof_map_base.Plo
@@ -37020,6 +37164,7 @@ distclean: distclean-recursive
 	-rm -f src/base/$(DEPDIR)/libmesh_devel_la-single_predicates.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_devel_la-sparsity_pattern.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_devel_la-variable.Plo
+	-rm -f src/base/$(DEPDIR)/libmesh_oprof_la-constraint_elimination_dof_map.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_oprof_la-dirichlet_boundary.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_oprof_la-dof_map.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_oprof_la-dof_map_base.Plo
@@ -37040,6 +37185,7 @@ distclean: distclean-recursive
 	-rm -f src/base/$(DEPDIR)/libmesh_oprof_la-single_predicates.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_oprof_la-sparsity_pattern.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_oprof_la-variable.Plo
+	-rm -f src/base/$(DEPDIR)/libmesh_opt_la-constraint_elimination_dof_map.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_opt_la-dirichlet_boundary.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_opt_la-dof_map.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_opt_la-dof_map_base.Plo
@@ -37060,6 +37206,7 @@ distclean: distclean-recursive
 	-rm -f src/base/$(DEPDIR)/libmesh_opt_la-single_predicates.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_opt_la-sparsity_pattern.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_opt_la-variable.Plo
+	-rm -f src/base/$(DEPDIR)/libmesh_prof_la-constraint_elimination_dof_map.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_prof_la-dirichlet_boundary.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_prof_la-dof_map.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_prof_la-dof_map_base.Plo
@@ -38319,6 +38466,7 @@ distclean: distclean-recursive
 	-rm -f src/numerics/$(DEPDIR)/libmesh_dbg_la-petsc_shell_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_dbg_la-petsc_vector.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_dbg_la-preconditioner.Plo
+	-rm -f src/numerics/$(DEPDIR)/libmesh_dbg_la-reduced_sparse_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_dbg_la-shell_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_dbg_la-sparse_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_dbg_la-sparse_shell_matrix.Plo
@@ -38357,6 +38505,7 @@ distclean: distclean-recursive
 	-rm -f src/numerics/$(DEPDIR)/libmesh_devel_la-petsc_shell_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_devel_la-petsc_vector.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_devel_la-preconditioner.Plo
+	-rm -f src/numerics/$(DEPDIR)/libmesh_devel_la-reduced_sparse_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_devel_la-shell_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_devel_la-sparse_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_devel_la-sparse_shell_matrix.Plo
@@ -38395,6 +38544,7 @@ distclean: distclean-recursive
 	-rm -f src/numerics/$(DEPDIR)/libmesh_oprof_la-petsc_shell_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_oprof_la-petsc_vector.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_oprof_la-preconditioner.Plo
+	-rm -f src/numerics/$(DEPDIR)/libmesh_oprof_la-reduced_sparse_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_oprof_la-shell_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_oprof_la-sparse_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_oprof_la-sparse_shell_matrix.Plo
@@ -38433,6 +38583,7 @@ distclean: distclean-recursive
 	-rm -f src/numerics/$(DEPDIR)/libmesh_opt_la-petsc_shell_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_opt_la-petsc_vector.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_opt_la-preconditioner.Plo
+	-rm -f src/numerics/$(DEPDIR)/libmesh_opt_la-reduced_sparse_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_opt_la-shell_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_opt_la-sparse_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_opt_la-sparse_shell_matrix.Plo
@@ -38471,6 +38622,7 @@ distclean: distclean-recursive
 	-rm -f src/numerics/$(DEPDIR)/libmesh_prof_la-petsc_shell_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_prof_la-petsc_vector.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_prof_la-preconditioner.Plo
+	-rm -f src/numerics/$(DEPDIR)/libmesh_prof_la-reduced_sparse_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_prof_la-shell_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_prof_la-sparse_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_prof_la-sparse_shell_matrix.Plo
@@ -39526,6 +39678,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f src/apps/$(DEPDIR)/splitter_devel-splitter.Po
 	-rm -f src/apps/$(DEPDIR)/splitter_oprof-splitter.Po
 	-rm -f src/apps/$(DEPDIR)/splitter_opt-splitter.Po
+	-rm -f src/base/$(DEPDIR)/libmesh_dbg_la-constraint_elimination_dof_map.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_dbg_la-dirichlet_boundary.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_dbg_la-dof_map.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_dbg_la-dof_map_base.Plo
@@ -39546,6 +39699,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f src/base/$(DEPDIR)/libmesh_dbg_la-single_predicates.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_dbg_la-sparsity_pattern.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_dbg_la-variable.Plo
+	-rm -f src/base/$(DEPDIR)/libmesh_devel_la-constraint_elimination_dof_map.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_devel_la-dirichlet_boundary.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_devel_la-dof_map.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_devel_la-dof_map_base.Plo
@@ -39566,6 +39720,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f src/base/$(DEPDIR)/libmesh_devel_la-single_predicates.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_devel_la-sparsity_pattern.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_devel_la-variable.Plo
+	-rm -f src/base/$(DEPDIR)/libmesh_oprof_la-constraint_elimination_dof_map.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_oprof_la-dirichlet_boundary.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_oprof_la-dof_map.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_oprof_la-dof_map_base.Plo
@@ -39586,6 +39741,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f src/base/$(DEPDIR)/libmesh_oprof_la-single_predicates.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_oprof_la-sparsity_pattern.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_oprof_la-variable.Plo
+	-rm -f src/base/$(DEPDIR)/libmesh_opt_la-constraint_elimination_dof_map.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_opt_la-dirichlet_boundary.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_opt_la-dof_map.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_opt_la-dof_map_base.Plo
@@ -39606,6 +39762,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f src/base/$(DEPDIR)/libmesh_opt_la-single_predicates.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_opt_la-sparsity_pattern.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_opt_la-variable.Plo
+	-rm -f src/base/$(DEPDIR)/libmesh_prof_la-constraint_elimination_dof_map.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_prof_la-dirichlet_boundary.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_prof_la-dof_map.Plo
 	-rm -f src/base/$(DEPDIR)/libmesh_prof_la-dof_map_base.Plo
@@ -40865,6 +41022,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f src/numerics/$(DEPDIR)/libmesh_dbg_la-petsc_shell_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_dbg_la-petsc_vector.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_dbg_la-preconditioner.Plo
+	-rm -f src/numerics/$(DEPDIR)/libmesh_dbg_la-reduced_sparse_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_dbg_la-shell_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_dbg_la-sparse_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_dbg_la-sparse_shell_matrix.Plo
@@ -40903,6 +41061,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f src/numerics/$(DEPDIR)/libmesh_devel_la-petsc_shell_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_devel_la-petsc_vector.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_devel_la-preconditioner.Plo
+	-rm -f src/numerics/$(DEPDIR)/libmesh_devel_la-reduced_sparse_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_devel_la-shell_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_devel_la-sparse_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_devel_la-sparse_shell_matrix.Plo
@@ -40941,6 +41100,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f src/numerics/$(DEPDIR)/libmesh_oprof_la-petsc_shell_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_oprof_la-petsc_vector.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_oprof_la-preconditioner.Plo
+	-rm -f src/numerics/$(DEPDIR)/libmesh_oprof_la-reduced_sparse_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_oprof_la-shell_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_oprof_la-sparse_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_oprof_la-sparse_shell_matrix.Plo
@@ -40979,6 +41139,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f src/numerics/$(DEPDIR)/libmesh_opt_la-petsc_shell_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_opt_la-petsc_vector.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_opt_la-preconditioner.Plo
+	-rm -f src/numerics/$(DEPDIR)/libmesh_opt_la-reduced_sparse_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_opt_la-shell_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_opt_la-sparse_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_opt_la-sparse_shell_matrix.Plo
@@ -41017,6 +41178,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f src/numerics/$(DEPDIR)/libmesh_prof_la-petsc_shell_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_prof_la-petsc_vector.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_prof_la-preconditioner.Plo
+	-rm -f src/numerics/$(DEPDIR)/libmesh_prof_la-reduced_sparse_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_prof_la-shell_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_prof_la-sparse_matrix.Plo
 	-rm -f src/numerics/$(DEPDIR)/libmesh_prof_la-sparse_shell_matrix.Plo
