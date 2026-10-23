@@ -1019,6 +1019,9 @@ void DistributedMesh::delete_node(Node * n)
 
   // delete the node
   delete n;
+
+  // We've invalidated any ranges that contained this node
+  this->clear_stored_ranges();
 }
 
 

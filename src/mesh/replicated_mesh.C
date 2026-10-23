@@ -605,6 +605,9 @@ void ReplicatedMesh::delete_node(Node * n)
 
   // explicitly zero the pointer
   *pos = nullptr;
+
+  // We've invalidated any ranges that contained this node
+  this->clear_stored_ranges();
 }
 
 
