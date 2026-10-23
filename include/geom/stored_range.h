@@ -58,7 +58,7 @@ public:
    * Allows an \p StoredRange to behave like an STL container.
    */
   typedef typename std::vector<object_type> vec_type;
-  typedef typename vec_type::const_iterator const_iterator;
+  typedef const object_type * const_iterator;
   typedef typename std::unique_ptr<vec_type, std::function<void (vec_type *)>> ptr_type;
 
   /**
@@ -106,8 +106,9 @@ public:
    */
   StoredRange (vec_type * objs,
                const unsigned int new_grainsize = libMesh::default_grainsize()) :
-    _end(objs->end()),
-    _begin(objs->begin()),
+    // Handle empty objs with pre-C++26-compliant code
+    _end(objs->size() ? (objs->data()+objs->size()) : objs->data()),
+    _begin(objs->data()),
     _last(objs->size()),
     _first(0),
     _grainsize(new_grainsize),
@@ -223,8 +224,9 @@ public:
     for (iterator_type it=first; it!=last; ++it)
       _objs->push_back(*it);
 
-    _begin = _objs->begin();
-    _end   = _objs->end();
+    _begin = _objs->data();
+    // Handle empty objs with pre-C++26-compliant code
+    _end   = _objs->size() ? (_objs->data()+_objs->size()) : _objs->data();
 
     _first = 0;
     _last  = _objs->size();
@@ -245,8 +247,9 @@ public:
     // _objs must be initialized in order to call reset()
     libmesh_assert(_objs);
 
-    _begin = _objs->begin();
-    _end   = _objs->end();
+    _begin = _objs->data();
+    // Handle empty objs with pre-C++26-compliant code
+    _end   = _objs->size() ? (_objs->data()+_objs->size()) : _objs->data();
 
     _first = 0;
     _last  = _objs->size();
