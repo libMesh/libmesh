@@ -24,6 +24,7 @@
 #include "libmesh/threads.h"
 
 // C++ includes
+#include <type_traits> // std::remove*
 #include <vector>
 #include <memory> // std::unique_ptr
 #include <functional> // std::function
@@ -60,6 +61,11 @@ public:
   typedef typename std::vector<object_type> vec_type;
   typedef const object_type * const_iterator;
   typedef typename std::unique_ptr<vec_type, std::function<void (vec_type *)>> ptr_type;
+
+  /**
+   * Allows conversion from non-const to const pointer objects
+   */
+  typedef std::remove_const_t<std::remove_pointer_t<object_type>> * nonconst_object_type;
 
   /**
    * Constructor. Optionally takes the \p grainsize parameter, which is the
@@ -113,6 +119,31 @@ public:
     _first(0),
     _grainsize(new_grainsize),
     _objs(ptr_type(objs, [](vec_type *){/*don't delete*/}))
+  {
+  }
+
+  /**
+   * Constructor.  Takes pointers to objects, which are expected to
+   * themselves be pointers but with const removed.  This lets us
+   * create a const range view of a saved non-const range.
+   *
+   * Optionally takes the \p grainsize parameter, which is the
+   * smallest chunk the range may be broken into for parallel
+   * execution.
+   *
+   * \note The pointer range passed in here MUST be dereferenceable
+   * for the lifetime of this StoredRange!
+   */
+  StoredRange (const nonconst_object_type * begin,
+               const nonconst_object_type * end,
+               const unsigned int new_grainsize = libMesh::default_grainsize()) :
+    // Handle empty objs with pre-C++26-compliant code
+    _end(end),
+    _begin(begin),
+    _last(std::distance(begin, end)),
+    _first(0),
+    _grainsize(new_grainsize),
+    _objs(nullptr)
   {
   }
 
