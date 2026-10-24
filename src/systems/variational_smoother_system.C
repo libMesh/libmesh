@@ -24,6 +24,7 @@
 #include "libmesh/fe_interface.h"
 #include "libmesh/fem_context.h"
 #include "libmesh/mesh.h"
+#include "libmesh/node_range.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/parallel_ghost_sync.h"
 #include "libmesh/quadrature.h"
@@ -112,15 +113,20 @@ void VariationalSmootherSystem::assembly (bool get_residual,
   auto & mesh = this->get_mesh();
   this->solution->close();
 
-  for (auto * node : mesh.local_node_ptr_range())
-  {
-    for (const auto d : make_range(mesh.mesh_dimension()))
-    {
-      const auto dof_id = node->dof_number(this->number(), d, 0);
-      // Update mesh
-      (*node)(d) = libmesh_real((*current_local_solution)(dof_id));
-    }
-  }
+  const auto dim = mesh.mesh_dimension();
+
+  Threads::parallel_for
+    (mesh.local_node_stored_range(),
+     [this, dim](const NodeRange & range)
+     {
+       for (Node * node : range)
+         for (const auto d : make_range(dim))
+         {
+           const auto dof_id = node->dof_number(this->number(), d, 0);
+           // Update mesh
+           (*node)(d) = libmesh_real((*current_local_solution)(dof_id));
+         }
+     });
 
   SyncNodalPositions sync_object(mesh);
   Parallel::sync_dofobject_data_by_id (mesh.comm(), mesh.nodes_begin(), mesh.nodes_end(), sync_object);

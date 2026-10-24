@@ -460,13 +460,9 @@ int main(int argc, char ** argv)
       // If we aren't doing a projection, then we just do an integral
       System & old_sys = old_es.get_system<System>(current_sys_name);
 
-      ConstElemRange active_local_elem_range
-        (old_mesh.active_local_elements_begin(),
-         old_mesh.active_local_elements_end());
-
       Integrate integrate(old_sys, *goal_function);
 
-      Threads::parallel_reduce (active_local_elem_range,
+      Threads::parallel_reduce (old_mesh.active_local_element_stored_range(),
                                 integrate);
 
       Number integral = integrate.integral();

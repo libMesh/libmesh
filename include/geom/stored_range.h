@@ -290,6 +290,24 @@ public:
    */
   std::size_t size () const { return std::distance(_begin, _end); }
 
+  /**
+   * \returns Whether two ranges are equal.
+   */
+  bool operator== (const StoredRange<iterator_type, object_type> & other) const
+  {
+    for (auto it = this->begin(), it2 = other.begin();
+         it != this->end() || it2 != other.end(); ++it, ++it2)
+      {
+        if (it == other.end() || it2 == other.end())
+          return false;
+
+        if (*it != *it2)
+          return false;
+      }
+
+    return true;
+  }
+
   //------------------------------------------------------------------------
   // Methods that implement Range concept
   //------------------------------------------------------------------------

@@ -28,6 +28,7 @@
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_tools.h"
 #include "libmesh/mesh_communication.h"
+#include "libmesh/node_range.h"
 #include "libmesh/parallel_ghost_sync.h"
 #include "libmesh/wrapped_petsc.h"
 #include "libmesh/boundary_info.h"
@@ -314,11 +315,17 @@ bool Partitioner::single_partition (MeshBase & mesh)
   // that rank might need to be informed of a change.
   mesh.comm().max(changed_pid);
 
-  // We may need to redistribute, in case someone (like our unit
-  // tests) is doing something silly (like moving a whole
-  // already-distributed mesh back onto rank 0).
   if (changed_pid)
+  {
+    // We may need to redistribute, in case someone (like our unit
+    // tests) is doing something silly (like moving a whole
+    // already-distributed mesh back onto rank 0).
     mesh.redistribute();
+
+    // Even single_partition can be a change, if we're starting with
+    // any unpartitioned elements or nodes
+    mesh.update_post_partitioning();
+  }
 
   return changed_pid;
 }
@@ -443,6 +450,9 @@ void Partitioner::partition_unpartitioned_elements (MeshBase & mesh,
       elem->processor_id() = subdomain_id;
       //libMesh::out << "assigning " << global_index << " to " << subdomain_id << std::endl;
     }
+
+  // Even a temporary partitioning may invalidate some mesh caches
+  mesh.update_post_partitioning();
 }
 
 
@@ -887,10 +897,13 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
 
   // Start from scratch here: nodes we used to own may not be
   // eligible for us to own any more.
-  for (auto & node : mesh.node_ptr_range())
-    {
-      node->processor_id() = DofObject::invalid_processor_id;
-    }
+  Threads::parallel_for
+    (mesh.node_stored_range(),
+     [](const NodeRange & range)
+     {
+       for (Node * node : range)
+         node->processor_id() = DofObject::invalid_processor_id;
+     });
 
   // Loop over all the active elements
   for (auto & elem : mesh.active_element_ptr_range())

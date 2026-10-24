@@ -492,6 +492,9 @@ Node * ReplicatedMesh::add_point (const Point & p,
                       cast_int<dof_id_type>(_nodes.size()-1) : id).release();
       n->processor_id() = proc_id;
 
+      // A new node invalidates any cached node ranges
+      this->clear_stored_ranges();
+
       n->add_extra_integers(_node_integer_names.size(),
                             _node_integer_default_values);
 
@@ -548,6 +551,9 @@ Node * ReplicatedMesh::add_node (Node * n)
    _next_unique_id = std::max(_next_unique_id, n->unique_id()+1);
 #endif
 
+  // A new node invalidates any cached node ranges
+  this->clear_stored_ranges();
+
   n->add_extra_integers(_node_integer_names.size(),
                         _node_integer_default_values);
 
@@ -599,6 +605,9 @@ void ReplicatedMesh::delete_node(Node * n)
 
   // explicitly zero the pointer
   *pos = nullptr;
+
+  // We've invalidated any ranges that contained this node
+  this->clear_stored_ranges();
 }
 
 
@@ -850,6 +859,10 @@ void ReplicatedMesh::renumber_nodes_and_elements ()
         _nodes.erase (nd, end);
       }
     }
+
+  // We've probably done *some* node removal and/or renumbering; let's
+  // clear caches to be safe.
+  this->clear_stored_ranges();
 
   this->_preparation.has_removed_orphaned_nodes = true;
 
