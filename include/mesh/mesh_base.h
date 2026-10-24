@@ -2254,22 +2254,17 @@ protected:
 
   /**
    * A cached \p NodeRange for threaded mutation of all semilocal
-   * nodes of this mesh.
+   * nodes of this mesh, or (via a temporary shim) for read-only
+   * iteration over all nodes.
    *
-   * This will not actually be built unless needed.
+   * This will not actually be built unless needed.  We do need this
+   * to be mutable so that we can build it on the fly if a const node
+   * range (using it) is requested
    */
-  std::unique_ptr<NodeRange> _node_stored_range;
+  mutable std::unique_ptr<NodeRange> _node_stored_range;
 
   /**
-   * A cached \p ConstNodeRange for threaded mutation on all semilocal
-   * nodes of this mesh.
-   *
-   * This will not actually be built unless needed. Further, since we
-   * want our \p const node_stored_range() method to be \p const (yet
-   * do the dynamic allocating) this needs to be mutable.
-   *
-   * It is a crime that the C++ language doesn't let us just get this
-   * via casting from _node_stored_range.
+   * A shim to _node_stored_range
    */
   mutable std::unique_ptr<ConstNodeRange> _const_node_stored_range;
 
