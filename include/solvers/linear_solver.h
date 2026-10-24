@@ -255,9 +255,23 @@ public:
   virtual LinearConvergenceReason get_converged_reason() const = 0;
 
   /**
+   * \returns The currently attached solver configuration object, if any.
+   */
+  SolverConfiguration * solver_configuration() const;
+
+  /**
+   * Set the solver configuration object.  The solver does not take
+   * ownership.  A null pointer detaches the current configuration.
+   */
+  void set_solver_configuration(SolverConfiguration * solver_configuration);
+
+  /**
    * Set the solver configuration object.
    */
-  void set_solver_configuration(SolverConfiguration & solver_configuration);
+  void set_solver_configuration(SolverConfiguration & solver_configuration)
+  {
+    this->set_solver_configuration(&solver_configuration);
+  }
 
 protected:
   /**
