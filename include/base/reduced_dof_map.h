@@ -106,6 +106,67 @@ public:
   const std::vector<dof_id_type> & local_retained_dofs() const { return _local_retained_dofs; }
 
   /**
+   * Nests this reduced space in \p parent's, or in the full space if \p parent is null. Only
+   * degrees of freedom that \p parent retains can be retained, and the parent space is the space
+   * this one reduces: its vectors are the ones operators on this space are prolonged to and
+   * restricted from. Takes effect at the next \p reinit(), which must follow the parent's
+   */
+  void set_parent(const ReducedDofMap * parent) { _parent = parent; }
+
+  /**
+   * \returns The reduced space this one is nested in, or null for the full space
+   */
+  const ReducedDofMap * parent() const { return _parent; }
+
+  /**
+   * \returns The index of \p full_dof in the parent space, or \p DofObject::invalid_id if the
+   * parent does not retain it. \p full_dof must be local or used by an active local element
+   */
+  dof_id_type parent_dof(dof_id_type full_dof) const;
+
+  /**
+   * \returns The number of degrees of freedom in the parent space, globally and locally, and the
+   * parent index range of this rank
+   */
+  dof_id_type parent_n_dofs() const;
+  dof_id_type parent_n_local_dofs() const;
+  dof_id_type parent_first_dof() const;
+  dof_id_type parent_end_dof() const;
+
+  /**
+   * \returns The local retained degrees of freedom in the parent numbering, sorted. Entry \p i is
+   * the parent index of reduced index <tt>first_dof() + i</tt>
+   */
+  const std::vector<dof_id_type> & local_retained_parent_dofs() const
+  { return _local_retained_parent_dofs; }
+
+  /**
+   * \returns The nonlocal reduced degrees of freedom used by active local elements, sorted: the
+   * ghost entries of a ghosted vector on this space
+   */
+  const std::vector<dof_id_type> & send_list() const { return _send_list; }
+
+  /**
+   * \returns The ghost entries of a ghosted vector on the parent space
+   */
+  const std::vector<dof_id_type> & parent_send_list() const;
+
+  /**
+   * Whether field degree of freedom \p field_dof is retained: the parent retains it and \p
+   * retain_field_dof() accepts it
+   */
+  bool retains_field_dof(const Elem & elem,
+                         unsigned int node_num,
+                         unsigned int var_num,
+                         dof_id_type field_dof) const;
+
+  /**
+   * Whether SCALAR degree of freedom \p scalar_dof is retained: the parent retains it and \p
+   * retain_scalar_dof() accepts it
+   */
+  bool retains_scalar_dof(dof_id_type scalar_dof) const;
+
+  /**
    * \returns The reduced degree of freedom indices on the active local element with id \p
    * elem_id, by reduced variable number. Concatenated, these are in the order in which \p
    * retained_dof_added() saw them
@@ -145,9 +206,9 @@ public:
   dof_id_type find_reduced_dof(dof_id_type full_dof) const;
 
   /**
-   * Whether field degree of freedom \p field_dof of variable \p var_num on \p elem is retained.
-   * \p node_num is the element-local node holding it, or \p invalid_uint for an element degree of
-   * freedom
+   * This space's rule for retaining field degree of freedom \p field_dof of variable \p var_num on
+   * \p elem, among those the parent retains. \p node_num is the element-local node holding it, or
+   * \p invalid_uint for an element degree of freedom
    */
   virtual bool retain_field_dof(const Elem & elem,
                                 unsigned int node_num,
@@ -155,7 +216,8 @@ public:
                                 dof_id_type field_dof) const = 0;
 
   /**
-   * Whether degree of freedom \p scalar_dof of a SCALAR variable is retained
+   * This space's rule for retaining degree of freedom \p scalar_dof of a SCALAR variable, among
+   * those the parent retains
    */
   virtual bool retain_scalar_dof(dof_id_type /*scalar_dof*/) const { return true; }
 
@@ -175,8 +237,8 @@ protected:
   virtual void retained_dof_added(const Elem & elem, dof_id_type full_dof);
 
   /**
-   * Called by \p reinit() for each field degree of freedom on \p elem that \p retain_field_dof()
-   * rejects
+   * Called by \p reinit() for each field degree of freedom on \p elem that the parent retains and
+   * \p retain_field_dof() rejects
    */
   virtual void unretained_dof_found(const Elem & elem, dof_id_type full_dof);
 
@@ -210,6 +272,15 @@ private:
 
   /// The name of the stand-in reduced system
   const std::string _reduced_system_name;
+
+  /// The reduced space this one is nested in, or null for the full space
+  const ReducedDofMap * _parent;
+
+  /// The local retained degrees of freedom in the parent numbering, sorted
+  std::vector<dof_id_type> _local_retained_parent_dofs;
+
+  /// The nonlocal reduced degrees of freedom used by active local elements, sorted
+  std::vector<dof_id_type> _send_list;
 
   /// Whether \p reinit() has built the reduced space
   bool _initialized;
