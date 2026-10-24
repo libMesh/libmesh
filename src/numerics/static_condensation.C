@@ -106,7 +106,11 @@ void StaticCondensation::init(const ParallelType type)
 {
   if (!this->initialized())
     {
-      PetscMatrixShellMatrix<Number>::init(type);
+      // The operator acts on the parent space of the static condensation dof map
+      const auto n = _reduced_dof_map.parent_n_dofs();
+      const auto n_local = _reduced_dof_map.parent_n_local_dofs();
+      libmesh_assert(n == n_local || type != SERIAL);
+      PetscMatrixShellMatrix<Number>::init(n, n, n_local, n_local);
       _parallel_type = type;
       this->init();
     }
@@ -175,9 +179,14 @@ void StaticCondensation::init()
       _reduced_sys_mat->init(n, n, n_local, n_local, nz, oz);
     }
 
-  // Build ghosted full solution vector. Note that this is, in general, *not equal* to the system
-  // solution, e.g. this may correspond to the solution for the Newton *update*
-  _ghosted_full_sol = _system.current_local_solution->clone();
+  // Build the ghosted parent-space solution vector. Note that this is, in general, *not equal* to
+  // the system solution, e.g. this may correspond to the solution for the Newton *update*
+  _ghosted_parent_sol = NumericVector<Number>::build(this->comm());
+  _ghosted_parent_sol->init(_reduced_dof_map.parent_n_dofs(),
+                            _reduced_dof_map.parent_n_local_dofs(),
+                            _reduced_dof_map.parent_send_list(),
+                            /*fast=*/false,
+                            GHOSTED);
 
   _sc_is_initialized = true;
 }
@@ -245,19 +254,29 @@ void StaticCondensation::zero()
 
 void StaticCondensation::setup() { libmesh_assert(this->closed()); }
 
-numeric_index_type StaticCondensation::m() const { return _full_dof_map.n_dofs(); }
+numeric_index_type StaticCondensation::m() const { return _reduced_dof_map.parent_n_dofs(); }
 
-numeric_index_type StaticCondensation::row_start() const { return _full_dof_map.first_dof(); }
+numeric_index_type StaticCondensation::row_start() const
+{
+  return _reduced_dof_map.parent_first_dof();
+}
 
-numeric_index_type StaticCondensation::row_stop() const { return _full_dof_map.end_dof(); }
+numeric_index_type StaticCondensation::row_stop() const
+{
+  return _reduced_dof_map.parent_end_dof();
+}
 
 void StaticCondensation::set(const numeric_index_type full_i,
                              const numeric_index_type full_j,
                              const Number val)
 {
-  const auto reduced_i = _reduced_dof_map.reduced_dof(full_i);
-  const auto reduced_j = _reduced_dof_map.reduced_dof(full_j);
-  _reduced_sys_mat->set(reduced_i, reduced_j, val);
+  const auto reduced_i = _reduced_dof_map.find_reduced_dof(full_i);
+  const auto reduced_j = _reduced_dof_map.find_reduced_dof(full_j);
+  libmesh_assert_msg((reduced_i != DofObject::invalid_id && reduced_j != DofObject::invalid_id) ||
+                         _reduced_dof_map.parent(),
+                     "Only uncondensed entries may be set in a statically condensed matrix");
+  if (reduced_i != DofObject::invalid_id && reduced_j != DofObject::invalid_id)
+    _reduced_sys_mat->set(reduced_i, reduced_j, val);
 }
 
 void StaticCondensation::set_current_elem(const Elem & elem)
@@ -286,6 +305,13 @@ void StaticCondensation::add_matrix(const DenseMatrix<Number> & dm,
   const auto & dof_data = libmesh_map_find(_reduced_dof_map._elem_to_dof_data, _current_elem_id);
   EigenMatrix * mat;
 
+  // Entries in rows or columns the parent space eliminates are dropped; the element matrix already
+  // carries the parent reduction, e.g. C^T K C for eliminated constraints
+  const auto * const parent = _reduced_dof_map.parent();
+  auto in_parent = [parent](const auto global_index) {
+    return !parent || parent->find_reduced_dof(global_index) != DofObject::invalid_id;
+  };
+
   auto info_from_index = [&dof_data](const auto global_index) {
     auto index_it = dof_data.condensed_global_to_local_map.find(global_index);
     const bool index_is_condensed = index_it != dof_data.condensed_global_to_local_map.end();
@@ -313,6 +339,8 @@ void StaticCondensation::add_matrix(const DenseMatrix<Number> & dm,
       {
         const auto global_i = rows[i];
         const auto global_j = cols[j];
+        if (!in_parent(global_i) || !in_parent(global_j))
+          continue;
         const auto [i_is_condensed, local_i] = info_from_index(global_i);
         const auto [j_is_condensed, local_j] = info_from_index(global_j);
         if (i_is_condensed)
@@ -379,14 +407,13 @@ void StaticCondensation::set_local_vectors(const NumericVector<Number> & global_
     elem_dof_values(i) = elem_dof_values_vec[i];
 }
 
-void StaticCondensation::forward_elimination(const NumericVector<Number> & full_rhs)
+void StaticCondensation::forward_elimination(const NumericVector<Number> & parent_rhs)
 {
-  std::vector<dof_id_type> elem_condensed_dofs;
   std::vector<Number> elem_condensed_rhs_vec;
   EigenVector elem_condensed_rhs, elem_uncondensed_rhs;
 
-  full_rhs.create_subvector(
-      *_reduced_rhs, _reduced_dof_map.local_retained_dofs(), /*all_global_entries=*/false);
+  parent_rhs.create_subvector(
+      *_reduced_rhs, _reduced_dof_map.local_retained_parent_dofs(), /*all_global_entries=*/false);
 
   std::vector<dof_id_type> reduced_space_indices;
   for (auto elem : _mesh.active_local_element_ptr_range())
@@ -398,14 +425,9 @@ void StaticCondensation::forward_elimination(const NumericVector<Number> & full_
         reduced_space_indices.insert(reduced_space_indices.end(),
                                      var_reduced_space_indices.begin(),
                                      var_reduced_space_indices.end());
-      elem_condensed_dofs.resize(dof_data.condensed_global_to_local_map.size());
-      for (const auto & [global_dof, local_dof] : dof_data.condensed_global_to_local_map)
-        {
-          libmesh_assert(local_dof < elem_condensed_dofs.size());
-          elem_condensed_dofs[local_dof] = global_dof;
-        }
 
-      set_local_vectors(full_rhs, elem_condensed_dofs, elem_condensed_rhs_vec, elem_condensed_rhs);
+      set_local_vectors(
+          parent_rhs, dof_data.condensed_parent_dofs, elem_condensed_rhs_vec, elem_condensed_rhs);
       elem_uncondensed_rhs = -matrix_data.Auc * matrix_data.AccFactor.solve(elem_condensed_rhs);
 
       libmesh_assert(cast_int<std::size_t>(elem_uncondensed_rhs.size()) ==
@@ -415,10 +437,9 @@ void StaticCondensation::forward_elimination(const NumericVector<Number> & full_
   _reduced_rhs->close();
 }
 
-void StaticCondensation::backwards_substitution(const NumericVector<Number> & full_rhs,
-                                                NumericVector<Number> & full_sol)
+void StaticCondensation::backwards_substitution(const NumericVector<Number> & parent_rhs,
+                                                NumericVector<Number> & parent_sol)
 {
-  std::vector<dof_id_type> elem_condensed_dofs, elem_uncondensed_dofs;
   std::vector<Number> elem_condensed_rhs_vec, elem_uncondensed_sol_vec;
   EigenVector elem_condensed_rhs, elem_uncondensed_sol, elem_condensed_sol;
 
@@ -426,49 +447,38 @@ void StaticCondensation::backwards_substitution(const NumericVector<Number> & fu
     {
       auto & matrix_data = libmesh_map_find(_elem_to_matrix_data, elem->id());
       const auto & dof_data = libmesh_map_find(_reduced_dof_map._elem_to_dof_data, elem->id());
-      elem_condensed_dofs.resize(dof_data.condensed_global_to_local_map.size());
-      elem_uncondensed_dofs.resize(dof_data.uncondensed_global_to_local_map.size());
-      for (const auto & [global_dof, local_dof] : dof_data.condensed_global_to_local_map)
-        {
-          libmesh_assert(local_dof < elem_condensed_dofs.size());
-          elem_condensed_dofs[local_dof] = global_dof;
-        }
-      for (const auto & [global_dof, local_dof] : dof_data.uncondensed_global_to_local_map)
-        {
-          libmesh_assert(local_dof < elem_uncondensed_dofs.size());
-          elem_uncondensed_dofs[local_dof] = global_dof;
-        }
 
-      set_local_vectors(full_rhs, elem_condensed_dofs, elem_condensed_rhs_vec, elem_condensed_rhs);
-      set_local_vectors(*_ghosted_full_sol,
-                        elem_uncondensed_dofs,
+      set_local_vectors(
+          parent_rhs, dof_data.condensed_parent_dofs, elem_condensed_rhs_vec, elem_condensed_rhs);
+      set_local_vectors(*_ghosted_parent_sol,
+                        dof_data.uncondensed_parent_dofs,
                         elem_uncondensed_sol_vec,
                         elem_uncondensed_sol);
 
       elem_condensed_sol =
           matrix_data.AccFactor.solve(elem_condensed_rhs - matrix_data.Acu * elem_uncondensed_sol);
-      full_sol.insert(elem_condensed_sol.data(), elem_condensed_dofs);
+      parent_sol.insert(elem_condensed_sol.data(), dof_data.condensed_parent_dofs);
     }
 
-  full_sol.close();
+  parent_sol.close();
 }
 
-void StaticCondensation::apply(const NumericVector<Number> & full_rhs,
-                               NumericVector<Number> & full_parallel_sol)
+void StaticCondensation::apply(const NumericVector<Number> & parent_rhs,
+                               NumericVector<Number> & parent_sol)
 {
-  forward_elimination(full_rhs);
+  forward_elimination(parent_rhs);
   // Apparently PETSc will send us the yvec without zeroing it ahead of time. This can be a poor
   // initial guess for the Krylov solve as well as lead to bewildered users who expect their initial
   // residual norm to equal the norm of the RHS
-  full_parallel_sol.zero();
-  _reduced_sol = full_parallel_sol.get_subvector(_reduced_dof_map.local_retained_dofs());
+  parent_sol.zero();
+  _reduced_sol = parent_sol.get_subvector(_reduced_dof_map.local_retained_parent_dofs());
   _reduced_solver->solve(*_reduced_sys_mat, *_reduced_sol, *_reduced_rhs, 1e-5, 300);
-  // Must restore to the full solution because during backwards substitution we will need to be able
-  // to read ghosted dofs and we don't support ghosting of subvectors
-  full_parallel_sol.restore_subvector(std::move(_reduced_sol),
-                                      _reduced_dof_map.local_retained_dofs());
-  *_ghosted_full_sol = full_parallel_sol;
-  backwards_substitution(full_rhs, full_parallel_sol);
+  // Must restore to the parent-space solution because during backwards substitution we will need
+  // to be able to read ghosted dofs and we don't support ghosting of subvectors
+  parent_sol.restore_subvector(std::move(_reduced_sol),
+                               _reduced_dof_map.local_retained_parent_dofs());
+  *_ghosted_parent_sol = parent_sol;
+  backwards_substitution(parent_rhs, parent_sol);
 }
 
 SolverPackage StaticCondensation::solver_package() { return libMesh::default_solver_package(); }

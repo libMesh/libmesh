@@ -50,16 +50,20 @@ bool StaticCondensationDofMap::retain_field_dof(const Elem & elem,
 
 void StaticCondensationDofMap::retained_dof_added(const Elem & elem, const dof_id_type full_dof)
 {
-  auto & map = _elem_to_dof_data[elem.id()].uncondensed_global_to_local_map;
+  auto & dof_data = _elem_to_dof_data[elem.id()];
+  auto & map = dof_data.uncondensed_global_to_local_map;
   const auto local_number = cast_int<dof_id_type>(map.size());
   map.emplace(full_dof, local_number);
+  dof_data.uncondensed_parent_dofs.push_back(this->parent_dof(full_dof));
 }
 
 void StaticCondensationDofMap::unretained_dof_found(const Elem & elem, const dof_id_type full_dof)
 {
-  auto & map = _elem_to_dof_data[elem.id()].condensed_global_to_local_map;
+  auto & dof_data = _elem_to_dof_data[elem.id()];
+  auto & map = dof_data.condensed_global_to_local_map;
   const auto local_number = cast_int<dof_id_type>(map.size());
   map.emplace(full_dof, local_number);
+  dof_data.condensed_parent_dofs.push_back(this->parent_dof(full_dof));
 }
 
 void StaticCondensationDofMap::reinit()
