@@ -3157,7 +3157,12 @@ void DofMap::create_static_condensation(MeshBase & mesh, System & sys)
 void DofMap::reinit_static_condensation()
 {
   if (_sc)
-    _sc->reinit();
+    {
+      // Static condensation reduces the space SNES solves on, which excludes constrained dofs when
+      // they are eliminated
+      _sc->set_parent(_constraint_elimination.get());
+      _sc->reinit();
+    }
 }
 
 void DofMap::create_constraint_elimination(MeshBase & mesh, System & sys)

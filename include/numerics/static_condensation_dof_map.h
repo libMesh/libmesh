@@ -108,6 +108,10 @@ private:
     /// found. The size of this container will be the number of condensed degrees of freedom whose
     /// basis functions are nonzero on the element
     std::unordered_map<dof_id_type, dof_id_type> condensed_global_to_local_map;
+    /// The parent-space indices of the uncondensed and condensed degrees of freedom, by element
+    /// local number
+    std::vector<dof_id_type> uncondensed_parent_dofs;
+    std::vector<dof_id_type> condensed_parent_dofs;
   };
 
   /// Friend the static condensation matrix class so they can inspect our degree of freedom data

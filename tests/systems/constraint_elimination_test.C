@@ -21,6 +21,8 @@
 #include <libmesh/petscdmlibmesh.h>
 #include <libmesh/quadrature_gauss.h>
 #include <libmesh/reduced_sparse_matrix.h>
+#include <libmesh/static_condensation_dof_map.h>
+#include <libmesh/static_condensation.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -92,7 +94,14 @@ public:
         if (residual)
           residual->add_vector(Re, dofs);
         if (jacobian)
-          jacobian->add_matrix(Ke, dofs);
+          {
+#ifdef LIBMESH_HAVE_EIGEN
+            // A statically condensed Jacobian accumulates element matrices by element
+            if (auto * sc = dynamic_cast<StaticCondensation *>(jacobian))
+              sc->set_current_elem(*elem);
+#endif
+            jacobian->add_matrix(Ke, dofs);
+          }
       }
   }
 };
@@ -235,6 +244,9 @@ public:
   CPPUNIT_TEST(testReducedFieldDecomposition);
   CPPUNIT_TEST(testReducedBounds);
   CPPUNIT_TEST(testReducedNullSpace);
+#ifdef LIBMESH_HAVE_EIGEN
+  CPPUNIT_TEST(testCondensedReducedSolve);
+#endif
 #endif
 
   CPPUNIT_TEST_SUITE_END();
@@ -472,6 +484,75 @@ private:
     PetscBool is_null;
     LibmeshPetscCall2(mesh.comm(), MatNullSpaceTest(nullspace, reduced.mat(), &is_null));
     CPPUNIT_ASSERT(is_null);
+  }
+
+  /**
+   * Static condensation nested in constraint elimination: the outer Krylov solve acts on the
+   * unconstrained degrees of freedom and the condensed solve on their element boundary subset.
+   * Condensing exactly must reproduce the eliminated solve without condensation
+   */
+  void testCondensedReducedSolve()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    MeshTools::Generation::build_square(mesh, 4, 4, 0., 1., 0., 1., QUAD9);
+
+    EquationSystems es(mesh);
+    auto & plain_sys = es.add_system<NonlinearImplicitSystem>("plain");
+    auto & condensed_sys = es.add_system<NonlinearImplicitSystem>("condensed");
+    plain_sys.create_constraint_elimination();
+    condensed_sys.create_constraint_elimination();
+    condensed_sys.create_static_condensation();
+
+    NonlinearDiffusion assembly;
+    for (auto * sys : {&plain_sys, &condensed_sys})
+      {
+        // Third order hierarchic shape functions have interior dofs to condense
+        const auto u = sys->add_variable("u", THIRD, HIERARCHIC);
+        PeriodicBoundary periodic(RealVectorValue(0., 1.));
+        periodic.myboundary = 0;
+        periodic.pairedboundary = 2;
+        sys->get_dof_map().add_periodic_boundary(periodic);
+        sys->get_dof_map().add_dirichlet_boundary(
+            DirichletBoundary({3}, {u}, ConstFunction<Number>(2.)));
+        sys->nonlinear_solver->residual_and_jacobian_object = &assembly;
+        sys->nonlinear_solver->relative_residual_tolerance = TOLERANCE * TOLERANCE;
+      }
+
+    if (Elem * elem = mesh.query_elem_ptr(5); elem && elem->active())
+      elem->set_refinement_flag(Elem::REFINE);
+    MeshRefinement(mesh).refine_elements();
+    es.init();
+
+    // The condensed problem is solved exactly, so the outer Krylov solve needs one iteration. The
+    // statically condensed operator has no action of its own, which the default line search needs
+    LibmeshPetscCall2(mesh.comm(), PetscOptionsSetValue(nullptr, "-condensed_ksp_type", "preonly"));
+    LibmeshPetscCall2(mesh.comm(),
+                      PetscOptionsSetValue(nullptr, "-condensed_snes_linesearch_type", "basic"));
+    LibmeshPetscCall2(mesh.comm(), PetscOptionsSetValue(nullptr, "-condensed_condensed_pc_type", "lu"));
+    LibmeshPetscCall2(mesh.comm(), PetscOptionsSetValue(nullptr, "-plain_pc_type", "lu"));
+    for (auto * sys : {&plain_sys, &condensed_sys})
+      {
+        sys->prefix_with_name(true);
+        sys->solution->zero();
+        sys->solution->close();
+        sys->update();
+        sys->solve();
+        CPPUNIT_ASSERT(sys->nonlinear_solver->converged);
+      }
+    for (const char * option : {"-condensed_ksp_type",
+                                "-condensed_snes_linesearch_type",
+                                "-condensed_condensed_pc_type",
+                                "-plain_pc_type"})
+      LibmeshPetscCall2(mesh.comm(), PetscOptionsClearValue(nullptr, option));
+
+    const auto & dof_map = plain_sys.get_dof_map();
+    CPPUNIT_ASSERT(condensed_sys.get_dof_map().get_static_condensation().n_dofs() <
+                   dof_map.get_constraint_elimination().n_dofs());
+    for (const auto i : make_range(dof_map.first_dof(), dof_map.end_dof()))
+      LIBMESH_ASSERT_NUMBERS_EQUAL(
+          (*plain_sys.solution)(i), (*condensed_sys.solution)(i), std::sqrt(TOLERANCE) * TOLERANCE);
   }
 
   /**

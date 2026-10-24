@@ -166,7 +166,7 @@ public:
    * Perform our three stages, \p forward_elimination(), a \p solve() on the condensed system, and
    * finally a \p backwards_substitution()
    */
-  void apply(const NumericVector<Number> & full_rhs, NumericVector<Number> & full_sol);
+  void apply(const NumericVector<Number> & parent_rhs, NumericVector<Number> & parent_sol);
 
   const SparseMatrix<Number> & get_condensed_mat() const;
 
@@ -211,20 +211,20 @@ private:
                                 EigenVector & elem_dof_values);
 
   /**
-   * Takes an incoming "full" RHS from the solver, where full means the union of uncondensed and
-   * condennsed dofs, and condenses it down into the condensed \p _reduced_rhs data member using
-   * element Schur complements
+   * Takes an incoming RHS from the solver on the parent space of the static condensation dof map,
+   * which holds both uncondensed and condensed dofs, and condenses it down into the condensed \p
+   * _reduced_rhs data member using element Schur complements
    */
-  void forward_elimination(const NumericVector<Number> & full_rhs);
+  void forward_elimination(const NumericVector<Number> & parent_rhs);
 
   /**
    * After performing the solve with the \p _reduced_rhs and Schur complement matrix (\p
-   * _reduced_sys_mat) to determine the \p _reduced_sol, we use the uncondensed \p full_rhs along
-   * with the \p _reduced_sol to back substitute into the \p full_sol, which is the final output
-   * data of the static condensation preconditioner application
+   * _reduced_sys_mat) to determine the \p _reduced_sol, we use the parent-space \p parent_rhs
+   * along with the \p _reduced_sol to back substitute into the parent-space \p parent_sol, which
+   * is the final output data of the static condensation preconditioner application
    */
-  void backwards_substitution(const NumericVector<Number> & full_rhs,
-                              NumericVector<Number> & full_sol);
+  void backwards_substitution(const NumericVector<Number> & parent_rhs,
+                              NumericVector<Number> & parent_sol);
 
   /**
    * Data stored on a per-element basis used to compute element Schur complements and their
@@ -263,10 +263,10 @@ private:
   std::unique_ptr<NumericVector<Number>> _reduced_rhs;
   /// The solver for the uncondensed degrees of freedom
   std::unique_ptr<LinearSolver<Number>> _reduced_solver;
-  /// This is a ghosted representation of the full (uncondensed + condensed) solution. Note that
-  // this is, in general, *not equal* to the system solution, e.g. this may correspond to the
-  // solution for the Newton *update*
-  std::unique_ptr<NumericVector<Number>> _ghosted_full_sol;
+  /// This is a ghosted representation of the solution on the parent space, uncondensed and
+  // condensed dofs together. Note that this is, in general, *not equal* to the system solution,
+  // e.g. this may correspond to the solution for the Newton *update*
+  std::unique_ptr<NumericVector<Number>> _ghosted_parent_sol;
 
   /// The current element ID. This is one half of a key, along with the global index, that maps to a
   /// local index

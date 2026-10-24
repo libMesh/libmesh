@@ -39,6 +39,7 @@ ReducedDofMap::ReducedDofMap(MeshBase & mesh,
     _system(system),
     _dof_map(dof_map),
     _reduced_system_name(std::move(reduced_system_name)),
+    _parent(nullptr),
     _initialized(false),
     _reduced_system(nullptr)
 {
@@ -49,6 +50,21 @@ ReducedDofMap::~ReducedDofMap() = default;
 void ReducedDofMap::retained_dof_added(const Elem &, dof_id_type) {}
 
 void ReducedDofMap::unretained_dof_found(const Elem &, dof_id_type) {}
+
+bool ReducedDofMap::retains_field_dof(const Elem & elem,
+                                      const unsigned int node_num,
+                                      const unsigned int var_num,
+                                      const dof_id_type field_dof) const
+{
+  return (!_parent || _parent->retains_field_dof(elem, node_num, var_num, field_dof)) &&
+         this->retain_field_dof(elem, node_num, var_num, field_dof);
+}
+
+bool ReducedDofMap::retains_scalar_dof(const dof_id_type scalar_dof) const
+{
+  return (!_parent || _parent->retains_scalar_dof(scalar_dof)) &&
+         this->retain_scalar_dof(scalar_dof);
+}
 
 void ReducedDofMap::retain_dof(const dof_id_type full_dof)
 {
@@ -65,6 +81,14 @@ void ReducedDofMap::retain_dof_and_constraining_dofs(const Elem * const elem,
 {
   if (!elem_seen.insert(full_dof).second)
     return;
+
+  // A constraining dof belongs to this space only if it belongs to the parent space; one the
+  // parent eliminates still passes its own constraining dofs on
+  if (_parent && _parent->find_reduced_dof(full_dof) == DofObject::invalid_id)
+    {
+      this->retain_constraining_dofs(elem, full_dof, elem_seen, elem_var_dofs);
+      return;
+    }
 
   this->retain_dof(full_dof);
   elem_var_dofs.push_back(full_dof);
@@ -107,7 +131,7 @@ void ReducedDofMap::reinit()
           {
             _dof_map.SCALAR_dof_indices(scalar_dof_indices, vg_description.number(vg_vn));
             for (const auto dof : scalar_dof_indices)
-              if (this->retain_scalar_dof(dof))
+              if (this->retains_scalar_dof(dof))
                 this->retain_dof(dof);
           }
       }
@@ -123,7 +147,7 @@ void ReducedDofMap::reinit()
                                  const std::vector<dof_id_type> & scalar_dof_indices) {
     dof_indices.insert(dof_indices.end(), scalar_dof_indices.begin(), scalar_dof_indices.end());
     for (const auto dof : scalar_dof_indices)
-      if (this->retain_scalar_dof(dof))
+      if (this->retains_scalar_dof(dof))
         this->retain_dof_and_constraining_dofs(&elem, dof, elem_seen, *elem_var_dofs);
       else
         {
@@ -139,11 +163,13 @@ void ReducedDofMap::reinit()
                                                               std::vector<dof_id_type> & dof_indices,
                                                               const dof_id_type field_dof) {
     dof_indices.push_back(field_dof);
-    if (this->retain_field_dof(elem, node_num, var_num, field_dof))
+    if (this->retains_field_dof(elem, node_num, var_num, field_dof))
       this->retain_dof_and_constraining_dofs(&elem, field_dof, elem_seen, *elem_var_dofs);
     else
       {
-        this->unretained_dof_found(elem, field_dof);
+        // Only dofs of the parent space belong to this space's problem
+        if (!_parent || _parent->retains_field_dof(elem, node_num, var_num, field_dof))
+          this->unretained_dof_found(elem, field_dof);
         if (!_dof_map.local_index(field_dof))
           _nonlocal_unretained.insert(field_dof);
         this->retain_constraining_dofs(&elem, field_dof, elem_seen, *elem_var_dofs);
@@ -230,6 +256,18 @@ void ReducedDofMap::reinit()
                                    store_reduced,
                                    &DofObject::invalid_id);
 
+  // The parent indices of the local retained dofs, and the ghosts of a vector on this space
+  _local_retained_parent_dofs.resize(_local_retained_dofs.size());
+  for (const auto i : index_range(_local_retained_dofs))
+    _local_retained_parent_dofs[i] = this->parent_dof(_local_retained_dofs[i]);
+  for (const auto & [full_dof, reduced] : _nonlocal_full_to_reduced)
+    {
+      libmesh_ignore(full_dof);
+      if (reduced != DofObject::invalid_id)
+        _send_list.push_back(reduced);
+    }
+  std::sort(_send_list.begin(), _send_list.end());
+
   //
   // Determine the variables with any dofs in the reduced space
   //
@@ -313,6 +351,36 @@ dof_id_type ReducedDofMap::find_reduced_dof(const dof_id_type full_dof) const
   return libmesh_map_find(_nonlocal_full_to_reduced, full_dof);
 }
 
+dof_id_type ReducedDofMap::parent_dof(const dof_id_type full_dof) const
+{
+  return _parent ? _parent->find_reduced_dof(full_dof) : full_dof;
+}
+
+dof_id_type ReducedDofMap::parent_n_dofs() const
+{
+  return _parent ? _parent->n_dofs() : _dof_map.n_dofs();
+}
+
+dof_id_type ReducedDofMap::parent_n_local_dofs() const
+{
+  return _parent ? _parent->n_local_dofs() : _dof_map.n_local_dofs();
+}
+
+dof_id_type ReducedDofMap::parent_first_dof() const
+{
+  return _parent ? _parent->first_dof() : _dof_map.first_dof();
+}
+
+dof_id_type ReducedDofMap::parent_end_dof() const
+{
+  return _parent ? _parent->end_dof() : _dof_map.end_dof();
+}
+
+const std::vector<dof_id_type> & ReducedDofMap::parent_send_list() const
+{
+  return _parent ? _parent->send_list() : _dof_map.get_send_list();
+}
+
 dof_id_type ReducedDofMap::reduced_dof(const dof_id_type full_dof) const
 {
   const auto reduced = this->find_reduced_dof(full_dof);
@@ -353,6 +421,8 @@ void ReducedDofMap::clear()
 {
   DofMapBase::clear();
   _local_retained_dofs.clear();
+  _local_retained_parent_dofs.clear();
+  _send_list.clear();
   _local_full_to_reduced.clear();
   _nonlocal_full_to_reduced.clear();
   _local_retained_set.clear();

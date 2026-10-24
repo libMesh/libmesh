@@ -234,10 +234,10 @@ void System::init_data ()
   // reinit_constraints() did prepare_send_list() for us.
 
   // Now finally after dof distribution and construction of any
-  // possible constraints, we may init any static condensation
-  // or constraint elimination data
-  _dof_map->reinit_static_condensation();
+  // possible constraints, we may init any constraint elimination
+  // data and then the static condensation data nested in it
   _dof_map->reinit_constraint_elimination();
+  _dof_map->reinit_static_condensation();
 
   // Resize the solution conformal to the current mesh
   solution->init (this->n_dofs(), this->n_local_dofs(), false, PARALLEL);
@@ -454,10 +454,10 @@ void System::reinit ()
   // project_vector handles vector initialization now
   libmesh_assert_equal_to (solution->size(), current_local_solution->size());
 
-  // Make sure our static condensation and constraint elimination dof maps are up-to-date before
+  // Make sure our constraint elimination and static condensation dof maps are up-to-date before
   // we init any matrices on their reduced spaces
-  this->get_dof_map().reinit_static_condensation();
   this->get_dof_map().reinit_constraint_elimination();
+  this->get_dof_map().reinit_static_condensation();
 
   if (!_matrices.empty() && !_basic_system_only)
     {
@@ -2686,8 +2686,6 @@ void System::create_static_condensation()
 
 void System::create_constraint_elimination()
 {
-  libmesh_error_msg_if(this->has_static_condensation(),
-                       "Constraint elimination cannot yet be combined with static condensation");
   this->get_dof_map().create_constraint_elimination(this->get_mesh(), *this);
 }
 

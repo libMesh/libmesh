@@ -114,7 +114,7 @@ void Build::sorted_connected_dofs(const Elem * elem,
     {
       dof_indices.insert(dof_indices.end(), scalar_dof_indices.begin(), scalar_dof_indices.end());
       for (const auto scalar_dof : scalar_dof_indices)
-        (this->reduced->retain_scalar_dof(scalar_dof) ? dofs_vi : dummy_unretained)
+        (this->reduced->retains_scalar_dof(scalar_dof) ? dofs_vi : dummy_unretained)
             .push_back(scalar_dof);
     };
 
@@ -126,7 +126,7 @@ void Build::sorted_connected_dofs(const Elem * elem,
                         const dof_id_type field_dof)
     {
       dof_indices.push_back(field_dof);
-      (this->reduced->retain_field_dof(functor_elem, node_num, var_num, field_dof)
+      (this->reduced->retains_field_dof(functor_elem, node_num, var_num, field_dof)
            ? dofs_vi
            : dummy_unretained)
           .push_back(field_dof);
