@@ -293,7 +293,7 @@ public:
   /**
    * \returns Whether two ranges are equal.
    */
-  bool operator== (StoredRange<iterator_type, object_type> & other) const
+  bool operator== (const StoredRange<iterator_type, object_type> & other) const
   {
     for (auto it = this->begin(), it2 = other.begin();
          it != this->end() || it2 != other.end(); ++it, ++it2)
