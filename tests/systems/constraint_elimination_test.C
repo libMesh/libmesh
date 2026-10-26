@@ -29,10 +29,12 @@
 
 using namespace libMesh;
 
-#ifdef LIBMESH_HAVE_PETSC
+// The tests use PETSc solvers and a mesh with hanging nodes, periodic and Dirichlet constraints
+#if defined(LIBMESH_HAVE_PETSC) && defined(LIBMESH_ENABLE_AMR) &&                                  \
+    defined(LIBMESH_ENABLE_PERIODIC) && defined(LIBMESH_ENABLE_DIRICHLET) && LIBMESH_DIM > 1
+
 // Defined in petscdmlibmeshimpl.C without a public declaration
 PetscErrorCode DMlibMeshCreateFieldDecompositionDM(DM dm, PetscInt dnumber, PetscInt * dsizes, char *** dvarlists, DM * ddm);
-#endif
 
 namespace
 {
@@ -80,13 +82,13 @@ public:
                 u += phi[j][qp] * soln(dofs[j]);
                 grad_u.add_scaled(dphi[j][qp], soln(dofs[j]));
               }
-            const Number k = 1 + u * u;
+            const Number k = 1. + u * u;
             for (const auto i : make_range(n))
               {
-                Re(i) += JxW[qp] * (k * grad_u * dphi[i][qp] + (grad_u(0) - 1) * phi[i][qp]);
+                Re(i) += JxW[qp] * (k * grad_u * dphi[i][qp] + (grad_u(0) - 1.) * phi[i][qp]);
                 for (const auto j : make_range(n))
                   Ke(i, j) += JxW[qp] * (k * dphi[j][qp] * dphi[i][qp] +
-                                         2 * u * phi[j][qp] * (grad_u * dphi[i][qp]) +
+                                         2. * u * phi[j][qp] * (grad_u * dphi[i][qp]) +
                                          dphi[j][qp](0) * phi[i][qp]);
               }
           }
@@ -237,8 +239,6 @@ class ConstraintEliminationTest : public CppUnit::TestCase
 public:
   LIBMESH_CPPUNIT_TEST_SUITE(ConstraintEliminationTest);
 
-#if defined(LIBMESH_HAVE_PETSC) && defined(LIBMESH_ENABLE_AMR) &&                                  \
-    defined(LIBMESH_ENABLE_PERIODIC) && defined(LIBMESH_ENABLE_DIRICHLET) && LIBMESH_DIM > 1
   CPPUNIT_TEST(testReducedOperator);
   CPPUNIT_TEST(testReducedSolve);
   CPPUNIT_TEST(testReducedFieldDecomposition);
@@ -246,7 +246,6 @@ public:
   CPPUNIT_TEST(testReducedNullSpace);
 #ifdef LIBMESH_HAVE_EIGEN
   CPPUNIT_TEST(testCondensedReducedSolve);
-#endif
 #endif
 
   CPPUNIT_TEST_SUITE_END();
@@ -495,6 +494,12 @@ private:
   {
     LOG_UNIT_TEST;
 
+#if !defined(LIBMESH_PETSC_HAVE_MUMPS) && !defined(LIBMESH_PETSC_HAVE_SUPERLU_DIST)
+    // The solves use LU, which needs a parallel direct solver when the matrices are distributed
+    if (TestCommWorld->size() > 1)
+      return;
+#endif
+
     Mesh mesh(*TestCommWorld);
     MeshTools::Generation::build_square(mesh, 4, 4, 0., 1., 0., 1., QUAD9);
 
@@ -630,3 +635,5 @@ private:
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION(ConstraintEliminationTest);
+
+#endif
