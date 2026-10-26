@@ -2020,16 +2020,6 @@ void MeshBase::cache_elem_data()
                   static_cast<int>(elem->supported_nodal_order())));
   }
 
-  if (!this->is_serial())
-  {
-    // Some different dimension/order/subdomain elements may only live
-    // on other processors
-    this->comm().set_union(_elem_dims);
-    this->comm().set_union(_elem_default_orders);
-    this->comm().min(_supported_nodal_order);
-    this->comm().set_union(_mesh_subdomains);
-  }
-
   // If the largest element dimension found is larger than the current
   // _spatial_dimension, increase _spatial_dimension.
   unsigned int max_dim = this->mesh_dimension();
@@ -2072,6 +2062,17 @@ void MeshBase::cache_elem_data()
             }
 #endif
         }
+    }
+
+  if (!this->is_serial())
+    {
+      // Some different dimension/order/subdomain elements may only
+      // live on other processors
+      this->comm().set_union(_elem_dims);
+      this->comm().set_union(_elem_default_orders);
+      this->comm().min(_supported_nodal_order);
+      this->comm().set_union(_mesh_subdomains);
+      this->comm().max(_spatial_dimension);
     }
 
   _preparation.has_cached_elem_data = true;
