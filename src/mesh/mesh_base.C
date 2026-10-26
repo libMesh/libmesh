@@ -54,10 +54,31 @@
 #include "libmesh/periodic_boundaries.h"
 #include "libmesh/periodic_boundary.h"
 
+namespace {
+  using namespace libMesh;
+
+  template <typename ConstRange, typename Range>
+  const ConstRange &
+  const_shim(const MeshBase & mesh,
+             const Range & (MeshBase::*range_func)(),
+             std::unique_ptr<ConstRange> & shim_range)
+  {
+    if (!shim_range)
+      {
+        MeshBase & evil = const_cast<MeshBase &>(mesh);
+        const Range & range = (evil.*range_func)();
+
+        shim_range =
+          std::make_unique<ConstRange>
+            (range.begin(), range.end(), range.grainsize());
+      }
+
+    return *shim_range;
+  }
+}
+
 namespace libMesh
 {
-
-
 
 // ------------------------------------------------------------
 // MeshBase class member functions
@@ -70,10 +91,15 @@ MeshBase::MeshBase (const Parallel::Communicator & comm_in,
   _default_mapping_data(0),
   _preparation (),
   _element_stored_range (),
+  _const_element_stored_range (),
+  _active_local_element_stored_range (),
   _const_active_local_element_stored_range (),
   _node_stored_range (),
+  _const_node_stored_range (),
   _local_node_stored_range (),
+  _const_local_node_stored_range (),
   _unpartitioned_node_stored_range (),
+  _const_unpartitioned_node_stored_range (),
   _point_locator (),
   _count_lower_dim_elems_in_point_locator(true),
   _partitioner   (),
@@ -110,10 +136,15 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
   _default_mapping_data(other_mesh._default_mapping_data),
   _preparation (other_mesh._preparation),
   _element_stored_range (),
+  _const_element_stored_range (),
+  _active_local_element_stored_range (),
   _const_active_local_element_stored_range (),
   _node_stored_range (),
+  _const_node_stored_range (),
   _local_node_stored_range (),
+  _const_local_node_stored_range (),
   _unpartitioned_node_stored_range (),
+  _const_unpartitioned_node_stored_range (),
   _point_locator (),
   _count_lower_dim_elems_in_point_locator(other_mesh._count_lower_dim_elems_in_point_locator),
   _partitioner   (),
@@ -201,15 +232,13 @@ MeshBase& MeshBase::operator= (MeshBase && other_mesh)
   // Move assign as a ParallelObject.
   this->ParallelObject::operator=(other_mesh);
 
+  // Any stored ranges we had are invalid now
+  this->clear_stored_ranges();
+
   _n_parts = other_mesh.n_partitions();
   _default_mapping_type = other_mesh.default_mapping_type();
   _default_mapping_data = other_mesh.default_mapping_data();
   _preparation = other_mesh._preparation;
-  _element_stored_range = std::move(other_mesh._element_stored_range);
-  _const_active_local_element_stored_range = std::move(other_mesh._const_active_local_element_stored_range);
-  _node_stored_range = std::move(other_mesh._node_stored_range);
-  _local_node_stored_range = std::move(other_mesh._local_node_stored_range);
-  _unpartitioned_node_stored_range = std::move(other_mesh._unpartitioned_node_stored_range);
   _point_locator = std::move(other_mesh._point_locator);
   _count_lower_dim_elems_in_point_locator = other_mesh.get_count_lower_dim_elems_in_point_locator();
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
@@ -1188,9 +1217,12 @@ void MeshBase::update_post_partitioning()
 {
   // Any range over local objects is obsolete if our partitioner
   // changed the definition of "local".
+  _active_local_element_stored_range.reset(nullptr);
   _const_active_local_element_stored_range.reset(nullptr);
   _local_node_stored_range.reset(nullptr);
+  _const_local_node_stored_range.reset(nullptr);
   _unpartitioned_node_stored_range.reset(nullptr);
+  _const_unpartitioned_node_stored_range.reset(nullptr);
 
   // A range over all elements or nodes might still be fine here, but
   // not if there's a possibility that we've remoted or gathered
@@ -1198,7 +1230,9 @@ void MeshBase::update_post_partitioning()
   if (!this->is_replicated())
     {
       _element_stored_range.reset(nullptr);
+      _const_element_stored_range.reset(nullptr);
       _node_stored_range.reset(nullptr);
+      _const_node_stored_range.reset(nullptr);
     }
 }
 
@@ -1993,30 +2027,44 @@ const ElemRange & MeshBase::element_stored_range()
 }
 
 
-const ConstElemRange & MeshBase::active_local_element_stored_range() const
+const ConstElemRange & MeshBase::element_stored_range() const
 {
-  if (!_const_active_local_element_stored_range)
+  return const_shim(*this, &MeshBase::element_stored_range,
+                    _const_element_stored_range);
+}
+
+
+const ElemRange & MeshBase::active_local_element_stored_range()
+{
+  if (!_active_local_element_stored_range)
     {
       // Assigning to our cache may not be safe within threads
       libmesh_assert(!Threads::in_threads);
 
-      _const_active_local_element_stored_range =
-        std::make_unique<ConstElemRange>(this->active_local_elements_begin(),
-                                         this->active_local_elements_end());
+      _active_local_element_stored_range =
+        std::make_unique<ElemRange>(this->active_local_elements_begin(),
+                                    this->active_local_elements_end());
     }
   else
 #ifdef DEBUG
-    libmesh_assert(*_const_active_local_element_stored_range ==
-                   ConstElemRange(this->active_local_elements_begin(),
-                                  this->active_local_elements_end()));
+    libmesh_assert(*_active_local_element_stored_range ==
+                   ElemRange(this->active_local_elements_begin(),
+                             this->active_local_elements_end()));
 #else
     libmesh_assert_equal_to
-      (cast_int<std::ptrdiff_t>(_const_active_local_element_stored_range->size()),
+      (cast_int<std::ptrdiff_t>(_active_local_element_stored_range->size()),
        std::distance(this->active_local_elements_begin(),
                      this->active_local_elements_end()));
 #endif
 
-  return *_const_active_local_element_stored_range;
+  return *_active_local_element_stored_range;
+}
+
+
+const ConstElemRange & MeshBase::active_local_element_stored_range() const
+{
+  return const_shim(*this, &MeshBase::active_local_element_stored_range,
+                    _const_active_local_element_stored_range);
 }
 
 
@@ -2048,19 +2096,9 @@ const NodeRange & MeshBase::node_stored_range()
 
 const ConstNodeRange & MeshBase::node_stored_range() const
 {
-  if (!_node_stored_range)
-    {
-      const NodeRange & range =
-        const_cast<MeshBase *>(this)->node_stored_range();
-
-      _const_node_stored_range =
-        std::make_unique<ConstNodeRange>
-          (range.begin(), range.end(), range.grainsize());
-    }
-
-  return *_const_node_stored_range;
+  return const_shim(*this, &MeshBase::node_stored_range,
+                    _const_node_stored_range);
 }
-
 
 
 const NodeRange & MeshBase::local_node_stored_range()
@@ -2087,6 +2125,13 @@ const NodeRange & MeshBase::local_node_stored_range()
 #endif
 
   return *_local_node_stored_range;
+}
+
+
+const ConstNodeRange & MeshBase::local_node_stored_range() const
+{
+  return const_shim(*this, &MeshBase::local_node_stored_range,
+                    _const_local_node_stored_range);
 }
 
 
@@ -2117,13 +2162,25 @@ const NodeRange & MeshBase::unpartitioned_node_stored_range()
 }
 
 
+const ConstNodeRange & MeshBase::unpartitioned_node_stored_range() const
+{
+  return const_shim(*this, &MeshBase::unpartitioned_node_stored_range,
+                    _const_unpartitioned_node_stored_range);
+}
+
+
 void MeshBase::clear_stored_ranges()
 {
   _element_stored_range.reset(nullptr);
+  _const_element_stored_range.reset(nullptr);
+  _active_local_element_stored_range.reset(nullptr);
   _const_active_local_element_stored_range.reset(nullptr);
   _node_stored_range.reset(nullptr);
+  _const_node_stored_range.reset(nullptr);
   _local_node_stored_range.reset(nullptr);
+  _const_local_node_stored_range.reset(nullptr);
   _unpartitioned_node_stored_range.reset(nullptr);
+  _const_unpartitioned_node_stored_range.reset(nullptr);
 }
 
 

@@ -1903,19 +1903,15 @@ public:
   /**
    * \returns A reference to a cached vector copy of a range of
    * pointers to all semilocal elements, suitable for threading.
-   *
-   * Iterating over all semilocal elements is most useful for
-   * modifying the mesh, so we only have a non-const version for now.
    */
   const ElemRange & element_stored_range();
+  const ConstElemRange & element_stored_range() const;
 
   /**
    * \returns A reference to a cached vector copy of a range of
    * pointers to all active local elements, suitable for threading.
-   *
-   * Iterating over only local elements is most useful for computing
-   * on the mesh, so we only have a non-const version for now.
    */
+  const ElemRange & active_local_element_stored_range();
   const ConstElemRange & active_local_element_stored_range() const;
 
   /**
@@ -1928,20 +1924,16 @@ public:
   /**
    * \returns A reference to a cached vector copy of a range of
    * pointers to all local nodes, suitable for threading.
-   *
-   * Iterating over all local nodes is most useful for
-   * modifying the mesh, so we only have a non-const version for now.
    */
   const NodeRange & local_node_stored_range();
+  const ConstNodeRange & local_node_stored_range() const;
 
   /**
    * \returns A reference to a cached vector copy of a range of
    * pointers to all unpartitioned nodes, suitable for threading.
-   *
-   * Iterating over all unpartitioned nodes is most useful for
-   * modifying the mesh, so we only have a non-const version for now.
    */
   const NodeRange & unpartitioned_node_stored_range();
+  const ConstNodeRange & unpartitioned_node_stored_range() const;
 
   /**
    * Clears stored ranges, to indicate that the mesh has changed and
@@ -2237,17 +2229,30 @@ protected:
    * A cached \p ElemRange for threaded mutation of all semilocal
    * elements of this mesh.
    *
-   * This will not actually be built unless needed.
+   * This will not actually be built unless needed.  We do need this
+   * to be mutable so that we can build it on the fly if a const elem
+   * range (using it) is requested
    */
-  std::unique_ptr<ElemRange> _element_stored_range;
+  mutable std::unique_ptr<ElemRange> _element_stored_range;
 
   /**
-   * A cached \p ConstElemRange for threaded calculation on all
+   * A shim to _element_stored_range
+   */
+  mutable std::unique_ptr<ConstElemRange> _const_element_stored_range;
+
+  /**
+   * A cached \p ElemRange for threaded calculation on all
    * local elements of this mesh.
    *
-   * This will not actually be built unless needed. Further, since we
-   * want our \p active_local_element_stored_range() method to be \p
-   * const (yet do the dynamic allocating) this needs to be mutable.
+   * This will not actually be built unless needed.  We do need this
+   * to be mutable so that we can build it on the fly if a const elem
+   * range (using it) is requested
+   */
+  mutable std::unique_ptr<ElemRange>
+    _active_local_element_stored_range;
+
+  /**
+   * A shim to _active_local_element_stored_range
    */
   mutable std::unique_ptr<ConstElemRange>
     _const_active_local_element_stored_range;
@@ -2272,17 +2277,31 @@ protected:
    * A cached \p NodeRange for threaded mutation of all local
    * nodes of this mesh.
    *
-   * This will not actually be built unless needed.
+   * This will not actually be built unless needed.  We do need this
+   * to be mutable so that we can build it on the fly if a const node
+   * range (using it) is requested
    */
-  std::unique_ptr<NodeRange> _local_node_stored_range;
+  mutable std::unique_ptr<NodeRange> _local_node_stored_range;
+
+  /**
+   * A shim to _local_node_stored_range
+   */
+  mutable std::unique_ptr<ConstNodeRange> _const_local_node_stored_range;
 
   /**
    * A cached \p NodeRange for threaded mutation of all unpartitioned
    * nodes of this mesh.
    *
-   * This will not actually be built unless needed.
+   * This will not actually be built unless needed.  We do need this
+   * to be mutable so that we can build it on the fly if a const node
+   * range (using it) is requested
    */
-  std::unique_ptr<NodeRange> _unpartitioned_node_stored_range;
+  mutable std::unique_ptr<NodeRange> _unpartitioned_node_stored_range;
+
+  /**
+   * A shim to _unpartitioned_node_stored_range
+   */
+  mutable std::unique_ptr<ConstNodeRange> _const_unpartitioned_node_stored_range;
 
   /**
    * A \p PointLocator class for this mesh.
