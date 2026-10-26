@@ -299,6 +299,23 @@ extern spin_mutex spin_mtx;
  */
 extern recursive_mutex recursive_mtx;
 
+/**
+ * A nicer syntax for parallel_for calls in cases where no setup or
+ * teardown is needed outside the subrange loop.
+ */
+template <typename Range, typename Body>
+inline
+void parallel_for_each (Range && range, Body && body,
+                        unsigned int n_threads = libMesh::n_threads())
+{
+  parallel_for(std::forward<Range>(range),
+               [body = std::forward<Body>(body)](const auto & subrange)
+               {
+                 for (auto&& item : subrange)
+                   body(item);
+               }, n_threads);
+}
+
 } // namespace Threads
 
 } // namespace libMesh
