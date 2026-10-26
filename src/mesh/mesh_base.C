@@ -94,6 +94,8 @@ MeshBase::MeshBase (const Parallel::Communicator & comm_in,
   _const_element_stored_range (),
   _active_local_element_stored_range (),
   _const_active_local_element_stored_range (),
+  _local_element_stored_range (),
+  _const_local_element_stored_range (),
   _node_stored_range (),
   _const_node_stored_range (),
   _local_node_stored_range (),
@@ -139,6 +141,8 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
   _const_element_stored_range (),
   _active_local_element_stored_range (),
   _const_active_local_element_stored_range (),
+  _local_element_stored_range (),
+  _const_local_element_stored_range (),
   _node_stored_range (),
   _const_node_stored_range (),
   _local_node_stored_range (),
@@ -1219,6 +1223,8 @@ void MeshBase::update_post_partitioning()
   // changed the definition of "local".
   _active_local_element_stored_range.reset(nullptr);
   _const_active_local_element_stored_range.reset(nullptr);
+  _local_element_stored_range.reset(nullptr);
+  _const_local_element_stored_range.reset(nullptr);
   _local_node_stored_range.reset(nullptr);
   _const_local_node_stored_range.reset(nullptr);
   _unpartitioned_node_stored_range.reset(nullptr);
@@ -2068,6 +2074,40 @@ const ConstElemRange & MeshBase::active_local_element_stored_range() const
 }
 
 
+const ElemRange & MeshBase::local_element_stored_range()
+{
+  if (!_local_element_stored_range)
+    {
+      // Assigning to our cache may not be safe within threads
+      libmesh_assert(!Threads::in_threads);
+
+      _local_element_stored_range =
+        std::make_unique<ElemRange>(this->local_elements_begin(),
+                                    this->local_elements_end());
+    }
+  else
+#ifdef DEBUG
+    libmesh_assert(*_local_element_stored_range ==
+                   ElemRange(this->local_elements_begin(),
+                             this->local_elements_end()));
+#else
+    libmesh_assert_equal_to
+      (cast_int<std::ptrdiff_t>(_local_element_stored_range->size()),
+       std::distance(this->local_elements_begin(),
+                     this->local_elements_end()));
+#endif
+
+  return *_local_element_stored_range;
+}
+
+
+const ConstElemRange & MeshBase::local_element_stored_range() const
+{
+  return const_shim(*this, &MeshBase::local_element_stored_range,
+                    _const_local_element_stored_range);
+}
+
+
 const NodeRange & MeshBase::node_stored_range()
 {
   if (!_node_stored_range)
@@ -2175,6 +2215,8 @@ void MeshBase::clear_stored_ranges()
   _const_element_stored_range.reset(nullptr);
   _active_local_element_stored_range.reset(nullptr);
   _const_active_local_element_stored_range.reset(nullptr);
+  _local_element_stored_range.reset(nullptr);
+  _const_local_element_stored_range.reset(nullptr);
   _node_stored_range.reset(nullptr);
   _const_node_stored_range.reset(nullptr);
   _local_node_stored_range.reset(nullptr);

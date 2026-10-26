@@ -1916,6 +1916,13 @@ public:
 
   /**
    * \returns A reference to a cached vector copy of a range of
+   * pointers to all local elements, suitable for threading.
+   */
+  const ElemRange & local_element_stored_range();
+  const ConstElemRange & local_element_stored_range() const;
+
+  /**
+   * \returns A reference to a cached vector copy of a range of
    * pointers to all semilocal nodes, suitable for threading.
    */
   const NodeRange & node_stored_range();
@@ -2241,7 +2248,7 @@ protected:
   mutable std::unique_ptr<ConstElemRange> _const_element_stored_range;
 
   /**
-   * A cached \p ElemRange for threaded calculation on all
+   * A cached \p ElemRange for threaded calculation on all active
    * local elements of this mesh.
    *
    * This will not actually be built unless needed.  We do need this
@@ -2256,6 +2263,23 @@ protected:
    */
   mutable std::unique_ptr<ConstElemRange>
     _const_active_local_element_stored_range;
+
+  /**
+   * A cached \p ElemRange for threaded calculation on all
+   * local elements of this mesh.
+   *
+   * This will not actually be built unless needed.  We do need this
+   * to be mutable so that we can build it on the fly if a const elem
+   * range (using it) is requested
+   */
+  mutable std::unique_ptr<ElemRange>
+    _local_element_stored_range;
+
+  /**
+   * A shim to _local_element_stored_range
+   */
+  mutable std::unique_ptr<ConstElemRange>
+    _const_local_element_stored_range;
 
   /**
    * A cached \p NodeRange for threaded mutation of all semilocal
