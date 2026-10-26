@@ -29,6 +29,8 @@
 #include "libmesh/shell_matrix.h"
 #include "libmesh/eigen_solver.h"
 #include "libmesh/dof_map.h"
+#include "libmesh/constraint_elimination_dof_map.h"
+#include "libmesh/numeric_vector.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/enum_eigen_solver_type.h"
 
@@ -76,6 +78,8 @@ void EigenSystem::clear ()
 
   // Preconditioning matrices
   shell_precond_matrix.reset();
+
+  _reduced_initial_space.reset();
 
   // clear the solver
   eigen_solver->clear();
@@ -159,7 +163,10 @@ void EigenSystem::init_matrices ()
 {
   Parent::init_matrices();
 
-  const bool condense_constraints = condense_constrained_dofs();
+  // Shell operators act on the unconstrained degrees of freedom, whose count and ownership are
+  // those of the constraint elimination space when there is one
+  const bool condense_constraints =
+    condense_constrained_dofs() || this->has_constraint_elimination();
   if (shell_matrix_A)
     {
       shell_matrix_A->attach_dof_map(this->get_dof_map());
@@ -286,11 +293,12 @@ EigenSystem::solve_helper(SparseMatrix<Number> * const A,
 
 void EigenSystem::solve ()
 {
-  if (get_dof_map().n_constrained_dofs())
-    libmesh_warning("EigenSystem does not have first-class support for constrained degrees of "
-                    "freedom. You may see spurious effects of the constrained degrees of freedom "
-                    "in a given eigenvector. If you wish to perform a reliable solve on a system "
-                    "with constraints, please use the CondensedEigenSystem class instead");
+  if (get_dof_map().n_constrained_dofs() && !this->has_constraint_elimination())
+    libmesh_warning("EigenSystem without constraint elimination does not have first-class support "
+                    "for constrained degrees of freedom. You may see spurious effects of the "
+                    "constrained degrees of freedom in a given eigenvector. If you wish to perform "
+                    "a reliable solve on a system with constraints, please call "
+                    "create_constraint_elimination() before init()");
 
   // check that necessary parameters have been set
   libmesh_assert(
@@ -307,8 +315,19 @@ void EigenSystem::solve ()
 
 std::pair<Real, Real> EigenSystem::get_eigenpair (dof_id_type i)
 {
-  // call the eigen_solver get_eigenpair method
-  return eigen_solver->get_eigenpair (i, *solution);
+  if (!this->has_constraint_elimination())
+    // call the eigen_solver get_eigenpair method
+    return eigen_solver->get_eigenpair (i, *solution);
+
+  // The eigenvector y of the reduced problem is the full eigenvector C y, since the eigenproblem
+  // lives in the space of homogeneous constraints
+  const auto & reduced_map = this->get_dof_map().get_constraint_elimination();
+  auto reduced = NumericVector<Number>::build(this->comm());
+  reduced->init(reduced_map.n_dofs(), reduced_map.n_local_dofs(), false, PARALLEL);
+  const auto eval = eigen_solver->get_eigenpair(i, *reduced);
+  reduced_map.prolong(*reduced, *solution, /*homogeneous=*/true);
+  this->update();
+  return eval;
 }
 
 std::pair<Real, Real> EigenSystem::get_eigenvalue (dof_id_type i)
@@ -318,7 +337,18 @@ std::pair<Real, Real> EigenSystem::get_eigenvalue (dof_id_type i)
 
 void EigenSystem::set_initial_space (NumericVector<Number> & initial_space_in)
 {
-  eigen_solver->set_initial_space (initial_space_in);
+  if (!this->has_constraint_elimination())
+    {
+      eigen_solver->set_initial_space (initial_space_in);
+      return;
+    }
+
+  // The solver keeps a reference to the initial space, so its reduced form must outlive this call
+  const auto & reduced_map = this->get_dof_map().get_constraint_elimination();
+  _reduced_initial_space = NumericVector<Number>::build(this->comm());
+  _reduced_initial_space->init(reduced_map.n_dofs(), reduced_map.n_local_dofs(), false, PARALLEL);
+  reduced_map.inject(initial_space_in, *_reduced_initial_space);
+  eigen_solver->set_initial_space (*_reduced_initial_space);
 }
 
 

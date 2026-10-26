@@ -2,6 +2,9 @@
 #include <libmesh/const_function.h>
 #include <libmesh/dense_matrix.h>
 #include <libmesh/dirichlet_boundaries.h>
+#include <libmesh/slepc_eigen_solver.h>
+#include <libmesh/eigen_system.h>
+#include <libmesh/enum_eigen_solver_type.h>
 #include <libmesh/dof_map.h>
 #include <libmesh/elem.h>
 #include <libmesh/equation_systems.h>
@@ -234,6 +237,49 @@ void assemble_operator(const System & sys, SparseMatrix<Number> & mat)
 }
 }
 
+#ifdef LIBMESH_HAVE_SLEPC
+/**
+ * Assembles the stiffness and mass matrices of the Laplacian eigenproblem into an \p EigenSystem
+ */
+void assemble_laplacian_eigenproblem(EquationSystems & es, const std::string & system_name)
+{
+  auto & sys = es.get_system<EigenSystem>(system_name);
+  const DofMap & dof_map = sys.get_dof_map();
+  const FEType fe_type = dof_map.variable_type(0);
+
+  std::unique_ptr<FEBase> fe(FEBase::build(2, fe_type));
+  QGauss qrule(2, fe_type.default_quadrature_order());
+  fe->attach_quadrature_rule(&qrule);
+  const auto & JxW = fe->get_JxW();
+  const auto & phi = fe->get_phi();
+  const auto & dphi = fe->get_dphi();
+
+  std::vector<dof_id_type> dof_indices;
+  DenseMatrix<Number> Ke, Me;
+  for (const Elem * elem : es.get_mesh().active_local_element_ptr_range())
+    {
+      dof_map.dof_indices(elem, dof_indices);
+      fe->reinit(elem);
+      const auto n = dof_indices.size();
+      Ke.resize(n, n);
+      Me.resize(n, n);
+      for (const auto qp : index_range(JxW))
+        for (const auto i : make_range(n))
+          for (const auto j : make_range(n))
+            {
+              Ke(i, j) += JxW[qp] * dphi[i][qp] * dphi[j][qp];
+              Me(i, j) += JxW[qp] * phi[i][qp] * phi[j][qp];
+            }
+      // Constraining expands the dof indices in place, so each matrix starts from the element's
+      std::vector<dof_id_type> mass_dof_indices = dof_indices;
+      dof_map.constrain_element_matrix(Ke, dof_indices, false);
+      dof_map.constrain_element_matrix(Me, mass_dof_indices, false);
+      sys.get_matrix_A().add_matrix(Ke, dof_indices);
+      sys.get_matrix_B().add_matrix(Me, mass_dof_indices);
+    }
+}
+#endif
+
 class ConstraintEliminationTest : public CppUnit::TestCase
 {
 public:
@@ -246,6 +292,9 @@ public:
   CPPUNIT_TEST(testReducedNullSpace);
 #ifdef LIBMESH_HAVE_EIGEN
   CPPUNIT_TEST(testCondensedReducedSolve);
+#endif
+#ifdef LIBMESH_HAVE_SLEPC
+  CPPUNIT_TEST(testReducedEigenSolve);
 #endif
 
   CPPUNIT_TEST_SUITE_END();
@@ -589,6 +638,138 @@ private:
       LIBMESH_ASSERT_NUMBERS_EQUAL(
           (*plain_sys.solution)(i), (*condensed_sys.solution)(i), std::sqrt(TOLERANCE) * TOLERANCE);
   }
+
+#ifdef LIBMESH_HAVE_SLEPC
+  /**
+   * A generalized eigenproblem with hanging node, periodic and Dirichlet constraints must give the
+   * same eigenpairs from an \p EigenSystem that eliminates constraints as from the unconstrained
+   * rows and columns of the full constrained matrices, and its eigenvectors must satisfy the
+   * homogeneous constraints
+   */
+  void testReducedEigenSolve()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    // A distributed mesh keeps periodic neighbors only if it knows the periodic boundaries before
+    // it deletes remote elements
+    mesh.allow_remote_element_removal(false);
+    MeshTools::Generation::build_square(mesh, 4, 4, 0., 1., 0., 1., QUAD9);
+
+    EquationSystems es(mesh);
+    auto & full_sys = es.add_system<EigenSystem>("full");
+    auto & reduced_sys = es.add_system<EigenSystem>("reduced_sys");
+    reduced_sys.create_constraint_elimination();
+
+    for (auto * sys : {&full_sys, &reduced_sys})
+      {
+        const auto u = sys->add_variable("u", SECOND, LAGRANGE);
+        PeriodicBoundary periodic(RealVectorValue(0., 1.));
+        periodic.myboundary = 0;
+        periodic.pairedboundary = 2;
+        sys->get_dof_map().add_periodic_boundary(periodic);
+        sys->get_dof_map().add_dirichlet_boundary(
+            DirichletBoundary({3}, {u}, ConstFunction<Number>(0.)));
+        sys->set_eigenproblem_type(GHEP);
+        sys->attach_assemble_function(assemble_laplacian_eigenproblem);
+      }
+
+    mesh.allow_remote_element_removal(true);
+    mesh.delete_remote_elements();
+
+    if (Elem * elem = mesh.query_elem_ptr(5); elem && elem->active())
+      elem->set_refinement_flag(Elem::REFINE);
+    MeshRefinement(mesh).refine_elements();
+
+    // Several eigenpairs, so that the comparison is more than one eigenvalue deep
+    constexpr unsigned int nev = 4;
+    es.parameters.set<unsigned int>("eigenpairs") = nev;
+    es.parameters.set<unsigned int>("basis vectors") = 3 * nev;
+    es.parameters.set<Real>("linear solver tolerance") = TOLERANCE * TOLERANCE;
+    es.parameters.set<unsigned int>("linear solver maximum iterations") = 1000;
+    es.init();
+
+    const DofMap & dof_map = reduced_sys.get_dof_map();
+    const auto & reduced_map = dof_map.get_constraint_elimination();
+    CPPUNIT_ASSERT(dof_map.n_constrained_dofs() > 0);
+    CPPUNIT_ASSERT_EQUAL(dof_map.n_dofs() - dof_map.n_constrained_dofs(), reduced_map.n_dofs());
+
+    // The reference problem is posed on the unconstrained rows and columns of the full
+    // constrained matrices. Both systems number their full dofs alike
+    full_sys.assemble();
+    const std::vector<numeric_index_type> retained(reduced_map.local_retained_dofs().begin(),
+                                                   reduced_map.local_retained_dofs().end());
+    auto A = SparseMatrix<Number>::build(full_sys.comm());
+    auto B = SparseMatrix<Number>::build(full_sys.comm());
+    full_sys.get_matrix_A().close();
+    full_sys.get_matrix_B().close();
+    full_sys.get_matrix_A().create_submatrix(*A, retained, retained);
+    full_sys.get_matrix_B().create_submatrix(*B, retained, retained);
+
+    // A dense solve finds every eigenpair, so the comparison is independent of convergence to a
+    // subset of the spectrum
+    SlepcEigenSolver<Number> reference(full_sys.comm());
+    for (EigenSolver<Number> * solver : {static_cast<EigenSolver<Number> *>(&reference),
+                                         &reduced_sys.get_eigen_solver()})
+      {
+        solver->set_eigensolver_type(LAPACK);
+        solver->set_eigenproblem_type(GHEP);
+        solver->set_position_of_spectrum(SMALLEST_MAGNITUDE);
+      }
+    const auto [n_reference, reference_its] =
+      reference.solve_generalized(*A, *B, nev, 3 * nev, TOLERANCE * TOLERANCE, 1000);
+    libmesh_ignore(reference_its);
+    CPPUNIT_ASSERT(n_reference >= nev);
+
+    reduced_sys.solve();
+    CPPUNIT_ASSERT(reduced_sys.get_n_converged() >= nev);
+
+    auto reference_vector = NumericVector<Number>::build(full_sys.comm());
+    reference_vector->init(reduced_map.n_dofs(), reduced_map.n_local_dofs(), false, PARALLEL);
+    auto reduced_vector = reference_vector->zero_clone();
+    for (const auto i : make_range(nev))
+      {
+        const auto [reference_re, reference_im] = reference.get_eigenpair(i, *reference_vector);
+        const auto [reduced_re, reduced_im] = reduced_sys.get_eigenpair(i);
+        libmesh_ignore(reference_im, reduced_im);
+        LIBMESH_ASSERT_FP_EQUAL(reference_re, reduced_re, TOLERANCE * reference_re);
+
+        // Eigenvectors agree up to scale; the lowest eigenvalue is simple, so its eigenvector is
+        // unique up to scale and can be compared directly
+        if (i == 0)
+          {
+            reduced_map.inject(*reduced_sys.solution, *reduced_vector);
+            const Number scale =
+              reference_vector->dot(*reduced_vector) / reduced_vector->dot(*reduced_vector);
+            reference_vector->add(-scale, *reduced_vector);
+            LIBMESH_ASSERT_FP_EQUAL(0.,
+                                    reference_vector->l2_norm() / (std::abs(scale) * reduced_vector->l2_norm()),
+                                    std::sqrt(TOLERANCE) * TOLERANCE);
+          }
+
+        // The prolonged eigenvector satisfies the homogeneous constraints
+        auto constrained = reduced_sys.solution->clone();
+        dof_map.enforce_constraints_exactly(reduced_sys, constrained.get(), /*homogeneous=*/true);
+        constrained->add(-1., *reduced_sys.solution);
+        LIBMESH_ASSERT_FP_EQUAL(0., constrained->linfty_norm(), TOLERANCE * TOLERANCE);
+
+        // Prolonging into a ghosted vector gives the same local entries, and its ghost entries
+        // are those of the localized solution
+        if (i == 0)
+          {
+            auto ghosted = reduced_sys.current_local_solution->zero_clone();
+            reduced_map.prolong(*reduced_vector, *ghosted, /*homogeneous=*/true);
+            reduced_sys.update();
+            for (const auto dof : dof_map.get_send_list())
+              LIBMESH_ASSERT_NUMBERS_EQUAL(
+                  (*reduced_sys.current_local_solution)(dof), (*ghosted)(dof), TOLERANCE * TOLERANCE);
+            for (const auto dof : make_range(dof_map.first_dof(), dof_map.end_dof()))
+              LIBMESH_ASSERT_NUMBERS_EQUAL(
+                  (*reduced_sys.solution)(dof), (*ghosted)(dof), TOLERANCE * TOLERANCE);
+          }
+      }
+  }
+#endif
 
   /**
    * A field decomposition of a system that eliminates constraints must partition the reduced space
