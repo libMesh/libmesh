@@ -1923,7 +1923,6 @@ public:
    * pointers to all semilocal nodes, suitable for threading.
    */
   const NodeRange & node_stored_range();
-
   const ConstNodeRange & node_stored_range() const;
 
   /**
@@ -1934,7 +1933,6 @@ public:
    * modifying the mesh, so we only have a non-const version for now.
    */
   const NodeRange & local_node_stored_range();
-
 
   /**
    * \returns A reference to a cached vector copy of a range of
@@ -2248,7 +2246,7 @@ protected:
    * local elements of this mesh.
    *
    * This will not actually be built unless needed. Further, since we
-   * want our \p activbe_local_element_stored_range() method to be \p
+   * want our \p active_local_element_stored_range() method to be \p
    * const (yet do the dynamic allocating) this needs to be mutable.
    */
   mutable std::unique_ptr<ConstElemRange>
