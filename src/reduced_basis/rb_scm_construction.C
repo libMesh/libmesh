@@ -34,6 +34,7 @@
 #include "libmesh/equation_systems.h"
 #include "libmesh/getpot.h"
 #include "libmesh/dof_map.h"
+#include "libmesh/constraint_elimination_dof_map.h"
 #include "libmesh/enum_eigen_solver_type.h"
 
 // For creating a directory
@@ -60,6 +61,10 @@ RBSCMConstruction::RBSCMConstruction (EquationSystems & es,
   // We symmetrize all operators hence use symmetric solvers
   set_eigenproblem_type(GHEP);
 
+  // Eliminating the RB system's constrained degrees of freedom keeps them from contributing
+  // spurious eigenvalues
+  this->create_constraint_elimination();
+
 }
 
 RBSCMConstruction::~RBSCMConstruction () = default;
@@ -67,6 +72,27 @@ RBSCMConstruction::~RBSCMConstruction () = default;
 void RBSCMConstruction::clear()
 {
   Parent::clear();
+}
+
+void RBSCMConstruction::user_constrain()
+{
+  Parent::user_constrain();
+
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
+  // perform_SCM_greedy() reports a missing RB system name
+  if (RB_system_name.empty())
+    return;
+
+  const auto & rb_system =
+    this->get_equation_systems().get_system<RBConstruction>(RB_system_name);
+  const DofMap & rb_dof_map = rb_system.get_dof_map();
+  libmesh_assert_equal_to(rb_dof_map.n_dofs(), this->n_dofs());
+
+  // The eigenproblems live in the space of homogeneous constraints
+  DofMap & dof_map = this->get_dof_map();
+  for (const auto & [dof, row] : rb_dof_map.get_dof_constraints())
+    dof_map.add_constraint_row(dof, row, /*forbid_constraint_overwrite=*/false);
+#endif
 }
 
 void RBSCMConstruction::set_rb_scm_evaluation(RBSCMEvaluation & rb_scm_eval_in)
@@ -216,9 +242,9 @@ void RBSCMConstruction::load_matrix_B()
   EquationSystems & es = this->get_equation_systems();
   RBConstruction & rb_system = es.get_system<RBConstruction>(RB_system_name);
 
-  matrix_B->zero();
-  matrix_B->close();
-  matrix_B->add(1.,*rb_system.get_inner_product_matrix());
+  // Assembling with the RB system's constrained element matrices gives the inner product matrix
+  // on the unconstrained degrees of freedom
+  rb_system.assemble_inner_product_matrix(matrix_B);
 }
 
 void RBSCMConstruction::perform_SCM_greedy()
@@ -228,24 +254,11 @@ void RBSCMConstruction::perform_SCM_greedy()
   // initialize rb_scm_eval's parameters
   rb_scm_eval->initialize_parameters(*this);
 
-#ifdef LIBMESH_ENABLE_CONSTRAINTS
-  // Get a list of constrained dofs from rb_system
-  std::set<dof_id_type> constrained_dofs_set;
-  EquationSystems & es = this->get_equation_systems();
-  RBConstruction & rb_system = es.get_system<RBConstruction>(RB_system_name);
-
-  for (dof_id_type i=0; i<rb_system.n_dofs(); i++)
-    {
-      if (rb_system.get_dof_map().is_constrained_dof(i))
-        {
-          constrained_dofs_set.insert(i);
-        }
-    }
-
-  // Use these constrained dofs to identify which dofs we want to "get rid of"
-  // (i.e. condense) in our eigenproblems.
-  this->initialize_condensed_dofs(constrained_dofs_set);
-#endif // LIBMESH_ENABLE_CONSTRAINTS
+  libmesh_error_msg_if(
+    this->get_dof_map().n_constrained_dofs() !=
+      this->get_equation_systems().get_system<RBConstruction>(RB_system_name).get_dof_map().n_constrained_dofs(),
+    "RBSCMConstruction must have the constraints of its RB system: add the RB system first and "
+    "call set_RB_system_name() before EquationSystems::init()");
 
   // Copy the inner product matrix over from rb_system to be used as matrix_B
   load_matrix_B();
@@ -381,11 +394,18 @@ void RBSCMConstruction::evaluate_stability_constant()
       // Compute and store the vector y = (y_1, \ldots, y_Q) for the
       // eigenvector currently stored in eigen_system.solution.
       // We use this later to compute the SCM upper bounds.
-      Real norm_B2 = libmesh_real( B_inner_product(*solution, *solution) );
+      // The operators act on the unconstrained degrees of freedom, so
+      // the inner products use the unconstrained part of the eigenvector
+      const auto & reduced_map = this->get_dof_map().get_constraint_elimination();
+      auto eigenvector = NumericVector<Number>::build(this->comm());
+      eigenvector->init(reduced_map.n_dofs(), reduced_map.n_local_dofs(), false, PARALLEL);
+      reduced_map.inject(*solution, *eigenvector);
+
+      Real norm_B2 = libmesh_real( B_inner_product(*eigenvector, *eigenvector) );
 
       for (unsigned int q=0; q<get_rb_theta_expansion().get_n_A_terms(); q++)
         {
-          Real norm_Aq2 = libmesh_real( Aq_inner_product(q, *solution, *solution) );
+          Real norm_Aq2 = libmesh_real( Aq_inner_product(q, *eigenvector, *eigenvector) );
 
           rb_scm_eval->set_SCM_UB_vector(j,q,norm_Aq2/norm_B2);
         }
@@ -397,9 +417,10 @@ void RBSCMConstruction::evaluate_stability_constant()
 Number RBSCMConstruction::B_inner_product(const NumericVector<Number> & v,
                                           const NumericVector<Number> & w) const
 {
-  matrix_B->vector_mult(*inner_product_storage_vector, w);
+  auto Bw = w.zero_clone();
+  matrix_B->vector_mult(*Bw, w);
 
-  return v.dot(*inner_product_storage_vector);
+  return v.dot(*Bw);
 }
 
 Number RBSCMConstruction::Aq_inner_product(unsigned int q,
@@ -411,9 +432,10 @@ Number RBSCMConstruction::Aq_inner_product(unsigned int q,
 
   matrix_A->zero();
   add_scaled_symm_Aq(q, 1.);
-  matrix_A->vector_mult(*inner_product_storage_vector, w);
+  auto Aw = w.zero_clone();
+  matrix_A->vector_mult(*Aw, w);
 
-  return v.dot(*inner_product_storage_vector);
+  return v.dot(*Aw);
 }
 
 std::pair<unsigned int,Real> RBSCMConstruction::compute_SCM_bounds_on_training_set()
