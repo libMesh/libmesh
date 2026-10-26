@@ -239,8 +239,8 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
   {
     // Nodes first
     {
-      ConstNodeRange nr (mesh.local_nodes_begin(),
-                         mesh.local_nodes_end());
+      const ConstNodeRange & nr =
+        const_cast<const MeshBase &>(mesh).local_node_stored_range();
       node_keys.resize (nr.size());
       Threads::parallel_for (nr, ComputeHilbertKeys (bbox, bboxinv, node_keys));
 
@@ -268,8 +268,8 @@ void MeshCommunication::assign_global_indices (MeshBase & mesh) const
 
     // Elements next
     {
-      ConstElemRange er (mesh.local_elements_begin(),
-                         mesh.local_elements_end());
+      const ConstElemRange & er =
+        const_cast<const MeshBase &>(mesh).local_element_stored_range();
       elem_keys.resize (er.size());
       Threads::parallel_for (er, ComputeHilbertKeys (bbox, bboxinv, elem_keys));
 
@@ -627,9 +627,8 @@ void MeshCommunication::check_for_duplicate_global_indices (MeshBase & mesh) con
   {
     // Nodes first
     {
-      ConstNodeRange nr (mesh.local_nodes_begin(),
-                         mesh.local_nodes_end());
-      node_keys.resize (nr.size());
+      const ConstNodeRange & nr =
+        const_cast<const MeshBase &>(mesh).local_node_stored_range();
       Threads::parallel_for (nr, ComputeHilbertKeys (bbox, bboxinv, node_keys));
 
       // It's O(N^2) to check that these keys don't duplicate before the
@@ -661,8 +660,8 @@ void MeshCommunication::check_for_duplicate_global_indices (MeshBase & mesh) con
 
     // Elements next
     {
-      ConstElemRange er (mesh.local_elements_begin(),
-                         mesh.local_elements_end());
+      const ConstElemRange & er =
+        const_cast<const MeshBase &>(mesh).local_element_stored_range();
       elem_keys.resize (er.size());
       Threads::parallel_for (er, ComputeHilbertKeys (bbox, bboxinv, elem_keys));
 
