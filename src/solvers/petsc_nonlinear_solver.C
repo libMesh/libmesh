@@ -872,7 +872,9 @@ PetscNonlinearSolver<T>::build_mat_null_space(NonlinearImplicitSystem::ComputeVe
               LibmeshPetscCall(VecSetSizes(modes[i],
                                            cast_int<PetscInt>(reduced_map.n_local_dofs()),
                                            cast_int<PetscInt>(reduced_map.n_dofs())));
-              LibmeshPetscCall(VecSetType(modes[i], ((PetscObject)pv->vec())->type_name));
+              VecType vec_type;
+              LibmeshPetscCall(VecGetType(pv->vec(), &vec_type));
+              LibmeshPetscCall(VecSetType(modes[i], vec_type));
               LibmeshPetscCall(VecSetUp(modes[i]));
               this->restrict_vector(*pv, modes[i]);
             }
@@ -950,7 +952,9 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // Jacobian operator
       const auto n_local = cast_int<PetscInt>(reduced_map.n_local_dofs());
       LibmeshPetscCall(VecCreate(this->comm().get(), reduced_x.get()));
       LibmeshPetscCall(VecSetSizes(reduced_x, n_local, n));
-      LibmeshPetscCall(VecSetType(reduced_x, ((PetscObject)x->vec())->type_name));
+      VecType vec_type;
+      LibmeshPetscCall(VecGetType(x->vec(), &vec_type));
+      LibmeshPetscCall(VecSetType(reduced_x, vec_type));
       LibmeshPetscCall(VecSetUp(reduced_x));
       LibmeshPetscCall(VecDuplicate(reduced_x, reduced_r.get()));
 
