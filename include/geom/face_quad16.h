@@ -214,18 +214,13 @@ protected:
   /**
    * Matrix used to create the elements children.
    */
-  virtual Real embedding_matrix (const unsigned int i,
-                                 const unsigned int j,
-                                 const unsigned int k) const override
-  { return _embedding_matrix[i][j][k]; }
+  virtual Real embedding_matrix (__attribute__ ((unused)) const unsigned int i,
+                                 __attribute__ ((unused)) const unsigned int j,
+                                 __attribute__ ((unused)) const unsigned int k) const override
+  { libmesh_not_implemented(); return 0; }
 
-  /**
-   * Matrix that computes new nodal locations/solution values
-   * from current nodes/solution.
-   */
-  static const Real _embedding_matrix[num_children][num_nodes][num_nodes];
-
-  LIBMESH_ENABLE_TOPOLOGY_CACHES;
+  // TODO delete?
+  //LIBMESH_ENABLE_TOPOLOGY_CACHES;
 
 #endif // LIBMESH_ENABLE_AMR
 

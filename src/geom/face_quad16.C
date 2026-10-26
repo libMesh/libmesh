@@ -72,54 +72,6 @@ const unsigned int Quad16::side_nodes_map[Quad16::num_sides][Quad16::nodes_per_s
     {3, 10, 11, 0}  // Side 3
   };
 
-#ifdef LIBMESH_ENABLE_AMR
-
-// TODO what is this?
-const Real Quad16::_embedding_matrix[Quad16::num_children][Quad16::num_nodes][Quad16::num_nodes] =
-  {
-    // embedding matrix for child 0
-    {
-      // 0    1    2    3
-      {1.0, 0.0, 0.0, 0.0}, // 0
-      {0.5, 0.5, 0.0, 0.0}, // 1
-      {.25, .25, .25, .25}, // 2
-      {0.5, 0.0, 0.0, 0.5}  // 3
-    },
-
-    // embedding matrix for child 1
-    {
-      // 0    1    2    3
-      {0.5, 0.5, 0.0, 0.0}, // 0
-      {0.0, 1.0, 0.0, 0.0}, // 1
-      {0.0, 0.5, 0.5, 0.0}, // 2
-      {.25, .25, .25, .25}  // 3
-    },
-
-    // embedding matrix for child 2
-    {
-      // 0    1    2    3
-      {0.5, 0.0, 0.0, 0.5}, // 0
-      {.25, .25, .25, .25}, // 1
-      {0.0, 0.0, 0.5, 0.5}, // 2
-      {0.0, 0.0, 0.0, 1.0}  // 3
-    },
-
-    // embedding matrix for child 3
-    {
-      // 0    1    2    3
-      {.25, .25, .25, .25}, // 0
-      {0.0, 0.5, 0.5, 0.0}, // 1
-      {0.0, 0.0, 1.0, 0.0}, // 2
-      {0.0, 0.0, 0.5, 0.5}  // 3
-    }
-  };
-
-#endif
-
-
-
-
-
 // ------------------------------------------------------------
 // Quad16 class member functions
 
