@@ -488,65 +488,66 @@ void HPCoarsenTest::select_refinement (System & system)
         }
     }
 
+  const Real smooth_mean = smoothness.mean();
+
   // Now that we've got our approximations for p_error and h_error, let's see
   // if we want to switch any h refinement flags to p refinement
 
   // Iterate over all the active elements in the mesh
   // that live on this processor.
-  for (auto & elem : mesh.active_local_element_ptr_range())
-    {
-      // We're only checking elements that are already flagged for h
-      // refinement
-      if (elem->refinement_flag() != Elem::REFINE)
-        continue;
+  Threads::parallel_for
+    (mesh.active_local_element_stored_range(),
+     [this, &dof_map, &h_error_per_cell, &p_error_per_cell,
+      &smoothness, smooth_mean, n_vars]
+     (const ElemRange & range)
+     {
+       for (Elem * elem : range)
+         {
+           // We're only checking elements that are already flagged
+           // for h refinement
+           if (elem->refinement_flag() != Elem::REFINE)
+             continue;
 
-      const dof_id_type e_id = elem->id();
+           const dof_id_type e_id = elem->id();
 
-      unsigned int dofs_per_elem = 0, dofs_per_p_elem = 0;
+           unsigned int dofs_per_elem = 0, dofs_per_p_elem = 0;
 
-      // Loop over all the variables in the system
-      for (unsigned int var=0; var<n_vars; var++)
-        {
-          // The type of finite element to use for this variable
-          const FEType & fe_type = dof_map.variable_type (var);
+           // Loop over all the variables in the system
+           for (unsigned int var=0; var<n_vars; var++)
+             {
+               // The type of finite element to use for this variable
+               const FEType & fe_type = dof_map.variable_type (var);
 
-          // FIXME: we're overestimating the number of DOFs added by h
-          // refinement
+               // FIXME: we're overestimating the number of DOFs added
+               // by h refinement
 
-          // Compute number of DOFs for elem at current p_level()
-          dofs_per_elem +=
-            FEInterface::n_dofs(fe_type, elem);
+               // Compute number of DOFs for elem at current p_level()
+               dofs_per_elem +=
+                 FEInterface::n_dofs(fe_type, elem);
 
-          // Compute number of DOFs for elem at current p_level() + 1
-          dofs_per_p_elem +=
-            FEInterface::n_dofs(fe_type, elem->p_level() + 1, elem);
-        }
+               // Compute number of DOFs for elem at current p_level() + 1
+               dofs_per_p_elem +=
+                 FEInterface::n_dofs(fe_type, elem->p_level() + 1, elem);
+             }
 
-      const unsigned int new_h_dofs = dofs_per_elem *
-        (elem->n_children() - 1);
+           const unsigned int new_h_dofs = dofs_per_elem *
+             (elem->n_children() - 1);
 
-      const unsigned int new_p_dofs = dofs_per_p_elem -
-        dofs_per_elem;
+           const unsigned int new_p_dofs = dofs_per_p_elem -
+             dofs_per_elem;
 
-      /*
-        libMesh::err << "Cell " << e_id << ": h = " << elem->hmax()
-        << ", p = " << elem->p_level() + 1 << "," << std::endl
-        << "     h_error = " << h_error_per_cell[e_id]
-        << ", p_error = " << p_error_per_cell[e_id] << std::endl
-        << "     new_h_dofs = " << new_h_dofs
-        << ", new_p_dofs = " << new_p_dofs << std::endl;
-      */
-      const Real p_value =
-        std::sqrt(p_error_per_cell[e_id]) * p_weight / new_p_dofs;
-      const Real h_value =
-        std::sqrt(h_error_per_cell[e_id]) /
-        static_cast<Real>(new_h_dofs);
-      if (smoothness[elem->id()] > smoothness.mean() && p_value > h_value)
-        {
-          elem->set_p_refinement_flag(Elem::REFINE);
-          elem->set_refinement_flag(Elem::DO_NOTHING);
-        }
-    }
+           const Real p_value =
+             std::sqrt(p_error_per_cell[e_id]) * p_weight / new_p_dofs;
+           const Real h_value =
+             std::sqrt(h_error_per_cell[e_id]) /
+             static_cast<Real>(new_h_dofs);
+           if (smoothness[elem->id()] > smooth_mean && p_value > h_value)
+             {
+               elem->set_p_refinement_flag(Elem::REFINE);
+               elem->set_refinement_flag(Elem::DO_NOTHING);
+             }
+         }
+     });
 
   // libMesh::MeshRefinement will now assume that users have set
   // refinement flags consistently on all processors, but all we've
