@@ -282,6 +282,7 @@ am__unit_tests_dbg_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/constraint_operator_test.C \
+	systems/dirichlet_constraint_values_test.C \
 	systems/equation_systems_test.C \
 	systems/heterogeneous_nonlinear_constraint_test.C \
 	systems/periodic_bc_test.C systems/disjoint_neighbor_test.C \
@@ -410,6 +411,7 @@ am__objects_2 = unit_tests_dbg-driver.$(OBJEXT) \
 	solvers/unit_tests_dbg-first_order_unsteady_solver_test.$(OBJEXT) \
 	solvers/unit_tests_dbg-second_order_unsteady_solver_test.$(OBJEXT) \
 	systems/unit_tests_dbg-constraint_operator_test.$(OBJEXT) \
+	systems/unit_tests_dbg-dirichlet_constraint_values_test.$(OBJEXT) \
 	systems/unit_tests_dbg-equation_systems_test.$(OBJEXT) \
 	systems/unit_tests_dbg-heterogeneous_nonlinear_constraint_test.$(OBJEXT) \
 	systems/unit_tests_dbg-periodic_bc_test.$(OBJEXT) \
@@ -508,6 +510,7 @@ am__unit_tests_devel_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/constraint_operator_test.C \
+	systems/dirichlet_constraint_values_test.C \
 	systems/equation_systems_test.C \
 	systems/heterogeneous_nonlinear_constraint_test.C \
 	systems/periodic_bc_test.C systems/disjoint_neighbor_test.C \
@@ -635,6 +638,7 @@ am__objects_4 = unit_tests_devel-driver.$(OBJEXT) \
 	solvers/unit_tests_devel-first_order_unsteady_solver_test.$(OBJEXT) \
 	solvers/unit_tests_devel-second_order_unsteady_solver_test.$(OBJEXT) \
 	systems/unit_tests_devel-constraint_operator_test.$(OBJEXT) \
+	systems/unit_tests_devel-dirichlet_constraint_values_test.$(OBJEXT) \
 	systems/unit_tests_devel-equation_systems_test.$(OBJEXT) \
 	systems/unit_tests_devel-heterogeneous_nonlinear_constraint_test.$(OBJEXT) \
 	systems/unit_tests_devel-periodic_bc_test.$(OBJEXT) \
@@ -751,6 +755,7 @@ am__unit_tests_oprof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/constraint_operator_test.C \
+	systems/dirichlet_constraint_values_test.C \
 	systems/equation_systems_test.C \
 	systems/heterogeneous_nonlinear_constraint_test.C \
 	systems/periodic_bc_test.C systems/disjoint_neighbor_test.C \
@@ -878,6 +883,7 @@ am__objects_6 = unit_tests_oprof-driver.$(OBJEXT) \
 	solvers/unit_tests_oprof-first_order_unsteady_solver_test.$(OBJEXT) \
 	solvers/unit_tests_oprof-second_order_unsteady_solver_test.$(OBJEXT) \
 	systems/unit_tests_oprof-constraint_operator_test.$(OBJEXT) \
+	systems/unit_tests_oprof-dirichlet_constraint_values_test.$(OBJEXT) \
 	systems/unit_tests_oprof-equation_systems_test.$(OBJEXT) \
 	systems/unit_tests_oprof-heterogeneous_nonlinear_constraint_test.$(OBJEXT) \
 	systems/unit_tests_oprof-periodic_bc_test.$(OBJEXT) \
@@ -972,6 +978,7 @@ am__unit_tests_opt_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/constraint_operator_test.C \
+	systems/dirichlet_constraint_values_test.C \
 	systems/equation_systems_test.C \
 	systems/heterogeneous_nonlinear_constraint_test.C \
 	systems/periodic_bc_test.C systems/disjoint_neighbor_test.C \
@@ -1099,6 +1106,7 @@ am__objects_8 = unit_tests_opt-driver.$(OBJEXT) \
 	solvers/unit_tests_opt-first_order_unsteady_solver_test.$(OBJEXT) \
 	solvers/unit_tests_opt-second_order_unsteady_solver_test.$(OBJEXT) \
 	systems/unit_tests_opt-constraint_operator_test.$(OBJEXT) \
+	systems/unit_tests_opt-dirichlet_constraint_values_test.$(OBJEXT) \
 	systems/unit_tests_opt-equation_systems_test.$(OBJEXT) \
 	systems/unit_tests_opt-heterogeneous_nonlinear_constraint_test.$(OBJEXT) \
 	systems/unit_tests_opt-periodic_bc_test.$(OBJEXT) \
@@ -1193,6 +1201,7 @@ am__unit_tests_prof_SOURCES_DIST = driver.C libmesh_cppunit.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/constraint_operator_test.C \
+	systems/dirichlet_constraint_values_test.C \
 	systems/equation_systems_test.C \
 	systems/heterogeneous_nonlinear_constraint_test.C \
 	systems/periodic_bc_test.C systems/disjoint_neighbor_test.C \
@@ -1320,6 +1329,7 @@ am__objects_10 = unit_tests_prof-driver.$(OBJEXT) \
 	solvers/unit_tests_prof-first_order_unsteady_solver_test.$(OBJEXT) \
 	solvers/unit_tests_prof-second_order_unsteady_solver_test.$(OBJEXT) \
 	systems/unit_tests_prof-constraint_operator_test.$(OBJEXT) \
+	systems/unit_tests_prof-dirichlet_constraint_values_test.$(OBJEXT) \
 	systems/unit_tests_prof-equation_systems_test.$(OBJEXT) \
 	systems/unit_tests_prof-heterogeneous_nonlinear_constraint_test.$(OBJEXT) \
 	systems/unit_tests_prof-periodic_bc_test.$(OBJEXT) \
@@ -1945,6 +1955,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	solvers/$(DEPDIR)/unit_tests_prof-first_order_unsteady_solver_test.Po \
 	solvers/$(DEPDIR)/unit_tests_prof-second_order_unsteady_solver_test.Po \
 	systems/$(DEPDIR)/unit_tests_dbg-constraint_operator_test.Po \
+	systems/$(DEPDIR)/unit_tests_dbg-dirichlet_constraint_values_test.Po \
 	systems/$(DEPDIR)/unit_tests_dbg-disjoint_neighbor_test.Po \
 	systems/$(DEPDIR)/unit_tests_dbg-equation_systems_test.Po \
 	systems/$(DEPDIR)/unit_tests_dbg-heterogeneous_nonlinear_constraint_test.Po \
@@ -1952,6 +1963,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	systems/$(DEPDIR)/unit_tests_dbg-periodic_bc_test.Po \
 	systems/$(DEPDIR)/unit_tests_dbg-systems_test.Po \
 	systems/$(DEPDIR)/unit_tests_devel-constraint_operator_test.Po \
+	systems/$(DEPDIR)/unit_tests_devel-dirichlet_constraint_values_test.Po \
 	systems/$(DEPDIR)/unit_tests_devel-disjoint_neighbor_test.Po \
 	systems/$(DEPDIR)/unit_tests_devel-equation_systems_test.Po \
 	systems/$(DEPDIR)/unit_tests_devel-heterogeneous_nonlinear_constraint_test.Po \
@@ -1959,6 +1971,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	systems/$(DEPDIR)/unit_tests_devel-periodic_bc_test.Po \
 	systems/$(DEPDIR)/unit_tests_devel-systems_test.Po \
 	systems/$(DEPDIR)/unit_tests_oprof-constraint_operator_test.Po \
+	systems/$(DEPDIR)/unit_tests_oprof-dirichlet_constraint_values_test.Po \
 	systems/$(DEPDIR)/unit_tests_oprof-disjoint_neighbor_test.Po \
 	systems/$(DEPDIR)/unit_tests_oprof-equation_systems_test.Po \
 	systems/$(DEPDIR)/unit_tests_oprof-heterogeneous_nonlinear_constraint_test.Po \
@@ -1966,6 +1979,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	systems/$(DEPDIR)/unit_tests_oprof-periodic_bc_test.Po \
 	systems/$(DEPDIR)/unit_tests_oprof-systems_test.Po \
 	systems/$(DEPDIR)/unit_tests_opt-constraint_operator_test.Po \
+	systems/$(DEPDIR)/unit_tests_opt-dirichlet_constraint_values_test.Po \
 	systems/$(DEPDIR)/unit_tests_opt-disjoint_neighbor_test.Po \
 	systems/$(DEPDIR)/unit_tests_opt-equation_systems_test.Po \
 	systems/$(DEPDIR)/unit_tests_opt-heterogeneous_nonlinear_constraint_test.Po \
@@ -1973,6 +1987,7 @@ am__depfiles_remade = ./$(DEPDIR)/unit_tests_dbg-driver.Po \
 	systems/$(DEPDIR)/unit_tests_opt-periodic_bc_test.Po \
 	systems/$(DEPDIR)/unit_tests_opt-systems_test.Po \
 	systems/$(DEPDIR)/unit_tests_prof-constraint_operator_test.Po \
+	systems/$(DEPDIR)/unit_tests_prof-dirichlet_constraint_values_test.Po \
 	systems/$(DEPDIR)/unit_tests_prof-disjoint_neighbor_test.Po \
 	systems/$(DEPDIR)/unit_tests_prof-equation_systems_test.Po \
 	systems/$(DEPDIR)/unit_tests_prof-heterogeneous_nonlinear_constraint_test.Po \
@@ -2583,6 +2598,7 @@ unit_tests_sources = driver.C libmesh_cppunit.h stream_redirector.h \
 	solvers/first_order_unsteady_solver_test.C \
 	solvers/second_order_unsteady_solver_test.C \
 	systems/constraint_operator_test.C \
+	systems/dirichlet_constraint_values_test.C \
 	systems/equation_systems_test.C \
 	systems/heterogeneous_nonlinear_constraint_test.C \
 	systems/periodic_bc_test.C systems/disjoint_neighbor_test.C \
@@ -3201,6 +3217,8 @@ systems/$(DEPDIR)/$(am__dirstamp):
 	@: >>systems/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_dbg-constraint_operator_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
+systems/unit_tests_dbg-dirichlet_constraint_values_test.$(OBJEXT):  \
+	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_dbg-equation_systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_dbg-heterogeneous_nonlinear_constraint_test.$(OBJEXT):  \
@@ -3484,6 +3502,8 @@ solvers/unit_tests_devel-first_order_unsteady_solver_test.$(OBJEXT):  \
 solvers/unit_tests_devel-second_order_unsteady_solver_test.$(OBJEXT):  \
 	solvers/$(am__dirstamp) solvers/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_devel-constraint_operator_test.$(OBJEXT):  \
+	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
+systems/unit_tests_devel-dirichlet_constraint_values_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_devel-equation_systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
@@ -3797,6 +3817,8 @@ solvers/unit_tests_oprof-second_order_unsteady_solver_test.$(OBJEXT):  \
 	solvers/$(am__dirstamp) solvers/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_oprof-constraint_operator_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
+systems/unit_tests_oprof-dirichlet_constraint_values_test.$(OBJEXT):  \
+	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_oprof-equation_systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_oprof-heterogeneous_nonlinear_constraint_test.$(OBJEXT):  \
@@ -4069,6 +4091,8 @@ solvers/unit_tests_opt-second_order_unsteady_solver_test.$(OBJEXT):  \
 	solvers/$(am__dirstamp) solvers/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_opt-constraint_operator_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
+systems/unit_tests_opt-dirichlet_constraint_values_test.$(OBJEXT):  \
+	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_opt-equation_systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_opt-heterogeneous_nonlinear_constraint_test.$(OBJEXT):  \
@@ -4340,6 +4364,8 @@ solvers/unit_tests_prof-first_order_unsteady_solver_test.$(OBJEXT):  \
 solvers/unit_tests_prof-second_order_unsteady_solver_test.$(OBJEXT):  \
 	solvers/$(am__dirstamp) solvers/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_prof-constraint_operator_test.$(OBJEXT):  \
+	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
+systems/unit_tests_prof-dirichlet_constraint_values_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
 systems/unit_tests_prof-equation_systems_test.$(OBJEXT):  \
 	systems/$(am__dirstamp) systems/$(DEPDIR)/$(am__dirstamp)
@@ -4981,6 +5007,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@solvers/$(DEPDIR)/unit_tests_prof-first_order_unsteady_solver_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@solvers/$(DEPDIR)/unit_tests_prof-second_order_unsteady_solver_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_dbg-constraint_operator_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_dbg-dirichlet_constraint_values_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_dbg-disjoint_neighbor_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_dbg-equation_systems_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_dbg-heterogeneous_nonlinear_constraint_test.Po@am__quote@ # am--include-marker
@@ -4988,6 +5015,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_dbg-periodic_bc_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_dbg-systems_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_devel-constraint_operator_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_devel-dirichlet_constraint_values_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_devel-disjoint_neighbor_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_devel-equation_systems_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_devel-heterogeneous_nonlinear_constraint_test.Po@am__quote@ # am--include-marker
@@ -4995,6 +5023,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_devel-periodic_bc_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_devel-systems_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_oprof-constraint_operator_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_oprof-dirichlet_constraint_values_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_oprof-disjoint_neighbor_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_oprof-equation_systems_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_oprof-heterogeneous_nonlinear_constraint_test.Po@am__quote@ # am--include-marker
@@ -5002,6 +5031,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_oprof-periodic_bc_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_oprof-systems_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_opt-constraint_operator_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_opt-dirichlet_constraint_values_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_opt-disjoint_neighbor_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_opt-equation_systems_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_opt-heterogeneous_nonlinear_constraint_test.Po@am__quote@ # am--include-marker
@@ -5009,6 +5039,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_opt-periodic_bc_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_opt-systems_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_prof-constraint_operator_test.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_prof-dirichlet_constraint_values_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_prof-disjoint_neighbor_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_prof-equation_systems_test.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@systems/$(DEPDIR)/unit_tests_prof-heterogeneous_nonlinear_constraint_test.Po@am__quote@ # am--include-marker
@@ -6727,6 +6758,20 @@ systems/unit_tests_dbg-constraint_operator_test.obj: systems/constraint_operator
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/constraint_operator_test.C' object='systems/unit_tests_dbg-constraint_operator_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_dbg-constraint_operator_test.obj `if test -f 'systems/constraint_operator_test.C'; then $(CYGPATH_W) 'systems/constraint_operator_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/constraint_operator_test.C'; fi`
+
+systems/unit_tests_dbg-dirichlet_constraint_values_test.o: systems/dirichlet_constraint_values_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_dbg-dirichlet_constraint_values_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_dbg-dirichlet_constraint_values_test.Tpo -c -o systems/unit_tests_dbg-dirichlet_constraint_values_test.o `test -f 'systems/dirichlet_constraint_values_test.C' || echo '$(srcdir)/'`systems/dirichlet_constraint_values_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_dbg-dirichlet_constraint_values_test.Tpo systems/$(DEPDIR)/unit_tests_dbg-dirichlet_constraint_values_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/dirichlet_constraint_values_test.C' object='systems/unit_tests_dbg-dirichlet_constraint_values_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_dbg-dirichlet_constraint_values_test.o `test -f 'systems/dirichlet_constraint_values_test.C' || echo '$(srcdir)/'`systems/dirichlet_constraint_values_test.C
+
+systems/unit_tests_dbg-dirichlet_constraint_values_test.obj: systems/dirichlet_constraint_values_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_dbg-dirichlet_constraint_values_test.obj -MD -MP -MF systems/$(DEPDIR)/unit_tests_dbg-dirichlet_constraint_values_test.Tpo -c -o systems/unit_tests_dbg-dirichlet_constraint_values_test.obj `if test -f 'systems/dirichlet_constraint_values_test.C'; then $(CYGPATH_W) 'systems/dirichlet_constraint_values_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/dirichlet_constraint_values_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_dbg-dirichlet_constraint_values_test.Tpo systems/$(DEPDIR)/unit_tests_dbg-dirichlet_constraint_values_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/dirichlet_constraint_values_test.C' object='systems/unit_tests_dbg-dirichlet_constraint_values_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_dbg-dirichlet_constraint_values_test.obj `if test -f 'systems/dirichlet_constraint_values_test.C'; then $(CYGPATH_W) 'systems/dirichlet_constraint_values_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/dirichlet_constraint_values_test.C'; fi`
 
 systems/unit_tests_dbg-equation_systems_test.o: systems/equation_systems_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_dbg_CPPFLAGS) $(CPPFLAGS) $(unit_tests_dbg_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_dbg-equation_systems_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_dbg-equation_systems_test.Tpo -c -o systems/unit_tests_dbg-equation_systems_test.o `test -f 'systems/equation_systems_test.C' || echo '$(srcdir)/'`systems/equation_systems_test.C
@@ -8562,6 +8607,20 @@ systems/unit_tests_devel-constraint_operator_test.obj: systems/constraint_operat
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_devel-constraint_operator_test.obj `if test -f 'systems/constraint_operator_test.C'; then $(CYGPATH_W) 'systems/constraint_operator_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/constraint_operator_test.C'; fi`
 
+systems/unit_tests_devel-dirichlet_constraint_values_test.o: systems/dirichlet_constraint_values_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_devel-dirichlet_constraint_values_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_devel-dirichlet_constraint_values_test.Tpo -c -o systems/unit_tests_devel-dirichlet_constraint_values_test.o `test -f 'systems/dirichlet_constraint_values_test.C' || echo '$(srcdir)/'`systems/dirichlet_constraint_values_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_devel-dirichlet_constraint_values_test.Tpo systems/$(DEPDIR)/unit_tests_devel-dirichlet_constraint_values_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/dirichlet_constraint_values_test.C' object='systems/unit_tests_devel-dirichlet_constraint_values_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_devel-dirichlet_constraint_values_test.o `test -f 'systems/dirichlet_constraint_values_test.C' || echo '$(srcdir)/'`systems/dirichlet_constraint_values_test.C
+
+systems/unit_tests_devel-dirichlet_constraint_values_test.obj: systems/dirichlet_constraint_values_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_devel-dirichlet_constraint_values_test.obj -MD -MP -MF systems/$(DEPDIR)/unit_tests_devel-dirichlet_constraint_values_test.Tpo -c -o systems/unit_tests_devel-dirichlet_constraint_values_test.obj `if test -f 'systems/dirichlet_constraint_values_test.C'; then $(CYGPATH_W) 'systems/dirichlet_constraint_values_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/dirichlet_constraint_values_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_devel-dirichlet_constraint_values_test.Tpo systems/$(DEPDIR)/unit_tests_devel-dirichlet_constraint_values_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/dirichlet_constraint_values_test.C' object='systems/unit_tests_devel-dirichlet_constraint_values_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_devel-dirichlet_constraint_values_test.obj `if test -f 'systems/dirichlet_constraint_values_test.C'; then $(CYGPATH_W) 'systems/dirichlet_constraint_values_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/dirichlet_constraint_values_test.C'; fi`
+
 systems/unit_tests_devel-equation_systems_test.o: systems/equation_systems_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_devel_CPPFLAGS) $(CPPFLAGS) $(unit_tests_devel_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_devel-equation_systems_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_devel-equation_systems_test.Tpo -c -o systems/unit_tests_devel-equation_systems_test.o `test -f 'systems/equation_systems_test.C' || echo '$(srcdir)/'`systems/equation_systems_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_devel-equation_systems_test.Tpo systems/$(DEPDIR)/unit_tests_devel-equation_systems_test.Po
@@ -10395,6 +10454,20 @@ systems/unit_tests_oprof-constraint_operator_test.obj: systems/constraint_operat
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/constraint_operator_test.C' object='systems/unit_tests_oprof-constraint_operator_test.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_oprof-constraint_operator_test.obj `if test -f 'systems/constraint_operator_test.C'; then $(CYGPATH_W) 'systems/constraint_operator_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/constraint_operator_test.C'; fi`
+
+systems/unit_tests_oprof-dirichlet_constraint_values_test.o: systems/dirichlet_constraint_values_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_oprof-dirichlet_constraint_values_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_oprof-dirichlet_constraint_values_test.Tpo -c -o systems/unit_tests_oprof-dirichlet_constraint_values_test.o `test -f 'systems/dirichlet_constraint_values_test.C' || echo '$(srcdir)/'`systems/dirichlet_constraint_values_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_oprof-dirichlet_constraint_values_test.Tpo systems/$(DEPDIR)/unit_tests_oprof-dirichlet_constraint_values_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/dirichlet_constraint_values_test.C' object='systems/unit_tests_oprof-dirichlet_constraint_values_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_oprof-dirichlet_constraint_values_test.o `test -f 'systems/dirichlet_constraint_values_test.C' || echo '$(srcdir)/'`systems/dirichlet_constraint_values_test.C
+
+systems/unit_tests_oprof-dirichlet_constraint_values_test.obj: systems/dirichlet_constraint_values_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_oprof-dirichlet_constraint_values_test.obj -MD -MP -MF systems/$(DEPDIR)/unit_tests_oprof-dirichlet_constraint_values_test.Tpo -c -o systems/unit_tests_oprof-dirichlet_constraint_values_test.obj `if test -f 'systems/dirichlet_constraint_values_test.C'; then $(CYGPATH_W) 'systems/dirichlet_constraint_values_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/dirichlet_constraint_values_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_oprof-dirichlet_constraint_values_test.Tpo systems/$(DEPDIR)/unit_tests_oprof-dirichlet_constraint_values_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/dirichlet_constraint_values_test.C' object='systems/unit_tests_oprof-dirichlet_constraint_values_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_oprof-dirichlet_constraint_values_test.obj `if test -f 'systems/dirichlet_constraint_values_test.C'; then $(CYGPATH_W) 'systems/dirichlet_constraint_values_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/dirichlet_constraint_values_test.C'; fi`
 
 systems/unit_tests_oprof-equation_systems_test.o: systems/equation_systems_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_oprof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_oprof_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_oprof-equation_systems_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_oprof-equation_systems_test.Tpo -c -o systems/unit_tests_oprof-equation_systems_test.o `test -f 'systems/equation_systems_test.C' || echo '$(srcdir)/'`systems/equation_systems_test.C
@@ -12230,6 +12303,20 @@ systems/unit_tests_opt-constraint_operator_test.obj: systems/constraint_operator
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_opt-constraint_operator_test.obj `if test -f 'systems/constraint_operator_test.C'; then $(CYGPATH_W) 'systems/constraint_operator_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/constraint_operator_test.C'; fi`
 
+systems/unit_tests_opt-dirichlet_constraint_values_test.o: systems/dirichlet_constraint_values_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_opt-dirichlet_constraint_values_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_opt-dirichlet_constraint_values_test.Tpo -c -o systems/unit_tests_opt-dirichlet_constraint_values_test.o `test -f 'systems/dirichlet_constraint_values_test.C' || echo '$(srcdir)/'`systems/dirichlet_constraint_values_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_opt-dirichlet_constraint_values_test.Tpo systems/$(DEPDIR)/unit_tests_opt-dirichlet_constraint_values_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/dirichlet_constraint_values_test.C' object='systems/unit_tests_opt-dirichlet_constraint_values_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_opt-dirichlet_constraint_values_test.o `test -f 'systems/dirichlet_constraint_values_test.C' || echo '$(srcdir)/'`systems/dirichlet_constraint_values_test.C
+
+systems/unit_tests_opt-dirichlet_constraint_values_test.obj: systems/dirichlet_constraint_values_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_opt-dirichlet_constraint_values_test.obj -MD -MP -MF systems/$(DEPDIR)/unit_tests_opt-dirichlet_constraint_values_test.Tpo -c -o systems/unit_tests_opt-dirichlet_constraint_values_test.obj `if test -f 'systems/dirichlet_constraint_values_test.C'; then $(CYGPATH_W) 'systems/dirichlet_constraint_values_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/dirichlet_constraint_values_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_opt-dirichlet_constraint_values_test.Tpo systems/$(DEPDIR)/unit_tests_opt-dirichlet_constraint_values_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/dirichlet_constraint_values_test.C' object='systems/unit_tests_opt-dirichlet_constraint_values_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_opt-dirichlet_constraint_values_test.obj `if test -f 'systems/dirichlet_constraint_values_test.C'; then $(CYGPATH_W) 'systems/dirichlet_constraint_values_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/dirichlet_constraint_values_test.C'; fi`
+
 systems/unit_tests_opt-equation_systems_test.o: systems/equation_systems_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_opt_CPPFLAGS) $(CPPFLAGS) $(unit_tests_opt_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_opt-equation_systems_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_opt-equation_systems_test.Tpo -c -o systems/unit_tests_opt-equation_systems_test.o `test -f 'systems/equation_systems_test.C' || echo '$(srcdir)/'`systems/equation_systems_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_opt-equation_systems_test.Tpo systems/$(DEPDIR)/unit_tests_opt-equation_systems_test.Po
@@ -14064,6 +14151,20 @@ systems/unit_tests_prof-constraint_operator_test.obj: systems/constraint_operato
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_prof-constraint_operator_test.obj `if test -f 'systems/constraint_operator_test.C'; then $(CYGPATH_W) 'systems/constraint_operator_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/constraint_operator_test.C'; fi`
 
+systems/unit_tests_prof-dirichlet_constraint_values_test.o: systems/dirichlet_constraint_values_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_prof-dirichlet_constraint_values_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_prof-dirichlet_constraint_values_test.Tpo -c -o systems/unit_tests_prof-dirichlet_constraint_values_test.o `test -f 'systems/dirichlet_constraint_values_test.C' || echo '$(srcdir)/'`systems/dirichlet_constraint_values_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_prof-dirichlet_constraint_values_test.Tpo systems/$(DEPDIR)/unit_tests_prof-dirichlet_constraint_values_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/dirichlet_constraint_values_test.C' object='systems/unit_tests_prof-dirichlet_constraint_values_test.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_prof-dirichlet_constraint_values_test.o `test -f 'systems/dirichlet_constraint_values_test.C' || echo '$(srcdir)/'`systems/dirichlet_constraint_values_test.C
+
+systems/unit_tests_prof-dirichlet_constraint_values_test.obj: systems/dirichlet_constraint_values_test.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_prof-dirichlet_constraint_values_test.obj -MD -MP -MF systems/$(DEPDIR)/unit_tests_prof-dirichlet_constraint_values_test.Tpo -c -o systems/unit_tests_prof-dirichlet_constraint_values_test.obj `if test -f 'systems/dirichlet_constraint_values_test.C'; then $(CYGPATH_W) 'systems/dirichlet_constraint_values_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/dirichlet_constraint_values_test.C'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_prof-dirichlet_constraint_values_test.Tpo systems/$(DEPDIR)/unit_tests_prof-dirichlet_constraint_values_test.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='systems/dirichlet_constraint_values_test.C' object='systems/unit_tests_prof-dirichlet_constraint_values_test.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -c -o systems/unit_tests_prof-dirichlet_constraint_values_test.obj `if test -f 'systems/dirichlet_constraint_values_test.C'; then $(CYGPATH_W) 'systems/dirichlet_constraint_values_test.C'; else $(CYGPATH_W) '$(srcdir)/systems/dirichlet_constraint_values_test.C'; fi`
+
 systems/unit_tests_prof-equation_systems_test.o: systems/equation_systems_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(unit_tests_prof_CPPFLAGS) $(CPPFLAGS) $(unit_tests_prof_CXXFLAGS) $(CXXFLAGS) -MT systems/unit_tests_prof-equation_systems_test.o -MD -MP -MF systems/$(DEPDIR)/unit_tests_prof-equation_systems_test.Tpo -c -o systems/unit_tests_prof-equation_systems_test.o `test -f 'systems/equation_systems_test.C' || echo '$(srcdir)/'`systems/equation_systems_test.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) systems/$(DEPDIR)/unit_tests_prof-equation_systems_test.Tpo systems/$(DEPDIR)/unit_tests_prof-equation_systems_test.Po
@@ -15200,6 +15301,7 @@ distclean: distclean-am
 	-rm -f solvers/$(DEPDIR)/unit_tests_prof-first_order_unsteady_solver_test.Po
 	-rm -f solvers/$(DEPDIR)/unit_tests_prof-second_order_unsteady_solver_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_dbg-constraint_operator_test.Po
+	-rm -f systems/$(DEPDIR)/unit_tests_dbg-dirichlet_constraint_values_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_dbg-disjoint_neighbor_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_dbg-equation_systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_dbg-heterogeneous_nonlinear_constraint_test.Po
@@ -15207,6 +15309,7 @@ distclean: distclean-am
 	-rm -f systems/$(DEPDIR)/unit_tests_dbg-periodic_bc_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_dbg-systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_devel-constraint_operator_test.Po
+	-rm -f systems/$(DEPDIR)/unit_tests_devel-dirichlet_constraint_values_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_devel-disjoint_neighbor_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_devel-equation_systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_devel-heterogeneous_nonlinear_constraint_test.Po
@@ -15214,6 +15317,7 @@ distclean: distclean-am
 	-rm -f systems/$(DEPDIR)/unit_tests_devel-periodic_bc_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_devel-systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_oprof-constraint_operator_test.Po
+	-rm -f systems/$(DEPDIR)/unit_tests_oprof-dirichlet_constraint_values_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_oprof-disjoint_neighbor_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_oprof-equation_systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_oprof-heterogeneous_nonlinear_constraint_test.Po
@@ -15221,6 +15325,7 @@ distclean: distclean-am
 	-rm -f systems/$(DEPDIR)/unit_tests_oprof-periodic_bc_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_oprof-systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_opt-constraint_operator_test.Po
+	-rm -f systems/$(DEPDIR)/unit_tests_opt-dirichlet_constraint_values_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_opt-disjoint_neighbor_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_opt-equation_systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_opt-heterogeneous_nonlinear_constraint_test.Po
@@ -15228,6 +15333,7 @@ distclean: distclean-am
 	-rm -f systems/$(DEPDIR)/unit_tests_opt-periodic_bc_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_opt-systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_prof-constraint_operator_test.Po
+	-rm -f systems/$(DEPDIR)/unit_tests_prof-dirichlet_constraint_values_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_prof-disjoint_neighbor_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_prof-equation_systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_prof-heterogeneous_nonlinear_constraint_test.Po
@@ -15902,6 +16008,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f solvers/$(DEPDIR)/unit_tests_prof-first_order_unsteady_solver_test.Po
 	-rm -f solvers/$(DEPDIR)/unit_tests_prof-second_order_unsteady_solver_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_dbg-constraint_operator_test.Po
+	-rm -f systems/$(DEPDIR)/unit_tests_dbg-dirichlet_constraint_values_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_dbg-disjoint_neighbor_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_dbg-equation_systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_dbg-heterogeneous_nonlinear_constraint_test.Po
@@ -15909,6 +16016,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f systems/$(DEPDIR)/unit_tests_dbg-periodic_bc_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_dbg-systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_devel-constraint_operator_test.Po
+	-rm -f systems/$(DEPDIR)/unit_tests_devel-dirichlet_constraint_values_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_devel-disjoint_neighbor_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_devel-equation_systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_devel-heterogeneous_nonlinear_constraint_test.Po
@@ -15916,6 +16024,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f systems/$(DEPDIR)/unit_tests_devel-periodic_bc_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_devel-systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_oprof-constraint_operator_test.Po
+	-rm -f systems/$(DEPDIR)/unit_tests_oprof-dirichlet_constraint_values_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_oprof-disjoint_neighbor_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_oprof-equation_systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_oprof-heterogeneous_nonlinear_constraint_test.Po
@@ -15923,6 +16032,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f systems/$(DEPDIR)/unit_tests_oprof-periodic_bc_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_oprof-systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_opt-constraint_operator_test.Po
+	-rm -f systems/$(DEPDIR)/unit_tests_opt-dirichlet_constraint_values_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_opt-disjoint_neighbor_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_opt-equation_systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_opt-heterogeneous_nonlinear_constraint_test.Po
@@ -15930,6 +16040,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f systems/$(DEPDIR)/unit_tests_opt-periodic_bc_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_opt-systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_prof-constraint_operator_test.Po
+	-rm -f systems/$(DEPDIR)/unit_tests_prof-dirichlet_constraint_values_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_prof-disjoint_neighbor_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_prof-equation_systems_test.Po
 	-rm -f systems/$(DEPDIR)/unit_tests_prof-heterogeneous_nonlinear_constraint_test.Po
