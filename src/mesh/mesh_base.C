@@ -1978,7 +1978,7 @@ const ElemRange & MeshBase::element_stored_range()
 {
   if (!_element_stored_range)
     {
-      // Range construction may not be safe within threads
+      // Assigning to our cache may not be safe within threads
       libmesh_assert(!Threads::in_threads);
 
       _element_stored_range =
@@ -2004,7 +2004,7 @@ const ConstElemRange & MeshBase::active_local_element_stored_range() const
 {
   if (!_const_active_local_element_stored_range)
     {
-      // Range construction may not be safe within threads
+      // Assigning to our cache may not be safe within threads
       libmesh_assert(!Threads::in_threads);
 
       _const_active_local_element_stored_range =
@@ -2031,7 +2031,7 @@ const NodeRange & MeshBase::node_stored_range()
 {
   if (!_node_stored_range)
     {
-      // Range construction may not be safe within threads
+      // Assigning to our cache may not be safe within threads
       libmesh_assert(!Threads::in_threads);
 
       _node_stored_range =
@@ -2057,7 +2057,7 @@ const ConstNodeRange & MeshBase::node_stored_range() const
 {
   if (!_const_node_stored_range)
     {
-      // Range construction may not be safe within threads
+      // Assigning to our cache may not be safe within threads
       libmesh_assert(!Threads::in_threads);
 
       _const_node_stored_range =
@@ -2084,7 +2084,7 @@ const NodeRange & MeshBase::local_node_stored_range()
 {
   if (!_local_node_stored_range)
     {
-      // Range construction may not be safe within threads
+      // Assigning to our cache may not be safe within threads
       libmesh_assert(!Threads::in_threads);
 
       _local_node_stored_range =
@@ -2111,7 +2111,7 @@ const NodeRange & MeshBase::unpartitioned_node_stored_range()
 {
   if (!_unpartitioned_node_stored_range)
     {
-      // Range construction may not be safe within threads
+      // Assigning to our cache may not be safe within threads
       libmesh_assert(!Threads::in_threads);
 
       _unpartitioned_node_stored_range =
