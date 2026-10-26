@@ -449,30 +449,40 @@ bool MeshRefinement::test_unflagged (bool libmesh_dbg_var(libmesh_assert_pass)) 
   // This function must be run on all processors at once
   parallel_object_only();
 
-  bool found_flag = false;
+  std::atomic<bool> found_flag = false;
 
 #ifndef NDEBUG
-  Elem * failed_elem = nullptr;
+  std::atomic<const Elem *> failed_elem = nullptr;
 #endif
 
   // Search for local flags
-  for (auto & elem : _mesh.active_local_element_ptr_range())
-    if (elem->refinement_flag() == Elem::REFINE ||
-        elem->refinement_flag() == Elem::COARSEN ||
-        elem->p_refinement_flag() == Elem::REFINE ||
-        elem->p_refinement_flag() == Elem::COARSEN)
-      {
-        found_flag = true;
+  Threads::parallel_for
+    (_mesh.active_local_element_stored_range(),
+     [&found_flag
 #ifndef NDEBUG
-        failed_elem = elem;
+     , &failed_elem
 #endif
-        break;
-      }
+     ] (const ElemRange & range)
+     {
+       for (Elem * elem : range)
+         if (elem->refinement_flag() == Elem::REFINE ||
+             elem->refinement_flag() == Elem::COARSEN ||
+             elem->p_refinement_flag() == Elem::REFINE ||
+             elem->p_refinement_flag() == Elem::COARSEN)
+           {
+             found_flag = true;
+#ifndef NDEBUG
+             failed_elem = elem;
+#endif
+             break;
+           }
+     });
 
   // If we found a flag on any processor, it counts
-  this->comm().max(found_flag);
+  bool found_some_flag = found_flag;
+  this->comm().max(found_some_flag);
 
-  if (found_flag)
+  if (found_some_flag)
     {
 #ifndef NDEBUG
       if (libmesh_assert_pass)
