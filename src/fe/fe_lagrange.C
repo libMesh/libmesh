@@ -134,6 +134,39 @@ void lagrange_nodal_soln(const Elem * elem,
               return;
             }
 
+          case QUAD16:
+            {
+              libmesh_assert_equal_to (nodal_soln.size(), 16);
+
+              //Lagrange-1 values at +/- 1/3
+              constexpr Real a = 2./3., b = 1./3.;
+              //product of Lagrange-1 values at (+/-1/3, +/-1/3)
+              constexpr Real c = 4./9., d = 2./9., e = 1./9.;
+
+
+              nodal_soln[0] = elem_soln[0];
+              nodal_soln[1] = elem_soln[1];
+              nodal_soln[2] = elem_soln[2];
+              nodal_soln[3] = elem_soln[3];
+              nodal_soln[4] = a*elem_soln[0] + b* elem_soln[1];
+              nodal_soln[5] = b*elem_soln[0] + a* elem_soln[1];
+              nodal_soln[6] = a*elem_soln[1] + b* elem_soln[2];
+              nodal_soln[7] = b*elem_soln[1] + a* elem_soln[2];
+              nodal_soln[8] = a*elem_soln[2] + b* elem_soln[3];
+              nodal_soln[9] = b*elem_soln[2] + a* elem_soln[3];
+              nodal_soln[10] = a*elem_soln[3] + b* elem_soln[0];
+              nodal_soln[11] = b*elem_soln[3] + a* elem_soln[0];
+
+              //interior
+              nodal_soln[12] = c*elem_soln[0] + d*elem_soln[1] + e*elem_soln[2] + d*elem_soln[3];
+              nodal_soln[13] = d*elem_soln[0] + c*elem_soln[1] + d*elem_soln[2] + e*elem_soln[3];
+              nodal_soln[14] = e*elem_soln[0] + d*elem_soln[1] + c*elem_soln[2] + d*elem_soln[3];
+              nodal_soln[15] = d*elem_soln[0] + e*elem_soln[1] + d*elem_soln[2] + c*elem_soln[3];
+
+              return;
+
+            }
+
 
           case TET14:
             libmesh_assert_equal_to (nodal_soln.size(), 14);
@@ -484,6 +517,7 @@ unsigned int lagrange_n_dofs(const ElemType t, const Elem * e, const Order o)
           case QUADSHELL8:
           case QUAD9:
           case QUADSHELL9:
+          case QUAD16:
             return 4;
 
           case TET4:
