@@ -413,30 +413,27 @@ void TriangulatorInterface::increase_triangle_order()
   if (!n_midpoints)
     return;
 
-  Threads::parallel_for
+  Threads::parallel_for_each
     (_mesh.element_stored_range(),
-     [&all_midpoints](const ElemRange & range)
+     [&all_midpoints](Elem * elem)
      {
-       for (Elem * elem : range)
+       // This should only be called right after we've finished
+       // converting a triangulation to higher order
+       libmesh_assert_equal_to(elem->n_vertices(), 3);
+       libmesh_assert_not_equal_to(elem->default_order(), FIRST);
+
+       for (auto n : make_range(3))
          {
-           // This should only be called right after we've finished
-           // converting a triangulation to higher order
-           libmesh_assert_equal_to(elem->n_vertices(), 3);
-           libmesh_assert_not_equal_to(elem->default_order(), FIRST);
+           // Only hole/outer boundary segments need adjusted
+           // midpoints
+           if (elem->neighbor_ptr(n))
+             continue;
 
-           for (auto n : make_range(3))
-             {
-               // Only hole/outer boundary segments need adjusted
-               // midpoints
-               if (elem->neighbor_ptr(n))
-                 continue;
+           const Point & p = elem->point(n);
 
-               const Point & p = elem->point(n);
-
-               if (const auto it = all_midpoints.find({p,0});
-                   it != all_midpoints.end())
-                 elem->point(n+3) = it->second;
-             }
+           if (const auto it = all_midpoints.find({p,0});
+               it != all_midpoints.end())
+             elem->point(n+3) = it->second;
          }
      });
 

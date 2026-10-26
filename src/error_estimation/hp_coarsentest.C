@@ -495,57 +495,54 @@ void HPCoarsenTest::select_refinement (System & system)
 
   // Iterate over all the active elements in the mesh
   // that live on this processor.
-  Threads::parallel_for
+  Threads::parallel_for_each
     (mesh.active_local_element_stored_range(),
      [this, &dof_map, &h_error_per_cell, &p_error_per_cell,
       &smoothness, smooth_mean, n_vars]
-     (const ElemRange & range)
+     (Elem * elem)
      {
-       for (Elem * elem : range)
+       // We're only checking elements that are already flagged
+       // for h refinement
+       if (elem->refinement_flag() != Elem::REFINE)
+         return;
+
+       const dof_id_type e_id = elem->id();
+
+       unsigned int dofs_per_elem = 0, dofs_per_p_elem = 0;
+
+       // Loop over all the variables in the system
+       for (unsigned int var=0; var<n_vars; var++)
          {
-           // We're only checking elements that are already flagged
-           // for h refinement
-           if (elem->refinement_flag() != Elem::REFINE)
-             continue;
+           // The type of finite element to use for this variable
+           const FEType & fe_type = dof_map.variable_type (var);
 
-           const dof_id_type e_id = elem->id();
+           // FIXME: we're overestimating the number of DOFs added
+           // by h refinement
 
-           unsigned int dofs_per_elem = 0, dofs_per_p_elem = 0;
+           // Compute number of DOFs for elem at current p_level()
+           dofs_per_elem +=
+             FEInterface::n_dofs(fe_type, elem);
 
-           // Loop over all the variables in the system
-           for (unsigned int var=0; var<n_vars; var++)
-             {
-               // The type of finite element to use for this variable
-               const FEType & fe_type = dof_map.variable_type (var);
+           // Compute number of DOFs for elem at current p_level() + 1
+           dofs_per_p_elem +=
+             FEInterface::n_dofs(fe_type, elem->p_level() + 1, elem);
+         }
 
-               // FIXME: we're overestimating the number of DOFs added
-               // by h refinement
+       const unsigned int new_h_dofs = dofs_per_elem *
+         (elem->n_children() - 1);
 
-               // Compute number of DOFs for elem at current p_level()
-               dofs_per_elem +=
-                 FEInterface::n_dofs(fe_type, elem);
+       const unsigned int new_p_dofs = dofs_per_p_elem -
+         dofs_per_elem;
 
-               // Compute number of DOFs for elem at current p_level() + 1
-               dofs_per_p_elem +=
-                 FEInterface::n_dofs(fe_type, elem->p_level() + 1, elem);
-             }
-
-           const unsigned int new_h_dofs = dofs_per_elem *
-             (elem->n_children() - 1);
-
-           const unsigned int new_p_dofs = dofs_per_p_elem -
-             dofs_per_elem;
-
-           const Real p_value =
-             std::sqrt(p_error_per_cell[e_id]) * p_weight / new_p_dofs;
-           const Real h_value =
-             std::sqrt(h_error_per_cell[e_id]) /
-             static_cast<Real>(new_h_dofs);
-           if (smoothness[elem->id()] > smooth_mean && p_value > h_value)
-             {
-               elem->set_p_refinement_flag(Elem::REFINE);
-               elem->set_refinement_flag(Elem::DO_NOTHING);
-             }
+       const Real p_value =
+         std::sqrt(p_error_per_cell[e_id]) * p_weight / new_p_dofs;
+       const Real h_value =
+         std::sqrt(h_error_per_cell[e_id]) /
+         static_cast<Real>(new_h_dofs);
+       if (smoothness[elem->id()] > smooth_mean && p_value > h_value)
+         {
+           elem->set_p_refinement_flag(Elem::REFINE);
+           elem->set_refinement_flag(Elem::DO_NOTHING);
          }
      });
 
