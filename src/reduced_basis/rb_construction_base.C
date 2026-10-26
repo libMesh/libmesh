@@ -37,7 +37,7 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/parallel.h"
-#include "libmesh/condensed_eigen_system.h"
+#include "libmesh/eigen_system.h"
 #include "libmesh/linear_implicit_system.h"
 #include "libmesh/int_range.h"
 #include "libmesh/utility.h"
@@ -786,7 +786,7 @@ void RBConstructionBase<Base>::set_training_random_seed(int seed)
 
 // EigenSystem is only defined if we have SLEPc
 #if defined(LIBMESH_HAVE_SLEPC)
-template class LIBMESH_EXPORT RBConstructionBase<CondensedEigenSystem>;
+template class LIBMESH_EXPORT RBConstructionBase<EigenSystem>;
 #endif
 
 template class LIBMESH_EXPORT RBConstructionBase<LinearImplicitSystem>;

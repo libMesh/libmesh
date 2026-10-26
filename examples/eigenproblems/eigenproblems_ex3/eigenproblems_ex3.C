@@ -54,7 +54,7 @@
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_generation.h"
 #include "libmesh/exodusII_io.h"
-#include "libmesh/condensed_eigen_system.h"
+#include "libmesh/eigen_system.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/fe.h"
 #include "libmesh/quadrature_gauss.h"
@@ -178,10 +178,13 @@ int main (int argc, char ** argv)
   // Create an equation systems object.
   EquationSystems equation_systems (mesh);
 
-  // Create a CondensedEigenSystem named "Eigensystem" and (for convenience)
-  // use a reference to the system we create.
-  CondensedEigenSystem & eigen_system =
-    equation_systems.add_system<CondensedEigenSystem> ("Eigensystem");
+  // Create an EigenSystem named "Eigensystem" and (for convenience)
+  // use a reference to the system we create. Eliminating constraints
+  // removes the Dirichlet degrees of freedom from the eigenproblem, so
+  // they contribute no spurious eigenvalues.
+  EigenSystem & eigen_system =
+    equation_systems.add_system<EigenSystem> ("Eigensystem");
+  eigen_system.create_constraint_elimination();
 
   // Declare the system variables.
   // Adds the variable "p" to "Eigensystem".   "p"
@@ -227,8 +230,6 @@ int main (int argc, char ** argv)
 
   // Prints information about the system to the screen.
   equation_systems.print_info();
-
-  eigen_system.initialize_condensed_dofs();
 
   // Solve the system "Eigensystem".
   eigen_system.solve();
@@ -397,8 +398,8 @@ void assemble_matrices(EquationSystems & es,
       // then it is essential to call constrain_element_matrix.
       // As a result we include constrain_element_matrix here to
       // ensure this example is ready to be used with hanging nodes.
-      // (Note that constrained rows/cols will be eliminated from
-      // the eigenproblem by the CondensedEigenSystem.)
+      // (Note that constrained rows/cols are dropped from the
+      // eigenproblem by the constraint elimination.)
       dof_map.constrain_element_matrix(Ke, dof_indices, false);
       dof_map.constrain_element_matrix(Me, dof_indices, false);
 

@@ -41,6 +41,7 @@ CondensedEigenSystem::CondensedEigenSystem (EquationSystems & es,
     _have_condensed_dofs(false),
     _create_submatrices_in_solve(true)
 {
+  libmesh_deprecated();
 }
 
 CondensedEigenSystem::~CondensedEigenSystem() = default;
@@ -48,6 +49,10 @@ CondensedEigenSystem::~CondensedEigenSystem() = default;
 void
 CondensedEigenSystem::initialize_condensed_dofs(const std::set<dof_id_type> & global_dirichlet_dofs_set)
 {
+  libmesh_error_msg_if(this->has_constraint_elimination(),
+                       "A CondensedEigenSystem with constraint elimination already solves on the "
+                       "unconstrained degrees of freedom; use an EigenSystem instead");
+
   const DofMap & dof_map = this->get_dof_map();
   if (global_dirichlet_dofs_set.empty() && !dof_map.n_constrained_dofs())
     {

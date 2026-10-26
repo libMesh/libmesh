@@ -39,6 +39,11 @@ namespace libMesh
  * This is useful, for example, in the case that one wants to solve
  * eigenvalue problems with Dirichlet boundary conditions.
  *
+ * \deprecated Call \p EigenSystem::create_constraint_elimination() before \p init() instead.
+ * An \p EigenSystem that eliminates constraints assembles its matrices directly on the
+ * unconstrained degrees of freedom, and \p ConstraintEliminationDofMap::prolong() and
+ * \p ReducedDofMap::inject() replace \p copy_sub_to_super() and \p copy_super_to_sub().
+ *
  * \author David Knezevic
  * \date 2011
  * \brief Extends EigenSystem to allow certain DOFs to be condensed out.
