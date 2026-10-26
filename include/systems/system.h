@@ -294,7 +294,7 @@ public:
    *
    * This method also prepares the send_list.
    */
-  virtual void reinit_dirichlet_constraint_values ();
+  void reinit_dirichlet_constraint_values ();
 
   /**
    * Reinitializes the system with a new mesh.

@@ -1091,28 +1091,19 @@ public:
    * carry a DirichletBoundary id. This method restores that copy. Then
    * it applies the DirichletBoundary objects again, on those elements
    * only and in the same order. Thus overlapping boundaries resolve as
-   * they do in create_dof_constraints().
+   * they do in create_dof_constraints(). Last, it processes any spline
+   * constraint rows of the mesh, as create_dof_constraints() does.
    *
    * This method calls create_dof_constraints() instead if one of these
    * conditions is true:
    * - No copy matches the current degrees of freedom and boundaries.
    * - There are no DirichletBoundary objects.
-   * - The mesh has spline constraint rows. Their processing uses the
-   *   Dirichlet values.
    *
    * As after create_dof_constraints(), add any user constraints and
    * then call process_constraints().
    * System::reinit_dirichlet_constraint_values() does these steps.
    */
   void reinit_dirichlet_constraint_values (const MeshBase & mesh, Real time);
-
-  /**
-   * \returns Two memory estimates in bytes for this processor. The
-   * first is the memory that reinit_dirichlet_constraint_values()
-   * keeps. The second is the memory of the processed degree of
-   * freedom constraints, for comparison.
-   */
-  std::pair<std::size_t, std::size_t> dirichlet_constraint_cache_memory () const;
 
   /**
    * Gathers constraint equation dependencies from other processors
@@ -1705,14 +1696,16 @@ public:
 private:
   /**
    * Adds the constraints of each primal and adjoint DirichletBoundary
-   * at \p time on the elements of \p range. If \p acted_on_elems is
-   * not null, it receives the elements that carry a DirichletBoundary
-   * id, sorted by id.
+   * at \p time on the elements of \p range.
+   *
+   * \returns If \p record_elems is true, the elements of \p range
+   * that carry a DirichletBoundary id, sorted by id. Otherwise, an
+   * empty vector.
    */
-  void apply_dirichlet_boundaries (const MeshBase & mesh,
-                                   Real time,
-                                   ConstElemRange & range,
-                                   std::vector<const Elem *> * acted_on_elems = nullptr);
+  std::vector<const Elem *> apply_dirichlet_boundaries (const MeshBase & mesh,
+                                                        Real time,
+                                                        ConstElemRange & range,
+                                                        bool record_elems);
 
 public:
 #endif // LIBMESH_ENABLE_DIRICHLET

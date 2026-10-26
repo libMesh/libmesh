@@ -5,19 +5,15 @@
 #include <libmesh/function_base.h>
 #include <libmesh/libmesh.h>
 #include <libmesh/linear_implicit_system.h>
-#include <libmesh/distributed_mesh.h>
 #include <libmesh/mesh.h>
-#include <libmesh/replicated_mesh.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/mesh_refinement.h>
 #include <libmesh/parallel.h>
 #include <libmesh/periodic_boundary.h>
+#include <libmesh/sparse_matrix.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
-
-#include <array>
-#include <chrono>
 
 using namespace libMesh;
 
@@ -84,6 +80,36 @@ std::map<dof_id_type, DofConstraintRow> gather_local_rows(const DofMap & dof_map
       rows[dof] = row;
   return rows;
 }
+
+/**
+ * Checks that the processed constraints of \p dof_map match \p rows
+ * and \p rhs exactly
+ */
+void assert_constraints_equal(const std::map<dof_id_type, DofConstraintRow> & rows,
+                              const std::map<dof_id_type, Number> & rhs,
+                              DofMap & dof_map)
+{
+  const auto other_rows = gather_local_rows(dof_map);
+  const auto other_rhs = gather_local_rhs(dof_map);
+
+  CPPUNIT_ASSERT_EQUAL(rows.size(), other_rows.size());
+  for (const auto & [dof, row] : rows)
+    {
+      const auto it = other_rows.find(dof);
+      CPPUNIT_ASSERT(it != other_rows.end());
+      CPPUNIT_ASSERT_EQUAL(row.size(), it->second.size());
+      for (const auto & [constraining_dof, coef] : row)
+        {
+          const auto jt = it->second.find(constraining_dof);
+          CPPUNIT_ASSERT(jt != it->second.end());
+          CPPUNIT_ASSERT_EQUAL(coef, jt->second);
+        }
+    }
+
+  CPPUNIT_ASSERT_EQUAL(rhs.size(), other_rhs.size());
+  for (const auto & [dof, value] : rhs)
+    CPPUNIT_ASSERT_EQUAL(value, libmesh_map_find(other_rhs, dof));
+}
 }
 
 class DirichletConstraintValuesTest : public CppUnit::TestCase
@@ -95,8 +121,10 @@ public:
 #if defined(LIBMESH_ENABLE_DIRICHLET) && defined(LIBMESH_ENABLE_PERIODIC) && \
     defined(LIBMESH_ENABLE_AMR)
   CPPUNIT_TEST(testUpdateMatchesRebuild);
-  CPPUNIT_TEST(testUpdateCost);
 #endif
+#endif
+#if defined(LIBMESH_ENABLE_DIRICHLET) && defined(LIBMESH_HAVE_SOLVER)
+  CPPUNIT_TEST(testSplineConstraintRows);
 #endif
 
   CPPUNIT_TEST_SUITE_END();
@@ -105,26 +133,72 @@ private:
   void testUpdateMatchesRebuild()
   {
     LOG_UNIT_TEST;
-    checkUpdate(4, /*report=*/false);
+    checkUpdate(4);
   }
 
   /**
-   * Compares the cost of the update with the cost of a full rebuild,
-   * phase by phase. The default grid is 64 x 64. That size gives
-   * meaningful timings and keeps the suite fast. Options:
-   * - --dirichlet-cost-n <n> sets the grid size, for a scaling study.
-   * - --dirichlet-cost-interior-refinement refines a checkerboard over
-   *   the whole domain. Then the number of hanging nodes grows with
-   *   the volume, not with the boundary.
-   * - --dirichlet-cost-distributed uses a DistributedMesh.
+   * Checks that System::reinit_dirichlet_constraint_values() gives
+   * exactly the result of System::reinit_constraints() on a mesh with
+   * spline constraint rows. The mesh is a line of 10 EDGE2 elements.
+   * The constraint rows tie its nodes to 6 spline nodes. The Dirichlet
+   * boundary is on a constrained node. Thus the processing of the
+   * constraint rows projects the Dirichlet value onto the spline
+   * nodes.
    */
-  void testUpdateCost()
+  void testSplineConstraintRows()
   {
     LOG_UNIT_TEST;
-    checkUpdate(libMesh::command_line_next("--dirichlet-cost-n", 64u),
-                /*report=*/true,
-                libMesh::on_command_line("--dirichlet-cost-interior-refinement"),
-                libMesh::on_command_line("--dirichlet-cost-distributed"));
+
+    Mesh mesh(*TestCommWorld);
+    EquationSystems es(mesh);
+    auto & sys = es.add_system<LinearImplicitSystem>("sys");
+    const auto u = sys.add_variable("u", FIRST);
+
+    // The constraint operator below uses the node numbering of
+    // build_line
+    mesh.allow_renumbering(false);
+    MeshTools::Generation::build_line(mesh, 10, 0., 1., EDGE2);
+
+    // Each interior even node is a spline node. Each odd node takes
+    // the mean of its two neighbors. The left node takes a combination
+    // of a new spline node and the next spline node, and the right node
+    // is a spline node. Processor 0 owns all rows of the operator.
+    auto matrix = SparseMatrix<Number>::build(mesh.comm());
+    const bool rank0 = !mesh.comm().rank();
+    matrix->init(11, 6, rank0 ? 11 : 0, rank0 ? 6 : 0, rank0 ? 6 : 0, 0);
+    if (rank0)
+      {
+        matrix->set(0, 0, 0.75);
+        matrix->set(0, 1, 0.25);
+        for (const auto i : make_range(5))
+          {
+            if (i)
+              matrix->set(i*2, i, 1);
+            matrix->set(i*2+1, i, 0.5);
+            matrix->set(i*2+1, i+1, 0.5);
+          }
+        matrix->set(10, 5, 1);
+      }
+    matrix->close();
+    mesh.copy_constraint_rows(*matrix);
+    mesh.prepare_for_use();
+
+    // build_line's left boundary id
+    sys.get_dof_map().add_dirichlet_boundary(DirichletBoundary({0}, {u}, RampFunction(1.)));
+
+    es.init();
+
+    auto & dof_map = sys.get_dof_map();
+    for (const Real time : {0., 0.5, 2.})
+      {
+        sys.time = time;
+        sys.reinit_constraints();
+        const auto rebuilt_rows = gather_local_rows(dof_map);
+        const auto rebuilt_rhs = gather_local_rhs(dof_map);
+
+        sys.reinit_dirichlet_constraint_values();
+        assert_constraints_equal(rebuilt_rows, rebuilt_rhs, dof_map);
+      }
   }
 
   /**
@@ -132,21 +206,11 @@ private:
    * exactly the result of System::reinit_constraints(). The mesh is an
    * n x n grid of QUAD9 elements with hanging nodes and a periodic
    * boundary. The periodic partners meet overlapping time-dependent
-   * Dirichlet boundaries. If \p interior_refinement is true, the
-   * hanging nodes cover the whole domain, not only the region near the
-   * boundary. If \p distributed is true, the mesh is a DistributedMesh.
+   * Dirichlet boundaries.
    */
-  void checkUpdate(const unsigned int n,
-                   const bool report,
-                   const bool interior_refinement = false,
-                   const bool distributed = false)
+  void checkUpdate(const unsigned int n)
   {
-    std::unique_ptr<UnstructuredMesh> mesh_ptr;
-    if (distributed)
-      mesh_ptr = std::make_unique<DistributedMesh>(*TestCommWorld);
-    else
-      mesh_ptr = std::make_unique<ReplicatedMesh>(*TestCommWorld);
-    UnstructuredMesh & mesh = *mesh_ptr;
+    Mesh mesh(*TestCommWorld);
 
     // Keep all neighbors until the periodic boundary is attached. The
     // periodic boundary needs them.
@@ -176,16 +240,13 @@ private:
     sys.get_dof_map().add_dirichlet_boundary(
         DirichletBoundary({left_id, right_id}, {u}, RampFunction(-3.)));
 
-    // Refine the elements near the left boundary, or a checkerboard
-    // over the whole domain. Then the hanging nodes on each
-    // refined/unrefined interface reach the Dirichlet and periodic
-    // boundaries.
+    // Refine the elements near the left boundary. Then the hanging
+    // nodes on the refined/unrefined interface reach the Dirichlet and
+    // periodic boundaries.
     MeshRefinement refinement(mesh);
     for (auto & elem : mesh.active_element_ptr_range())
       {
-        const Point c = elem->vertex_average();
-        const bool checker = (unsigned(c(0) * n) + unsigned(c(1) * n)) % 2;
-        if (interior_refinement ? checker : c(0) < 0.3)
+        if (elem->vertex_average()(0) < 0.3)
           elem->set_refinement_flag(Elem::REFINE);
       }
     refinement.refine_elements();
@@ -194,44 +255,19 @@ private:
 
     auto & dof_map = sys.get_dof_map();
 
-    using clock = std::chrono::steady_clock;
-    double rebuild_seconds = 0, update_seconds = 0;
-
     for (const Real time : {0., 0.25, 1., 2.5})
       {
         sys.time = time;
 
-        auto start = clock::now();
         sys.reinit_constraints();
-        rebuild_seconds += std::chrono::duration<double>(clock::now() - start).count();
         const auto rebuilt_rows = gather_local_rows(dof_map);
         const auto rebuilt_rhs = gather_local_rhs(dof_map);
 
         // The update must give the same result from any state that the
         // last processing left
-        start = clock::now();
         sys.reinit_dirichlet_constraint_values();
-        update_seconds += std::chrono::duration<double>(clock::now() - start).count();
-        const auto updated_rows = gather_local_rows(dof_map);
+        assert_constraints_equal(rebuilt_rows, rebuilt_rhs, dof_map);
         const auto updated_rhs = gather_local_rhs(dof_map);
-
-        CPPUNIT_ASSERT_EQUAL(rebuilt_rows.size(), updated_rows.size());
-        for (const auto & [dof, row] : rebuilt_rows)
-          {
-            const auto it = updated_rows.find(dof);
-            CPPUNIT_ASSERT(it != updated_rows.end());
-            CPPUNIT_ASSERT_EQUAL(row.size(), it->second.size());
-            for (const auto & [constraining_dof, coef] : row)
-              {
-                const auto jt = it->second.find(constraining_dof);
-                CPPUNIT_ASSERT(jt != it->second.end());
-                CPPUNIT_ASSERT_EQUAL(coef, jt->second);
-              }
-          }
-
-        CPPUNIT_ASSERT_EQUAL(rebuilt_rhs.size(), updated_rhs.size());
-        for (const auto & [dof, value] : rebuilt_rhs)
-          CPPUNIT_ASSERT_EQUAL(value, libmesh_map_find(updated_rhs, dof));
 
         // The values must change with time. Otherwise the comparison
         // above could pass on stale values.
@@ -250,68 +286,10 @@ private:
     sys.time = 4.;
     sys.reinit_dirichlet_constraint_values();
     sys.reinit_dirichlet_constraint_values();
+    const auto twice_updated_rows = gather_local_rows(dof_map);
     const auto twice_updated_rhs = gather_local_rhs(dof_map);
     sys.reinit_constraints();
-    const auto rebuilt_rhs = gather_local_rhs(dof_map);
-    CPPUNIT_ASSERT_EQUAL(rebuilt_rhs.size(), twice_updated_rhs.size());
-    for (const auto & [dof, value] : rebuilt_rhs)
-      CPPUNIT_ASSERT_EQUAL(value, libmesh_map_find(twice_updated_rhs, dof));
-
-    if (!report)
-      return;
-
-    // Time each phase of both paths separately. The update replaces
-    // only the first phase. Thus the fraction of the update time in the
-    // shared phases is the time that the update could also save if it
-    // skipped process_constraints().
-    const auto time_phases = [&](const bool update)
-    {
-      std::array<double, 3> seconds = {0, 0, 0};
-      for (const Real time : {5., 6., 7., 8.})
-        {
-          sys.time = time;
-          auto start = clock::now();
-          if (update)
-            dof_map.reinit_dirichlet_constraint_values(mesh, time);
-          else
-            dof_map.create_dof_constraints(mesh, time);
-          sys.user_constrain();
-          seconds[0] += std::chrono::duration<double>(clock::now() - start).count();
-
-          start = clock::now();
-          dof_map.process_constraints(mesh);
-          seconds[1] += std::chrono::duration<double>(clock::now() - start).count();
-
-          start = clock::now();
-          dof_map.prepare_send_list();
-          seconds[2] += std::chrono::duration<double>(clock::now() - start).count();
-        }
-      for (auto & s : seconds)
-        TestCommWorld->max(s);
-      return seconds;
-    };
-
-    const auto rebuild_phases = time_phases(false);
-    const auto update_phases = time_phases(true);
-
-    auto [cache_bytes, constraint_bytes] = dof_map.dirichlet_constraint_cache_memory();
-    TestCommWorld->sum(cache_bytes);
-    TestCommWorld->sum(constraint_bytes);
-    TestCommWorld->max(rebuild_seconds);
-    TestCommWorld->max(update_seconds);
-    libMesh::out << "\nDirichletConstraintValuesTest: " << mesh.n_active_elem()
-                 << " active elements, " << mesh.n_nodes() << " nodes, " << dof_map.n_dofs()
-                 << " dofs, " << dof_map.n_constrained_dofs() << " constrained, "
-                 << TestCommWorld->size() << " processors"
-                 << "\n  time over 4 calls: reinit_constraints " << rebuild_seconds
-                 << " s, reinit_dirichlet_constraint_values " << update_seconds << " s"
-                 << "\n  phases over 4 calls (build raw | process_constraints | prepare_send_list):"
-                 << "\n    rebuild " << rebuild_phases[0] << " | " << rebuild_phases[1] << " | "
-                 << rebuild_phases[2] << " s"
-                 << "\n    update  " << update_phases[0] << " | " << update_phases[1] << " | "
-                 << update_phases[2] << " s"
-                 << "\n  memory summed over processors: cache " << cache_bytes
-                 << " B, processed dof constraints " << constraint_bytes << " B" << std::endl;
+    assert_constraints_equal(twice_updated_rows, twice_updated_rhs, dof_map);
   }
 };
 
