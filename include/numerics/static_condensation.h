@@ -250,7 +250,6 @@ private:
 
   const MeshBase & _mesh;
   System & _system;
-  const DofMap & _full_dof_map;
   StaticCondensationDofMap & _reduced_dof_map;
 
   /// global sparse matrix for the uncondensed degrees of freedom
