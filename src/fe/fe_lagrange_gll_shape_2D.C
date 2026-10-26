@@ -121,8 +121,8 @@ Real FE<2,LAGRANGE_GLL>::shape(const ElemType,
                                const unsigned int,
                                const Point &)
 {
-  libmesh_error_msg("The LAGRANGE_GLL shape functions follow the orientation of the "
-                    "entity owning each degree of freedom, so they need an Elem.");
+  libmesh_error_msg("The LAGRANGE_GLL shape functions depend on the orientation of the "
+                    "entity that owns each degree of freedom. Pass an Elem.");
   return 0.;
 }
 
@@ -162,8 +162,8 @@ Real FE<2,LAGRANGE_GLL>::shape_deriv(const ElemType,
                                      const unsigned int,
                                      const Point &)
 {
-  libmesh_error_msg("The LAGRANGE_GLL shape functions follow the orientation of the "
-                    "entity owning each degree of freedom, so they need an Elem.");
+  libmesh_error_msg("The LAGRANGE_GLL shape functions depend on the orientation of the "
+                    "entity that owns each degree of freedom. Pass an Elem.");
   return 0.;
 }
 
@@ -255,8 +255,8 @@ Real FE<2,LAGRANGE_GLL>::shape_second_deriv(const ElemType,
                                             const unsigned int,
                                             const Point &)
 {
-  libmesh_error_msg("The LAGRANGE_GLL shape functions follow the orientation of the "
-                    "entity owning each degree of freedom, so they need an Elem.");
+  libmesh_error_msg("The LAGRANGE_GLL shape functions depend on the orientation of the "
+                    "entity that owns each degree of freedom. Pass an Elem.");
   return 0.;
 }
 

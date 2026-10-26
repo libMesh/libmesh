@@ -33,15 +33,15 @@ namespace libMesh
  * \returns The number of degrees of freedom that the LAGRANGE_GLL basis of order \p o carries
  * on an element of type \p t.
  *
- * The basis is a tensor product, so it lives on the tensor product element types alone, and
- * carries \f$(p+1)^d\f$ degrees of freedom on one of those.
+ * The basis is a tensor product, so it applies only to tensor product element types. On
+ * these types it has \f$(p+1)^d\f$ degrees of freedom.
  *
- * The element has to have a node for each entity that owns degrees of freedom, which is what
- * limits the order some types reach. A vertex owns one and an edge owns p-1, so a type without
- * mid-edge nodes stops at order one. A face owns \f$(p-1)^2\f$, so in three dimensions a type
- * without face nodes stops there too. Interior degrees of freedom belong to the element rather
- * than to a node, so no type needs an interior node, and these are the same limits HIERARCHIC
- * carries for the same reason.
+ * Each entity that owns degrees of freedom needs a node, and this limits the order on some
+ * types. A vertex owns one degree of freedom and an edge owns p-1. Thus a type without mid-edge
+ * nodes supports only order one. A face owns \f$(p-1)^2\f$, so in three dimensions a type
+ * without face nodes supports only order one as well. The element owns the interior degrees of
+ * freedom, so no type needs an interior node. HIERARCHIC has the same limits for the same
+ * reason.
  */
 unsigned int lagrange_gll_n_dofs(const ElemType t, const Order o)
 {
@@ -50,8 +50,8 @@ unsigned int lagrange_gll_n_dofs(const ElemType t, const Order o)
   const unsigned int n = static_cast<unsigned int>(o) + 1;
 
   libmesh_error_msg_if(n > fe_lagrange_gll_max_points_1D,
-                       "The LAGRANGE_GLL basis of order " << o << " would interpolate at "
-                       << n << " Gauss-Lobatto points, and they are tabulated up to "
+                       "The LAGRANGE_GLL basis of order " << o << " needs " << n
+                       << " Gauss-Lobatto points. The table has at most "
                        << fe_lagrange_gll_max_points_1D << ".");
 
   switch (t)
@@ -59,21 +59,21 @@ unsigned int lagrange_gll_n_dofs(const ElemType t, const Order o)
     case NODEELEM:
       return 1;
 
-      // An edge owns no entity between its vertices and its interior, so it needs no node
-      // beyond them at any order
+      // An edge element has only vertices and an interior, so it needs no other nodes at any
+      // order
     case EDGE2:
     case EDGE3:
     case EDGE4:
       return n;
 
-      // Without mid-edge nodes there is nowhere to put an edge's degrees of freedom
+      // Above order one, the edge degrees of freedom need mid-edge nodes
     case QUAD4:
     case QUADSHELL4:
       libmesh_error_msg_if(o > FIRST,
                            "The LAGRANGE_GLL basis of order " << o << " puts " << o - 1
-                           << " degrees of freedom on each edge, and "
-                           << Utility::enum_to_string(t) << " has no mid-edge node to own them. "
-                           "QUAD8 or QUAD9 does.");
+                           << " degrees of freedom on each edge. "
+                           << Utility::enum_to_string(t) << " has no mid-edge nodes. "
+                           "Use QUAD8 or QUAD9.");
       libmesh_fallthrough();
     case QUAD8:
     case QUADSHELL8:
@@ -81,19 +81,18 @@ unsigned int lagrange_gll_n_dofs(const ElemType t, const Order o)
     case QUADSHELL9:
       return n*n;
 
-      // In three dimensions a face owns degrees of freedom as well, so a type needs face
-      // nodes and not only mid-edge ones
+      // In three dimensions, the face degrees of freedom also need face nodes
     case HEX8:
       libmesh_error_msg_if(o > FIRST,
                            "The LAGRANGE_GLL basis of order " << o
-                           << " puts degrees of freedom on the edges and faces of a hexahedron, "
-                           "and HEX8 has no node to own them. HEX27 does.");
+                           << " puts degrees of freedom on the edges and faces of a hexahedron. "
+                           "HEX8 has no edge or face nodes. Use HEX27.");
       libmesh_fallthrough();
     case HEX20:
       libmesh_error_msg_if(o > FIRST,
                            "The LAGRANGE_GLL basis of order " << o << " puts " << (o - 1)*(o - 1)
-                           << " degrees of freedom on each face, and HEX20 has no face node to "
-                           "own them. HEX27 does.");
+                           << " degrees of freedom on each face. HEX20 has no face nodes. "
+                           "Use HEX27.");
       libmesh_fallthrough();
     case HEX27:
       return n*n*n;
@@ -102,7 +101,7 @@ unsigned int lagrange_gll_n_dofs(const ElemType t, const Order o)
       return 0;
 
     default:
-      libmesh_error_msg("The LAGRANGE_GLL basis is a tensor product, so it has no form on "
+      libmesh_error_msg("The LAGRANGE_GLL basis is a tensor product. It does not support "
                         << Utility::enum_to_string(t) << ".");
     }
 }
@@ -117,10 +116,10 @@ unsigned int lagrange_gll_n_dofs(const Elem * e, const Order o)
 /**
  * \returns The number of degrees of freedom that node \p n of an element of type \p t owns.
  *
- * A vertex owns the one whose interpolation point it is. A mid-edge node owns the p-1 points
- * inside its edge, and a mid-face node the \f$(p-1)^2\f$ inside its face. An interior node owns
- * none: those points belong to the element, which is what lets static condensation reach them
- * and what keeps a type without an interior node usable.
+ * A vertex owns the degree of freedom at its own interpolation point. A mid-edge node owns
+ * the p-1 points inside its edge. A mid-face node owns the \f$(p-1)^2\f$ points inside its face.
+ * An interior node owns none. The element owns the interior points. This lets static
+ * condensation eliminate them, and it lets types without an interior node use the basis.
  */
 unsigned int lagrange_gll_n_dofs_at_node(const ElemType t,
                                          const Order o,
@@ -171,14 +170,14 @@ unsigned int lagrange_gll_n_dofs_at_node(const ElemType t,
       return 0;
 
     default:
-      libmesh_error_msg("The LAGRANGE_GLL basis is a tensor product, so it has no form on "
+      libmesh_error_msg("The LAGRANGE_GLL basis is a tensor product. It does not support "
                         << Utility::enum_to_string(t) << ".");
     }
 }
 
 /**
- * \returns The number of degrees of freedom that the element itself owns, which are the
- * interpolation points interior to it: \f$(p-1)^d\f$ of them.
+ * \returns The number of degrees of freedom that the element itself owns. These are the
+ * \f$(p-1)^d\f$ interpolation points in its interior.
  */
 unsigned int lagrange_gll_n_dofs_per_elem(const ElemType t, const Order o)
 {
@@ -211,18 +210,17 @@ unsigned int lagrange_gll_n_dofs_per_elem(const ElemType t, const Order o)
       return per_edge * per_edge * per_edge;
 
     default:
-      libmesh_error_msg("The LAGRANGE_GLL basis is a tensor product, so it has no form on "
+      libmesh_error_msg("The LAGRANGE_GLL basis is a tensor product. It does not support "
                         << Utility::enum_to_string(t) << ".");
     }
 }
 
 
 /**
- * Evaluates a solution at the nodes of \p elem, for the writers that report a variable there.
+ * Evaluates a solution at the nodes of \p elem. Output writers use these nodal values.
  *
- * The vertex coefficients are already values at their nodes, but past order two the remaining
- * interpolation points are not nodes, so the values at the nodes are interpolated rather than
- * read off.
+ * Each vertex coefficient is the value at its node. Above order two, the other interpolation
+ * points are not nodes. Thus this function evaluates the basis at each node.
  */
 void lagrange_gll_nodal_soln(const Elem * elem,
                              const Order order,
@@ -286,8 +284,8 @@ template <> unsigned int FE<1,LAGRANGE_GLL>::n_dofs_per_elem(const Elem & e, con
 template <> unsigned int FE<2,LAGRANGE_GLL>::n_dofs_per_elem(const Elem & e, const Order o) { return lagrange_gll_n_dofs_per_elem(e.type(), o); }
 template <> unsigned int FE<3,LAGRANGE_GLL>::n_dofs_per_elem(const Elem & e, const Order o) { return lagrange_gll_n_dofs_per_elem(e.type(), o); }
 
-// A nodal basis on the Gauss-Lobatto points is continuous across a shared entity
-// because the two elements agree on which point each shared degree of freedom sits at
+// The basis is continuous across a shared entity, because the two elements put each
+// shared degree of freedom at the same point
 template <> FEContinuity FE<0,LAGRANGE_GLL>::get_continuity() const { return C_ZERO; }
 template <> FEContinuity FE<1,LAGRANGE_GLL>::get_continuity() const { return C_ZERO; }
 template <> FEContinuity FE<2,LAGRANGE_GLL>::get_continuity() const { return C_ZERO; }
@@ -299,8 +297,8 @@ template <> bool FE<1,LAGRANGE_GLL>::is_hierarchic() const { return false; }
 template <> bool FE<2,LAGRANGE_GLL>::is_hierarchic() const { return false; }
 template <> bool FE<3,LAGRANGE_GLL>::is_hierarchic() const { return false; }
 
-// The shape functions follow the orientation of the entity owning each degree of
-// freedom, so an element whose entities are oriented differently needs them again
+// Each shape function depends on the orientation of the entity that owns it. Elements
+// with different orientations thus need new shape values.
 template <> bool FE<0,LAGRANGE_GLL>::shapes_need_reinit() const { return true; }
 template <> bool FE<1,LAGRANGE_GLL>::shapes_need_reinit() const { return true; }
 template <> bool FE<2,LAGRANGE_GLL>::shapes_need_reinit() const { return true; }

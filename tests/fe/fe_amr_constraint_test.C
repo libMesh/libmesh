@@ -1,12 +1,11 @@
-// A conforming basis on an adaptively refined mesh needs the degrees of freedom on a hanging
-// node constrained to the coarse side it lies on. Whether that machinery is right is not
-// visible on a conforming mesh, and nothing else here exercises it, so this holds it to the
-// property it exists to preserve: the constrained space still contains the polynomials of its
-// own order, so projecting one reproduces it exactly, on both sides of the interface.
+// On an adaptively refined mesh, a conforming basis constrains the degrees of freedom on a
+// hanging node to the coarse side that contains the node. A conforming mesh does not exercise
+// these constraints. This test checks the property that the constraints must preserve. The
+// constrained space contains the polynomials of its order, so the projection of such a
+// polynomial reproduces it exactly on both sides of the interface.
 //
-// A wrong constraint shows up as a solution that no longer equals the polynomial it was
-// projected from, since enforcing the constraint moves the hanging degrees of freedom away
-// from the values that interpolate it.
+// A wrong constraint moves the hanging degrees of freedom away from the values that
+// interpolate the polynomial. The solution then differs from the polynomial.
 
 #include <libmesh/dof_map.h>
 #include <libmesh/elem.h>
@@ -14,10 +13,12 @@
 #include <libmesh/enum_order.h>
 #include <libmesh/equation_systems.h>
 #include <libmesh/fe_type.h>
+#include <libmesh/int_range.h>
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/mesh_refinement.h>
 #include <libmesh/system.h>
+#include <libmesh/utility.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -31,8 +32,8 @@ using namespace libMesh;
 namespace {
 
 /**
- * A polynomial of total degree \p D, which the tensor product space of order \p D holds, so a
- * family of that order can reproduce it and a projection onto it should.
+ * A polynomial of total degree \p D. The tensor product space of order \p D contains it, so
+ * a projection onto a family of that order reproduces it.
  */
 template <unsigned int D>
 Number amr_test_poly(const Point & p,
@@ -40,13 +41,7 @@ Number amr_test_poly(const Point & p,
                      const std::string &,
                      const std::string &)
 {
-  const Real s = 1. + p(0) + 2.*p(1) + 3.*p(2);
-
-  Real value = 1.;
-  for (unsigned int d = 0; d != D; ++d)
-    value *= s;
-
-  return value;
+  return Utility::pow<D>(1. + p(0) + 2.*p(1) + 3.*p(2));
 }
 
 }
@@ -67,7 +62,8 @@ public:
 
     const unsigned int dim = Elem::type_to_dim_map[elem_type];
 
-    // A second order type, which the families needing mid-edge and face nodes ask for
+    // For a second-order type, build the first-order mesh and then convert it. Families above
+    // order one need the mid-edge and face nodes of the second-order type.
     ElemType base = elem_type;
     if (elem_type == QUAD9)  base = QUAD4;
     if (elem_type == HEX27)  base = HEX8;
@@ -83,8 +79,8 @@ public:
     if (base != elem_type)
       _mesh->all_second_order();
 
-    // Refine part of the mesh, which is what puts a hanging node on the interface between the
-    // refined elements and their unrefined neighbours
+    // Refine part of the mesh. This puts hanging nodes on the interface between the refined
+    // elements and their unrefined neighbors.
     MeshRefinement refine(*_mesh);
 
     for (auto * elem : _mesh->active_element_ptr_range())
@@ -108,13 +104,13 @@ public:
     sys.project_solution(amr_test_poly<static_cast<unsigned int>(order)>,
                          nullptr, es.parameters);
 
-    // The constraints the projection just enforced must leave the polynomial intact, at points
-    // spread through the mesh so that some fall in the refined part and some outside it
+    // The projection enforced the constraints. Check that the solution still equals the
+    // polynomial at points in the refined and the unrefined parts of the mesh.
     Parameters dummy;
     unsigned int n_checked = 0;
 
-    for (int a = 1; a < 8; ++a)
-      for (int b = 1; b < 8; ++b)
+    for (const auto a : make_range(1, 8))
+      for (const auto b : make_range(1, 8))
         {
           const unsigned int dim = Elem::type_to_dim_map[elem_type];
           const Point q(a/8., (dim > 1) ? b/8. : 0., (dim > 2) ? (a + b)/16. : 0.);
@@ -150,19 +146,25 @@ public:
                                                                                     \
   CPPUNIT_TEST_SUITE_REGISTRATION( FEAMRConstraintTest_##family##_##order##_##elemtype )
 
-// The Gauss-Lobatto basis this exists for, with LAGRANGE and HIERARCHIC beside it. LAGRANGE is
-// the control: its constraints are long settled, so a failure there would be the test's fault
-// rather than the family's. HIERARCHIC is the other family that allocates a separate degree of
-// freedom at a hanging node, which is the path this was written to cover.
+// LAGRANGE_GLL is the family under test. LAGRANGE is the control, because its constraints
+// are well established. A LAGRANGE failure thus indicates a defect in the test. HIERARCHIC is
+// the other family that adds a separate degree of freedom at a hanging node.
 INSTANTIATE_FEAMRCONSTRAINTTEST(QUAD9, SECOND, LAGRANGE);
+INSTANTIATE_FEAMRCONSTRAINTTEST(QUAD9, SECOND, LAGRANGE_GLL);
 INSTANTIATE_FEAMRCONSTRAINTTEST(QUAD9, THIRD,  LAGRANGE_GLL);
 INSTANTIATE_FEAMRCONSTRAINTTEST(QUAD9, FOURTH, LAGRANGE_GLL);
+INSTANTIATE_FEAMRCONSTRAINTTEST(QUAD9, SECOND, HIERARCHIC);
 INSTANTIATE_FEAMRCONSTRAINTTEST(QUAD9, THIRD,  HIERARCHIC);
+INSTANTIATE_FEAMRCONSTRAINTTEST(QUAD9, FOURTH, HIERARCHIC);
 
 #if LIBMESH_DIM > 2
 INSTANTIATE_FEAMRCONSTRAINTTEST(HEX27, SECOND, LAGRANGE);
+INSTANTIATE_FEAMRCONSTRAINTTEST(HEX27, SECOND, LAGRANGE_GLL);
 INSTANTIATE_FEAMRCONSTRAINTTEST(HEX27, THIRD,  LAGRANGE_GLL);
+INSTANTIATE_FEAMRCONSTRAINTTEST(HEX27, FOURTH, LAGRANGE_GLL);
+INSTANTIATE_FEAMRCONSTRAINTTEST(HEX27, SECOND, HIERARCHIC);
 INSTANTIATE_FEAMRCONSTRAINTTEST(HEX27, THIRD,  HIERARCHIC);
+INSTANTIATE_FEAMRCONSTRAINTTEST(HEX27, FOURTH, HIERARCHIC);
 #endif
 
 #endif // LIBMESH_ENABLE_AMR

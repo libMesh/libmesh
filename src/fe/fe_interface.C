@@ -2664,9 +2664,9 @@ bool FEInterface::extra_hanging_dofs(const FEType & fe_t)
     case HIERARCHIC_VEC:
     case L2_HIERARCHIC_VEC:
       // A mid-edge or mid-face node of this family owns the interpolation points inside its
-      // entity, and past order two none of those is the node itself, so the node cannot serve
-      // as a vertex for the elements meeting it at a refinement interface and needs a degree
-      // of freedom of its own there
+      // entity. Above order two, none of these points is at the node itself. At a refinement
+      // interface, the node is a vertex of the fine elements, so it needs a separate degree of
+      // freedom for that role.
     case LAGRANGE_GLL:
     fe_family_horder_case()
     default:

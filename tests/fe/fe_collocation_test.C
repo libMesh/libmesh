@@ -1,17 +1,18 @@
 // A nodal basis whose interpolation points are the points of a quadrature rule is
 // collocated with that rule. Each shape function is one at its own point and zero at the
-// others, so the matrix of shape function values at the quadrature points is a permutation
-// matrix. The mass matrix assembled with the rule is then diagonal. This holds for any mapping
+// others. The matrix of shape function values at the quadrature points is thus a
+// permutation matrix. The mass matrix assembled with the rule is then diagonal. This holds for any mapping
 // and element shape, because the Jacobian only scales the diagonal entries.
 //
 // The Gauss-Lobatto families are collocated with their default Gauss-Lobatto rule.
-// L2_LAGRANGE_GLL numbers its shape functions in the order of the rule's points, so its
+// L2_LAGRANGE_GLL numbers its shape functions in the order of the rule points, so its
 // permutation is the identity. LAGRANGE_GLL numbers them by the entity that owns them, so its
-// permutation is general. Both read their points from QGaussLobatto, so the property holds
-// exactly, and those cases compare against 1 and 0 without a tolerance. LAGRANGE and L2_LAGRANGE are collocated with
-// QNODAL, whose points are the element nodes in an order that can differ from the node
-// numbering. Their shape functions are evaluated at the nodes in floating point, so those
-// cases use a tolerance.
+// permutation is general. Both families read their points from QGaussLobatto, so the
+// property holds exactly. These cases compare against 1 and 0 without a tolerance.
+//
+// LAGRANGE and L2_LAGRANGE are collocated with QNODAL. The QNODAL points are the element
+// nodes, in an order that can differ from the node numbering. The shape functions of these
+// families are evaluated in floating point at the nodes, so these cases use a tolerance.
 
 #include <libmesh/elem.h>
 #include <libmesh/enum_fe_family.h>

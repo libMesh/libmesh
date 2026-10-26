@@ -1,7 +1,7 @@
 #include "fe_test.h"
 
-// The C0 Gauss-Lobatto basis needs a node for each entity that owns degrees of freedom, so
-// order two and above wants mid-edge nodes in two dimensions and face nodes as well in three.
+// The C0 Gauss-Lobatto basis needs a node for each entity that owns degrees of freedom. Above
+// order one, it thus needs mid-edge nodes in two dimensions, and also face nodes in three.
 
 INSTANTIATE_FETEST(FIRST,  LAGRANGE_GLL, EDGE2);
 INSTANTIATE_FETEST(SECOND, LAGRANGE_GLL, EDGE2);
