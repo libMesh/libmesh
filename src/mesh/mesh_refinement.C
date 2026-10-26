@@ -1455,9 +1455,12 @@ bool MeshRefinement::_coarsen_elements ()
 
   this->comm().max(mesh_p_changed);
 
-  // And we may need to update DistributedMesh values reflecting the changes
+  // And we may need to update cached values reflecting the changes
   if (mesh_changed)
-    _mesh.update_parallel_id_counts();
+    {
+      _mesh.clear_stored_ranges();
+      _mesh.update_parallel_id_counts();
+    }
 
   // Node processor ids may need to change if an element of that id
   // was coarsened away
@@ -1588,9 +1591,12 @@ bool MeshRefinement::_refine_elements ()
   this->comm().max(mesh_changed);
   this->comm().max(mesh_p_changed);
 
-  // And we may need to update DistributedMesh values reflecting the changes
+  // And we may need to update cached values reflecting the changes
   if (mesh_changed)
-    _mesh.update_parallel_id_counts();
+    {
+      _mesh.clear_stored_ranges();
+      _mesh.update_parallel_id_counts();
+    }
 
   if (mesh_changed && !_mesh.is_replicated())
     {
