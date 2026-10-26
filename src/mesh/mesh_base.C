@@ -564,18 +564,15 @@ void MeshBase::change_elemset_code(dof_id_type old_code, dof_id_type new_code)
   unsigned int elemset_index = this->get_elem_integer_index("elemset_code");
 
   // Loop over all elems and update code
-  Threads::parallel_for
+  Threads::parallel_for_each
     (this->element_stored_range(),
-     [elemset_index, old_code, new_code](const ElemRange & range)
+     [elemset_index, old_code, new_code](Elem * elem)
      {
-       for (Elem * elem : range)
-         {
-           dof_id_type elemset_code =
-             elem->get_extra_integer(elemset_index);
+       dof_id_type elemset_code =
+         elem->get_extra_integer(elemset_index);
 
-           if (elemset_code == old_code)
-             elem->set_extra_integer(elemset_index, new_code);
-         }
+       if (elemset_code == old_code)
+         elem->set_extra_integer(elemset_index, new_code);
      });
 }
 
@@ -2534,12 +2531,11 @@ void MeshBase::size_elem_extra_integers()
 {
   const std::size_t new_size = _elem_integer_names.size();
 
-  Threads::parallel_for
+  Threads::parallel_for_each
     (this->element_stored_range(),
-     [new_size, this](const ElemRange & range)
+     [new_size, this](Elem * elem)
      {
-       for (Elem * elem : range)
-         elem->add_extra_integers(new_size, this->_elem_integer_default_values);
+       elem->add_extra_integers(new_size, this->_elem_integer_default_values);
      });
 }
 
@@ -2548,12 +2544,11 @@ void MeshBase::size_elem_extra_integers()
 void MeshBase::size_node_extra_integers()
 {
   const std::size_t new_size = _node_integer_names.size();
-  Threads::parallel_for
+  Threads::parallel_for_each
     (this->node_stored_range(),
-     [this, new_size](const NodeRange & range)
+     [this, new_size](Node * node)
      {
-       for (Node * node : range)
-         node->add_extra_integers(new_size, _node_integer_default_values);
+       node->add_extra_integers(new_size, _node_integer_default_values);
      });
 }
 

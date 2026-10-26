@@ -178,15 +178,12 @@ void VariationalMeshSmoother::smooth()
     }
 
   // Update _mesh from _mesh_copy
-  Threads::parallel_for
+  Threads::parallel_for_each
     (_mesh_copy->local_node_stored_range(),
-     [this](const NodeRange & range)
+     [this](Node * node_copy)
      {
-       for (Node * node_copy : range)
-         {
-           Point & node = _mesh.node_ref(node_copy->id());
-           node = *node_copy;
-         }
+       Point & node = _mesh.node_ref(node_copy->id());
+       node = *node_copy;
      });
 
   SyncNodalPositions sync_object(_mesh);

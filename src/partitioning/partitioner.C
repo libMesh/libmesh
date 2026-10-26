@@ -897,13 +897,9 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
 
   // Start from scratch here: nodes we used to own may not be
   // eligible for us to own any more.
-  Threads::parallel_for
-    (mesh.node_stored_range(),
-     [](const NodeRange & range)
-     {
-       for (Node * node : range)
-         node->processor_id() = DofObject::invalid_processor_id;
-     });
+  Threads::parallel_for_each
+    (mesh.node_stored_range(), [](Node * node)
+     { node->processor_id() = DofObject::invalid_processor_id; });
 
   // Loop over all the active elements
   for (auto & elem : mesh.active_element_ptr_range())

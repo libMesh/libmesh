@@ -376,54 +376,51 @@ void ParmetisPartitioner::initialize (const MeshBase & mesh,
 
     libmesh_assert_equal_to (subdomain_bounds.back(), n_active_elem);
 
-    Threads::parallel_for
+    Threads::parallel_for_each
       (mesh.active_local_element_stored_range(),
        [first_local_elem, n_active_elem, n_active_local_elem, this,
-        &global_index_map, &subdomain_bounds](const ConstElemRange & range)
+        &global_index_map, &subdomain_bounds](const Elem * elem)
        {
-         for (const Elem * elem : range)
-           {
-             const dof_id_type global_index_by_pid =
-               libmesh_map_find(_global_index_by_pid_map, elem->id());
-             libmesh_assert_less (global_index_by_pid, n_active_elem);
+         const dof_id_type global_index_by_pid =
+           libmesh_map_find(_global_index_by_pid_map, elem->id());
+         libmesh_assert_less (global_index_by_pid, n_active_elem);
 
-             const dof_id_type local_index =
-               global_index_by_pid - first_local_elem;
+         const dof_id_type local_index =
+           global_index_by_pid - first_local_elem;
 
-             libmesh_assert_less (local_index, n_active_local_elem);
-             libmesh_assert_less (local_index, _pmetis->vwgt.size());
+         libmesh_assert_less (local_index, n_active_local_elem);
+         libmesh_assert_less (local_index, _pmetis->vwgt.size());
 
-             libmesh_ignore(n_active_elem); // unused outside dbg/devel
-             libmesh_ignore(n_active_local_elem); // unused outside dbg/devel
+         libmesh_ignore(n_active_elem); // unused outside dbg/devel
+         libmesh_ignore(n_active_local_elem); // unused outside dbg/devel
 
-             // Spline nodes are a special case (storing all the
-             // unconstrained DoFs in an IGA simulation), but in general
-             // we'll try to distribute work by expecting it to be roughly
-             // proportional to DoFs, which are roughly proportional to
-             // nodes.
-             if (elem->type() == NODEELEM &&
-                 elem->mapping_type() == RATIONAL_BERNSTEIN_MAP)
-               _pmetis->vwgt[local_index] = 50;
-             else
-               _pmetis->vwgt[local_index] = elem->n_nodes();
+         // Spline nodes are a special case (storing all the
+         // unconstrained DoFs in an IGA simulation), but in general
+         // we'll try to distribute work by expecting it to be roughly
+         // proportional to DoFs, which are roughly proportional to
+         // nodes.
+         if (elem->type() == NODEELEM &&
+             elem->mapping_type() == RATIONAL_BERNSTEIN_MAP)
+           _pmetis->vwgt[local_index] = 50;
+         else
+           _pmetis->vwgt[local_index] = elem->n_nodes();
 
-             // find the subdomain this element belongs in
-             const dof_id_type global_index =
-               libmesh_map_find(global_index_map, elem->id());
+         // find the subdomain this element belongs in
+         const dof_id_type global_index =
+           libmesh_map_find(global_index_map, elem->id());
 
-             libmesh_assert_less (global_index, subdomain_bounds.back());
+         libmesh_assert_less (global_index, subdomain_bounds.back());
 
-             const unsigned int subdomain_id =
-               cast_int<unsigned int>
-               (std::distance(subdomain_bounds.begin(),
-                              std::lower_bound(subdomain_bounds.begin(),
-                                               subdomain_bounds.end(),
-                                               global_index)));
-             libmesh_assert_less (subdomain_id, _pmetis->nparts);
-             libmesh_assert_less (local_index, _pmetis->part.size());
+         const unsigned int subdomain_id =
+           cast_int<unsigned int>
+           (std::distance(subdomain_bounds.begin(),
+                          std::lower_bound(subdomain_bounds.begin(),
+                                           subdomain_bounds.end(),
+                                           global_index)));
+         libmesh_assert_less (subdomain_id, _pmetis->nparts);
+         libmesh_assert_less (local_index, _pmetis->part.size());
 
-             _pmetis->part[local_index] = subdomain_id;
-           }
+         _pmetis->part[local_index] = subdomain_id;
        });
   }
 }

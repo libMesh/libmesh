@@ -335,12 +335,11 @@ void MeshTools::Modification::translate (MeshBase & mesh,
 {
   const Point p(xt, yt, zt);
 
-  Threads::parallel_for
+  Threads::parallel_for_each
     (mesh.node_stored_range(),
-     [p](const NodeRange & range)
+     [p](Node * node)
      {
-       for (Node * node : range)
-         *node += p;
+       *node += p;
      });
 
   // If we just moved a mesh in or out out of the X axis or XY plane
@@ -388,15 +387,12 @@ MeshTools::Modification::rotate (MeshBase & mesh,
 #if LIBMESH_DIM == 3
   const auto R = RealTensorValue::intrinsic_rotation_matrix(phi, theta, psi);
 
-  Threads::parallel_for
+  Threads::parallel_for_each
     (mesh.node_stored_range(),
-     [R](const NodeRange & range)
+     [R](Node * node)
      {
-       for (Node * node : range)
-         {
-           Point & pt = *node;
-           pt = R * pt;
-         }
+       Point & pt = *node;
+       pt = R * pt;
      });
 
   // If we just moved a mesh in or out out of the X axis or XY plane
@@ -1958,13 +1954,12 @@ void MeshTools::Modification::change_subdomain_id (MeshBase & mesh,
       return;
     }
 
-  Threads::parallel_for
+  Threads::parallel_for_each
     (mesh.element_stored_range(),
-     [old_id, new_id](const ElemRange & range)
+     [old_id, new_id](Elem * elem)
      {
-       for (Elem * elem : range)
-         if (elem->subdomain_id() == old_id)
-           elem->subdomain_id() = new_id;
+       if (elem->subdomain_id() == old_id)
+         elem->subdomain_id() = new_id;
      });
 
   // We just invalidated mesh.get_subdomain_ids(), but it might not be

@@ -115,17 +115,16 @@ void VariationalSmootherSystem::assembly (bool get_residual,
 
   const auto dim = mesh.mesh_dimension();
 
-  Threads::parallel_for
+  Threads::parallel_for_each
     (mesh.local_node_stored_range(),
-     [this, dim](const NodeRange & range)
+     [this, dim](Node * node)
      {
-       for (Node * node : range)
-         for (const auto d : make_range(dim))
-         {
-           const auto dof_id = node->dof_number(this->number(), d, 0);
-           // Update mesh
-           (*node)(d) = libmesh_real((*current_local_solution)(dof_id));
-         }
+       for (const auto d : make_range(dim))
+       {
+         const auto dof_id = node->dof_number(this->number(), d, 0);
+         // Update mesh
+         (*node)(d) = libmesh_real((*current_local_solution)(dof_id));
+       }
      });
 
   SyncNodalPositions sync_object(mesh);

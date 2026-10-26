@@ -1461,34 +1461,28 @@ void System::zero_variable (NumericVector<Number> & v,
   const unsigned int sys_num = this->number();
 
   // Loop over nodes.
-  Threads::parallel_for
+  Threads::parallel_for_each
     (mesh.node_stored_range(),
-     [sys_num, var_num, &v](const ConstNodeRange & range)
+     [sys_num, var_num, &v](const Node * node)
      {
-       for (const Node * node : range)
+       unsigned int n_comp = node->n_comp(sys_num,var_num);
+       for (unsigned int i=0; i<n_comp; i++)
          {
-           unsigned int n_comp = node->n_comp(sys_num,var_num);
-           for (unsigned int i=0; i<n_comp; i++)
-             {
-               const dof_id_type index = node->dof_number(sys_num,var_num,i);
-               v.set(index,0.0);
-             }
+           const dof_id_type index = node->dof_number(sys_num,var_num,i);
+           v.set(index,0.0);
          }
      });
 
   // Loop over elements.
-  Threads::parallel_for
+  Threads::parallel_for_each
     (mesh.active_local_element_stored_range(),
-     [sys_num, var_num, &v](const ConstElemRange & range)
+     [sys_num, var_num, &v](const Elem * elem)
      {
-       for (const Elem * elem : range)
+       unsigned int n_comp = elem->n_comp(sys_num,var_num);
+       for (unsigned int i=0; i<n_comp; i++)
          {
-           unsigned int n_comp = elem->n_comp(sys_num,var_num);
-           for (unsigned int i=0; i<n_comp; i++)
-             {
-               const dof_id_type index = elem->dof_number(sys_num,var_num,i);
-               v.set(index,0.0);
-             }
+           const dof_id_type index = elem->dof_number(sys_num,var_num,i);
+           v.set(index,0.0);
          }
      });
 }

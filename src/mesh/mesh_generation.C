@@ -560,12 +560,11 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           }
         else // !gauss_lobatto_grid
           {
-            Threads::parallel_for
+            Threads::parallel_for_each
               (mesh.node_stored_range(),
-               [xmin, xmax](const NodeRange & range)
+               [xmin, xmax](Node * node)
                {
-                 for (Node * node : range)
-                   (*node)(0) = (*node)(0)*(xmax-xmin) + xmin;
+                 (*node)(0) = (*node)(0)*(xmax-xmin) + xmin;
                });
           }
 
@@ -1130,15 +1129,12 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           }
         else // !gauss_lobatto_grid
           {
-            Threads::parallel_for
+            Threads::parallel_for_each
               (mesh.node_stored_range(),
-               [xmin, xmax, ymin, ymax](const NodeRange & range)
+               [xmin, xmax, ymin, ymax](Node * node)
                {
-                 for (Node * node : range)
-                   {
-                     (*node)(0) = (*node)(0)*(xmax-xmin) + xmin;
-                     (*node)(1) = ((*node)(1))*(ymax-ymin) + ymin;
-                   }
+                 (*node)(0) = (*node)(0)*(xmax-xmin) + xmin;
+                 (*node)(1) = ((*node)(1))*(ymax-ymin) + ymin;
                });
           }
 
@@ -1788,16 +1784,13 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           }
         else // !gauss_lobatto_grid
           {
-            Threads::parallel_for
+            Threads::parallel_for_each
               (mesh.node_stored_range(),
-               [xmin, xmax, ymin, ymax, zmin, zmax](const NodeRange & range)
+               [xmin, xmax, ymin, ymax, zmin, zmax](Node * node)
                {
-                 for (Node * node : range)
-                   {
-                     (*node)(0) = ((*node)(0))*(xmax-xmin) + xmin;
-                     (*node)(1) = ((*node)(1))*(ymax-ymin) + ymin;
-                     (*node)(2) = ((*node)(2))*(zmax-zmin) + zmin;
-                   }
+                 (*node)(0) = ((*node)(0))*(xmax-xmin) + xmin;
+                 (*node)(1) = ((*node)(1))*(ymax-ymin) + ymin;
+                 (*node)(2) = ((*node)(2))*(zmax-zmin) + zmin;
                });
           }
 
