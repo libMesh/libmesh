@@ -22,6 +22,7 @@
 #include "libmesh/equation_systems.h"
 #include "libmesh/int_range.h"
 #include "libmesh/mesh_base.h"
+#include "libmesh/numeric_vector.h"
 #include "libmesh/system.h"
 #include "timpi/parallel_sync.h"
 
@@ -349,6 +350,17 @@ dof_id_type ReducedDofMap::find_reduced_dof(const dof_id_type full_dof) const
   if (_dof_map.local_index(full_dof))
     return _local_full_to_reduced[full_dof - _dof_map.first_dof()];
   return libmesh_map_find(_nonlocal_full_to_reduced, full_dof);
+}
+
+void ReducedDofMap::inject(const NumericVector<Number> & full,
+                           NumericVector<Number> & reduced) const
+{
+  libmesh_assert_equal_to(full.local_size(), _dof_map.n_local_dofs());
+  libmesh_assert_equal_to(reduced.local_size(), this->n_local_dofs());
+  std::vector<Number> values;
+  full.get(_local_retained_dofs, values);
+  reduced = values;
+  reduced.close();
 }
 
 dof_id_type ReducedDofMap::parent_dof(const dof_id_type full_dof) const

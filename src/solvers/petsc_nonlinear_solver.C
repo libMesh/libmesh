@@ -944,7 +944,6 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // Jacobian operator
   // solution x = C y + h is formed for every evaluation, and its residual is the reduced one.
   // The full x_in and r_in remain the system's assembly vectors
   WrappedPetsc<Vec> reduced_x, reduced_r;
-  this->setup_constraint_elimination();
   if (this->eliminating_constraints())
     {
       const auto & reduced_map = this->system().get_dof_map().get_constraint_elimination();
@@ -1248,24 +1247,6 @@ void PetscNonlinearSolver<T>::force_new_preconditioner()
 }
 
 template <typename T>
-void PetscNonlinearSolver<T>::setup_constraint_elimination()
-{
-  _retained_is.destroy();
-
-  const DofMap & dof_map = this->system().get_dof_map();
-  if (!dof_map.has_constraint_elimination())
-    return;
-
-  const auto & retained = dof_map.get_constraint_elimination().local_retained_dofs();
-  std::vector<PetscInt> indices(retained.begin(), retained.end());
-  LibmeshPetscCall(ISCreateGeneral(this->comm().get(),
-                                   cast_int<PetscInt>(indices.size()),
-                                   indices.data(),
-                                   PETSC_COPY_VALUES,
-                                   _retained_is.get()));
-}
-
-template <typename T>
 void PetscNonlinearSolver<T>::localize_solution(Vec x)
 {
   sys_type & sys = this->system();
@@ -1298,24 +1279,25 @@ void PetscNonlinearSolver<T>::localize_solution(Vec x)
 }
 
 template <typename T>
+bool PetscNonlinearSolver<T>::eliminating_constraints() const
+{
+  return this->system().get_dof_map().has_constraint_elimination();
+}
+
+template <typename T>
 void PetscNonlinearSolver<T>::prolong(Vec y, NumericVector<T> & x, const bool homogeneous) const
 {
   libmesh_assert(this->eliminating_constraints());
-  auto & petsc_x = cast_ref<PetscVector<T> &>(x);
-  libmesh_assert_equal_to(petsc_x.type(), PARALLEL);
-
-  // The constrained entries of x are overwritten below, so their prior values do not matter
-  LibmeshPetscCall(VecISCopy(petsc_x.vec(), _retained_is, SCATTER_FORWARD, y));
-  x.close();
-  this->system().get_dof_map().enforce_constraints_exactly(this->system(), &x, homogeneous);
+  PetscVector<T> reduced(y, this->comm());
+  this->system().get_dof_map().get_constraint_elimination().prolong(reduced, x, homogeneous);
 }
 
 template <typename T>
 void PetscNonlinearSolver<T>::restrict_vector(const NumericVector<T> & x, Vec y) const
 {
   libmesh_assert(this->eliminating_constraints());
-  const auto & petsc_x = cast_ref<const PetscVector<T> &>(x);
-  LibmeshPetscCall(VecISCopy(petsc_x.vec(), _retained_is, SCATTER_REVERSE, y));
+  PetscVector<T> reduced(y, this->comm());
+  this->system().get_dof_map().get_constraint_elimination().inject(x, reduced);
 }
 
 //------------------------------------------------------------------
