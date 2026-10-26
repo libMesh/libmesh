@@ -53,6 +53,17 @@ public:
    */
   virtual bool retain_scalar_dof(dof_id_type scalar_dof) const override;
 
+  /**
+   * Prolongs \p reduced, a vector on this space, into the full-space vector \p full, which must be
+   * \p PARALLEL or \p GHOSTED. The ghost entries of a \p GHOSTED vector must include the
+   * \p DofMap send list, and they are updated. With \p homogeneous false this forms
+   * \f$ x = C y + h \f$; with \p homogeneous true, as for a step, a search direction, or an
+   * eigenvector, \f$ x = C y \f$
+   */
+  void prolong(const NumericVector<Number> & reduced,
+               NumericVector<Number> & full,
+               bool homogeneous) const;
+
 private:
   bool is_unconstrained(dof_id_type dof) const;
 };

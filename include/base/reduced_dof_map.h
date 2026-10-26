@@ -36,6 +36,7 @@ class System;
 class DofMap;
 class Elem;
 class Node;
+template <typename T> class NumericVector;
 
 /**
  * A degree of freedom map for a reduced space: a subset of the degrees of freedom of a full \p
@@ -104,6 +105,16 @@ public:
    * index of entry \p i is <tt>first_dof() + i</tt>
    */
   const std::vector<dof_id_type> & local_retained_dofs() const { return _local_retained_dofs; }
+
+  /**
+   * Injects the full-space vector \p full into \p reduced, a vector on this space, by copying the
+   * retained entries. This is the restriction of a primal vector such as a solution or an initial
+   * guess. A dual vector such as a residual restricts by \f$ C^T \f$ in general; injection gives
+   * the same result when assembly has already applied \f$ C^T \f$, e.g. through
+   * \p DofMap::constrain_element_vector(). Every retained degree of freedom keeps its owner, so
+   * this copies local entries only
+   */
+  void inject(const NumericVector<Number> & full, NumericVector<Number> & reduced) const;
 
   /**
    * Nests this reduced space in \p parent's, or in the full space if \p parent is null. Only

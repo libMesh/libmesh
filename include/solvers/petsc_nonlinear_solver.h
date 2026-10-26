@@ -254,15 +254,9 @@ public:
   virtual void force_new_preconditioner() override;
 
   /**
-   * Builds \p _retained_is from the system's \p ConstraintEliminationDofMap, or clears it when
-   * the system does not eliminate constraints
-   */
-  void setup_constraint_elimination();
-
-  /**
    * Whether the solve eliminates constrained degrees of freedom
    */
-  bool eliminating_constraints() const { return static_cast<IS>(_retained_is) != nullptr; }
+  bool eliminating_constraints() const;
 
   /**
    * Makes the system's \p current_local_solution the full iterate that \p x represents: \p x
@@ -279,7 +273,8 @@ public:
   void prolong(Vec y, NumericVector<T> & x, bool homogeneous) const;
 
   /**
-   * Restricts the full vector \p x into the reduced vector \p y by taking its retained entries
+   * Restricts the full vector \p x into the reduced vector \p y by taking its retained entries.
+   * See \p ReducedDofMap::inject() for when this is the correct restriction of a dual vector
    */
   void restrict_vector(const NumericVector<T> & x, Vec y) const;
 
@@ -353,13 +348,6 @@ protected:
     * Whether we've triggered the preconditioner reuse
     */
   bool _setup_reuse;
-
-  /**
-   * The local retained degrees of freedom of the system's \p ConstraintEliminationDofMap, in the
-   * full numbering, when the solve eliminates constrained degrees of freedom. Entry \p i is the
-   * full index of the \p i-th local entry of a reduced vector. Null otherwise
-   */
-  WrappedPetsc<IS> _retained_is;
 
 #if defined(LIBMESH_ENABLE_AMR) && defined(LIBMESH_HAVE_METAPHYSICL)
   /**
