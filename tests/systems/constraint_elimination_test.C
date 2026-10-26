@@ -261,6 +261,9 @@ private:
     LOG_UNIT_TEST;
 
     Mesh mesh(*TestCommWorld);
+    // A distributed mesh keeps periodic neighbors only if it knows the periodic boundaries before
+    // it deletes remote elements
+    mesh.allow_remote_element_removal(false);
     MeshTools::Generation::build_square(mesh, 4, 4, 0., 1., 0., 1., QUAD9);
 
     // build_square's boundary ids: 0 bottom, 1 right, 2 top, 3 left
@@ -281,6 +284,9 @@ private:
       }
 
     // Refine one element to create hanging nodes
+    mesh.allow_remote_element_removal(true);
+    mesh.delete_remote_elements();
+
     if (Elem * elem = mesh.query_elem_ptr(5); elem && elem->active())
       elem->set_refinement_flag(Elem::REFINE);
     MeshRefinement(mesh).refine_elements();
@@ -327,6 +333,9 @@ private:
     LOG_UNIT_TEST;
 
     Mesh mesh(*TestCommWorld);
+    // A distributed mesh keeps periodic neighbors only if it knows the periodic boundaries before
+    // it deletes remote elements
+    mesh.allow_remote_element_removal(false);
     MeshTools::Generation::build_square(mesh, 4, 4, 0., 1., 0., 1., QUAD9);
 
     EquationSystems es(mesh);
@@ -347,6 +356,9 @@ private:
         sys->nonlinear_solver->residual_and_jacobian_object = &assembly;
         sys->nonlinear_solver->relative_residual_tolerance = TOLERANCE * TOLERANCE;
       }
+
+    mesh.allow_remote_element_removal(true);
+    mesh.delete_remote_elements();
 
     if (Elem * elem = mesh.query_elem_ptr(5); elem && elem->active())
       elem->set_refinement_flag(Elem::REFINE);
@@ -373,7 +385,9 @@ private:
   /**
    * A variational inequality solve with an active upper bound must give the same solution with
    * and without eliminating constraints, so the bounds a user computes on full vectors must reach
-   * the reduced solve as the bounds of the unconstrained degrees of freedom
+   * the reduced solve as the bounds of the unconstrained degrees of freedom. Elimination bounds
+   * only the unconstrained degrees of freedom, so a hanging node value C y can exceed the bound,
+   * and the two solves agree when the bound is inactive at constrained degrees of freedom
    */
   void testReducedBounds()
   {
@@ -401,8 +415,12 @@ private:
         sys->nonlinear_solver->relative_residual_tolerance = TOLERANCE * TOLERANCE;
       }
 
-    if (Elem * elem = mesh.query_elem_ptr(5); elem && elem->active())
-      elem->set_refinement_flag(Elem::REFINE);
+    // Refine at the Dirichlet side, away from where the unbounded solution peaks, so that the
+    // bound is inactive at the hanging nodes. Element ids depend on the partitioning of a
+    // distributed mesh, so the element is chosen by position
+    for (Elem * elem : mesh.active_element_ptr_range())
+      if (const Point c = elem->vertex_average(); c(0) < 0.25 && c(1) > 0.5 && c(1) < 0.75)
+        elem->set_refinement_flag(Elem::REFINE);
     MeshRefinement(mesh).refine_elements();
     es.init();
 
@@ -440,6 +458,9 @@ private:
     LOG_UNIT_TEST;
 
     Mesh mesh(*TestCommWorld);
+    // A distributed mesh keeps periodic neighbors only if it knows the periodic boundaries before
+    // it deletes remote elements
+    mesh.allow_remote_element_removal(false);
     MeshTools::Generation::build_square(mesh, 4, 4, 0., 1., 0., 1., QUAD9);
 
     EquationSystems es(mesh);
@@ -461,6 +482,9 @@ private:
     sys.nonlinear_solver->residual_and_jacobian_object = &assembly;
     sys.nonlinear_solver->nullspace_object = &constants;
     sys.nonlinear_solver->relative_residual_tolerance = TOLERANCE * TOLERANCE;
+
+    mesh.allow_remote_element_removal(true);
+    mesh.delete_remote_elements();
 
     if (Elem * elem = mesh.query_elem_ptr(5); elem && elem->active())
       elem->set_refinement_flag(Elem::REFINE);
@@ -501,6 +525,9 @@ private:
 #endif
 
     Mesh mesh(*TestCommWorld);
+    // A distributed mesh keeps periodic neighbors only if it knows the periodic boundaries before
+    // it deletes remote elements
+    mesh.allow_remote_element_removal(false);
     MeshTools::Generation::build_square(mesh, 4, 4, 0., 1., 0., 1., QUAD9);
 
     EquationSystems es(mesh);
@@ -524,6 +551,9 @@ private:
         sys->nonlinear_solver->residual_and_jacobian_object = &assembly;
         sys->nonlinear_solver->relative_residual_tolerance = TOLERANCE * TOLERANCE;
       }
+
+    mesh.allow_remote_element_removal(true);
+    mesh.delete_remote_elements();
 
     if (Elem * elem = mesh.query_elem_ptr(5); elem && elem->active())
       elem->set_refinement_flag(Elem::REFINE);
