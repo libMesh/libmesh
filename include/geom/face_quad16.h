@@ -214,9 +214,7 @@ protected:
   /**
    * Matrix used to create the elements children.
    */
-  virtual Real embedding_matrix (__attribute__ ((unused)) const unsigned int i,
-                                 __attribute__ ((unused)) const unsigned int j,
-                                 __attribute__ ((unused)) const unsigned int k) const override
+  virtual Real embedding_matrix (const unsigned int, const unsigned int, const unsigned int) const override
   { libmesh_not_implemented(); return 0; }
 
   // TODO delete?
