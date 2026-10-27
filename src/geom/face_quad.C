@@ -207,8 +207,11 @@ Quad::edges_adjacent_to_node(const unsigned int n) const
   if (this->is_vertex(n))
     return {std::begin(adjacent_sides_map[n]), std::end(adjacent_sides_map[n])};
   else if (this->is_edge(n))
+  {
+    if (this->type() == QUAD16)
+      return { (n - this->n_vertices())/2};
     return {n - this->n_vertices()};
-
+  }
   libmesh_assert(this->is_face(n));
   return {};
 }

@@ -77,17 +77,26 @@ const unsigned int Quad16::side_nodes_map[Quad16::num_sides][Quad16::nodes_per_s
 
 bool Quad16::is_vertex(const unsigned int libmesh_dbg_var(n)) const
 {
-  libmesh_assert_not_equal_to (n, invalid_uint);
-  return true;
-}
-
-bool Quad16::is_edge(const unsigned int) const
-{
+  if (n < 4)
+    return true;
   return false;
 }
 
-bool Quad16::is_face(const unsigned int) const
+bool Quad16::is_edge(const unsigned int libmesh_dbg_var(n)) const
 {
+  libmesh_assert_not_equal_to (n, invalid_uint);
+  if (n < 4)
+    return false;
+  if (n > 11)
+    return false;
+  return true;
+}
+
+bool Quad16::is_face(const unsigned int libmesh_dbg_var(n)) const
+{
+  libmesh_assert_not_equal_to (n, invalid_uint);
+  if (n > 11)
+    return true;
   return false;
 }
 
