@@ -3099,79 +3099,31 @@ void DofMap::enforce_constraints_exactly (const System & system,
   if (!v->closed())
     v->close();
 
-  NumericVector<Number> * v_local  = nullptr; // will be initialized below
-  NumericVector<Number> * v_global = nullptr; // will be initialized below
   std::unique_ptr<NumericVector<Number>> v_built;
-  if (v->type() == SERIAL)
-    {
-      v_built = NumericVector<Number>::build(this->comm());
-      v_built->init(this->n_dofs(), this->n_local_dofs(), true, PARALLEL);
-      v_built->close();
+  const NumericVector<Number> & v_local = this->send_list_view(*v, v_built);
 
-      for (dof_id_type i=v_built->first_local_index();
-           i<v_built->last_local_index(); i++)
-        v_built->set(i, (*v)(i));
-      v_built->close();
-      v_global = v_built.get();
-
-      v_local = v;
-      libmesh_assert (v_local->closed());
-    }
-  else if (v->type() == PARALLEL)
-    {
-      v_built = NumericVector<Number>::build(this->comm());
-      v_built->init (v->size(), v->local_size(),
-                     this->get_send_list(), true,
-                     GHOSTED);
-      v->localize(*v_built, this->get_send_list());
-      v_built->close();
-      v_local = v_built.get();
-
-      v_global = v;
-    }
-  else if (v->type() == GHOSTED)
-    {
-      v_local = v;
-      v_global = v;
-    }
-  else // unknown v->type()
-    libmesh_error_msg("ERROR: Unsupported NumericVector type == " << Utility::enum_to_string(v->type()));
-
-  // We should never hit these asserts because we should error-out in
-  // else clause above.  Just to be sure we don't try to use v_local
-  // and v_global uninitialized...
-  libmesh_assert(v_local);
-  libmesh_assert(v_global);
   libmesh_assert_equal_to (this, &(system.get_dof_map()));
 
-  for (const auto & [constrained_dof, constraint_row] : _dof_constraints)
-    {
-      if (!this->local_index(constrained_dof))
-        continue;
+  this->update_owned_entries(*v, [&](NumericVector<Number> & v_global)
+  {
+    for (const auto & [constrained_dof, constraint_row] : _dof_constraints)
+      {
+        if (!this->local_index(constrained_dof))
+          continue;
 
-      Number exact_value = 0;
-      if (!homogeneous)
-        {
-          if (auto rhsit = _primal_constraint_values.find(constrained_dof);
-              rhsit != _primal_constraint_values.end())
-            exact_value = rhsit->second;
-        }
-      for (const auto & [dof, val] : constraint_row)
-        exact_value += val * (*v_local)(dof);
+        Number exact_value = 0;
+        if (!homogeneous)
+          {
+            if (auto rhsit = _primal_constraint_values.find(constrained_dof);
+                rhsit != _primal_constraint_values.end())
+              exact_value = rhsit->second;
+          }
+        for (const auto & [dof, val] : constraint_row)
+          exact_value += val * v_local(dof);
 
-      v_global->set(constrained_dof, exact_value);
-    }
-
-  // If the old vector was serial, we probably need to send our values
-  // to other processors
-  if (v->type() == SERIAL)
-    {
-#ifndef NDEBUG
-      v_global->close();
-#endif
-      v_global->localize (*v);
-    }
-  v->close();
+        v_global.set(constrained_dof, exact_value);
+      }
+  });
 }
 
 void DofMap::enforce_constraints_on_residual (const NonlinearImplicitSystem & system,
@@ -3189,25 +3141,9 @@ void DofMap::enforce_constraints_on_residual (const NonlinearImplicitSystem & sy
   if (!solution)
     solution = system.solution.get();
 
-  NumericVector<Number> const * solution_local  = nullptr; // will be initialized below
   std::unique_ptr<NumericVector<Number>> solution_built;
-  if (solution->type() == SERIAL || solution->type() == GHOSTED)
-      solution_local = solution;
-  else if (solution->type() == PARALLEL)
-    {
-      solution_built = NumericVector<Number>::build(this->comm());
-      solution_built->init (solution->size(), solution->local_size(),
-                            this->get_send_list(), true, GHOSTED);
-      solution->localize(*solution_built, this->get_send_list());
-      solution_built->close();
-      solution_local = solution_built.get();
-    }
-  else // unknown solution->type()
-    libmesh_error_msg("ERROR: Unsupported NumericVector type == " << Utility::enum_to_string(solution->type()));
+  const NumericVector<Number> & solution_local = this->send_list_view(*solution, solution_built);
 
-  // We should never hit these asserts because we should error-out in
-  // else clause above.  Just to be sure we don't try to use solution_local
-  libmesh_assert(solution_local);
   libmesh_assert_equal_to (this, &(system.get_dof_map()));
 
   for (const auto & [constrained_dof, constraint_row] : _dof_constraints)
@@ -3217,8 +3153,8 @@ void DofMap::enforce_constraints_on_residual (const NonlinearImplicitSystem & sy
 
       Number exact_value = 0;
       for (const auto & [dof, val] : constraint_row)
-        exact_value -= val * (*solution_local)(dof);
-      exact_value += (*solution_local)(constrained_dof);
+        exact_value -= val * solution_local(dof);
+      exact_value += solution_local(constrained_dof);
       if (!homogeneous)
         {
           if (auto rhsit = _primal_constraint_values.find(constrained_dof);
@@ -3265,48 +3201,8 @@ void DofMap::enforce_adjoint_constraints_exactly (NumericVector<Number> & v,
 
   LOG_SCOPE("enforce_adjoint_constraints_exactly()", "DofMap");
 
-  NumericVector<Number> * v_local  = nullptr; // will be initialized below
-  NumericVector<Number> * v_global = nullptr; // will be initialized below
   std::unique_ptr<NumericVector<Number>> v_built;
-  if (v.type() == SERIAL)
-    {
-      v_built = NumericVector<Number>::build(this->comm());
-      v_built->init(this->n_dofs(), this->n_local_dofs(), true, PARALLEL);
-      v_built->close();
-
-      for (dof_id_type i=v_built->first_local_index();
-           i<v_built->last_local_index(); i++)
-        v_built->set(i, v(i));
-      v_built->close();
-      v_global = v_built.get();
-
-      v_local = &v;
-      libmesh_assert (v_local->closed());
-    }
-  else if (v.type() == PARALLEL)
-    {
-      v_built = NumericVector<Number>::build(this->comm());
-      v_built->init (v.size(), v.local_size(),
-                     this->get_send_list(), true, GHOSTED);
-      v.localize(*v_built, this->get_send_list());
-      v_built->close();
-      v_local = v_built.get();
-
-      v_global = &v;
-    }
-  else if (v.type() == GHOSTED)
-    {
-      v_local = &v;
-      v_global = &v;
-    }
-  else // unknown v.type()
-    libmesh_error_msg("ERROR: Unknown v.type() == " << v.type());
-
-  // We should never hit these asserts because we should error-out in
-  // else clause above.  Just to be sure we don't try to use v_local
-  // and v_global uninitialized...
-  libmesh_assert(v_local);
-  libmesh_assert(v_global);
+  const NumericVector<Number> & v_local = this->send_list_view(v, v_built);
 
   // Do we have any non_homogeneous constraints?
   const AdjointDofConstraintValues::const_iterator
@@ -3315,34 +3211,75 @@ void DofMap::enforce_adjoint_constraints_exactly (NumericVector<Number> & v,
     (adjoint_constraint_map_it == _adjoint_constraint_values.end()) ?
     nullptr : &adjoint_constraint_map_it->second;
 
-  for (const auto & [constrained_dof, constraint_row] : _dof_constraints)
+  this->update_owned_entries(v, [&](NumericVector<Number> & v_global)
+  {
+    for (const auto & [constrained_dof, constraint_row] : _dof_constraints)
+      {
+        if (!this->local_index(constrained_dof))
+          continue;
+
+        Number exact_value = 0;
+        if (constraint_map)
+          {
+            if (const auto adjoint_constraint_it = constraint_map->find(constrained_dof);
+                adjoint_constraint_it != constraint_map->end())
+              exact_value = adjoint_constraint_it->second;
+          }
+
+        for (const auto & j : constraint_row)
+          exact_value += j.second * v_local(j.first);
+
+        v_global.set(constrained_dof, exact_value);
+      }
+  });
+}
+
+
+
+const NumericVector<Number> &
+DofMap::send_list_view(const NumericVector<Number> & v,
+                       std::unique_ptr<NumericVector<Number>> & storage) const
+{
+  if (v.type() == SERIAL || v.type() == GHOSTED)
+    return v;
+
+  if (v.type() != PARALLEL)
+    libmesh_error_msg("ERROR: Unsupported NumericVector type == " << Utility::enum_to_string(v.type()));
+
+  storage = NumericVector<Number>::build(this->comm());
+  storage->init(v.size(), v.local_size(), this->get_send_list(), true, GHOSTED);
+  v.localize(*storage, this->get_send_list());
+  storage->close();
+  return *storage;
+}
+
+
+
+void
+DofMap::update_owned_entries(NumericVector<Number> & v,
+                             const std::function<void(NumericVector<Number> &)> & update) const
+{
+  if (!v.closed())
+    v.close();
+
+  if (v.type() != SERIAL)
     {
-      if (!this->local_index(constrained_dof))
-        continue;
-
-      Number exact_value = 0;
-      if (constraint_map)
-        {
-          if (const auto adjoint_constraint_it = constraint_map->find(constrained_dof);
-              adjoint_constraint_it != constraint_map->end())
-            exact_value = adjoint_constraint_it->second;
-        }
-
-      for (const auto & j : constraint_row)
-        exact_value += j.second * (*v_local)(j.first);
-
-      v_global->set(constrained_dof, exact_value);
+      update(v);
+      v.close();
+      return;
     }
 
-  // If the old vector was serial, we probably need to send our values
-  // to other processors
-  if (v.type() == SERIAL)
-    {
-#ifndef NDEBUG
-      v_global->close();
-#endif
-      v_global->localize (v);
-    }
+  // A serial vector holds every entry on every processor, so each processor updates the entries it
+  // owns in a distributed copy, and the copy then sends them to every processor
+  auto owned = NumericVector<Number>::build(this->comm());
+  owned->init(this->n_dofs(), this->n_local_dofs(), true, PARALLEL);
+  for (const auto i : make_range(owned->first_local_index(), owned->last_local_index()))
+    owned->set(i, v(i));
+  owned->close();
+
+  update(*owned);
+  owned->close();
+  owned->localize(v);
   v.close();
 }
 

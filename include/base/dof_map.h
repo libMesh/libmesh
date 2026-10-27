@@ -47,6 +47,7 @@
 // C++ Includes
 #include <algorithm>
 #include <cstddef>
+#include <functional>
 #include <iterator>
 #include <map>
 #include <string>
@@ -1531,6 +1532,23 @@ public:
    * constrained.
    */
   void constrain_nothing (std::vector<dof_id_type> & dofs) const;
+
+  /**
+   * \returns \p v if it stores the send list entries, i.e. if it is \p SERIAL or \p GHOSTED.
+   * Otherwise builds a \p GHOSTED copy of \p v in \p storage and returns it.
+   */
+  const NumericVector<Number> &
+  send_list_view(const NumericVector<Number> & v,
+                 std::unique_ptr<NumericVector<Number>> & storage) const;
+
+  /**
+   * Calls \p update with a vector whose local entries are those of \p v, and in which \p update
+   * sets entries that this processor owns. Then \p v receives every updated entry that it stores:
+   * a \p SERIAL vector receives every entry on every processor, and a \p GHOSTED vector receives
+   * its ghost entries.
+   */
+  void update_owned_entries(NumericVector<Number> & v,
+                            const std::function<void(NumericVector<Number> &)> & update) const;
 
   /**
    * Constrains the numeric vector \p v, which represents a solution defined on

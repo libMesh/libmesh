@@ -766,6 +766,15 @@ private:
             for (const auto dof : make_range(dof_map.first_dof(), dof_map.end_dof()))
               LIBMESH_ASSERT_NUMBERS_EQUAL(
                   (*reduced_sys.solution)(dof), (*ghosted)(dof), TOLERANCE * TOLERANCE);
+
+            // Prolonging into a serial vector gives every entry of the localized solution
+            auto serial = NumericVector<Number>::build(full_sys.comm());
+            serial->init(dof_map.n_dofs(), false, SERIAL);
+            reduced_map.prolong(*reduced_vector, *serial, /*homogeneous=*/true);
+            std::vector<Number> localized;
+            reduced_sys.solution->localize(localized);
+            for (const auto dof : make_range(dof_map.n_dofs()))
+              LIBMESH_ASSERT_NUMBERS_EQUAL(localized[dof], (*serial)(dof), TOLERANCE * TOLERANCE);
           }
       }
   }
