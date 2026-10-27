@@ -1240,6 +1240,8 @@ public:
             CPPUNIT_ASSERT(elem->is_internal(nd));
           else if ((elem->type() == QUAD9 || elem->type() == QUADSHELL9) && nd == 8)
             CPPUNIT_ASSERT(elem->is_internal(nd));
+          else if (elem->type() == QUAD16 && nd >= 12)
+            CPPUNIT_ASSERT(elem->is_internal(nd));
           else if (elem->type() == TRI7 && nd == 6)
             CPPUNIT_ASSERT(elem->is_internal(nd));
           else if (elem->type() == INFHEX18 && nd == 17)
