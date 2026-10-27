@@ -632,8 +632,7 @@ create_local_bounding_box (const MeshBase & mesh)
 {
   FindBBox find_bbox;
 
-  Threads::parallel_reduce (ConstElemRange (mesh.local_elements_begin(),
-                                            mesh.local_elements_end()),
+  Threads::parallel_reduce (mesh.active_local_element_stored_range(),
                             find_bbox);
 
   return find_bbox.bbox();
@@ -643,7 +642,7 @@ create_local_bounding_box (const MeshBase & mesh)
 
 libMesh::BoundingBox
 create_processor_bounding_box (const MeshBase & mesh,
-                                          const processor_id_type pid)
+                               const processor_id_type pid)
 {
   // This can only be run in parallel, with consistent arguments.
   libmesh_parallel_only(mesh.comm());

@@ -56,6 +56,7 @@
 #include "libmesh/parallel.h"
 #include "libmesh/parallel_ghost_sync.h"
 #include "libmesh/enum_to_string.h"
+#include "libmesh/node_range.h"
 
 // C++ includes
 #include <array>
@@ -559,8 +560,12 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           }
         else // !gauss_lobatto_grid
           {
-            for (Node * node : mesh.node_ptr_range())
-              (*node)(0) = (*node)(0)*(xmax-xmin) + xmin;
+            Threads::parallel_for_each
+              (mesh.node_stored_range(),
+               [xmin, xmax](Node * node)
+               {
+                 (*node)(0) = (*node)(0)*(xmax-xmin) + xmin;
+               });
           }
 
         // Add sideset names to boundary info
@@ -1124,11 +1129,13 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           }
         else // !gauss_lobatto_grid
           {
-            for (Node * node : mesh.node_ptr_range())
-              {
-                (*node)(0) = ((*node)(0))*(xmax-xmin) + xmin;
-                (*node)(1) = ((*node)(1))*(ymax-ymin) + ymin;
-              }
+            Threads::parallel_for_each
+              (mesh.node_stored_range(),
+               [xmin, xmax, ymin, ymax](Node * node)
+               {
+                 (*node)(0) = (*node)(0)*(xmax-xmin) + xmin;
+                 (*node)(1) = ((*node)(1))*(ymax-ymin) + ymin;
+               });
           }
 
         // Add sideset names to boundary info
@@ -1777,12 +1784,14 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           }
         else // !gauss_lobatto_grid
           {
-            for (Node * node : mesh.node_ptr_range())
-              {
-                (*node)(0) = ((*node)(0))*(xmax-xmin) + xmin;
-                (*node)(1) = ((*node)(1))*(ymax-ymin) + ymin;
-                (*node)(2) = ((*node)(2))*(zmax-zmin) + zmin;
-              }
+            Threads::parallel_for_each
+              (mesh.node_stored_range(),
+               [xmin, xmax, ymin, ymax, zmin, zmax](Node * node)
+               {
+                 (*node)(0) = ((*node)(0))*(xmax-xmin) + xmin;
+                 (*node)(1) = ((*node)(1))*(ymax-ymin) + ymin;
+                 (*node)(2) = ((*node)(2))*(zmax-zmin) + zmin;
+               });
           }
 
 

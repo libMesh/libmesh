@@ -33,6 +33,7 @@
 #include "libmesh/int_range.h"
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_tools.h"
+#include "libmesh/node_range.h"
 #include "libmesh/numeric_vector.h"
 #include "libmesh/periodic_boundary_base.h"
 #include "libmesh/periodic_boundaries.h"
@@ -105,8 +106,7 @@ DofMap::build_sparsity (const MeshBase & mesh,
      calculate_constrained,
      sc);
 
-  Threads::parallel_reduce (ConstElemRange (mesh.active_local_elements_begin(),
-                                            mesh.active_local_elements_end()), *sp);
+  Threads::parallel_reduce (mesh.active_local_element_stored_range(), *sp);
 
   sp->parallel_sync();
 
@@ -518,21 +518,20 @@ void DofMap::reinit
   //------------------------------------------------------------
   // Clear the old_dof_objects for all the nodes
   // and elements so that we can overwrite them
-  for (auto & node : mesh.node_ptr_range())
-    {
-      node->clear_old_dof_object();
-      libmesh_assert (!node->get_old_dof_object());
-    }
-
-  Threads::parallel_for
-    (mesh.element_stored_range(),
-     [](const ElemRange & range)
+  Threads::parallel_for_each
+    (mesh.node_stored_range(),
+     [](Node * node)
      {
-       for (Elem * elem : range)
-         {
-           elem->clear_old_dof_object();
-           libmesh_assert (!elem->get_old_dof_object());
-         }
+       node->clear_old_dof_object();
+       libmesh_assert (!node->get_old_dof_object());
+     });
+
+  Threads::parallel_for_each
+    (mesh.element_stored_range(),
+     [](Elem * elem)
+     {
+       elem->clear_old_dof_object();
+       libmesh_assert (!elem->get_old_dof_object());
      });
 
   //------------------------------------------------------------
@@ -565,16 +564,19 @@ void DofMap::reinit
   // handle new \p DofObjects that may have just been created
 
   // All the nodes
-  for (auto & node : mesh.node_ptr_range())
-    node->set_n_vars_per_group(sys_num, n_vars_per_group);
+  Threads::parallel_for_each
+    (mesh.node_stored_range(),
+     [sys_num, n_vars_per_group](Node * node)
+     {
+       node->set_n_vars_per_group(sys_num, n_vars_per_group);
+     });
 
   // All the elements
-  Threads::parallel_for
+  Threads::parallel_for_each
     (mesh.element_stored_range(),
-     [sys_num, n_vars_per_group](const ElemRange & range)
+     [sys_num, n_vars_per_group](Elem * elem)
      {
-       for (Elem * elem : range)
-         elem->set_n_vars_per_group(sys_num, n_vars_per_group);
+       elem->set_n_vars_per_group(sys_num, n_vars_per_group);
      });
 
   // Zero _n_SCALAR_dofs, it will be updated below.
@@ -859,12 +861,21 @@ void DofMap::invalidate_dofs(MeshBase & mesh) const
   const unsigned int sys_num = this->sys_number();
 
   // All the nodes
-  for (auto & node : mesh.node_ptr_range())
-    node->invalidate_dofs(sys_num);
+  Threads::parallel_for_each
+    (mesh.node_stored_range(),
+     [sys_num](Node * node)
+     {
+       node->invalidate_dofs(sys_num);
+     });
 
   // All the active elements.
-  for (auto & elem : mesh.active_element_ptr_range())
-    elem->invalidate_dofs(sys_num);
+  Threads::parallel_for_each
+    (mesh.element_stored_range(),
+     [sys_num](Elem * elem)
+     {
+       if (elem->active())
+         elem->invalidate_dofs(sys_num);
+     });
 }
 
 

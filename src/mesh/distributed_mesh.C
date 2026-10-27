@@ -966,6 +966,9 @@ Node * DistributedMesh::add_node (Node * n)
     }
 #endif
 
+  // A new node invalidates any cached node ranges
+  this->clear_stored_ranges();
+
   n->add_extra_integers(_node_integer_names.size(),
                         _node_integer_default_values);
 
@@ -1016,6 +1019,9 @@ void DistributedMesh::delete_node(Node * n)
 
   // delete the node
   delete n;
+
+  // We've invalidated any ranges that contained this node
+  this->clear_stored_ranges();
 }
 
 
@@ -1718,6 +1724,10 @@ void DistributedMesh::renumber_nodes_and_elements ()
   // And figure out what IDs we should use when adding new nodes and
   // new elements
   this->update_parallel_id_counts();
+
+  // We've probably done *some* node removal and/or renumbering; let's
+  // clear caches to be safe.
+  this->clear_stored_ranges();
 
   // Make sure our caches are up to date and our
   // DofObjects are well packed

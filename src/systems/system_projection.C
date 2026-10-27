@@ -289,12 +289,10 @@ void System::project_vector (const NumericVector<Number> & old_v,
   std::unique_ptr<NumericVector<Number>> local_old_vector_built;
   const NumericVector<Number> * old_vector_ptr = nullptr;
 
-  if (!active_local_range)
-    {
-      active_local_range.emplace
-        (this->get_mesh().active_local_elements_begin(),
-         this->get_mesh().active_local_elements_end());
-    }
+  const ConstElemRange & range =
+    active_local_range ?
+      active_local_range.value() :
+      this->get_mesh().active_local_element_stored_range();
 
   // If the old vector was uniprocessor, make the new
   // vector uniprocessor
@@ -311,8 +309,7 @@ void System::project_vector (const NumericVector<Number> & old_v,
     {
       // Build a send list for efficient localization
       BuildProjectionList projection_list(*this);
-      Threads::parallel_reduce (active_local_range.value(),
-                                projection_list);
+      Threads::parallel_reduce (range, projection_list);
 
       // Create a sorted, unique send_list
       projection_list.unique();
@@ -335,8 +332,7 @@ void System::project_vector (const NumericVector<Number> & old_v,
     {
       // Build a send list for efficient localization
       BuildProjectionList projection_list(*this);
-      Threads::parallel_reduce (active_local_range.value(),
-                                projection_list);
+      Threads::parallel_reduce (range, projection_list);
 
       // Create a sorted, unique send_list
       projection_list.unique();
@@ -412,7 +408,7 @@ void System::project_vector (const NumericVector<Number> & old_v,
             g(*this, old_vector, &regular_vars);
 
           FEMProjector projector(*this, f, &g, setter, regular_vars);
-          projector.project(active_local_range.value());
+          projector.project(range);
         }
 
       if (!vector_vars.empty())
@@ -426,7 +422,7 @@ void System::project_vector (const NumericVector<Number> & old_v,
           OldSolutionValue<Tensor, &FEMContext::point_gradient> g_vector(*this, old_vector, &vector_vars);
 
           FEMVectorProjector vector_projector(*this, f_vector, &g_vector, setter, vector_vars);
-          vector_projector.project(active_local_range.value());
+          vector_projector.project(range);
         }
 
       // Copy the SCALAR dofs from old_vector to new_vector
@@ -988,10 +984,6 @@ void System::projection_matrix (SparseMatrix<Number> & proj_mat) const
 
   if (n_variables)
     {
-      ConstElemRange active_local_elem_range
-        (this->get_mesh().active_local_elements_begin(),
-         this->get_mesh().active_local_elements_end());
-
       std::vector<unsigned int> vars(n_variables);
       std::iota(vars.begin(), vars.end(), 0);
 
@@ -1010,7 +1002,7 @@ void System::projection_matrix (SparseMatrix<Number> & proj_mat) const
       MatrixFillAction<Real, Number> setter(proj_mat);
 
       ProjMatFiller mat_filler(*this, f, &g, setter, vars);
-      mat_filler.project(active_local_elem_range);
+      mat_filler.project(this->get_mesh().active_local_element_stored_range());
 
       // Set the SCALAR dof transfer entries too.
       // Note: We assume that all SCALAR dofs are on the
@@ -1148,12 +1140,10 @@ void System::project_vector (NumericVector<Number> & new_vector,
 
   libmesh_assert (f);
 
-  if (!active_local_range)
-    {
-      active_local_range.emplace
-        (this->get_mesh().active_local_elements_begin(),
-         this->get_mesh().active_local_elements_end());
-    }
+  const ConstElemRange & range =
+    active_local_range ?
+      active_local_range.value() :
+      this->get_mesh().active_local_element_stored_range();
 
   VectorSetAction<Number> setter(new_vector);
 
@@ -1188,12 +1178,12 @@ void System::project_vector (NumericVector<Number> & new_vector,
       FEMFunctionWrapper<Gradient> gw(*g);
 
       FEMProjector projector(*this, fw, &gw, setter, vars);
-      projector.project(active_local_range.value());
+      projector.project(range);
     }
   else
     {
       FEMProjector projector(*this, fw, nullptr, setter, vars);
-      projector.project(active_local_range.value());
+      projector.project(range);
     }
 
   // Also, load values into the SCALAR dofs
@@ -1248,7 +1238,7 @@ void System::project_vector (NumericVector<Number> & new_vector,
     {
       // Look for a spline node: a NodeElem with a rational variable
       // on it.
-      for (auto & elem : active_local_range.value())
+      for (auto & elem : range)
         if (elem->type() == NODEELEM)
           for (auto rational_var : rational_vars)
             if (rational_var->active_on_subdomain(elem->subdomain_id()))
@@ -1351,15 +1341,13 @@ void System::boundary_project_vector (const std::set<boundary_id_type> & b,
 {
   LOG_SCOPE ("boundary_project_vector()", "System");
 
-  if (!active_local_range)
-  {
-    active_local_range.emplace
-      (this->get_mesh().active_local_elements_begin(),
-       this->get_mesh().active_local_elements_end());
-  }
+  const ConstElemRange & range =
+    active_local_range ?
+      active_local_range.value() :
+      this->get_mesh().active_local_element_stored_range();
 
   Threads::parallel_for
-    (active_local_range.value(),
+    (range,
      BoundaryProjectSolution(b, variables, *this, f, g,
                              this->get_equation_systems().parameters,
                              new_vector)
