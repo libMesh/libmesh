@@ -344,6 +344,7 @@ Real fe_lagrange_2D_shape(const ElemType type,
           case QUADSHELL8:
           case QUAD9:
           case QUADSHELL9:
+          case QUAD16:
             {
               // Compute quad shape functions as a tensor-product
               const Real xi  = p(0);
@@ -623,6 +624,7 @@ Real fe_lagrange_2D_shape_deriv(const ElemType type,
           case QUADSHELL8:
           case QUAD9:
           case QUADSHELL9:
+          case QUAD16:
             {
               // Compute quad shape functions as a tensor-product
               const Real xi  = p(0);
