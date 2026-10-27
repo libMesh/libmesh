@@ -1007,6 +1007,7 @@ public:
 #ifdef LIBMESH_ENABLE_AMR
     // We don't support refinement of all element types
     if (elem_type == EDGE4 ||
+        elem_type == QUAD16 ||
         elem_type == PRISM20 ||
         elem_type == PYRAMID5 ||
         elem_type == PYRAMID13 ||
