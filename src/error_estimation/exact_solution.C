@@ -298,6 +298,8 @@ std::vector<Real> & ExactSolution::_check_inputs(std::string_view sys_name,
 void ExactSolution::compute_error(std::string_view sys_name,
                                   std::string_view unknown_name)
 {
+  LOG_SCOPE("compute_error", "ExactSolution");
+
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
   std::vector<Real> & error_vals = this->_check_inputs(sys_name,
