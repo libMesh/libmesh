@@ -67,6 +67,7 @@ class FEType;
 class MeshBase;
 class PeriodicBoundaryBase;
 class PeriodicBoundaries;
+class PeriodicPointNeighbors;
 class System;
 class NonlinearImplicitSystem;
 class StaticCondensationDofMap;
@@ -2212,6 +2213,18 @@ private:
    * We use a std::unique_ptr here to reduce header dependencies.
    */
   std::unique_ptr<DefaultCoupling> _default_evaluating;
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+  /**
+   * The geometric GhostingFunctor for our periodic boundaries. Periodic constraint computation
+   * needs every element at a periodic vertex and at its image, so this functor is a correctness
+   * requirement. The first periodic boundary adds it to the mesh, and the default ghosting
+   * controls leave it in place.
+   *
+   * We use a std::unique_ptr here to reduce header dependencies.
+   */
+  std::unique_ptr<PeriodicPointNeighbors> _periodic_ghosting;
+#endif
 
   /**
    * The list of all GhostingFunctor objects to be used when
