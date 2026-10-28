@@ -41,6 +41,7 @@
 #include "libmesh/parallel_elem.h"
 #include "libmesh/parallel_node.h"
 #include "libmesh/periodic_boundaries.h"
+#include "libmesh/periodic_point_neighbors.h"
 #include "libmesh/periodic_boundary.h"
 #include "libmesh/periodic_boundary_base.h"
 #include "libmesh/point_locator_base.h"
@@ -5569,6 +5570,10 @@ void DofMap::add_periodic_boundary (const PeriodicBoundaryBase & boundary,
   libmesh_assert_equal_to (boundary.myboundary, inverse_boundary.pairedboundary);
   libmesh_assert_equal_to (boundary.pairedboundary, inverse_boundary.myboundary);
   libmesh_assert(boundary.get_variables() == inverse_boundary.get_variables());
+
+  // The mesh must ghost the elements across our periodic boundaries
+  if (_periodic_boundaries->empty())
+    _mesh.add_ghosting_functor(*_periodic_ghosting);
 
   // See if we already have a periodic boundary associated myboundary...
   PeriodicBoundaryBase * existing_boundary =

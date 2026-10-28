@@ -43,20 +43,14 @@ void GhostPointNeighbors::operator()
   libmesh_assert(_mesh);
 
 #ifdef LIBMESH_ENABLE_PERIODIC
-  const bool check_periodic_bcs =
-    (_periodic_bcs && !_periodic_bcs->empty());
+  _periodic_neighbors(range_begin, range_end, p, coupled_elements);
 
   auto * db = _mesh->get_disjoint_neighbor_boundary_pairs();
   const bool check_disjoint_bcs = (db && !db->empty());
 
   std::unique_ptr<PointLocatorBase> point_locator;
-  if (check_periodic_bcs || check_disjoint_bcs)
+  if (check_disjoint_bcs)
       point_locator = _mesh->sub_point_locator();
-
-  std::set<const Elem *> periodic_elems_examined;
-  const BoundaryInfo & binfo = _mesh->get_boundary_info();
-  std::vector<boundary_id_type> appn_bcids;
-  std::vector<const Elem *> active_periodic_neighbors;
 #endif
 
   // Using a connected_nodes set rather than point_neighbors() would
@@ -116,70 +110,6 @@ void GhostPointNeighbors::operator()
         coupled_elements.emplace(ip, nullcm);
 
 #ifdef LIBMESH_ENABLE_PERIODIC
-      if (check_periodic_bcs)
-        {
-          for (const auto s : elem->side_index_range())
-            {
-              if (elem->neighbor_ptr(s))
-                continue;
-
-              const Elem * const equal_level_periodic_neigh = elem->topological_neighbor
-                (s, *_mesh, *point_locator, _periodic_bcs);
-
-              if (!equal_level_periodic_neigh || equal_level_periodic_neigh == remote_elem)
-                continue;
-
-#ifdef LIBMESH_ENABLE_AMR
-              equal_level_periodic_neigh->active_family_tree_by_topological_neighbor(
-                active_periodic_neighbors,
-                elem,
-                *_mesh,
-                *point_locator,
-                _periodic_bcs,
-                /*reset=*/true);
-#else
-              active_periodic_neighbors = { equal_level_periodic_neigh };
-#endif
-
-              for (const Elem * const active_periodic_neigh : active_periodic_neighbors)
-                {
-                  std::set <const Elem *> active_periodic_point_neighbors;
-
-                  // This fills point neighbors *including*
-                  // active_periodic_neigh. The documentation for this method
-                  // states that this will return *active* point neighbors
-                  active_periodic_neigh->find_point_neighbors(active_periodic_point_neighbors);
-
-                  for (const Elem * const appn : active_periodic_point_neighbors)
-                    {
-                      // Don't need to ghost RemoteElem or an element we already own or an
-                      // element we've already examined
-                      if (appn == remote_elem || appn->processor_id() == p ||
-                          periodic_elems_examined.count(appn))
-                        continue;
-
-                      // We only need to keep point neighbors that are along the periodic boundaries
-                      bool on_periodic_boundary = false;
-                      for (const auto appn_s : appn->side_index_range())
-                        {
-                          binfo.boundary_ids(appn, appn_s, appn_bcids);
-                          for (const auto appn_bcid : appn_bcids)
-                            if (_periodic_bcs->find(appn_bcid) != _periodic_bcs->end())
-                              {
-                                on_periodic_boundary = true;
-                                goto jump;
-                              }
-                        }
-                      jump:
-                        if (on_periodic_boundary)
-                          coupled_elements.emplace(appn, nullcm);
-
-                        periodic_elems_examined.insert(appn);
-                    }
-                }
-            }
-        }
-
       if (check_disjoint_bcs)
         {
           // Also ghost their disjoint neighbors
@@ -207,18 +137,25 @@ void GhostPointNeighbors::operator()
     }
 }
 
+void GhostPointNeighbors::set_mesh(const MeshBase * mesh)
+{
+  GhostingFunctor::set_mesh(mesh);
+#ifdef LIBMESH_ENABLE_PERIODIC
+  _periodic_neighbors.set_mesh(mesh);
+#endif
+}
+
 void GhostPointNeighbors::mesh_reinit()
 {
   // Unless we have periodic boundary conditions, we don't need
   // anything precomputed.
 #ifdef LIBMESH_ENABLE_PERIODIC
-  const bool check_periodic_bcs =
-    (_periodic_bcs && !_periodic_bcs->empty());
+  _periodic_neighbors.mesh_reinit();
 
   auto * db = _mesh->get_disjoint_neighbor_boundary_pairs();
   const bool check_disjoint_bcs = (db && !db->empty());
 
-  if (!check_periodic_bcs && !check_disjoint_bcs)
+  if (!check_disjoint_bcs)
     return;
 #endif
 
