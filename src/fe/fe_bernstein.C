@@ -111,6 +111,7 @@ unsigned int BERNSTEIN_n_dofs(const ElemType t, const Order o)
       return 1;
     case EDGE2:
     case EDGE3:
+    case EDGE4:
       return (o+1);
     case QUAD4:
     case QUADSHELL4:
@@ -195,6 +196,21 @@ unsigned int BERNSTEIN_n_dofs_at_node(const ElemType t,
           return (o-1);
         default:
           libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for EDGE2/3!");
+        }
+    case EDGE4:
+      switch (n)
+        {
+        case 0:
+        case 1:
+          return 1;
+        case 2:
+          libmesh_assert (o>2);
+          return (o-1)/2;  // floor
+        case 3:
+          libmesh_assert (o>2);
+          return o/2;          // "ceiling", add extra DoFs here first
+        default:
+          libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for EDGE4!");
         }
     case TRI3:
       libmesh_assert_less (n, 3);
@@ -361,6 +377,7 @@ unsigned int BERNSTEIN_n_dofs_per_elem(const ElemType t, const Order o)
     case NODEELEM:
     case EDGE2:
     case EDGE3:
+    case EDGE4:
       return 0;
     case TRI3:
     case TRISHELL3:
