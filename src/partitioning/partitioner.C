@@ -303,6 +303,10 @@ void Partitioner::repartition (MeshBase & mesh,
 
   // Set the node's processor ids
   Partitioner::set_node_processor_ids(mesh);
+
+  // Give derived Mesh classes a chance to update any cached data to
+  // reflect the new partitioning
+  mesh.update_post_partitioning();
 }
 
 
