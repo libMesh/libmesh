@@ -233,6 +233,11 @@ void Partitioner::partition (MeshBase & mesh,
   // Set the parent's processor ids
   Partitioner::set_parent_processor_ids(mesh);
 
+  // Ghosting functors may iterate over local elements while we
+  // redistribute, so cached local ranges must reflect the new element
+  // processor ids
+  mesh.update_post_partitioning();
+
   // Redistribute elements if necessary, before setting node processor
   // ids, to make sure those will be set consistently
   mesh.redistribute();
@@ -298,6 +303,10 @@ void Partitioner::repartition (MeshBase & mesh,
 
   // Set the node's processor ids
   Partitioner::set_node_processor_ids(mesh);
+
+  // Give derived Mesh classes a chance to update any cached data to
+  // reflect the new partitioning
+  mesh.update_post_partitioning();
 }
 
 
@@ -317,6 +326,11 @@ bool Partitioner::single_partition (MeshBase & mesh)
 
   if (changed_pid)
   {
+    // Ghosting functors may iterate over local elements while we
+    // redistribute, so cached local ranges must reflect the new
+    // element processor ids
+    mesh.update_post_partitioning();
+
     // We may need to redistribute, in case someone (like our unit
     // tests) is doing something silly (like moving a whole
     // already-distributed mesh back onto rank 0).
