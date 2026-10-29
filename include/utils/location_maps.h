@@ -24,11 +24,11 @@
 
 // Local Includes
 #include "libmesh/libmesh_common.h"
+#include "libmesh/bounding_box.h"
 #include "libmesh/point.h"
 
 // C++ Includes
 #include <unordered_map>
-#include <vector>
 
 namespace libMesh
 {
@@ -74,8 +74,7 @@ protected:
 
 private:
   map_type          _map;
-  std::vector<Real> _lower_bound;
-  std::vector<Real> _upper_bound;
+  BoundingBox       _bbox;
 };
 
 } // namespace libMesh

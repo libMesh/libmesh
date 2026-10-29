@@ -22,6 +22,7 @@
 #include "libmesh/libmesh_logging.h"
 #include "libmesh/location_maps.h"
 #include "libmesh/mesh_base.h"
+#include "libmesh/mesh_tools.h"
 #include "libmesh/node.h"
 #include "libmesh/parallel.h"
 
@@ -57,27 +58,7 @@ void LocationMap<T>::init(MeshBase & mesh)
   _map.clear();
 
   // Cache a bounding box
-  _lower_bound.clear();
-  _lower_bound.resize(LIBMESH_DIM, std::numeric_limits<Real>::max());
-  _upper_bound.clear();
-  _upper_bound.resize(LIBMESH_DIM, -std::numeric_limits<Real>::max());
-
-  for (auto & node : mesh.node_ptr_range())
-    for (unsigned int i=0; i != LIBMESH_DIM; ++i)
-      {
-        // Expand the bounding box if necessary
-        _lower_bound[i] = std::min(_lower_bound[i],
-                                   (*node)(i));
-        _upper_bound[i] = std::max(_upper_bound[i],
-                                   (*node)(i));
-      }
-
-  // On a parallel mesh we might not yet have a full bounding box
-  if (!mesh.is_serial())
-    {
-      mesh.comm().min(_lower_bound);
-      mesh.comm().max(_upper_bound);
-    }
+  _bbox = MeshTools::create_nodal_bounding_box(mesh);
 
   this->fill(mesh);
 }
@@ -150,25 +131,25 @@ unsigned int LocationMap<T>::key(const Point & p)
 {
   Real xscaled = 0., yscaled = 0., zscaled = 0.;
 
-  Real deltax = _upper_bound[0] - _lower_bound[0];
+  const Real deltax = _bbox.max()(0) - _bbox.min()(0);
 
   if (std::abs(deltax) > TOLERANCE)
-    xscaled = (p(0) - _lower_bound[0])/deltax;
+    xscaled = (p(0) - _bbox.min()(0))/deltax;
 
   // Only check y-coords if libmesh is compiled with LIBMESH_DIM>1
 #if LIBMESH_DIM > 1
-  Real deltay = _upper_bound[1] - _lower_bound[1];
+  const Real deltay = _bbox.max()(1) - _bbox.min()(1);
 
   if (std::abs(deltay) > TOLERANCE)
-    yscaled = (p(1) - _lower_bound[1])/deltay;
+    yscaled = (p(1) - _bbox.min()(1))/deltay;
 #endif
 
   // Only check z-coords if libmesh is compiled with LIBMESH_DIM>2
 #if LIBMESH_DIM > 2
-  Real deltaz = _upper_bound[2] - _lower_bound[2];
+  const Real deltaz = _bbox.max()(2) - _bbox.min()(2);
 
   if (std::abs(deltaz) > TOLERANCE)
-    zscaled = (p(2) - _lower_bound[2])/deltaz;
+    zscaled = (p(2) - _bbox.min()(2))/deltaz;
 #endif
 
   unsigned int n0 = static_cast<unsigned int> (chunkfloat * xscaled),

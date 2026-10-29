@@ -28,7 +28,10 @@
 #include "libmesh/parallel.h"
 #include "libmesh/parallel_ghost_sync.h" // sync_dofobject_data_by_id()
 #include "libmesh/parallel_algebra.h" // StandardType<Point>
+#include "libmesh/threads.h"
+#include "libmesh/elem_range.h"
 #include "libmesh/int_range.h"
+#include "libmesh/node_range.h"
 #include "libmesh/elem_side_builder.h"
 #include "libmesh/libmesh_logging.h"
 
@@ -91,23 +94,28 @@ void LaplaceMeshSmoother::smooth()
       };
 
       // calculate new node positions (local and unpartitioned nodes only)
-      for (auto & node : _mesh.local_node_ptr_range())
-        calculate_new_position(node);
+      Threads::parallel_for_each
+        (_mesh.local_node_stored_range(), calculate_new_position);
 
-      for (auto & node : as_range(_mesh.pid_nodes_begin(DofObject::invalid_processor_id),
-                                  _mesh.pid_nodes_end(DofObject::invalid_processor_id)))
-        calculate_new_position(node);
-
+      Threads::parallel_for_each
+        (_mesh.unpartitioned_node_stored_range(), calculate_new_position);
 
       // now update the node positions (local and unpartitioned nodes only)
-      for (auto & node : _mesh.local_node_ptr_range())
-        if (!on_boundary.count(node->id()) && (_graph[node->id()].size() > 0))
-          *node = new_positions[node->id()];
+      Threads::parallel_for_each
+        (_mesh.local_node_stored_range(),
+         [this, &on_boundary, &new_positions](Node * node)
+         {
+           if (!on_boundary.count(node->id()) && (_graph[node->id()].size() > 0))
+             *node = new_positions[node->id()];
+         });
 
-      for (auto & node : as_range(_mesh.pid_nodes_begin(DofObject::invalid_processor_id),
-                                  _mesh.pid_nodes_end(DofObject::invalid_processor_id)))
-        if (!on_boundary.count(node->id()) && (_graph[node->id()].size() > 0))
-          *node = new_positions[node->id()];
+      Threads::parallel_for_each
+        (_mesh.unpartitioned_node_stored_range(),
+         [this, &on_boundary, &new_positions](Node * node)
+         {
+           if (!on_boundary.count(node->id()) && (_graph[node->id()].size() > 0))
+             *node = new_positions[node->id()];
+         });
 
       // Now the nodes which are ghosts on this processor may have been moved on
       // the processors which own them.  So we need to synchronize with our neighbors
@@ -121,33 +129,35 @@ void LaplaceMeshSmoother::smooth()
   // finally adjust the second order nodes (those located between vertices)
   // these nodes will be located between their adjacent nodes
   // do this element-wise
-  for (auto & elem : _mesh.active_element_ptr_range())
-    {
-      // get the second order nodes (son)
-      // their element indices start at n_vertices and go to n_nodes
-      const unsigned int son_begin = elem->n_vertices();
-      const unsigned int son_end   = elem->n_nodes();
+  Threads::parallel_for_each
+    (_mesh.element_stored_range(),
+     [this, &on_boundary](Elem * elem)
+     {
+       // get the second order nodes (son)
+       // their element indices start at n_vertices and go to n_nodes
+       const unsigned int son_begin = elem->n_vertices();
+       const unsigned int son_end   = elem->n_nodes();
 
-      // loop over all second order nodes (son)
-      for (unsigned int son=son_begin; son<son_end; son++)
-        {
-          // Don't smooth second-order nodes which are on the boundary
-          if (!on_boundary.count(elem->node_id(son)))
-            {
-              const unsigned int n_adjacent_vertices =
-                elem->n_second_order_adjacent_vertices(son);
+       // loop over all second order nodes (son)
+       for (unsigned int son=son_begin; son<son_end; son++)
+         {
+           // Don't smooth second-order nodes which are on the boundary
+           if (on_boundary.count(elem->node_id(son)))
+             continue;
 
-              // calculate the new position which is the average of the
-              // position of the adjacent vertices
-              Point avg_position(0,0,0);
-              for (unsigned int v=0; v<n_adjacent_vertices; v++)
-                avg_position +=
-                  _mesh.point( elem->node_id( elem->second_order_adjacent_vertex(son,v) ) );
+           const unsigned int n_adjacent_vertices =
+             elem->n_second_order_adjacent_vertices(son);
 
-              _mesh.node_ref(elem->node_id(son)) = avg_position / n_adjacent_vertices;
-            }
-        }
-    }
+           // calculate the new position which is the average of the
+           // position of the adjacent vertices
+           Point avg_position(0,0,0);
+           for (unsigned int v=0; v<n_adjacent_vertices; v++)
+             avg_position +=
+               _mesh.point( elem->node_id( elem->second_order_adjacent_vertex(son,v) ) );
+
+           _mesh.node_ref(elem->node_id(son)) = avg_position / n_adjacent_vertices;
+         }
+     });
 }
 
 #ifdef LIBMESH_ENABLE_DEPRECATED

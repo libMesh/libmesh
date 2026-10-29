@@ -209,6 +209,62 @@ data = matrices/geom_1_extraction_op.h5 \
        meshes/exodus_elements/read_exodus_TRISHELL3.e \
        meshes/exodus_elements/read_exodus_TRI6.e \
        meshes/exodus_elements/read_exodus_TRI7.e \
+       meshes/xdrio_elements/read_xdrio_EDGE2.xda \
+       meshes/xdrio_elements/read_xdrio_EDGE3.xda \
+       meshes/xdrio_elements/read_xdrio_EDGE4.xda \
+       meshes/xdrio_elements/read_xdrio_HEX20.xda \
+       meshes/xdrio_elements/read_xdrio_HEX27.xda \
+       meshes/xdrio_elements/read_xdrio_HEX8.xda \
+       meshes/xdrio_elements/read_xdrio_PRISM15.xda \
+       meshes/xdrio_elements/read_xdrio_PRISM18.xda \
+       meshes/xdrio_elements/read_xdrio_PRISM20.xda \
+       meshes/xdrio_elements/read_xdrio_PRISM21.xda \
+       meshes/xdrio_elements/read_xdrio_PRISM6.xda \
+       meshes/xdrio_elements/read_xdrio_PYRAMID13.xda \
+       meshes/xdrio_elements/read_xdrio_PYRAMID14.xda \
+       meshes/xdrio_elements/read_xdrio_PYRAMID18.xda \
+       meshes/xdrio_elements/read_xdrio_PYRAMID5.xda \
+       meshes/xdrio_elements/read_xdrio_QUAD4.xda \
+       meshes/xdrio_elements/read_xdrio_QUADSHELL4.xda \
+       meshes/xdrio_elements/read_xdrio_QUAD8.xda \
+       meshes/xdrio_elements/read_xdrio_QUADSHELL8.xda \
+       meshes/xdrio_elements/read_xdrio_QUAD9.xda \
+       meshes/xdrio_elements/read_xdrio_QUADSHELL9.xda \
+       meshes/xdrio_elements/read_xdrio_TET10.xda \
+       meshes/xdrio_elements/read_xdrio_TET14.xda \
+       meshes/xdrio_elements/read_xdrio_TET4.xda \
+       meshes/xdrio_elements/read_xdrio_TRI3.xda \
+       meshes/xdrio_elements/read_xdrio_TRISHELL3.xda \
+       meshes/xdrio_elements/read_xdrio_TRI6.xda \
+       meshes/xdrio_elements/read_xdrio_TRI7.xda \
+       meshes/xdrio_elements/read_xdrio_EDGE2.xdr \
+       meshes/xdrio_elements/read_xdrio_EDGE3.xdr \
+       meshes/xdrio_elements/read_xdrio_EDGE4.xdr \
+       meshes/xdrio_elements/read_xdrio_HEX20.xdr \
+       meshes/xdrio_elements/read_xdrio_HEX27.xdr \
+       meshes/xdrio_elements/read_xdrio_HEX8.xdr \
+       meshes/xdrio_elements/read_xdrio_PRISM15.xdr \
+       meshes/xdrio_elements/read_xdrio_PRISM18.xdr \
+       meshes/xdrio_elements/read_xdrio_PRISM20.xdr \
+       meshes/xdrio_elements/read_xdrio_PRISM21.xdr \
+       meshes/xdrio_elements/read_xdrio_PRISM6.xdr \
+       meshes/xdrio_elements/read_xdrio_PYRAMID13.xdr \
+       meshes/xdrio_elements/read_xdrio_PYRAMID14.xdr \
+       meshes/xdrio_elements/read_xdrio_PYRAMID18.xdr \
+       meshes/xdrio_elements/read_xdrio_PYRAMID5.xdr \
+       meshes/xdrio_elements/read_xdrio_QUAD4.xdr \
+       meshes/xdrio_elements/read_xdrio_QUADSHELL4.xdr \
+       meshes/xdrio_elements/read_xdrio_QUAD8.xdr \
+       meshes/xdrio_elements/read_xdrio_QUADSHELL8.xdr \
+       meshes/xdrio_elements/read_xdrio_QUAD9.xdr \
+       meshes/xdrio_elements/read_xdrio_QUADSHELL9.xdr \
+       meshes/xdrio_elements/read_xdrio_TET10.xdr \
+       meshes/xdrio_elements/read_xdrio_TET14.xdr \
+       meshes/xdrio_elements/read_xdrio_TET4.xdr \
+       meshes/xdrio_elements/read_xdrio_TRI3.xdr \
+       meshes/xdrio_elements/read_xdrio_TRISHELL3.xdr \
+       meshes/xdrio_elements/read_xdrio_TRI6.xdr \
+       meshes/xdrio_elements/read_xdrio_TRI7.xdr \
        meshes/geom_2.exo \
        meshes/geom_4.exo \
        meshes/geom_8.exo \

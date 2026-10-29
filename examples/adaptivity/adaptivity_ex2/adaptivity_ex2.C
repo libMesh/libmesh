@@ -134,6 +134,13 @@ int main (int argc, char ** argv)
   // problems
   libmesh_example_requires(libMesh::default_solver_package() != TRILINOS_SOLVERS, "--enable-petsc");
 
+  // Our static condensation code relies on PETSc and Eigen
+#if !defined(LIBMESH_HAVE_EIGEN) || !defined(LIBMESH_HAVE_PETSC)
+  libmesh_example_requires
+    (!libMesh::on_command_line("--Convection-Diffusion-static-condensation"),
+     "--enable-eigen and --enable-petsc");
+#endif
+
   // Brief message to the user regarding the program name
   // and command line arguments.
 

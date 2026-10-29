@@ -32,6 +32,7 @@
 #include "libmesh/mesh_base.h"
 #include "libmesh/mesh_refinement.h"
 #include "libmesh/newmark_system.h"
+#include "libmesh/node_range.h"
 #include "libmesh/nonlinear_implicit_system.h"
 #include "libmesh/parallel.h"
 #include "libmesh/rb_construction.h"
@@ -110,16 +111,13 @@ void EquationSystems::reinit_mesh ()
 
   // Tell all the \p DofObject entities how many systems
   // there are.
-  for (auto & node : _mesh.node_ptr_range())
-    node->set_n_systems(n_sys);
+  Threads::parallel_for_each
+    (_mesh.node_stored_range(),
+     [n_sys](Node * node) { node->set_n_systems(n_sys); });
 
-  Threads::parallel_for
+  Threads::parallel_for_each
     (_mesh.element_stored_range(),
-     [n_sys](const ElemRange & range)
-     {
-       for (Elem * elem : range)
-         elem->set_n_systems(n_sys);
-     });
+     [n_sys](Elem * elem) { elem->set_n_systems(n_sys); });
 
   //for (auto i : make_range(this->n_systems()))
     //this->get_system(i).init();
@@ -157,17 +155,14 @@ bool EquationSystems::reinit_solutions ()
   // there are.
   {
     // All the nodes
-    for (auto & node : _mesh.node_ptr_range())
-      node->set_n_systems(n_sys);
+    Threads::parallel_for_each
+      (_mesh.node_stored_range(),
+       [n_sys](Node * node) { node->set_n_systems(n_sys); });
 
     // All the elements
-    Threads::parallel_for
+    Threads::parallel_for_each
       (_mesh.element_stored_range(),
-       [n_sys](const ElemRange & range)
-       {
-         for (Elem * elem : range)
-           elem->set_n_systems(n_sys);
-       });
+       [n_sys](Elem * elem) { elem->set_n_systems(n_sys); });
   }
 
   // Localize each system's vectors
@@ -290,16 +285,13 @@ void EquationSystems::allgather ()
 
   // Tell all the \p DofObject entities how many systems
   // there are.
-  for (auto & node : _mesh.node_ptr_range())
-    node->set_n_systems(n_sys);
+  Threads::parallel_for_each
+    (_mesh.node_stored_range(),
+     [n_sys](Node * node) { node->set_n_systems(n_sys); });
 
-  Threads::parallel_for
+  Threads::parallel_for_each
     (_mesh.element_stored_range(),
-     [n_sys](const ElemRange & range)
-     {
-       for (Elem * elem : range)
-         elem->set_n_systems(n_sys);
-     });
+     [n_sys](Elem * elem) { elem->set_n_systems(n_sys); });
 
   // And distribute each system's dofs
   for (auto i : make_range(this->n_systems()))
@@ -1956,17 +1948,14 @@ std::size_t EquationSystems::n_active_dofs () const
 void EquationSystems::_add_system_to_nodes_and_elems()
 {
   // All the nodes
-  for (auto & node : _mesh.node_ptr_range())
-    node->add_system();
+  Threads::parallel_for_each
+    (_mesh.node_stored_range(),
+     [](Node * node) { node->add_system(); });
 
   // All the elements
-  Threads::parallel_for
+  Threads::parallel_for_each
     (_mesh.element_stored_range(),
-     [](const ElemRange & range)
-     {
-       for (Elem * elem : range)
-         elem->add_system();
-     });
+     [](Elem * elem) { elem->add_system(); });
 }
 
 void EquationSystems::_remove_default_ghosting(unsigned int sys_num)

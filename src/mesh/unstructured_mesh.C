@@ -1013,14 +1013,13 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
 
   //TODO:[BSK] This should be removed later?!
   if (reset_current_list)
-    Threads::parallel_for
+    Threads::parallel_for_each
       (this->element_stored_range(),
-       [reset_remote_elements](const ElemRange & range)
+       [reset_remote_elements](Elem * e)
        {
-         for (Elem * e : range)
-           for (auto s : e->side_index_range())
-             if (e->neighbor_ptr(s) != remote_elem || reset_remote_elements)
-               e->set_neighbor(s, nullptr);
+         for (auto s : e->side_index_range())
+           if (e->neighbor_ptr(s) != remote_elem || reset_remote_elements)
+             e->set_neighbor(s, nullptr);
        });
 
   // Find neighboring elements by first finding elements

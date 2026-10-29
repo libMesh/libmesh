@@ -543,6 +543,10 @@ void MetisPartitioner::partition_range(MeshBase & mesh,
       elem->processor_id() = elem_procid;
     }
 #endif
+
+  // Give derived Mesh classes a chance to invalidate/update any
+  // cached data to reflect the new partitioning
+  mesh.update_post_partitioning();
 }
 
 
