@@ -233,6 +233,10 @@ void Partitioner::partition (MeshBase & mesh,
   // Set the parent's processor ids
   Partitioner::set_parent_processor_ids(mesh);
 
+  // Give derived Mesh classes a chance to update any cached data to
+  // reflect the new element partitioning
+  mesh.update_post_partitioning();
+
   // Redistribute elements if necessary, before setting node processor
   // ids, to make sure those will be set consistently
   mesh.redistribute();
@@ -253,7 +257,7 @@ void Partitioner::partition (MeshBase & mesh,
 #endif
 
   // Give derived Mesh classes a chance to update any cached data to
-  // reflect the new partitioning
+  // reflect the new node partitioning
   mesh.update_post_partitioning();
 }
 
