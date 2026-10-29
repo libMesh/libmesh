@@ -298,7 +298,7 @@ public:
     for (auto it = this->begin(), it2 = other.begin();
          it != this->end() || it2 != other.end(); ++it, ++it2)
       {
-        if (it == other.end() || it2 == other.end())
+        if (it == this->end() || it2 == other.end())
           return false;
 
         if (*it != *it2)
