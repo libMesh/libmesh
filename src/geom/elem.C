@@ -112,7 +112,6 @@ const unsigned int Elem::type_to_dim_map [] =
     2,  // QUAD4
     2,  // QUAD8
     2,  // QUAD9
-    2,  // QUAD16
 
     3,  // TET4
     3,  // TET10
@@ -160,6 +159,8 @@ const unsigned int Elem::type_to_dim_map [] =
 
     2,  // C0POLYGON
     3,  // C0POLYHEDRON
+
+    2,  // QUAD16
   };
 
 const unsigned int Elem::max_n_nodes;

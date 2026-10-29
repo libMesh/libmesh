@@ -199,7 +199,7 @@ bool Quad16::has_invertible_map(Real tol) const
 Order Quad16::default_order() const
 // TODO does this make sense here?
 {
-  return FIRST;
+  return THIRD;
 }
 
 

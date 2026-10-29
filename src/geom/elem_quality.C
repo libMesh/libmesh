@@ -417,6 +417,7 @@ std::vector<ElemQuality> Quality::valid(const ElemType t)
     case QUADSHELL8:
     case QUAD9:
     case QUADSHELL9:
+    case QUAD16:
       {
         v = {
           ASPECT_RATIO,
