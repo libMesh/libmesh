@@ -1007,6 +1007,7 @@ public:
 #ifdef LIBMESH_ENABLE_AMR
     // We don't support refinement of all element types
     if (elem_type == EDGE4 ||
+        elem_type == QUAD16 ||
         elem_type == PRISM20 ||
         elem_type == PYRAMID5 ||
         elem_type == PYRAMID13 ||
@@ -1239,6 +1240,8 @@ public:
             CPPUNIT_ASSERT(elem->is_internal(nd));
           else if ((elem->type() == QUAD9 || elem->type() == QUADSHELL9) && nd == 8)
             CPPUNIT_ASSERT(elem->is_internal(nd));
+          else if (elem->type() == QUAD16 && nd >= 12)
+            CPPUNIT_ASSERT(elem->is_internal(nd));
           else if (elem->type() == TRI7 && nd == 6)
             CPPUNIT_ASSERT(elem->is_internal(nd));
           else if (elem->type() == INFHEX18 && nd == 17)
@@ -1348,6 +1351,7 @@ INSTANTIATE_ELEMTEST(QUAD8);
 INSTANTIATE_ELEMTEST(QUADSHELL8);
 INSTANTIATE_ELEMTEST(QUAD9);
 INSTANTIATE_ELEMTEST(QUADSHELL9);
+INSTANTIATE_ELEMTEST(QUAD16);
 
 // This just tests with one pentagon, but better than nothing
 INSTANTIATE_ELEMTEST(C0POLYGON);
