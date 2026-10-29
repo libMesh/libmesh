@@ -76,6 +76,8 @@ public:
   scalable_allocator (const scalable_allocator & a) :
     tbb::scalable_allocator<T>(a) {}
 
+  scalable_allocator & operator= (const scalable_allocator &) = default;
+
   template<typename U>
   scalable_allocator(const scalable_allocator<U> & a) :
     tbb::scalable_allocator<T>(a) {}
@@ -114,6 +116,8 @@ public:
 
   scalable_allocator (const scalable_allocator & a) :
     std::allocator<T>(a) {}
+
+  scalable_allocator & operator= (const scalable_allocator &) = default;
 
   template<typename U>
   scalable_allocator(const scalable_allocator<U> & a) :

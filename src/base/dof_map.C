@@ -945,6 +945,9 @@ void DofMap::clear()
   _stashed_dof_constraints.clear();
   _primal_constraint_values.clear();
   _adjoint_constraint_values.clear();
+#ifdef LIBMESH_ENABLE_DIRICHLET
+  _dirichlet_cache = DirichletConstraintCache();
+#endif
   _n_old_dfs = 0;
   _first_old_df.clear();
   _end_old_df.clear();
@@ -983,6 +986,11 @@ std::size_t DofMap::distribute_dofs (MeshBase & mesh)
   const std::map<const Node *, std::set<subdomain_id_type>>
     constraining_subdomains =
     this->calculate_constraining_subdomains();
+
+#ifdef LIBMESH_ENABLE_DIRICHLET
+  // New degree of freedom indices invalidate every cached constraint
+  _dirichlet_cache = DirichletConstraintCache();
+#endif
 
   // re-init in case the mesh has changed
   this->reinit(mesh,
