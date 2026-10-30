@@ -34,6 +34,8 @@
 #include <libmesh/cell_tet10.h>
 #include <libmesh/cell_tet14.h>
 #include <libmesh/boundary_info.h>
+#include <libmesh/petsc_vector.h>
+#include <libmesh/petsc_matrix.h>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -451,6 +453,9 @@ public:
   CPPUNIT_TEST( testAddVectorProjChange );
   CPPUNIT_TEST( testAddVectorTypeChange );
   CPPUNIT_TEST( testPostInitAddVectorTypeChange );
+#if defined(LIBMESH_HAVE_PETSC) && defined(LIBMESH_ENABLE_AMR)
+  CPPUNIT_TEST( testPetscOptionsPrefix );
+#endif
 
   CPPUNIT_TEST( testProjectHierarchicEdge3 );
 #if LIBMESH_DIM > 1
@@ -774,6 +779,60 @@ public:
       }
   }
 
+
+
+#if defined(LIBMESH_HAVE_PETSC) && defined(LIBMESH_ENABLE_AMR)
+  void testPetscOptionsPrefix()
+  {
+    if (default_solver_package() != PETSC_SOLVERS)
+      return;
+
+    Mesh mesh(*TestCommWorld);
+    EquationSystems es(mesh);
+    LinearImplicitSystem & sys = es.add_system<LinearImplicitSystem>("Simple");
+    sys.add_variable("u", FIRST);
+    MeshTools::Generation::build_line(mesh, 10, 0., 1., EDGE3);
+
+    // Objects added before and after the prefix is set both get it
+    sys.add_vector("early", true, GHOSTED);
+    sys.set_options_prefix("simple_");
+    sys.add_vector("late", true, PARALLEL);
+    sys.add_matrix("late_matrix");
+
+    auto check = [&sys]()
+    {
+      const auto prefix_of = [](PetscObject obj)
+      {
+        const char * prefix;
+        LibmeshPetscCallA(PETSC_COMM_WORLD, PetscObjectGetOptionsPrefix(obj, &prefix));
+        return std::string(prefix ? prefix : "");
+      };
+      const auto vec_prefix = [&prefix_of](const NumericVector<Number> & vec)
+      { return prefix_of((PetscObject)cast_ref<const PetscVector<Number> &>(vec).vec()); };
+      const std::string ghosted =
+          sys.n_processors() > 1 ? "simple_ghost_" : "simple_";
+
+      CPPUNIT_ASSERT_EQUAL(std::string("simple_"), vec_prefix(*sys.solution));
+      CPPUNIT_ASSERT_EQUAL(ghosted, vec_prefix(*sys.current_local_solution));
+      CPPUNIT_ASSERT_EQUAL(ghosted, vec_prefix(sys.get_vector("early")));
+      CPPUNIT_ASSERT_EQUAL(std::string("simple_"), vec_prefix(sys.get_vector("late")));
+      CPPUNIT_ASSERT_EQUAL(std::string("simple_"), vec_prefix(*sys.rhs));
+      CPPUNIT_ASSERT_EQUAL(
+          std::string("simple_"),
+          prefix_of((PetscObject)cast_ref<PetscMatrix<Number> &>(sys.get_matrix("late_matrix")).mat()));
+      CPPUNIT_ASSERT_EQUAL(std::string("simple_"),
+                           vec_prefix(*sys.get_vector("late").zero_clone()));
+    };
+
+    es.init();
+    check();
+
+    // Refinement rebuilds every vector and matrix
+    MeshRefinement(mesh).uniformly_refine(1);
+    es.reinit();
+    check();
+  }
+#endif
 
 
   void testProjectLine(const ElemType elem_type)

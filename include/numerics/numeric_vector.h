@@ -37,6 +37,7 @@
 #include <vector>
 #include <memory>
 #include <mutex>
+#include <string>
 
 namespace libMesh
 {
@@ -202,6 +203,18 @@ public:
    * throw an error if this is requested.
    */
   void set_type(ParallelType t);
+
+  /**
+   * Sets the prefix that solver packages prepend to option names when
+   * they configure this vector, e.g. a PETSc options prefix. The
+   * prefix takes effect at the next init() of the vector.
+   */
+  void set_options_prefix(std::string prefix) { _options_prefix = std::move(prefix); }
+
+  /**
+   * \returns The options prefix of this vector. See set_options_prefix().
+   */
+  const std::string & options_prefix() const { return _options_prefix; }
 
   /**
    * \returns \p true if the vector is closed and ready for
@@ -878,6 +891,11 @@ protected:
   ParallelType _type;
 
   /**
+   * Prefix for solver-package options. See set_options_prefix().
+   */
+  std::string _options_prefix;
+
+  /**
    * Mutex for performing thread-safe operations
    */
   std::mutex _numeric_vector_mutex;
@@ -1137,6 +1155,7 @@ void  NumericVector<T>::swap (NumericVector<T> & v)
   std::swap(_is_closed, v._is_closed);
   std::swap(_is_initialized, v._is_initialized);
   std::swap(_type, v._type);
+  std::swap(_options_prefix, v._options_prefix);
 }
 
 template <typename T>
