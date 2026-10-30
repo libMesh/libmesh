@@ -47,6 +47,7 @@
 #include <fstream>
 #include <iomanip>
 #include <map>
+#include <tuple>
 #include <sstream>
 #include <unordered_map>
 
@@ -1133,6 +1134,58 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
   // Get the disjoint neighbor boundary pairs object (from periodic BCs)
   auto * db = this->get_disjoint_neighbor_boundary_pairs();
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  if (db && this->has_disjoint_neighbor_node_keys())
+    {
+      // Match sides across disjoint neighbor boundary pairs by their
+      // sorted vertex keys. The keys are independent of the node
+      // coordinates, so this gives the same neighbors on a deformed mesh.
+      typedef std::tuple<Elem *, unsigned int, boundary_id_type> side_type;
+      std::map<std::vector<unique_id_type>, std::vector<side_type>> key_to_sides;
+      std::vector<boundary_id_type> side_bcids;
+
+      // Key every disjoint side, including sides with a neighbor, so
+      // that a side without a neighbor always finds its paired side.
+      for (const auto & element : this->element_ptr_range())
+        for (auto ms : element->side_index_range())
+          {
+            this->get_boundary_info().boundary_ids(element, ms, side_bcids);
+            for (const auto bcid : side_bcids)
+              {
+                if (!db->boundary(bcid))
+                  continue;
+
+                std::vector<unique_id_type> key;
+                for (const auto n : element->nodes_on_side(ms))
+                  if (element->is_vertex(n))
+                    key.push_back(this->disjoint_neighbor_node_key(element->node_ref(n)));
+                std::sort(key.begin(), key.end());
+                key_to_sides[std::move(key)].emplace_back(element, ms, bcid);
+              }
+          }
+
+      for (const auto & [_, sides] : key_to_sides)
+        for (const auto & [elem, s, bcid] : sides)
+          {
+            const boundary_id_type paired_bcid = db->boundary(bcid)->pairedboundary;
+            Elem * neigh = nullptr;
+            for (const auto & [candidate, cs, candidate_bcid] : sides)
+              if (candidate != elem && candidate_bcid == paired_bcid)
+                {
+                  neigh = candidate;
+                  break;
+                }
+
+            // A local element must have its disjoint neighbor at least
+            // ghosted. A ghost element may have a remote one.
+            libmesh_error_msg_if(!neigh && (this->is_serial() ||
+                                            elem->processor_id() == this->processor_id()),
+                                 "Disjoint neighbor not found");
+            elem->set_neighbor(s, neigh ? neigh : const_cast<RemoteElem *>(remote_elem));
+          }
+    }
+  else
+#endif // LIBMESH_ENABLE_UNIQUE_ID
   if (db)
     {
       // Obtain a point locator

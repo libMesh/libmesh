@@ -205,6 +205,9 @@ public:
   CPPUNIT_TEST(testTempJumpLocalRefineFail);
 #endif
   CPPUNIT_TEST( testCloneEquality );
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  CPPUNIT_TEST( testNodeKeysAfterOpening );
+#endif
   CPPUNIT_TEST( testStitchingDiscontinuousBoundaries );
   CPPUNIT_TEST( testPreserveDisjointNeighborPairsAfterStitch );
   CPPUNIT_TEST( testStitchCrossMesh );
@@ -305,6 +308,34 @@ private:
     std::unique_ptr<MeshBase> mesh_clone = mesh.clone();
     CPPUNIT_ASSERT(*mesh_clone == mesh);
   }
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  void testNodeKeysAfterOpening()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld, 2);
+    build_two_disjoint_elems(mesh, true, Point(0.0, 0.0, 0.0), /*add_node_keys=*/true);
+
+    // Open the interface so that a coordinate match would fail
+    for (auto & node : mesh.node_ptr_range())
+      if ((*node)(0) > 0.75 || node->id() == 4 || node->id() == 6)
+        (*node)(0) += 0.25;
+
+    mesh.find_neighbors();
+
+    if (const Elem * left = mesh.query_elem_ptr(0))
+      if (const Elem * right = mesh.query_elem_ptr(1))
+        {
+          CPPUNIT_ASSERT_EQUAL(right, left->neighbor_ptr(1));
+          CPPUNIT_ASSERT_EQUAL(left, right->neighbor_ptr(3));
+        }
+
+    std::unique_ptr<MeshBase> mesh_clone = mesh.clone();
+    CPPUNIT_ASSERT(*mesh_clone == mesh);
+    CPPUNIT_ASSERT(mesh_clone->has_disjoint_neighbor_node_keys());
+  }
+#endif
 
   void testStitchingDiscontinuousBoundaries()
   {
@@ -636,7 +667,8 @@ private:
 
 
 
-  void build_two_disjoint_elems(Mesh &mesh, bool add_pair = true, const Point &translate_vec = Point(0.0, 0.0, 0.0))
+  void build_two_disjoint_elems(Mesh &mesh, bool add_pair = true, const Point &translate_vec = Point(0.0, 0.0, 0.0),
+                                bool add_node_keys = false)
   {
     // Domain: x in (0, 1), y in (0, 1)
     // Split into two subdomains:
@@ -704,6 +736,22 @@ private:
     // And, in `prepare_for_use()`, libMesh will set up the disjoint neighbor relationships.
     if (add_pair)
       mesh.add_disjoint_neighbor_boundary_pairs(interface_left_id, interface_right_id, RealVectorValue(0.0, 0.0, 0.0));
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+    // Give each pair of duplicated interface nodes a shared key
+    if (add_node_keys)
+      {
+        mesh.add_disjoint_neighbor_node_keys();
+        for (const auto & [left, right] : {std::make_pair(1, 4), std::make_pair(3, 6)})
+          {
+            Node & left_node = mesh.node_ref(left);
+            mesh.set_disjoint_neighbor_node_key(left_node, left_node.unique_id());
+            mesh.set_disjoint_neighbor_node_key(mesh.node_ref(right), left_node.unique_id());
+          }
+      }
+#else
+    libmesh_ignore(add_node_keys);
+#endif
 
     // libMesh shouldn't renumber, or our based-on-initial-id
     // assertions later may fail.

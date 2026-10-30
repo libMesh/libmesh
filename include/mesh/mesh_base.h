@@ -2110,6 +2110,39 @@ public:
 
   void remove_disjoint_boundary_pair(const boundary_id_type b1,
                                      const boundary_id_type b2);
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  /**
+   * Register the node datum that stores disjoint neighbor node keys.
+   * This must be called on all processors at once.
+   *
+   * When this datum exists, find_neighbors() matches sides across
+   * disjoint neighbor boundary pairs by their sorted vertex keys.
+   * Matching then uses no coordinates, so it gives the same neighbors
+   * after the nodes move, for example on a displaced mesh.
+   *
+   * A mesh generator that duplicates a node along a disjoint interface
+   * must give each copy the key of the original node.
+   */
+  void add_disjoint_neighbor_node_keys();
+
+  /**
+   * \returns true if this mesh has disjoint neighbor node keys.
+   */
+  bool has_disjoint_neighbor_node_keys() const;
+
+  /**
+   * \returns The disjoint neighbor key of \p node.  This is the key
+   * set with set_disjoint_neighbor_node_key(), or the unique id of
+   * \p node if no key was set.
+   */
+  unique_id_type disjoint_neighbor_node_key(const Node & node) const;
+
+  /**
+   * Set the disjoint neighbor key of \p node to \p key.
+   */
+  void set_disjoint_neighbor_node_key(Node & node, unique_id_type key) const;
+#endif // LIBMESH_ENABLE_UNIQUE_ID
 #endif
 
   /**
