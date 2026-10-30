@@ -1,4 +1,5 @@
 #include <libmesh/dirichlet_boundaries.h>
+#include <libmesh/distributed_mesh.h>
 #include <libmesh/dof_map.h>
 #include <libmesh/elem.h>
 #include <libmesh/equation_systems.h>
@@ -6,6 +7,8 @@
 #include <libmesh/function_base.h>
 #include <libmesh/linear_implicit_system.h>
 #include <libmesh/mesh.h>
+#include <libmesh/mesh_generation.h>
+#include <libmesh/mesh_refinement.h>
 #include <libmesh/numeric_vector.h>
 #include <libmesh/periodic_boundary.h>
 #include <libmesh/quadrature_gauss.h>
@@ -166,6 +169,9 @@ public:
 #if defined(LIBMESH_HAVE_SOLVER) && defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_GZSTREAM)
   CPPUNIT_TEST( testPeriodicLagrange2 );
 #endif
+#ifdef LIBMESH_ENABLE_AMR
+  CPPUNIT_TEST( testDistributedRefinedConstraints );
+#endif
 #endif // LIBMESH_DIM > 1
 
   CPPUNIT_TEST_SUITE_END();
@@ -250,6 +256,53 @@ private:
 
 
   void testPeriodicLagrange2() { LOG_UNIT_TEST; testPeriodicBC(FEType(SECOND, LAGRANGE)); }
+
+#ifdef LIBMESH_ENABLE_AMR
+  /**
+   * On a refined distributed mesh, each processor chooses which side of a periodic vertex to
+   * constrain from the elements at the vertex and at its image. Missing ghost elements give
+   * processors different choices, and both vertices are then constrained in terms of each other.
+   */
+  void testDistributedRefinedConstraints()
+  {
+    LOG_UNIT_TEST;
+
+    DistributedMesh mesh(*TestCommWorld);
+    mesh.allow_remote_element_removal(false);
+    MeshTools::Generation::build_square(mesh, 4, 4, 0., 1., 0., 1., QUAD9);
+
+    EquationSystems es(mesh);
+    auto & sys = es.add_system<LinearImplicitSystem>("PBCSys");
+    sys.add_variable("u", SECOND, LAGRANGE);
+
+    // build_square() puts boundary 0 at the bottom and boundary 2 at the top
+    PeriodicBoundary vert(RealVectorValue(0., 1.));
+    vert.myboundary = 0;
+    vert.pairedboundary = 2;
+    sys.get_dof_map().add_periodic_boundary(vert);
+
+    mesh.allow_remote_element_removal(true);
+    mesh.delete_remote_elements();
+
+    // Refine one element, selected by position so that the mesh is independent of the
+    // partitioning
+    for (auto & elem : mesh.active_element_ptr_range())
+      if (elem->vertex_average().absolute_fuzzy_equals(Point(0.375, 0.375)))
+        elem->set_refinement_flag(Elem::REFINE);
+    MeshRefinement(mesh).refine_elements();
+
+    es.init();
+
+    // Constraint rows are fully resolved, so no constrained dof appears in any row
+    const DofMap & dof_map = sys.get_dof_map();
+    for (const auto & [dof, row] : dof_map.get_dof_constraints())
+      for (const auto & [row_dof, coef] : row)
+        {
+          libmesh_ignore(dof, coef);
+          CPPUNIT_ASSERT(!dof_map.is_constrained_dof(row_dof));
+        }
+  }
+#endif
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( PeriodicBCTest );

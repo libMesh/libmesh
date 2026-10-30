@@ -47,6 +47,7 @@
 // C++ Includes
 #include <algorithm>
 #include <cstddef>
+#include <functional>
 #include <iterator>
 #include <map>
 #include <string>
@@ -67,9 +68,12 @@ class FEType;
 class MeshBase;
 class PeriodicBoundaryBase;
 class PeriodicBoundaries;
+class PeriodicPointNeighbors;
 class System;
 class NonlinearImplicitSystem;
 class StaticCondensationDofMap;
+class ReducedDofMap;
+class ConstraintEliminationDofMap;
 template <typename T> class DenseVectorBase;
 template <typename T> class DenseVector;
 template <typename T> class DenseMatrix;
@@ -1530,6 +1534,23 @@ public:
   void constrain_nothing (std::vector<dof_id_type> & dofs) const;
 
   /**
+   * \returns \p v if it stores the send list entries, i.e. if it is \p SERIAL or \p GHOSTED.
+   * Otherwise builds a \p GHOSTED copy of \p v in \p storage and returns it.
+   */
+  const NumericVector<Number> &
+  send_list_view(const NumericVector<Number> & v,
+                 std::unique_ptr<NumericVector<Number>> & storage) const;
+
+  /**
+   * Calls \p update with a vector whose local entries are those of \p v, and in which \p update
+   * sets entries that this processor owns. Then \p v receives every updated entry that it stores:
+   * a \p SERIAL vector receives every entry on every processor, and a \p GHOSTED vector receives
+   * its ghost entries.
+   */
+  void update_owned_entries(NumericVector<Number> & v,
+                            const std::function<void(NumericVector<Number> &)> & update) const;
+
+  /**
    * Constrains the numeric vector \p v, which represents a solution defined on
    * the mesh.  This may need to be used after a linear solve, if your linear
    * solver's solutions do not satisfy your DoF constraints to a tight enough
@@ -1765,10 +1786,14 @@ public:
    * Can be told to calculate sparsity for the constrained matrix,
    * which may be necessary in the case of spline control node
    * constraints or sufficiently many user constraints.
+   *
+   * If \p reduced is provided, the pattern couples only the degrees
+   * of freedom that \p reduced retains, giving the nonzero counts of
+   * matrices in that reduced space.
    */
   std::unique_ptr<SparsityPattern::Build> build_sparsity(const MeshBase & mesh,
                                                          bool calculate_constrained = false,
-                                                         bool use_condensed_system = false) const;
+                                                         const ReducedDofMap * reduced = nullptr) const;
 
   /**
    * Set whether the given variable group should be p-refined on a
@@ -1819,6 +1844,28 @@ public:
    * Calls reinit on the static condensation map if it exists
    */
   void reinit_static_condensation();
+
+  /**
+   * Add a map of the unconstrained degrees of freedom, so that solves can eliminate the
+   * constrained ones
+   */
+  void create_constraint_elimination(MeshBase & mesh, System & system);
+
+  /**
+   * Checks whether we eliminate constrained degrees of freedom
+   */
+  bool has_constraint_elimination() const { return _constraint_elimination.get(); }
+
+  /**
+   * @returns The map of the unconstrained degrees of freedom. This should have been already added
+   * with a call to \p create_constraint_elimination()
+   */
+  const ConstraintEliminationDofMap & get_constraint_elimination() const;
+
+  /**
+   * Calls reinit on the constraint elimination map if it exists
+   */
+  void reinit_constraint_elimination();
 
 private:
 
@@ -2213,6 +2260,18 @@ private:
    */
   std::unique_ptr<DefaultCoupling> _default_evaluating;
 
+#ifdef LIBMESH_ENABLE_PERIODIC
+  /**
+   * The geometric GhostingFunctor for our periodic boundaries. Periodic constraint computation
+   * needs every element at a periodic vertex and at its image, so this functor is a correctness
+   * requirement. The first periodic boundary adds it to the mesh, and the default ghosting
+   * controls leave it in place.
+   *
+   * We use a std::unique_ptr here to reduce header dependencies.
+   */
+  std::unique_ptr<PeriodicPointNeighbors> _periodic_ghosting;
+#endif
+
   /**
    * The list of all GhostingFunctor objects to be used when
    * distributing ghosted vectors.
@@ -2344,6 +2403,9 @@ private:
 
   /// Static condensation class
   std::unique_ptr<StaticCondensationDofMap> _sc;
+
+  /// The map of the unconstrained degrees of freedom, when solves eliminate constrained ones
+  std::unique_ptr<ConstraintEliminationDofMap> _constraint_elimination;
 };
 
 
@@ -2886,6 +2948,13 @@ const StaticCondensationDofMap & DofMap::get_static_condensation() const
 {
   libmesh_assert(_sc);
   return *_sc;
+}
+
+inline
+const ConstraintEliminationDofMap & DofMap::get_constraint_elimination() const
+{
+  libmesh_assert(_constraint_elimination);
+  return *_constraint_elimination;
 }
 
 inline const std::pair<unsigned int, unsigned int> &

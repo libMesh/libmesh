@@ -641,6 +641,7 @@ noinst_HEADERS = \
 # will get installed into '$(prefix)/include/libmesh'
 include_HEADERS = \
         libmesh_config.h \
+        base/constraint_elimination_dof_map.h \
         base/dirichlet_boundaries.h \
         base/dof_map.h \
         base/dof_map_base.h \
@@ -664,6 +665,7 @@ include_HEADERS = \
         base/periodic_boundary.h \
         base/periodic_boundary_base.h \
         base/print_trace.h \
+        base/reduced_dof_map.h \
         base/reference_counted_object.h \
         base/reference_counter.h \
         base/single_predicates.h \
@@ -808,6 +810,7 @@ include_HEADERS = \
         ghosting/ghosting_functor.h \
         ghosting/non_manifold_coupling.h \
         ghosting/overlap_coupling.h \
+        ghosting/periodic_point_neighbors.h \
         ghosting/point_neighbor_coupling.h \
         ghosting/sibling_coupling.h \
         gpu/kokkos_linalg_base.h \
@@ -916,6 +919,7 @@ include_HEADERS = \
         numerics/petsc_vector.h \
         numerics/preconditioner.h \
         numerics/raw_accessor.h \
+        numerics/reduced_sparse_matrix.h \
         numerics/refinement_selector.h \
         numerics/shell_matrix.h \
         numerics/sparse_matrix.h \

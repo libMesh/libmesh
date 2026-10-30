@@ -24,6 +24,7 @@
 // type of iterator you will be using.
 
 #include "libmesh/libmesh_config.h"
+#include "libmesh/id_types.h"
 
 #if defined(LIBMESH_HAVE_LIBHILBERT)
 
@@ -38,6 +39,7 @@
 #include "libmesh/restore_warnings.h"
 
 #include <cstddef>
+#include <utility>
 
 namespace TIMPI {
 
@@ -76,11 +78,13 @@ namespace libMesh {
 
 namespace Parallel {
 
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
+/**
+ * The key by which DofObjects are sorted for partition-agnostic numbering: the Hilbert index of
+ * the object's location and a tiebreaker for objects that share a location, such as a parent
+ * element and a child with the same vertex average. The tiebreaker is the object's unique id when
+ * unique ids are enabled; otherwise it is the element level, and zero for nodes.
+ */
 typedef std::pair<Hilbert::HilbertIndices, unique_id_type> DofObjectKey;
-#else
-typedef Hilbert::HilbertIndices DofObjectKey;
-#endif
 
 } // namespace Parallel
 
@@ -92,7 +96,6 @@ namespace Hilbert {
 // This has to be in the Hilbert namespace for Koenig lookup to work?
 // g++ doesn't find it if it's in the global namespace.
 // XCode didn't find it in the libMesh namespace.
-#ifdef LIBMESH_ENABLE_UNIQUE_ID
 inline
 std::ostream & operator << (std::ostream & os,
                             const libMesh::Parallel::DofObjectKey & hilbert_pair)
@@ -100,7 +103,6 @@ std::ostream & operator << (std::ostream & os,
   os << '(' << hilbert_pair.first << ',' << hilbert_pair.second << ')' << std::endl;
   return os;
 }
-#endif
 
 }
 

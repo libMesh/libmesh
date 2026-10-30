@@ -44,6 +44,12 @@
 namespace libMesh
 {
 class ResidualContext;
+template <typename T>
+class NumericVector;
+void libmesh_petsc_snes_finish_residual (ResidualContext & rc,
+                                         Vec x,
+                                         Vec r,
+                                         NumericVector<Number> & R);
 
 // Allow users access to these functions in case they want to reuse them.  Users shouldn't
 // need access to these most of the time as they are used internally by this object.
@@ -210,7 +216,9 @@ public:
   bool computing_base_vector() const { return _computing_base_vector; }
 
   /**
-   * Abstract base class to be used to implement a custom line-search algorithm
+   * Abstract base class to be used to implement a custom line-search algorithm. When the system
+   * eliminates constrained degrees of freedom, the line search's vectors are reduced; \p prolong()
+   * forms full vectors from them
    */
   class ComputeLineSearchObject
   {
@@ -244,6 +252,32 @@ public:
    *  Immediately force a new preconditioner, even if reuse is set
    */
   virtual void force_new_preconditioner() override;
+
+  /**
+   * Whether the solve eliminates constrained degrees of freedom
+   */
+  bool eliminating_constraints() const;
+
+  /**
+   * Makes the system's \p current_local_solution the full iterate that \p x represents: \p x
+   * itself, with constraints enforced exactly if requested, or \f$ C x + h \f$ when eliminating
+   * constraints. When eliminating constraints the system's \p solution is set as well
+   */
+  void localize_solution(Vec x);
+
+  /**
+   * Prolongs the reduced vector \p y into the full vector \p x, which must be parallel. With \p
+   * homogeneous false this forms \f$ x = C y + h \f$; with \p homogeneous true, as for a step or
+   * a search direction, \f$ x = C y \f$
+   */
+  void prolong(Vec y, NumericVector<T> & x, bool homogeneous) const;
+
+  /**
+   * Restricts the full vector \p x into the reduced vector \p y by taking its retained entries.
+   * See \p ReducedDofMap::inject() for when this is the correct restriction of a dual vector
+   */
+  void restrict_vector(const NumericVector<T> & x, Vec y) const;
+
 
 protected:
 
@@ -326,10 +360,21 @@ protected:
 
 private:
   friend ResidualContext libmesh_petsc_snes_residual_helper (SNES snes, Vec x, void * ctx);
+  friend void libmesh_petsc_snes_finish_residual (ResidualContext & rc,
+                                                  Vec x,
+                                                  Vec r,
+                                                  NumericVector<Number> & R);
   friend PetscErrorCode libmesh_petsc_snes_residual (SNES snes, Vec x, Vec r, void * ctx);
   friend PetscErrorCode libmesh_petsc_snes_fd_residual (SNES snes, Vec x, Vec r, void * ctx);
   friend PetscErrorCode libmesh_petsc_snes_mffd_residual (SNES snes, Vec x, Vec r, void * ctx);
   friend PetscErrorCode libmesh_petsc_snes_jacobian (SNES snes, Vec x, Mat jac, Mat pc, void * ctx);
+  friend PetscErrorCode libmesh_petsc_snes_postcheck (SNESLineSearch,
+                                                      Vec x,
+                                                      Vec y,
+                                                      Vec w,
+                                                      PetscBool * changed_y,
+                                                      PetscBool * changed_w,
+                                                      void * context);
   friend PetscErrorCode libmesh_petsc_snes_precheck (SNESLineSearch,
                                                      Vec X,
                                                      Vec Y,
