@@ -274,7 +274,10 @@ ConstraintVariant PlaneConstraint::intersect(const ConstraintVariant & other) co
             const Real s = -(n1_dot_n2 * n2_dot_w - n2_dot_n2 * n1_dot_w) / denom;
             const Point p0 = _point + s * _normal;
 
-            return LineConstraint{p0, dir};
+            // |dir| is the sine of the angle between the planes, which may be
+            // smaller than the zero-length threshold of the LineConstraint
+            // constructor, so pass it a unit vector
+            return LineConstraint{p0, dir.unit()};
           }
 
         else if constexpr (std::is_same_v<T, LineConstraint>)

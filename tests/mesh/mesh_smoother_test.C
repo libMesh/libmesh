@@ -233,6 +233,7 @@ public:
   CPPUNIT_TEST(testLaplaceQuad);
   CPPUNIT_TEST(testLaplaceTri);
   CPPUNIT_TEST(testConstraintLinePlane);
+  CPPUNIT_TEST(testConstraintNearlyParallelPlanes);
 #if defined(LIBMESH_ENABLE_VSMOOTHER) && defined(LIBMESH_HAVE_SOLVER)
   CPPUNIT_TEST(testVariationalEdge2);
   CPPUNIT_TEST(testVariationalEdge3);
@@ -1103,6 +1104,29 @@ public:
         CPPUNIT_ASSERT(
             std::get<PointConstraint>(intersection).point().absolute_fuzzy_equals(Point(1, 0, 0)));
       }
+  }
+
+  // Planes whose normals differ by a small angle are distinct and must
+  // intersect in a line. The angle used here is between the sine of the angle
+  // (compared against the tolerance by is_parallel()) and its square
+  // (the determinant of the intersection system), which previously disagreed.
+  void testConstraintNearlyParallelPlanes()
+  {
+    LOG_UNIT_TEST;
+
+    // Angle between the plane normals, chosen so that angle > tol > angle^2
+    // for the default tolerance TOLERANCE^2
+    const Real angle = TOLERANCE;
+    const PlaneConstraint plane1(Point(0, 0, 0), Point(0, 0, 1));
+    const PlaneConstraint plane2(Point(0, 0, 0), Point(std::sin(angle), 0, std::cos(angle)));
+    CPPUNIT_ASSERT(!(plane1 == plane2));
+    CPPUNIT_ASSERT(!plane1.is_parallel(plane2));
+
+    const auto intersection = intersect_constraints(plane1, plane2);
+    CPPUNIT_ASSERT(std::holds_alternative<LineConstraint>(intersection));
+    const auto & line = std::get<LineConstraint>(intersection);
+    CPPUNIT_ASSERT(line.direction().absolute_fuzzy_equals(Point(0, 1, 0)));
+    CPPUNIT_ASSERT(line.contains_point(PointConstraint(Point(0, 0, 0))));
   }
 
 #ifdef LIBMESH_ENABLE_VSMOOTHER
