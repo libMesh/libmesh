@@ -37,10 +37,12 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/periodic_boundary_base.h"
 #include "libmesh/periodic_boundaries.h"
+#include "libmesh/periodic_point_neighbors.h"
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/sparsity_pattern.h"
 #include "libmesh/threads.h"
 #include "libmesh/static_condensation_dof_map.h"
+#include "libmesh/constraint_elimination_dof_map.h"
 #include "libmesh/system.h"
 #include "libmesh/parallel_fe_type.h"
 
@@ -63,7 +65,7 @@ namespace libMesh
 std::unique_ptr<SparsityPattern::Build>
 DofMap::build_sparsity (const MeshBase & mesh,
                         const bool calculate_constrained,
-                        const bool use_condensed_system) const
+                        const ReducedDofMap * const reduced) const
 {
   libmesh_assert (mesh.is_prepared());
 
@@ -82,13 +84,6 @@ DofMap::build_sparsity (const MeshBase & mesh,
   // between neighbor dofs
   bool implicit_neighbor_dofs = this->use_coupled_neighbor_dofs(mesh);
 
-  const StaticCondensationDofMap * sc = nullptr;
-  if (use_condensed_system)
-    {
-      libmesh_assert(this->has_static_condensation());
-      sc = _sc.get();
-    }
-
   // We can compute the sparsity pattern in parallel on multiple
   // threads.  The goal is for each thread to compute the full sparsity
   // pattern for a subset of elements.  These sparsity patterns can
@@ -104,7 +99,7 @@ DofMap::build_sparsity (const MeshBase & mesh,
      implicit_neighbor_dofs,
      _need_full_sparsity_pattern,
      calculate_constrained,
-     sc);
+     reduced);
 
   Threads::parallel_reduce (mesh.active_local_element_stored_range(), *sp);
 
@@ -157,6 +152,9 @@ DofMap::DofMap(const unsigned int number,
   _extra_send_list_context(nullptr),
   _default_coupling(std::make_unique<DefaultCoupling>()),
   _default_evaluating(std::make_unique<DefaultCoupling>()),
+#ifdef LIBMESH_ENABLE_PERIODIC
+  _periodic_ghosting(std::make_unique<PeriodicPointNeighbors>(mesh)),
+#endif
   _need_full_sparsity_pattern(false),
   _need_ghost_constraints(false),
   _n_SCALAR_dofs(0)
@@ -193,6 +191,7 @@ DofMap::DofMap(const unsigned int number,
 #ifdef LIBMESH_ENABLE_PERIODIC
   _default_coupling->set_periodic_boundaries(_periodic_boundaries.get());
   _default_evaluating->set_periodic_boundaries(_periodic_boundaries.get());
+  _periodic_ghosting->set_periodic_boundaries(_periodic_boundaries.get());
 #endif
 
   this->add_coupling_functor(*_default_coupling);
@@ -210,6 +209,9 @@ DofMap::~DofMap()
   // need to remove those from the mesh too before we die.
   _mesh.remove_ghosting_functor(*_default_coupling);
   _mesh.remove_ghosting_functor(*_default_evaluating);
+#ifdef LIBMESH_ENABLE_PERIODIC
+  _mesh.remove_ghosting_functor(*_periodic_ghosting);
+#endif
 }
 
 
@@ -955,6 +957,8 @@ void DofMap::clear()
   _matrices.clear();
   if (_sc)
     _sc->clear();
+  if (_constraint_elimination)
+    _constraint_elimination->clear();
 }
 
 
@@ -3153,7 +3157,23 @@ void DofMap::create_static_condensation(MeshBase & mesh, System & sys)
 void DofMap::reinit_static_condensation()
 {
   if (_sc)
-    _sc->reinit();
+    {
+      // Static condensation reduces the space SNES solves on, which excludes constrained dofs when
+      // they are eliminated
+      _sc->set_parent(_constraint_elimination.get());
+      _sc->reinit();
+    }
+}
+
+void DofMap::create_constraint_elimination(MeshBase & mesh, System & sys)
+{
+  _constraint_elimination = std::make_unique<ConstraintEliminationDofMap>(mesh, sys, *this);
+}
+
+void DofMap::reinit_constraint_elimination()
+{
+  if (_constraint_elimination)
+    _constraint_elimination->reinit();
 }
 
 unsigned int DofMap::add_variable(System & sys,

@@ -35,7 +35,7 @@ namespace libMesh
 // Forward declarations
 class DofMap;
 class CouplingMatrix;
-class StaticCondensationDofMap;
+class ReducedDofMap;
 
 /**
  * This defines the sparsity pattern, or graph, of a sparse matrix.
@@ -109,7 +109,7 @@ public:
          const bool implicit_neighbor_dofs_in,
          const bool need_full_sparsity_pattern_in,
          const bool calculate_constrained_in = false,
-         const StaticCondensationDofMap * sc = nullptr);
+         const ReducedDofMap * reduced = nullptr);
 
   /**
    * Special functions.
@@ -212,7 +212,7 @@ private:
   const bool implicit_neighbor_dofs;
   const bool need_full_sparsity_pattern;
   const bool calculate_constrained;
-  const StaticCondensationDofMap * const sc;
+  const ReducedDofMap * const reduced;
 
   /**
    * If there are "spider" nodes in the mesh (i.e. a single node which
@@ -229,6 +229,9 @@ private:
 
   /// A dummy work vector to avoid repeated memory allocations
   std::vector<dof_id_type> dummy_vec;
+
+  /// A work vector of the unretained dofs on an element, when building a reduced space pattern
+  std::vector<dof_id_type> dummy_unretained;
 
   void handle_vi_vj(const std::vector<dof_id_type> & element_dofs_i,
                     const std::vector<dof_id_type> & element_dofs_j);

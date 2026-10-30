@@ -38,6 +38,8 @@
 #include "libmesh/fe_interface.h"
 #include "libmesh/fe_compute_data.h"
 #include "libmesh/static_condensation.h"
+#include "libmesh/reduced_sparse_matrix.h"
+#include "libmesh/constraint_elimination_dof_map.h"
 #include "libmesh/static_condensation_dof_map.h"
 #include "libmesh/node_range.h"
 
@@ -105,6 +107,8 @@ System::System (EquationSystems & es,
     this->prefix_with_name(true);
   if (libMesh::on_command_line("--" + name_in + "-static-condensation"))
     this->create_static_condensation();
+  if (libMesh::on_command_line("--" + name_in + "-eliminate-constraints"))
+    this->create_constraint_elimination();
 }
 
 
@@ -190,6 +194,8 @@ void System::clear ()
   // But our "basic"/"null" state may still have a StaticCondensation
   if (libMesh::on_command_line("--" + _sys_name + "-static-condensation"))
     this->create_static_condensation();
+  if (libMesh::on_command_line("--" + _sys_name + "-eliminate-constraints"))
+    this->create_constraint_elimination();
 }
 
 
@@ -228,8 +234,9 @@ void System::init_data ()
   // reinit_constraints() did prepare_send_list() for us.
 
   // Now finally after dof distribution and construction of any
-  // possible constraints, we may init any static condensation
-  // data
+  // possible constraints, we may init any constraint elimination
+  // data and then the static condensation data nested in it
+  _dof_map->reinit_constraint_elimination();
   _dof_map->reinit_static_condensation();
 
   // Resize the solution conformal to the current mesh
@@ -447,8 +454,9 @@ void System::reinit ()
   // project_vector handles vector initialization now
   libmesh_assert_equal_to (solution->size(), current_local_solution->size());
 
-  // Make sure our static condensation dof map is up-to-date before we init any
-  // static condensation matrices
+  // Make sure our constraint elimination and static condensation dof maps are up-to-date before
+  // we init any matrices on their reduced spaces
+  this->get_dof_map().reinit_constraint_elimination();
   this->get_dof_map().reinit_static_condensation();
 
   if (!_matrices.empty() && !_basic_system_only)
@@ -1023,6 +1031,16 @@ SparseMatrix<Number> & System::add_matrix (std::string_view mat_name,
                                                     this->get_dof_map(),
                                                     this->get_dof_map().get_static_condensation());
     }
+#ifdef LIBMESH_HAVE_PETSC
+  else if (this->get_dof_map().has_constraint_elimination())
+    {
+      if (mat_build_type == MatrixBuildType::DIAGONAL)
+        libmesh_error_msg(
+            "We do not currently support constraint elimination for the diagonal matrix type");
+      matrix = std::make_unique<ReducedSparseMatrix<Number>>(
+          this->comm(), this->get_dof_map().get_constraint_elimination());
+    }
+#endif
   else
     matrix = SparseMatrix<Number>::build(this->comm(), libMesh::default_solver_package());
   auto & mat = *matrix;
@@ -2664,6 +2682,16 @@ Tensor System::point_hessian(unsigned int, const Point &, const NumericVector<Nu
 void System::create_static_condensation()
 {
   this->get_dof_map().create_static_condensation(this->get_mesh(), *this);
+}
+
+void System::create_constraint_elimination()
+{
+  this->get_dof_map().create_constraint_elimination(this->get_mesh(), *this);
+}
+
+bool System::has_constraint_elimination() const
+{
+  return this->get_dof_map().has_constraint_elimination();
 }
 
 bool System::has_static_condensation() const

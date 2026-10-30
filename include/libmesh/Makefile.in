@@ -545,17 +545,17 @@ vtkversion = @vtkversion@
 #
 # include the magic script!
 EXTRA_DIST = rebuild_makefile.sh
-BUILT_SOURCES = dirichlet_boundaries.h dof_map.h dof_map_base.h \
-	dof_object.h factory.h float128_shims.h getpot.h id_types.h \
-	libmesh.h libmesh_abort.h libmesh_augment_std_namespace.h \
-	libmesh_base.h libmesh_common.h libmesh_device.h \
-	libmesh_documentation.h libmesh_exceptions.h libmesh_logging.h \
-	libmesh_singleton.h libmesh_version.h multi_predicates.h \
-	periodic_boundaries.h periodic_boundary.h \
-	periodic_boundary_base.h print_trace.h \
-	reference_counted_object.h reference_counter.h \
-	single_predicates.h sparsity_pattern.h variable.h \
-	variant_filter_iterator.h enum_convergence_flags.h \
+BUILT_SOURCES = constraint_elimination_dof_map.h \
+	dirichlet_boundaries.h dof_map.h dof_map_base.h dof_object.h \
+	factory.h float128_shims.h getpot.h id_types.h libmesh.h \
+	libmesh_abort.h libmesh_augment_std_namespace.h libmesh_base.h \
+	libmesh_common.h libmesh_device.h libmesh_documentation.h \
+	libmesh_exceptions.h libmesh_logging.h libmesh_singleton.h \
+	libmesh_version.h multi_predicates.h periodic_boundaries.h \
+	periodic_boundary.h periodic_boundary_base.h print_trace.h \
+	reduced_dof_map.h reference_counted_object.h \
+	reference_counter.h single_predicates.h sparsity_pattern.h \
+	variable.h variant_filter_iterator.h enum_convergence_flags.h \
 	enum_eigen_solver_type.h enum_elem_quality.h enum_elem_type.h \
 	enum_error_estimator_type.h enum_fe_family.h \
 	enum_inf_map_type.h enum_io_package.h enum_matrix_build_type.h \
@@ -601,25 +601,26 @@ BUILT_SOURCES = dirichlet_boundaries.h dof_map.h dof_map_base.h \
 	remote_elem.h sphere.h stored_range.h surface.h \
 	default_coupling.h ghost_point_neighbors.h ghosting_functor.h \
 	non_manifold_coupling.h overlap_coupling.h \
-	point_neighbor_coupling.h sibling_coupling.h \
-	kokkos_linalg_base.h kokkos_storage.h kokkos_storage_policy.h \
-	kokkos_tensor_ops.h kokkos_vector_ops.h abaqus_io.h \
-	boundary_info.h boundary_mesh.h checkpoint_io.h \
-	distributed_mesh.h dyna_io.h ensight_io.h exodusII_io.h \
-	exodusII_io_helper.h exodus_header_info.h fro_io.h gmsh_io.h \
-	gmv_io.h gnuplot_io.h inf_elem_builder.h matlab_io.h \
-	medit_io.h mesh.h mesh_base.h mesh_communication.h \
-	mesh_function.h mesh_generation.h mesh_input.h \
-	mesh_modification.h mesh_netgen_interface.h mesh_output.h \
-	mesh_refinement.h mesh_serializer.h mesh_smoother.h \
-	mesh_smoother_laplace.h mesh_smoother_vsmoother.h \
-	mesh_subdivision_support.h mesh_tet_interface.h \
-	mesh_tetgen_interface.h mesh_tetgen_wrapper.h mesh_tools.h \
-	mesh_triangle_holes.h mesh_triangle_interface.h \
-	mesh_triangle_wrapper.h namebased_io.h nemesis_io.h \
-	nemesis_io_helper.h off_io.h parallel_mesh.h patch.h \
-	poly2tri_triangulator.h postscript_io.h replicated_mesh.h \
-	serial_mesh.h sides_to_elem_map.h simplex_refiner.h stl_io.h \
+	periodic_point_neighbors.h point_neighbor_coupling.h \
+	sibling_coupling.h kokkos_linalg_base.h kokkos_storage.h \
+	kokkos_storage_policy.h kokkos_tensor_ops.h \
+	kokkos_vector_ops.h abaqus_io.h boundary_info.h \
+	boundary_mesh.h checkpoint_io.h distributed_mesh.h dyna_io.h \
+	ensight_io.h exodusII_io.h exodusII_io_helper.h \
+	exodus_header_info.h fro_io.h gmsh_io.h gmv_io.h gnuplot_io.h \
+	inf_elem_builder.h matlab_io.h medit_io.h mesh.h mesh_base.h \
+	mesh_communication.h mesh_function.h mesh_generation.h \
+	mesh_input.h mesh_modification.h mesh_netgen_interface.h \
+	mesh_output.h mesh_refinement.h mesh_serializer.h \
+	mesh_smoother.h mesh_smoother_laplace.h \
+	mesh_smoother_vsmoother.h mesh_subdivision_support.h \
+	mesh_tet_interface.h mesh_tetgen_interface.h \
+	mesh_tetgen_wrapper.h mesh_tools.h mesh_triangle_holes.h \
+	mesh_triangle_interface.h mesh_triangle_wrapper.h \
+	namebased_io.h nemesis_io.h nemesis_io_helper.h off_io.h \
+	parallel_mesh.h patch.h poly2tri_triangulator.h \
+	postscript_io.h replicated_mesh.h serial_mesh.h \
+	sides_to_elem_map.h simplex_refiner.h stl_io.h \
 	sync_refinement_flags.h tecplot_io.h tetgen_io.h \
 	triangulator_interface.h ucd_io.h unstructured_mesh.h unv_io.h \
 	vtk_io.h xdr_io.h analytic_function.h composite_fem_function.h \
@@ -637,9 +638,10 @@ BUILT_SOURCES = dirichlet_boundaries.h dof_map.h dof_map_base.h \
 	petsc_matrix_base.h petsc_matrix_shell_matrix.h \
 	petsc_mffd_matrix.h petsc_preconditioner.h \
 	petsc_shell_matrix.h petsc_solver_exception.h petsc_vector.h \
-	preconditioner.h raw_accessor.h refinement_selector.h \
-	shell_matrix.h sparse_matrix.h sparse_shell_matrix.h \
-	static_condensation.h static_condensation_dof_map.h \
+	preconditioner.h raw_accessor.h reduced_sparse_matrix.h \
+	refinement_selector.h shell_matrix.h sparse_matrix.h \
+	sparse_shell_matrix.h static_condensation.h \
+	static_condensation_dof_map.h \
 	static_condensation_preconditioner.h sum_shell_matrix.h \
 	tensor_shell_matrix.h tensor_tools.h tensor_value.h \
 	trilinos_epetra_matrix.h trilinos_epetra_vector.h \
@@ -977,6 +979,9 @@ libmesh_config.h: $(top_builddir)/include/libmesh_config.h
 
 #
 # libMesh header rules
+constraint_elimination_dof_map.h: $(top_srcdir)/include/base/constraint_elimination_dof_map.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 dirichlet_boundaries.h: $(top_srcdir)/include/base/dirichlet_boundaries.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1047,6 +1052,9 @@ periodic_boundary_base.h: $(top_srcdir)/include/base/periodic_boundary_base.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 print_trace.h: $(top_srcdir)/include/base/print_trace.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+reduced_dof_map.h: $(top_srcdir)/include/base/reduced_dof_map.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 reference_counted_object.h: $(top_srcdir)/include/base/reference_counted_object.h
@@ -1481,6 +1489,9 @@ non_manifold_coupling.h: $(top_srcdir)/include/ghosting/non_manifold_coupling.h
 overlap_coupling.h: $(top_srcdir)/include/ghosting/overlap_coupling.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+periodic_point_neighbors.h: $(top_srcdir)/include/ghosting/periodic_point_neighbors.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 point_neighbor_coupling.h: $(top_srcdir)/include/ghosting/point_neighbor_coupling.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1809,6 +1820,9 @@ preconditioner.h: $(top_srcdir)/include/numerics/preconditioner.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 raw_accessor.h: $(top_srcdir)/include/numerics/raw_accessor.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+reduced_sparse_matrix.h: $(top_srcdir)/include/numerics/reduced_sparse_matrix.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 refinement_selector.h: $(top_srcdir)/include/numerics/refinement_selector.h

@@ -1,5 +1,6 @@
 # Do not edit - automatically generated from ./rebuild_libmesh_SOURCES.sh
 libmesh_SOURCES =  \
+        src/base/constraint_elimination_dof_map.C \
         src/base/dirichlet_boundary.C \
         src/base/dof_map.C \
         src/base/dof_map_base.C \
@@ -14,6 +15,7 @@ libmesh_SOURCES =  \
         src/base/periodic_boundary.C \
         src/base/periodic_boundary_base.C \
         src/base/print_trace.C \
+        src/base/reduced_dof_map.C \
         src/base/reference_counted_object.C \
         src/base/reference_counter.C \
         src/base/single_predicates.C \
@@ -201,6 +203,7 @@ libmesh_SOURCES =  \
         src/ghosting/ghost_point_neighbors.C \
         src/ghosting/non_manifold_coupling.C \
         src/ghosting/overlap_coupling.C \
+        src/ghosting/periodic_point_neighbors.C \
         src/ghosting/point_neighbor_coupling.C \
         src/ghosting/sibling_coupling.C \
         src/mesh/abaqus_io.C \
@@ -286,6 +289,7 @@ libmesh_SOURCES =  \
         src/numerics/petsc_shell_matrix.C \
         src/numerics/petsc_vector.C \
         src/numerics/preconditioner.C \
+        src/numerics/reduced_sparse_matrix.C \
         src/numerics/shell_matrix.C \
         src/numerics/sparse_matrix.C \
         src/numerics/sparse_shell_matrix.C \
