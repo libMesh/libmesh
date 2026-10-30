@@ -14,6 +14,7 @@
 #include <libmesh/replicated_mesh.h>
 #include <libmesh/mesh.h>
 #include <libmesh/system.h> // LIBMESH_HAVE_SOLVER define
+#include <libmesh/variational_smoother_constraint.h>
 #include "libmesh/face_tri.h"
 #include "libmesh/cell_prism.h"
 #include "libmesh/utility.h"
@@ -231,6 +232,7 @@ public:
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST(testLaplaceQuad);
   CPPUNIT_TEST(testLaplaceTri);
+  CPPUNIT_TEST(testConstraintLinePlane);
 #if defined(LIBMESH_ENABLE_VSMOOTHER) && defined(LIBMESH_HAVE_SOLVER)
   CPPUNIT_TEST(testVariationalEdge2);
   CPPUNIT_TEST(testVariationalEdge3);
@@ -1082,6 +1084,25 @@ public:
     LaplaceMeshSmoother laplace(mesh, 8);
 
     testLaplaceSmoother(mesh, laplace, TRI3);
+  }
+
+  // A line whose (canonically oriented) direction has a negative dot product
+  // with a plane normal is not parallel to the plane, and must intersect it.
+  void testConstraintLinePlane()
+  {
+    LOG_UNIT_TEST;
+
+    const PlaneConstraint plane(Point(0, 0, 0), Point(0, 0, 1));
+    const LineConstraint line(Point(0, 0, 1), Point(1, 0, -1));
+    CPPUNIT_ASSERT(!line.is_parallel(plane));
+
+    for (const auto & intersection :
+         {intersect_constraints(plane, line), intersect_constraints(line, plane)})
+      {
+        CPPUNIT_ASSERT(std::holds_alternative<PointConstraint>(intersection));
+        CPPUNIT_ASSERT(
+            std::get<PointConstraint>(intersection).point().absolute_fuzzy_equals(Point(1, 0, 0)));
+      }
   }
 
 #ifdef LIBMESH_ENABLE_VSMOOTHER

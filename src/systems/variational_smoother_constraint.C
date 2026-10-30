@@ -115,7 +115,7 @@ bool LineConstraint::is_parallel(const LineConstraint & l) const
 
 bool LineConstraint::is_parallel(const PlaneConstraint & p) const
 {
-  return _direction * p.normal() < _tol;
+  return std::abs(_direction * p.normal()) < _tol;
 }
 
 ConstraintVariant LineConstraint::intersect(const ConstraintVariant & other) const
