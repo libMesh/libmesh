@@ -174,6 +174,7 @@ BUILT_SOURCES = \
         ghosting_functor.h \
         non_manifold_coupling.h \
         overlap_coupling.h \
+        periodic_point_neighbors.h \
         point_neighbor_coupling.h \
         sibling_coupling.h \
         kokkos_linalg_base.h \
@@ -1132,6 +1133,9 @@ non_manifold_coupling.h: $(top_srcdir)/include/ghosting/non_manifold_coupling.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 overlap_coupling.h: $(top_srcdir)/include/ghosting/overlap_coupling.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+periodic_point_neighbors.h: $(top_srcdir)/include/ghosting/periodic_point_neighbors.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 point_neighbor_coupling.h: $(top_srcdir)/include/ghosting/point_neighbor_coupling.h

@@ -183,6 +183,7 @@ include_HEADERS =  \
         ghosting/ghosting_functor.h \
         ghosting/non_manifold_coupling.h \
         ghosting/overlap_coupling.h \
+        ghosting/periodic_point_neighbors.h \
         ghosting/point_neighbor_coupling.h \
         ghosting/sibling_coupling.h \
         gpu/kokkos_linalg_base.h \
