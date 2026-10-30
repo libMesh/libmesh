@@ -2502,6 +2502,42 @@ void MeshBase::detect_interior_parents()
       erase_if_match(b2, b1, pairs);
     }
 
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+namespace
+{
+const std::string disjoint_neighbor_node_key_name = "disjoint_neighbor_node_key";
+}
+
+void MeshBase::add_disjoint_neighbor_node_keys()
+{
+  constexpr unique_id_type no_key = DofObject::invalid_unique_id;
+  this->add_node_datum<unique_id_type>(disjoint_neighbor_node_key_name, true, &no_key);
+}
+
+bool MeshBase::has_disjoint_neighbor_node_keys() const
+{
+  return this->has_node_integer(disjoint_neighbor_node_key_name);
+}
+
+unique_id_type MeshBase::disjoint_neighbor_node_key(const Node & node) const
+{
+  if (this->has_disjoint_neighbor_node_keys())
+    {
+      const auto key = node.get_extra_datum<unique_id_type>(
+        this->get_node_integer_index(disjoint_neighbor_node_key_name));
+      if (key != DofObject::invalid_unique_id)
+        return key;
+    }
+  return node.unique_id();
+}
+
+void MeshBase::set_disjoint_neighbor_node_key(Node & node, const unique_id_type key) const
+{
+  node.set_extra_datum<unique_id_type>(
+    this->get_node_integer_index(disjoint_neighbor_node_key_name), key);
+}
+#endif // LIBMESH_ENABLE_UNIQUE_ID
+
 
 #endif
 
