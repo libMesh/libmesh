@@ -1980,6 +1980,20 @@ public:
   std::string prefix() const { return this->name() + "_"; }
 
   /**
+   * Sets the solver-package options prefix of every vector and matrix
+   * this system owns, including ones added later. Each object reads
+   * options with this prefix the next time it is initialized, so the
+   * prefix persists through reinitialization, e.g. after adaptivity.
+   */
+  void set_options_prefix(std::string options_prefix);
+
+  /**
+   * \returns The options prefix of this system's vectors and matrices.
+   * See set_options_prefix().
+   */
+  const std::string & options_prefix() const { return _options_prefix; }
+
+  /**
    * Request that static condensation be performed for this system
    */
    virtual void create_static_condensation();
@@ -2356,6 +2370,11 @@ private:
    * Whether we are name prefixing solver options
    */
   bool _prefix_with_name;
+
+  /**
+   * Solver-package options prefix of this system's vectors and matrices
+   */
+  std::string _options_prefix;
 
   /**
    * Values of the quantities of interest.  This vector needs to be

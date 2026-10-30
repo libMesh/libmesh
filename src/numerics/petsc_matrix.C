@@ -154,7 +154,7 @@ PetscMatrix<T>::init_without_preallocation (const numeric_index_type m_in,
   LibmeshPetscCall(MatSetSizes(this->_mat, m_local, n_local, m_global, n_global));
   PetscInt blocksize  = static_cast<PetscInt>(blocksize_in);
   LibmeshPetscCall(MatSetBlockSize(this->_mat,blocksize));
-  LibmeshPetscCall(MatSetOptionsPrefix(this->_mat, ""));
+  LibmeshPetscCall(MatSetOptionsPrefix(this->_mat, this->options_prefix().c_str()));
 
 #ifdef LIBMESH_ENABLE_BLOCKED_STORAGE
   if (blocksize > 1)
