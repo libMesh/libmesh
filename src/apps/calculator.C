@@ -462,7 +462,10 @@ int main(int argc, char ** argv)
 
       Integrate integrate(old_sys, *goal_function);
 
-      Threads::parallel_reduce (old_mesh.active_local_element_stored_range(),
+      // Be sure to give integrate a const range
+      const MeshBase & const_old_mesh = old_mesh;
+
+      Threads::parallel_reduce (const_old_mesh.active_local_element_stored_range(),
                                 integrate);
 
       Number integral = integrate.integral();

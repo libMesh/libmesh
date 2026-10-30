@@ -298,6 +298,8 @@ std::vector<Real> & ExactSolution::_check_inputs(std::string_view sys_name,
 void ExactSolution::compute_error(std::string_view sys_name,
                                   std::string_view unknown_name)
 {
+  LOG_SCOPE("compute_error", "ExactSolution");
+
   // Check the inputs for validity, and get a reference
   // to the proper location to store the error
   std::vector<Real> & error_vals = this->_check_inputs(sys_name,
@@ -529,6 +531,16 @@ void ExactSolution::_compute_error(std::string_view sys_name,
   // This function must be run on all processors at once
   libmesh_parallel_only(communicator);
 
+  // Zero the error before summation
+  // 0 - sum of square of function error (L2)
+  // 1 - sum of square of gradient error (H1 semi)
+  // 2 - sum of square of Hessian error (H2 semi)
+  // 3 - sum of sqrt(square of function error) (L1)
+  // 4 - max of sqrt(square of function error) (Linfty)
+  // 5 - sum of square of curl error (HCurl semi)
+  // 6 - sum of square of div error (HDiv semi)
+  error_vals.assign(7, 0);
+
   // Get a reference to the system whose error is being computed.
   // If we have a fine grid, however, we'll integrate on that instead
   // for more accuracy.
@@ -536,13 +548,8 @@ void ExactSolution::_compute_error(std::string_view sys_name,
     _equation_systems_fine->get_system(sys_name) :
     _equation_systems.get_system (sys_name);
 
-  FEMContext context(computed_system);
-
   const MeshBase & mesh = computed_system.get_mesh();
 
-  const Real time = _equation_systems.get_system(sys_name).time;
-
-  const unsigned int sys_num = computed_system.number();
   const unsigned int var = computed_system.variable_number(unknown_name);
   unsigned int var_component = 0;
   for (const auto var_num : make_range(var))
@@ -578,62 +585,8 @@ void ExactSolution::_compute_error(std::string_view sys_name,
       coarse_values->init();
     }
 
-  // Grab which element dimensions are present in the mesh
-  const std::set<unsigned char> & elem_dims = mesh.elem_dimensions();
-
-  // Initialize any functors we're going to use
-  for (auto & ev : _exact_values)
-    if (ev)
-      {
-        ev->init();
-        ev->init_context(context);
-      }
-
-  for (auto & ed : _exact_derivs)
-    if (ed)
-      {
-        ed->init();
-        ed->init_context(context);
-      }
-
-  for (auto & eh : _exact_hessians)
-    if (eh)
-      {
-        eh->init();
-        eh->init_context(context);
-      }
-
-  // If we have *no* functors we intend to use (because we're using a
-  // fine system, or because our exact solution is zero and we're just
-  // computing norms in an outdated way) then let our FE objects know
-  // we don't actually need anything from them, so they don't think
-  // we've just invoked them in a deprecated "compute everything"
-  // fashion.
-  if (_exact_values.empty() && _exact_derivs.empty() &&
-      _exact_hessians.empty())
-    for (auto dim : elem_dims)
-      for (auto v : make_range(computed_system.n_vars()))
-        {
-          FEAbstract * fe;
-          context.get_element_fe(v, fe, dim);
-          fe->get_nothing();
-        }
-
-  // Get a reference to the dofmap and mesh for that system
-  const DofMap & computed_dof_map = computed_system.get_dof_map();
-
-  // Zero the error before summation
-  // 0 - sum of square of function error (L2)
-  // 1 - sum of square of gradient error (H1 semi)
-  // 2 - sum of square of Hessian error (H2 semi)
-  // 3 - sum of sqrt(square of function error) (L1)
-  // 4 - max of sqrt(square of function error) (Linfty)
-  // 5 - sum of square of curl error (HCurl semi)
-  // 6 - sum of square of div error (HDiv semi)
-  error_vals = std::vector<Real>(7, 0.);
-
   // Construct Quadrature rule based on default quadrature order
-  const FEType & fe_type  = computed_dof_map.variable_type(var);
+  const FEType & fe_type  = computed_system.variable_type(var);
   const auto field_type = FEInterface::field_type(fe_type);
 
   unsigned int n_vec_dim = FEInterface::n_vec_dim( mesh, fe_type );
@@ -648,290 +601,396 @@ void ExactSolution::_compute_error(std::string_view sys_name,
       libmesh_not_implemented();
     }
 
+  // Init functors before we enter threads, in case any of their
+  // clones need point locators etc.
+   for (auto & ev : _exact_values)
+     if (ev)
+       ev->init();
 
-  // Allow space for dims 0-3, even if we don't use them all
-  std::vector<std::unique_ptr<FEGenericBase<OutputShape>>> fe_ptrs(4);
-  std::vector<std::unique_ptr<QBase>> q_rules(4);
+   for (auto & ed : _exact_derivs)
+     if (ed)
+       ed->init();
 
-  // Prepare finite elements for each dimension present in the mesh
-  for (const auto dim : elem_dims)
-    {
-      // Build a quadrature rule.
-      q_rules[dim] = fe_type.default_quadrature_rule (dim, _extra_order);
+   for (auto & eh : _exact_hessians)
+     if (eh)
+       eh->init();
 
-      // Disallow rules with negative weights.  That will use more
-      // quadrature points, but we're going to be taking square roots
-      // of element integral results here!
-      q_rules[dim]->allow_rules_with_negative_weights = false;
+  const Real time = _equation_systems.get_system(sys_name).time;
 
-      // Construct finite element object
-      fe_ptrs[dim] = FEGenericBase<OutputShape>::build(dim, fe_type);
+  // Mutex for combining error values
+  Threads::spin_mutex error_mtx;
 
-      // Attach quadrature rule to FE object
-      fe_ptrs[dim]->attach_quadrature_rule (q_rules[dim].get());
-    }
-
-  // The global degree of freedom indices associated
-  // with the local degrees of freedom.
-  std::vector<dof_id_type> dof_indices;
-
-
-  //
   // Begin the loop over the elements
-  //
-  // TODO: this ought to be threaded (and using subordinate
-  // MeshFunction objects in each thread rather than a single
-  // master)
-  for (const auto & elem : mesh.active_local_element_ptr_range())
-    {
-      // Skip this element if it is in a subdomain excluded by the user.
-      const subdomain_id_type elem_subid = elem->subdomain_id();
-      if (_excluded_subdomains.count(elem_subid))
-        continue;
+  Threads::parallel_for
+    (mesh.active_local_element_stored_range(),
+     [this, &coarse_values, &computed_system, &error_mtx, &error_vals, &mesh, fe_type, field_type, n_vec_dim, time, var, var_component]
+     (const ConstElemRange & range)
+     {
+       // Grab which element dimensions are present in the mesh
+       const std::set<unsigned char> & elem_dims = mesh.elem_dimensions();
 
-      // The spatial dimension of the current Elem. FEs and other data
-      // are indexed on dim.
-      const unsigned int dim = elem->dim();
+       const unsigned int sys_num = computed_system.number();
 
-      // If the variable is not active on this subdomain, don't bother
-      if (!computed_system.variable(var).active_on_subdomain(elem_subid))
-        continue;
+       // Get a reference to the dofmap and mesh for that system
+       const DofMap & computed_dof_map = computed_system.get_dof_map();
 
-      /* If the variable is active, then we're going to restrict the
-         MeshFunction evaluations to the current element subdomain.
-         This is for cases such as mixed dimension meshes where we want
-         to restrict the calculation to one particular domain. */
-      std::set<subdomain_id_type> subdomain_id;
-      subdomain_id.insert(elem_subid);
+       FEMContext context(computed_system);
 
-      FEGenericBase<OutputShape> * fe = fe_ptrs[dim].get();
-      QBase * qrule = q_rules[dim].get();
-      libmesh_assert(fe);
-      libmesh_assert(qrule);
+       // Clone and initialize any functors we're going to use
+       std::vector<std::unique_ptr<FEMFunctionBase<Number>>> my_exact_values;
+       std::vector<std::unique_ptr<FEMFunctionBase<Gradient>>> my_exact_derivs;
+       std::vector<std::unique_ptr<FEMFunctionBase<Tensor>>> my_exact_hessians;
 
-      // The Jacobian*weight at the quadrature points.
-      const std::vector<Real> & JxW = fe->get_JxW();
+       for (auto & ev : _exact_values)
+         if (ev)
+           {
+             my_exact_values.push_back(ev->clone());
+             auto & my_ev = my_exact_values.back();
+             my_ev->init();
+             my_ev->init_context(context);
+           }
+         else
+           my_exact_values.push_back(nullptr);
 
-      // The value of the shape functions at the quadrature points
-      // i.e. phi(i) = phi_values[i][qp]
-      const std::vector<std::vector<OutputShape>> &  phi_values = fe->get_phi();
+       for (auto & ed : _exact_derivs)
+         if (ed)
+           {
+             my_exact_derivs.push_back(ed->clone());
+             auto & my_ed = my_exact_derivs.back();
+             my_ed->init();
+             my_ed->init_context(context);
+           }
+         else
+           my_exact_derivs.push_back(nullptr);
 
-      // The value of the shape function gradients at the quadrature points
-      const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient>> &
-        dphi_values = fe->get_dphi();
+       for (auto & eh : _exact_hessians)
+         if (eh)
+           {
+             my_exact_hessians.push_back(eh->clone());
+             auto & my_eh = my_exact_hessians.back();
+             my_eh->init();
+             my_eh->init_context(context);
+           }
+         else
+           my_exact_hessians.push_back(nullptr);
 
-      // The value of the shape function curls at the quadrature points
-      // Only computed for vector-valued elements
-      const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputShape>> * curl_values = nullptr;
+       std::unique_ptr<MeshFunction> my_coarse_values;
+       if (coarse_values)
+         {
+           auto clone = coarse_values->clone();
+           // clone() returns FunctionBase, but it's a MeshFunction
+           my_coarse_values.reset
+             (static_cast<MeshFunction *>(clone.release()));
+           my_coarse_values->init();
+         }
 
-      // The value of the shape function divergences at the quadrature points
-      // Only computed for vector-valued elements
-      const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputDivergence>> * div_values = nullptr;
+       // If we have *no* functors we intend to use (because we're using a
+       // fine system, or because our exact solution is zero and we're just
+       // computing norms in an outdated way) then let our FE objects know
+       // we don't actually need anything from them, so they don't think
+       // we've just invoked them in a deprecated "compute everything"
+       // fashion.
+       if (_exact_values.empty() && _exact_derivs.empty() &&
+           _exact_hessians.empty())
+         for (auto dim : elem_dims)
+           for (auto v : make_range(computed_system.n_vars()))
+             {
+               FEAbstract * fe;
+               context.get_element_fe(v, fe, dim);
+               fe->get_nothing();
+             }
 
-      if (field_type == TYPE_VECTOR)
-        {
-          curl_values = &fe->get_curl_phi();
-          div_values = &fe->get_div_phi();
-        }
+       // Zero the error before summation
+       // 0 - sum of square of function error (L2)
+       // 1 - sum of square of gradient error (H1 semi)
+       // 2 - sum of square of Hessian error (H2 semi)
+       // 3 - sum of sqrt(square of function error) (L1)
+       // 4 - max of sqrt(square of function error) (Linfty)
+       // 5 - sum of square of curl error (HCurl semi)
+       // 6 - sum of square of div error (HDiv semi)
+       std::vector<Real> my_error_vals(error_vals.size(), 0);
 
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-      // The value of the shape function second derivatives at the quadrature points
-      // Not computed for vector-valued elements
-      const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor>> *
-        d2phi_values = nullptr;
+       // Allow space for dims 0-3, even if we don't use them all
+       std::vector<std::unique_ptr<FEGenericBase<OutputShape>>> fe_ptrs(4);
+       std::vector<std::unique_ptr<QBase>> q_rules(4);
 
-      if (field_type != TYPE_VECTOR)
-        d2phi_values = &fe->get_d2phi();
-#endif
+       // Prepare finite elements for each dimension present in the mesh
+       for (const auto dim : elem_dims)
+         {
+           // Build a quadrature rule.
+           q_rules[dim] = fe_type.default_quadrature_rule (dim, _extra_order);
 
-      // The XYZ locations (in physical space) of the quadrature points
-      const std::vector<Point> & q_point = fe->get_xyz();
+           // Disallow rules with negative weights.  That will use more
+           // quadrature points, but we're going to be taking square roots
+           // of element integral results here!
+           q_rules[dim]->allow_rules_with_negative_weights = false;
 
-      // reinitialize the element-specific data
-      // for the current element
-      fe->reinit (elem);
+           // Construct finite element object
+           fe_ptrs[dim] = FEGenericBase<OutputShape>::build(dim, fe_type);
 
-      context.pre_fe_reinit(computed_system, elem);
-      context.elem_fe_reinit();
+           // Attach quadrature rule to FE object
+           fe_ptrs[dim]->attach_quadrature_rule (q_rules[dim].get());
+         }
 
-      // Get the local to global degree of freedom maps
-      computed_dof_map.dof_indices    (elem, dof_indices, var);
+       // The global degree of freedom indices associated
+       // with the local degrees of freedom.
+       std::vector<dof_id_type> dof_indices;
 
-      // The number of quadrature points
-      const unsigned int n_qp = qrule->n_points();
+       for (const Elem * elem : range)
+         {
+           // Skip this element if it is in a subdomain excluded by the user.
+           const subdomain_id_type elem_subid = elem->subdomain_id();
+           if (_excluded_subdomains.count(elem_subid))
+             continue;
 
-      // The number of shape functions
-      const unsigned int n_sf =
-        cast_int<unsigned int>(dof_indices.size());
+           // The spatial dimension of the current Elem. FEs and other data
+           // are indexed on dim.
+           const unsigned int dim = elem->dim();
 
-      //
-      // Begin the loop over the Quadrature points.
-      //
-      for (unsigned int qp=0; qp<n_qp; qp++)
-        {
-          // Real u_h = 0.;
-          // RealGradient grad_u_h;
+           // If the variable is not active on this subdomain, don't bother
+           if (!computed_system.variable(var).active_on_subdomain(elem_subid))
+             continue;
 
-          typename FEGenericBase<OutputShape>::OutputNumber u_h(0.);
+           /* If the variable is active, then we're going to restrict the
+              MeshFunction evaluations to the current element subdomain.
+              This is for cases such as mixed dimension meshes where we want
+              to restrict the calculation to one particular domain. */
+           std::set<subdomain_id_type> subdomain_id;
+           subdomain_id.insert(elem_subid);
 
-          typename FEGenericBase<OutputShape>::OutputNumberGradient grad_u_h;
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-          typename FEGenericBase<OutputShape>::OutputNumberTensor grad2_u_h;
-#endif
-          typename FEGenericBase<OutputShape>::OutputNumber curl_u_h(0.0);
-          typename FEGenericBase<OutputShape>::OutputNumberDivergence div_u_h = 0.0;
+           FEGenericBase<OutputShape> * fe = fe_ptrs[dim].get();
+           QBase * qrule = q_rules[dim].get();
+           libmesh_assert(fe);
+           libmesh_assert(qrule);
 
-          // Compute solution values at the current
-          // quadrature point.  This requires a sum
-          // over all the shape functions evaluated
-          // at the quadrature point.
-          for (unsigned int i=0; i<n_sf; i++)
-            {
-              // Values from current solution.
-              u_h      += phi_values[i][qp]*computed_system.current_solution  (dof_indices[i]);
-              grad_u_h += dphi_values[i][qp]*computed_system.current_solution (dof_indices[i]);
-              if (field_type == TYPE_VECTOR)
-                {
-                  curl_u_h += (*curl_values)[i][qp]*computed_system.current_solution (dof_indices[i]);
-                  div_u_h += (*div_values)[i][qp]*computed_system.current_solution (dof_indices[i]);
-                }
-              else
-                {
-#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-                  grad2_u_h += (*d2phi_values)[i][qp]*computed_system.current_solution (dof_indices[i]);
-#endif
-                }
-            }
+           // The Jacobian*weight at the quadrature points.
+           const std::vector<Real> & JxW = fe->get_JxW();
 
-          // Compute the value of the error at this quadrature point
-          typename FEGenericBase<OutputShape>::OutputNumber exact_val(0);
-          RawAccessor<typename FEGenericBase<OutputShape>::OutputNumber> exact_val_accessor( exact_val, n_vec_dim );
-          if (_exact_values.size() > sys_num && _exact_values[sys_num])
-            {
-              for (unsigned int c = 0; c < n_vec_dim; c++)
-                exact_val_accessor(c) =
-                  _exact_values[sys_num]->
-                  component(context, var_component+c, q_point[qp], time);
-            }
-          else if (_equation_systems_fine)
-            {
-              // FIXME: Needs to be updated for vector-valued elements
-              DenseVector<Number> output(1);
-              (*coarse_values)(q_point[qp],time,output,&subdomain_id);
-              exact_val = output(0);
-            }
-          const typename FEGenericBase<OutputShape>::OutputNumber val_error = u_h - exact_val;
+           // The value of the shape functions at the quadrature points
+           // i.e. phi(i) = phi_values[i][qp]
+           const std::vector<std::vector<OutputShape>> &  phi_values = fe->get_phi();
 
-          // Add the squares of the error to each contribution
-          Real error_sq = TensorTools::norm_sq(val_error);
-          error_vals[0] += JxW[qp]*error_sq;
+           // The value of the shape function gradients at the quadrature points
+           const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputGradient>> &
+             dphi_values = fe->get_dphi();
 
-          Real norm = sqrt(error_sq);
-          error_vals[3] += JxW[qp]*norm;
+           // The value of the shape function curls at the quadrature points
+           // Only computed for vector-valued elements
+           const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputShape>> * curl_values = nullptr;
 
-          if (error_vals[4]<norm) { error_vals[4] = norm; }
+           // The value of the shape function divergences at the quadrature points
+           // Only computed for vector-valued elements
+           const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputDivergence>> * div_values = nullptr;
 
-          // Compute the value of the error in the gradient at this
-          // quadrature point
-          typename FEGenericBase<OutputShape>::OutputNumberGradient exact_grad;
-          RawAccessor<typename FEGenericBase<OutputShape>::OutputNumberGradient> exact_grad_accessor( exact_grad, LIBMESH_DIM );
-          if (_exact_derivs.size() > sys_num && _exact_derivs[sys_num])
-            {
-              for (unsigned int c = 0; c < n_vec_dim; c++)
-                for (unsigned int d = 0; d < LIBMESH_DIM; d++)
-                  exact_grad_accessor(d + c*LIBMESH_DIM) =
-                    _exact_derivs[sys_num]->
-                    component(context, var_component+c, q_point[qp], time)(d);
-            }
-          else if (_equation_systems_fine)
-            {
-              // FIXME: Needs to be updated for vector-valued elements
-              std::vector<Gradient> output(1);
-              coarse_values->gradient(q_point[qp],time,output,&subdomain_id);
-              exact_grad = output[0];
-            }
-
-          const typename FEGenericBase<OutputShape>::OutputNumberGradient grad_error = grad_u_h - exact_grad;
-
-          error_vals[1] += JxW[qp]*grad_error.norm_sq();
-
-
-          if (field_type == TYPE_VECTOR)
-            {
-              // Compute the value of the error in the curl at this
-              // quadrature point
-              typename FEGenericBase<OutputShape>::OutputNumber exact_curl(0.0);
-              if (_exact_derivs.size() > sys_num && _exact_derivs[sys_num])
-                {
-                  exact_curl = TensorTools::curl_from_grad( exact_grad );
-                }
-              else if (_equation_systems_fine)
-                {
-                  // FIXME: Need to implement curl for MeshFunction and support reference
-                  //        solution for vector-valued elements
-                }
-
-              const typename FEGenericBase<OutputShape>::OutputNumber curl_error = curl_u_h - exact_curl;
-
-              error_vals[5] += JxW[qp]*TensorTools::norm_sq(curl_error);
-
-              // Compute the value of the error in the divergence at this
-              // quadrature point
-              typename FEGenericBase<OutputShape>::OutputNumberDivergence exact_div = 0.0;
-              if (_exact_derivs.size() > sys_num && _exact_derivs[sys_num])
-                {
-                  exact_div = TensorTools::div_from_grad( exact_grad );
-                }
-              else if (_equation_systems_fine)
-                {
-                  // FIXME: Need to implement div for MeshFunction and support reference
-                  //        solution for vector-valued elements
-                }
-
-              const typename FEGenericBase<OutputShape>::OutputNumberDivergence div_error = div_u_h - exact_div;
-
-              error_vals[6] += JxW[qp]*TensorTools::norm_sq(div_error);
-            }
+           if (field_type == TYPE_VECTOR)
+             {
+               curl_values = &fe->get_curl_phi();
+               div_values = &fe->get_div_phi();
+             }
 
 #ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
-          // Compute the value of the error in the hessian at this
-          // quadrature point
-          typename FEGenericBase<OutputShape>::OutputNumberTensor exact_hess;
-          RawAccessor<typename FEGenericBase<OutputShape>::OutputNumberTensor> exact_hess_accessor( exact_hess, dim );
-          if (_exact_hessians.size() > sys_num && _exact_hessians[sys_num])
-            {
-              //FIXME: This needs to be implemented to support rank 3 tensors
-              //       which can't happen until type_n_tensor is fully implemented
-              //       and a RawAccessor<TypeNTensor> is fully implemented
-              if (field_type == TYPE_VECTOR)
-                libmesh_not_implemented();
+           // The value of the shape function second derivatives at the quadrature points
+           // Not computed for vector-valued elements
+           const std::vector<std::vector<typename FEGenericBase<OutputShape>::OutputTensor>> *
+             d2phi_values = nullptr;
 
-              for (unsigned int c = 0; c < n_vec_dim; c++)
-                for (unsigned int d = 0; d < dim; d++)
-                  for (unsigned int e =0; e < dim; e++)
-                    exact_hess_accessor(d + e*dim + c*dim*dim) =
-                      _exact_hessians[sys_num]->
-                      component(context, var_component+c, q_point[qp], time)(d,e);
-
-              // FIXME: operator- is not currently implemented for TypeNTensor
-              const typename FEGenericBase<OutputShape>::OutputNumberTensor grad2_error = grad2_u_h - exact_hess;
-              error_vals[2] += JxW[qp]*grad2_error.norm_sq();
-            }
-          else if (_equation_systems_fine)
-            {
-              // FIXME: Needs to be updated for vector-valued elements
-              std::vector<Tensor> output(1);
-              coarse_values->hessian(q_point[qp],time,output,&subdomain_id);
-              exact_hess = output[0];
-
-              // FIXME: operator- is not currently implemented for TypeNTensor
-              const typename FEGenericBase<OutputShape>::OutputNumberTensor grad2_error = grad2_u_h - exact_hess;
-              error_vals[2] += JxW[qp]*grad2_error.norm_sq();
-            }
+           if (field_type != TYPE_VECTOR)
+             d2phi_values = &fe->get_d2phi();
 #endif
 
-        } // end qp loop
-    } // end element loop
+           // The XYZ locations (in physical space) of the quadrature points
+           const std::vector<Point> & q_point = fe->get_xyz();
+
+           // reinitialize the element-specific data
+           // for the current element
+           fe->reinit (elem);
+
+           context.pre_fe_reinit(computed_system, elem);
+           context.elem_fe_reinit();
+
+           // Get the local to global degree of freedom maps
+           computed_dof_map.dof_indices    (elem, dof_indices, var);
+
+           // The number of quadrature points
+           const unsigned int n_qp = qrule->n_points();
+
+           // The number of shape functions
+           const unsigned int n_sf =
+             cast_int<unsigned int>(dof_indices.size());
+
+           // Begin the loop over the Quadrature points.
+           for (unsigned int qp=0; qp<n_qp; qp++)
+             {
+               typename FEGenericBase<OutputShape>::OutputNumber u_h(0.);
+
+               typename FEGenericBase<OutputShape>::OutputNumberGradient grad_u_h;
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+               typename FEGenericBase<OutputShape>::OutputNumberTensor grad2_u_h;
+#endif
+               typename FEGenericBase<OutputShape>::OutputNumber curl_u_h(0.0);
+               typename FEGenericBase<OutputShape>::OutputNumberDivergence div_u_h = 0.0;
+
+               // Compute solution values at the current
+               // quadrature point.  This requires a sum
+               // over all the shape functions evaluated
+               // at the quadrature point.
+               for (unsigned int i=0; i<n_sf; i++)
+                 {
+                   // Values from current solution.
+                   u_h      += phi_values[i][qp]*computed_system.current_solution  (dof_indices[i]);
+                   grad_u_h += dphi_values[i][qp]*computed_system.current_solution (dof_indices[i]);
+                   if (field_type == TYPE_VECTOR)
+                     {
+                       curl_u_h += (*curl_values)[i][qp]*computed_system.current_solution (dof_indices[i]);
+                       div_u_h += (*div_values)[i][qp]*computed_system.current_solution (dof_indices[i]);
+                     }
+                   else
+                     {
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+                       grad2_u_h += (*d2phi_values)[i][qp]*computed_system.current_solution (dof_indices[i]);
+#endif
+                     }
+                 }
+
+               // Compute the value of the error at this quadrature point
+               typename FEGenericBase<OutputShape>::OutputNumber exact_val(0);
+               RawAccessor<typename FEGenericBase<OutputShape>::OutputNumber> exact_val_accessor( exact_val, n_vec_dim );
+               if (_exact_values.size() > sys_num && _exact_values[sys_num])
+                 {
+                   for (unsigned int c = 0; c < n_vec_dim; c++)
+                     exact_val_accessor(c) =
+                       _exact_values[sys_num]->
+                       component(context, var_component+c, q_point[qp], time);
+                 }
+               else if (_equation_systems_fine)
+                 {
+                   // FIXME: Needs to be updated for vector-valued elements
+                   DenseVector<Number> output(1);
+                   (*my_coarse_values)(q_point[qp],time,output,&subdomain_id);
+                   exact_val = output(0);
+                 }
+               const typename FEGenericBase<OutputShape>::OutputNumber val_error = u_h - exact_val;
+
+               // Add the squares of the error to each contribution
+               Real error_sq = TensorTools::norm_sq(val_error);
+               my_error_vals[0] += JxW[qp]*error_sq;
+
+               Real norm = sqrt(error_sq);
+               my_error_vals[3] += JxW[qp]*norm;
+
+               if (my_error_vals[4]<norm) { my_error_vals[4] = norm; }
+
+               // Compute the value of the error in the gradient at this
+               // quadrature point
+               typename FEGenericBase<OutputShape>::OutputNumberGradient exact_grad;
+               RawAccessor<typename FEGenericBase<OutputShape>::OutputNumberGradient> exact_grad_accessor( exact_grad, LIBMESH_DIM );
+               if (_exact_derivs.size() > sys_num && _exact_derivs[sys_num])
+                 {
+                   for (unsigned int c = 0; c < n_vec_dim; c++)
+                     for (unsigned int d = 0; d < LIBMESH_DIM; d++)
+                       exact_grad_accessor(d + c*LIBMESH_DIM) =
+                         _exact_derivs[sys_num]->
+                         component(context, var_component+c, q_point[qp], time)(d);
+                 }
+               else if (_equation_systems_fine)
+                 {
+                   // FIXME: Needs to be updated for vector-valued elements
+                   std::vector<Gradient> output(1);
+                   my_coarse_values->gradient(q_point[qp],time,output,&subdomain_id);
+                   exact_grad = output[0];
+                 }
+
+               const typename FEGenericBase<OutputShape>::OutputNumberGradient grad_error = grad_u_h - exact_grad;
+
+               my_error_vals[1] += JxW[qp]*grad_error.norm_sq();
+
+
+               if (field_type == TYPE_VECTOR)
+                 {
+                   // Compute the value of the error in the curl at this
+                   // quadrature point
+                   typename FEGenericBase<OutputShape>::OutputNumber exact_curl(0.0);
+                   if (_exact_derivs.size() > sys_num && _exact_derivs[sys_num])
+                     {
+                       exact_curl = TensorTools::curl_from_grad( exact_grad );
+                     }
+                   else if (_equation_systems_fine)
+                     {
+                       // FIXME: Need to implement curl for MeshFunction and support reference
+                       //        solution for vector-valued elements
+                     }
+
+                   const typename FEGenericBase<OutputShape>::OutputNumber curl_error = curl_u_h - exact_curl;
+
+                   my_error_vals[5] += JxW[qp]*TensorTools::norm_sq(curl_error);
+
+                   // Compute the value of the error in the divergence at this
+                   // quadrature point
+                   typename FEGenericBase<OutputShape>::OutputNumberDivergence exact_div = 0.0;
+                   if (_exact_derivs.size() > sys_num && _exact_derivs[sys_num])
+                     {
+                       exact_div = TensorTools::div_from_grad( exact_grad );
+                     }
+                   else if (_equation_systems_fine)
+                     {
+                       // FIXME: Need to implement div for MeshFunction and support reference
+                       //        solution for vector-valued elements
+                     }
+
+                   const typename FEGenericBase<OutputShape>::OutputNumberDivergence div_error = div_u_h - exact_div;
+
+                   my_error_vals[6] += JxW[qp]*TensorTools::norm_sq(div_error);
+                 }
+
+#ifdef LIBMESH_ENABLE_SECOND_DERIVATIVES
+               // Compute the value of the error in the hessian at this
+               // quadrature point
+               typename FEGenericBase<OutputShape>::OutputNumberTensor exact_hess;
+               RawAccessor<typename FEGenericBase<OutputShape>::OutputNumberTensor> exact_hess_accessor( exact_hess, dim );
+               if (_exact_hessians.size() > sys_num && _exact_hessians[sys_num])
+                 {
+                   //FIXME: This needs to be implemented to support rank 3 tensors
+                   //       which can't happen until type_n_tensor is fully implemented
+                   //       and a RawAccessor<TypeNTensor> is fully implemented
+                   if (field_type == TYPE_VECTOR)
+                     libmesh_not_implemented();
+
+                   for (unsigned int c = 0; c < n_vec_dim; c++)
+                     for (unsigned int d = 0; d < dim; d++)
+                       for (unsigned int e =0; e < dim; e++)
+                         exact_hess_accessor(d + e*dim + c*dim*dim) =
+                           _exact_hessians[sys_num]->
+                           component(context, var_component+c, q_point[qp], time)(d,e);
+
+                   // FIXME: operator- is not currently implemented for TypeNTensor
+                   const typename FEGenericBase<OutputShape>::OutputNumberTensor grad2_error = grad2_u_h - exact_hess;
+                   my_error_vals[2] += JxW[qp]*grad2_error.norm_sq();
+                 }
+               else if (_equation_systems_fine)
+                 {
+                   // FIXME: Needs to be updated for vector-valued elements
+                   std::vector<Tensor> output(1);
+                   my_coarse_values->hessian(q_point[qp],time,output,&subdomain_id);
+                   exact_hess = output[0];
+
+                   // FIXME: operator- is not currently implemented for TypeNTensor
+                   const typename FEGenericBase<OutputShape>::OutputNumberTensor grad2_error = grad2_u_h - exact_hess;
+                   my_error_vals[2] += JxW[qp]*grad2_error.norm_sq();
+                 }
+#endif // SECOND_DERIVATIVES
+             } // end qp loop
+         } // end elem loop
+
+       Threads::spin_mutex::scoped_lock lock(error_mtx);
+
+       for (auto i : index_range(my_error_vals))
+         {
+           if (i == 4)
+             error_vals[4] = std::max(error_vals[4], my_error_vals[4]);
+           else
+             error_vals[i] += my_error_vals[i];
+         }
+     }); // end threaded element loop
 
   // Add up the error values on all processors, except for the L-infty
   // norm, for which the maximum is computed.

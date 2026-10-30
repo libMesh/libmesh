@@ -360,52 +360,68 @@ bool MeshRefinement::test_level_one (bool libmesh_dbg_var(libmesh_assert_pass)) 
 
   // We may need a PointLocator for topological_neighbor() tests
   // later, which we need to make sure gets constructed on all
-  // processors at once.
-  std::unique_ptr<PointLocatorBase> point_locator;
-
+  // ranks at once, before we split into threads.
+  bool has_periodic_boundaries = false;
 #ifdef LIBMESH_ENABLE_PERIODIC
-  bool has_periodic_boundaries =
+  has_periodic_boundaries =
     _periodic_boundaries && !_periodic_boundaries->empty();
   libmesh_assert(this->comm().verify(has_periodic_boundaries));
 
+  // Make sure we have a master point locator if needed
   if (has_periodic_boundaries)
-    point_locator = _mesh.sub_point_locator();
+    _mesh.sub_point_locator();
 #endif
 
-  bool failure = false;
+  std::atomic<bool> failure = false;
 
 #ifndef NDEBUG
-  Elem * failed_elem = nullptr;
-  Elem * failed_neighbor = nullptr;
+  std::atomic<const Elem *> failed_elem = nullptr;
+  std::atomic<const Elem *> failed_neighbor = nullptr;
 #endif // !NDEBUG
 
-  for (auto & elem : _mesh.active_local_element_ptr_range())
-    for (auto n : elem->side_index_range())
-      {
-        Elem * neighbor =
-          topological_neighbor(elem, point_locator.get(), n);
-
-        if (!neighbor || !neighbor->active() ||
-            neighbor == remote_elem)
-          continue;
-
-        if ((neighbor->level() + 1 < elem->level()) ||
-            (neighbor->p_level() + 1 < elem->p_level()) ||
-            (neighbor->p_level() > elem->p_level() + 1))
-          {
-            failure = true;
+  Threads::parallel_for
+    (_mesh.active_local_element_stored_range(),
+     [this, &failure,
 #ifndef NDEBUG
-            failed_elem = elem;
-            failed_neighbor = neighbor;
+     &failed_elem, &failed_neighbor,
+#endif
+     has_periodic_boundaries]
+     (const ElemRange & range)
+     {
+       std::unique_ptr<PointLocatorBase> point_locator;
+
+       if (has_periodic_boundaries)
+         point_locator = _mesh.sub_point_locator();
+
+       for (Elem * elem : range)
+         for (auto n : elem->side_index_range())
+           {
+             Elem * neighbor =
+               topological_neighbor(elem, point_locator.get(), n);
+
+             if (!neighbor || !neighbor->active() ||
+                 neighbor == remote_elem)
+               continue;
+
+             if ((neighbor->level() + 1 < elem->level()) ||
+                 (neighbor->p_level() + 1 < elem->p_level()) ||
+                 (neighbor->p_level() > elem->p_level() + 1))
+               {
+                 failure = true;
+#ifndef NDEBUG
+                 failed_elem = elem;
+                 failed_neighbor = neighbor;
 #endif // !NDEBUG
-            break;
-          }
-      }
+                 break;
+               }
+           }
+     });
 
   // If any processor failed, we failed globally
-  this->comm().max(failure);
+  bool some_failure = failure;
+  this->comm().max(some_failure);
 
-  if (failure)
+  if (some_failure)
     {
       // We didn't pass the level one test, so libmesh_assert that
       // we're allowed not to
@@ -433,30 +449,40 @@ bool MeshRefinement::test_unflagged (bool libmesh_dbg_var(libmesh_assert_pass)) 
   // This function must be run on all processors at once
   parallel_object_only();
 
-  bool found_flag = false;
+  std::atomic<bool> found_flag = false;
 
 #ifndef NDEBUG
-  Elem * failed_elem = nullptr;
+  std::atomic<const Elem *> failed_elem = nullptr;
 #endif
 
   // Search for local flags
-  for (auto & elem : _mesh.active_local_element_ptr_range())
-    if (elem->refinement_flag() == Elem::REFINE ||
-        elem->refinement_flag() == Elem::COARSEN ||
-        elem->p_refinement_flag() == Elem::REFINE ||
-        elem->p_refinement_flag() == Elem::COARSEN)
-      {
-        found_flag = true;
+  Threads::parallel_for
+    (_mesh.active_local_element_stored_range(),
+     [&found_flag
 #ifndef NDEBUG
-        failed_elem = elem;
+     , &failed_elem
 #endif
-        break;
-      }
+     ] (const ElemRange & range)
+     {
+       for (Elem * elem : range)
+         if (elem->refinement_flag() == Elem::REFINE ||
+             elem->refinement_flag() == Elem::COARSEN ||
+             elem->p_refinement_flag() == Elem::REFINE ||
+             elem->p_refinement_flag() == Elem::COARSEN)
+           {
+             found_flag = true;
+#ifndef NDEBUG
+             failed_elem = elem;
+#endif
+             break;
+           }
+     });
 
   // If we found a flag on any processor, it counts
-  this->comm().max(found_flag);
+  bool found_some_flag = found_flag;
+  this->comm().max(found_some_flag);
 
-  if (found_flag)
+  if (found_some_flag)
     {
 #ifndef NDEBUG
       if (libmesh_assert_pass)
@@ -1455,9 +1481,12 @@ bool MeshRefinement::_coarsen_elements ()
 
   this->comm().max(mesh_p_changed);
 
-  // And we may need to update DistributedMesh values reflecting the changes
+  // And we may need to update cached values reflecting the changes
   if (mesh_changed)
-    _mesh.update_parallel_id_counts();
+    {
+      _mesh.clear_stored_ranges();
+      _mesh.update_parallel_id_counts();
+    }
 
   // Node processor ids may need to change if an element of that id
   // was coarsened away
@@ -1588,9 +1617,12 @@ bool MeshRefinement::_refine_elements ()
   this->comm().max(mesh_changed);
   this->comm().max(mesh_p_changed);
 
-  // And we may need to update DistributedMesh values reflecting the changes
+  // And we may need to update cached values reflecting the changes
   if (mesh_changed)
-    _mesh.update_parallel_id_counts();
+    {
+      _mesh.clear_stored_ranges();
+      _mesh.update_parallel_id_counts();
+    }
 
   if (mesh_changed && !_mesh.is_replicated())
     {
