@@ -115,7 +115,7 @@ bool LineConstraint::is_parallel(const LineConstraint & l) const
 
 bool LineConstraint::is_parallel(const PlaneConstraint & p) const
 {
-  return _direction * p.normal() < _tol;
+  return std::abs(_direction * p.normal()) < _tol;
 }
 
 ConstraintVariant LineConstraint::intersect(const ConstraintVariant & other) const
@@ -202,7 +202,10 @@ bool PlaneConstraint::operator==(const PlaneConstraint & other) const
 
 bool PlaneConstraint::is_parallel(const PlaneConstraint & p) const
 {
-  return _normal.absolute_fuzzy_equals(p.normal(), _tol);
+  // |n1 x n2| is the sine of the angle between the unit normals, and its
+  // square is the determinant that intersect() divides by, so any pair of
+  // planes that fails this test can be intersected.
+  return _normal.cross(p.normal()).norm() <= _tol;
 }
 
 bool PlaneConstraint::is_parallel(const LineConstraint & l) const { return l.is_parallel(*this); }
@@ -256,19 +259,25 @@ ConstraintVariant PlaneConstraint::intersect(const ConstraintVariant & other) co
             const Point w = _point - o.point();
 
             // Dot product terms used in 2x2 system
-            const Real n1_dot_n1 = _normal * _normal;
             const Real n1_dot_n2 = _normal * o.normal();
             const Real n2_dot_n2 = o.normal() * o.normal();
             const Real n1_dot_w = _normal * w;
             const Real n2_dot_w = o.normal() * w;
 
-            const Real denom = -(n1_dot_n1 * n2_dot_n2 - n1_dot_n2 * n1_dot_n2);
-            libmesh_assert(std::abs(denom) > _tol);
+            // By Lagrange's identity the determinant
+            // -(n1.n1 * n2.n2 - (n1.n2)^2) equals -|n1 x n2|^2, which is
+            // nonzero because the planes are not parallel. Computing it from
+            // dir avoids the cancellation in 1 - cos^2 for nearly parallel
+            // planes.
+            const Real denom = -dir.norm_sq();
 
             const Real s = -(n1_dot_n2 * n2_dot_w - n2_dot_n2 * n1_dot_w) / denom;
             const Point p0 = _point + s * _normal;
 
-            return LineConstraint{p0, dir};
+            // |dir| is the sine of the angle between the planes, which may be
+            // smaller than the zero-length threshold of the LineConstraint
+            // constructor, so pass it a unit vector
+            return LineConstraint{p0, dir.unit()};
           }
 
         else if constexpr (std::is_same_v<T, LineConstraint>)
