@@ -2118,7 +2118,7 @@ public:
    *
    * When this datum exists, find_neighbors() matches sides across
    * disjoint neighbor boundary pairs by their sorted vertex keys.
-   * Matching then uses no coordinates, so it gives the same neighbors
+   * Matching then doesn't rely on node coordinates, so it gives the same neighbors
    * after the nodes move, for example on a displaced mesh.
    *
    * A mesh generator that duplicates a node along a disjoint interface
