@@ -470,6 +470,11 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
 
   LOG_SCOPE("redistribute()", "MeshCommunication");
 
+  // Until the elements arrive, this processor may own an element
+  // whose neighbors it does not have yet. Ghosting functors that
+  // query neighbors in this window must tolerate the gap.
+  mesh._is_redistributing = true;
+
   // Be compatible with both deprecated and corrected MeshBase iterator types
   typedef std::remove_const<MeshBase::const_element_iterator::value_type>::type nc_v_t;
 
@@ -602,6 +607,9 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
 
   TIMPI::push_parallel_packed_range(mesh.comm(), all_elems_to_send, &mesh,
                                     null_elem_action);
+
+  // Every element and ghost we need has now arrived
+  mesh._is_redistributing = false;
 
   // At this point we have all the nodes and elems we need, so we can
   // communicate any constraint rows that our targets will need.

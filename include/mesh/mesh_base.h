@@ -1392,6 +1392,13 @@ public:
   bool allow_node_and_elem_unique_id_overlap() const { return _allow_node_and_elem_unique_id_overlap; }
 
   /**
+   * \returns \p true while this mesh redistributes elements to match
+   * new processor ids. During that time a processor may own an
+   * element whose neighbors have not arrived yet.
+   */
+  bool is_redistributing() const { return _is_redistributing; }
+
+  /**
    * If true is passed in then the elements on this mesh will no
    * longer be (re)partitioned, and the nodes on this mesh will only
    * be repartitioned if they are found "orphaned" via coarsening or
@@ -2373,6 +2380,12 @@ protected:
    * when checking the "uniqueness" of unique_ids.
    */
   bool _allow_node_and_elem_unique_id_overlap;
+
+  /**
+   * True while \p MeshCommunication::redistribute() moves elements
+   * to match new processor ids.
+   */
+  bool _is_redistributing;
 
   /**
    * This structure maintains the mapping of named blocks

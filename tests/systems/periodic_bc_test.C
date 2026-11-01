@@ -1,11 +1,14 @@
 #include <libmesh/dirichlet_boundaries.h>
+#include <libmesh/distributed_mesh.h>
 #include <libmesh/dof_map.h>
 #include <libmesh/elem.h>
 #include <libmesh/equation_systems.h>
 #include <libmesh/exodusII_io.h>
 #include <libmesh/function_base.h>
 #include <libmesh/linear_implicit_system.h>
+#include <libmesh/linear_partitioner.h>
 #include <libmesh/mesh.h>
+#include <libmesh/mesh_generation.h>
 #include <libmesh/numeric_vector.h>
 #include <libmesh/periodic_boundary.h>
 #include <libmesh/quadrature_gauss.h>
@@ -166,6 +169,7 @@ public:
 #if defined(LIBMESH_HAVE_SOLVER) && defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_GZSTREAM)
   CPPUNIT_TEST( testPeriodicLagrange2 );
 #endif
+  CPPUNIT_TEST( testRedistributeToGhosts );
 #endif // LIBMESH_DIM > 1
 
   CPPUNIT_TEST_SUITE_END();
@@ -248,6 +252,50 @@ private:
         }
   }
 
+
+  // Repartition a distributed periodic mesh so that processors take
+  // ownership of elements they only ghosted.  Ghosting functors query
+  // periodic neighbors of those elements before the neighbors arrive.
+  void testRedistributeToGhosts()
+  {
+    LOG_UNIT_TEST;
+
+    DistributedMesh mesh(*TestCommWorld);
+    mesh.partitioner() = std::make_unique<LinearPartitioner>();
+
+    EquationSystems es(mesh);
+    System & sys = es.add_system<System>("PBCSys");
+    sys.add_variable("u", FEType(FIRST, LAGRANGE));
+
+    // Keep every element until the periodic boundaries tell the
+    // ghosting functors what to preserve
+    mesh.allow_remote_element_removal(false);
+    MeshTools::Generation::build_square(mesh, 20, 20, 0., 1., 0., 1., QUAD4);
+
+    // build_square() numbers the bottom, right, top, and left sides 0 to 3
+    PeriodicBoundary vert(RealVectorValue(0., 1.));
+    vert.myboundary = 0;
+    vert.pairedboundary = 2;
+    sys.get_dof_map().add_periodic_boundary(vert);
+    PeriodicBoundary horz(RealVectorValue(1., 0.));
+    horz.myboundary = 3;
+    horz.pairedboundary = 1;
+    sys.get_dof_map().add_periodic_boundary(horz);
+
+    mesh.allow_remote_element_removal(true);
+    mesh.delete_remote_elements();
+    es.init();
+
+    // Give each element to the next processor, so that every
+    // processor takes ownership of elements it did not own before
+    const processor_id_type n_procs = mesh.n_processors();
+    for (auto & elem : mesh.element_ptr_range())
+      elem->processor_id() = (elem->processor_id() + 1) % n_procs;
+    mesh.redistribute();
+    mesh.update_post_partitioning();
+
+    CPPUNIT_ASSERT(!mesh.is_redistributing());
+  }
 
   void testPeriodicLagrange2() { LOG_UNIT_TEST; testPeriodicBC(FEType(SECOND, LAGRANGE)); }
 };

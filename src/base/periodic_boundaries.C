@@ -103,9 +103,12 @@ const Elem * PeriodicBoundaries::neighbor(boundary_id_type boundary_id,
 
   // If we should have found a periodic neighbor but didn't then
   // either we're on a ghosted element with a remote periodic neighbor
-  // or we're on a mesh with an inconsistent periodic boundary.
+  // or we're on a mesh with an inconsistent periodic boundary.  While
+  // a distributed mesh redistributes, a processor may own an element
+  // whose periodic neighbor has not arrived yet.
   libmesh_error_msg_if(mesh.is_serial() ||
-                       (e->processor_id() == mesh.processor_id()),
+                       (e->processor_id() == mesh.processor_id() &&
+                        !mesh.is_redistributing()),
                        "Periodic boundary neighbor not found");
 
   if (neigh_side)
