@@ -3309,6 +3309,8 @@ ElemType Elem::side_type (const ElemType t,
     case QUAD9:
     case QUADSHELL9:
       return EDGE3;
+    case QUAD16:
+      return EDGE4;
     case TET4:
       return TRI3;
     case TET10:
@@ -3408,6 +3410,7 @@ ElemType Elem::edge_type (const ElemType t)
     case QUADSHELL8:
     case QUAD9:
     case QUADSHELL9:
+    case QUAD16:
     case C0POLYGON:
       return side_type(t, 0);
       // A first-order 3D element's edges hold their two vertices
@@ -3473,6 +3476,8 @@ unsigned int Elem::local_side_node (const ElemType t,
     case QUAD8:
     case QUADSHELL8:
       return Quad8::side_nodes_map[side][side_node];
+    case QUAD16:
+      return Quad16::side_nodes_map[side][side_node];
     case QUAD9:
     case QUADSHELL9:
       return Quad9::side_nodes_map[side][side_node];
@@ -3539,6 +3544,7 @@ unsigned int Elem::local_edge_node (const ElemType t,
     case QUADSHELL8:
     case QUAD9:
     case QUADSHELL9:
+    case QUAD16:
       return local_side_node(t, edge, edge_node);
     case TET4:
       return Tet4::edge_nodes_map[edge][edge_node];

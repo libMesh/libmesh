@@ -117,6 +117,8 @@ public:
   virtual std::vector<unsigned int> nodes_on_side(const unsigned int s) const override;
 
   virtual std::vector<unsigned int> nodes_on_edge(const unsigned int e) const override;
+  virtual unsigned int local_side_node(unsigned int side,
+                                   unsigned int side_node) const override;
 
   /**
    * \returns \p true if the specified (local) node number is on the

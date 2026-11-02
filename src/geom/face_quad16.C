@@ -16,7 +16,7 @@
 // Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // Local includes
-#include "libmesh/edge_edge2.h"
+#include "libmesh/edge_edge4.h"
 #include "libmesh/face_quad16.h"
 #include "libmesh/enum_io_package.h"
 #include "libmesh/enum_order.h"
@@ -107,6 +107,15 @@ bool Quad16::is_node_on_side(const unsigned int n,
   return std::find(std::begin(side_nodes_map[s]),
                    std::end(side_nodes_map[s]),
                    n) != std::end(side_nodes_map[s]);
+}
+
+unsigned int Quad16::local_side_node(unsigned int side,
+                                   unsigned int side_node) const
+{
+  libmesh_assert_less (side, this->n_sides());
+  libmesh_assert_less (side_node, Quad16::nodes_per_side);
+
+  return Quad16::side_nodes_map[side][side_node];
 }
 
 std::vector<unsigned>
@@ -206,7 +215,7 @@ Order Quad16::default_order() const
 
 std::unique_ptr<Elem> Quad16::build_side_ptr (const unsigned int i)
 {
-  return this->simple_build_side_ptr<Edge2, Quad16>(i);
+  return this->simple_build_side_ptr<Edge4, Quad16>(i);
 }
 
 
@@ -214,7 +223,7 @@ std::unique_ptr<Elem> Quad16::build_side_ptr (const unsigned int i)
 void Quad16::build_side_ptr (std::unique_ptr<Elem> & side,
                             const unsigned int i)
 {
-  this->simple_build_side_ptr<Quad16>(side, i, EDGE2);
+  this->simple_build_side_ptr<Quad16>(side, i, EDGE4);
 }
 
 
@@ -377,11 +386,10 @@ void Quad16::flip(BoundaryInfo * boundary_info)
   swap2boundaryedges(1,3,boundary_info);
 }
 
-
 ElemType Quad16::side_type (const unsigned int libmesh_dbg_var(s)) const
 {
   libmesh_assert_less (s, 4);
-  return EDGE2;
+  return EDGE4;
 }
 
 
