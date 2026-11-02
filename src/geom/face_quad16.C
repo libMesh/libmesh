@@ -381,6 +381,12 @@ void Quad16::flip(BoundaryInfo * boundary_info)
 
   swap2nodes(0,1);
   swap2nodes(2,3);
+  swap2nodes(4,5);
+  swap2nodes(6,11);
+  swap2nodes(7,10);
+  swap2nodes(8,9);
+  swap2nodes(12,13);
+  swap2nodes(14,15);
   swap2neighbors(1,3);
   swap2boundarysides(1,3,boundary_info);
   swap2boundaryedges(1,3,boundary_info);
