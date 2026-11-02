@@ -177,14 +177,37 @@ public:
             // if it sits on one, else a face, else the element itself.
             // Its vertices are what the node should be the centroid of.
             std::vector<unsigned int> subentity_vertices;
+            Point expected;
+            bool has_expected = false;
             if (elem->dim() > 1)
               for (const auto e : elem->edge_index_range())
                 {
                   const auto nodes = elem->nodes_on_edge(e);
-                  if (std::find(nodes.begin(), nodes.end(), i) != nodes.end())
-                    subentity_vertices = {nodes[0], nodes[1]};
+                  const auto it = std::find(nodes.begin(), nodes.end(), i);
+                  if (it == nodes.end())
+                    continue;
+
+                  // Convention: edge vertices first, then interior nodes in order
+                  // from nodes[0] toward nodes[1].
+                  libmesh_assert(elem->is_vertex(nodes[0]));
+                  libmesh_assert(elem->is_vertex(nodes[1]));
+                  libmesh_assert(!elem->is_vertex(i));
+
+                  const Real k = (it - nodes.begin()) - 2;       // 0-based among interior
+                  const Real m = nodes.size() - 2;               // interior node count
+                  const Point a = elem->master_point(nodes[0]);
+                  const Point b = elem->master_point(nodes[1]);
+                  expected = a + (b - a) * ((k + 1) / (m + 1));
+                  has_expected = true;
+                  break;
                 }
-            if (subentity_vertices.empty())
+            if (!has_expected && type == QUAD16)
+              {
+                const Real t = Real(1)/3;
+                const Point q[4] = {{-t,-t}, {t,-t}, {t,t}, {-t,t}};
+                expected = q[i - 12];
+              }
+            if (!has_expected)
               for (const auto s : elem->side_index_range())
                 {
                   const auto nodes = elem->nodes_on_side(s);
@@ -202,8 +225,9 @@ public:
             for (auto v : subentity_vertices)
               centroid += elem->master_point(v);
             centroid /= Real(subentity_vertices.size());
+            expected = centroid;
 
-            LIBMESH_ASSERT_REALVEC_EQUAL(centroid, elem->master_point(i),
+            LIBMESH_ASSERT_REALVEC_EQUAL(expected, elem->master_point(i),
                                          TOLERANCE*TOLERANCE);
           }
       }
