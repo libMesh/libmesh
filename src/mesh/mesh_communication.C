@@ -470,9 +470,9 @@ void MeshCommunication::redistribute (DistributedMesh & mesh,
 
   LOG_SCOPE("redistribute()", "MeshCommunication");
 
-  // Until the elements arrive, this processor may own an element
-  // whose neighbors it does not have yet. Ghosting functors that
-  // query neighbors in this window must tolerate the gap.
+  // Keep track of whether we're redistributing so that we can
+  // relax requirements such as we must have the periodic neighbor
+  // of an owned element
   mesh._is_redistributing = true;
 
   // Be compatible with both deprecated and corrected MeshBase iterator types
