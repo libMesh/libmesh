@@ -270,6 +270,12 @@ void restore_delaunay(Container & check_delaunay_on,
           elem.set_neighbor((n+2)%3, neigh);
           neigh->set_neighbor((nn+2)%3, &elem);
 
+          // The new diagonal should not call for a swap back.
+          libmesh_error_msg_if
+            (can_delaunay_swap(elem, (n+2)%3, -TOLERANCE*TOLERANCE).first,
+             "Poly2TriTriangulator would swap the diagonal shared by two "
+             "triangles back and forth forever");
+
           // Start over after this much change, don't just loop to the
           // next neighbor
           break;
