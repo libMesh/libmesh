@@ -206,26 +206,29 @@ public:
                 const Real t = Real(1)/3;
                 const Point q[4] = {{-t,-t}, {t,-t}, {t,t}, {-t,t}};
                 expected = q[i - 12];
+                has_expected = true;
               }
             if (!has_expected)
-              for (const auto s : elem->side_index_range())
-                {
-                  const auto nodes = elem->nodes_on_side(s);
-                  if (std::find(nodes.begin(), nodes.end(), i) != nodes.end())
-                    for (auto n : nodes)
-                      if (elem->is_vertex(n))
-                        subentity_vertices.push_back(n);
-                }
-            if (subentity_vertices.empty())
-              for (const auto n : elem->node_index_range())
-                if (elem->is_vertex(n))
-                  subentity_vertices.push_back(n);
+              {
+                for (const auto s : elem->side_index_range())
+                  {
+                    const auto nodes = elem->nodes_on_side(s);
+                    if (std::find(nodes.begin(), nodes.end(), i) != nodes.end())
+                      for (auto n : nodes)
+                        if (elem->is_vertex(n))
+                          subentity_vertices.push_back(n);
+                  }
+                if (subentity_vertices.empty())
+                  for (const auto n : elem->node_index_range())
+                    if (elem->is_vertex(n))
+                      subentity_vertices.push_back(n);
 
-            Point centroid;
-            for (auto v : subentity_vertices)
-              centroid += elem->master_point(v);
-            centroid /= Real(subentity_vertices.size());
-            expected = centroid;
+                Point centroid;
+                for (auto v : subentity_vertices)
+                  centroid += elem->master_point(v);
+                centroid /= Real(subentity_vertices.size());
+                expected = centroid;
+              }
 
             LIBMESH_ASSERT_REALVEC_EQUAL(expected, elem->master_point(i),
                                          TOLERANCE*TOLERANCE);
