@@ -68,8 +68,14 @@ p2t::Point to_p2t(const libMesh::Point & p)
   return {double(p(0)), double(p(1))};
 }
 
-Real distance_from_circumcircle(const Elem & elem,
-                                const Point & p)
+// The tolerance is relative to the circumradius.  The rounding error
+// in the distance from a circumcircle grows with the radius, so with
+// a fixed tolerance, points on a common circle in a large enough mesh
+// would call for a swap of both diagonals, and restore_delaunay()
+// would swap them back and forth forever.
+bool in_circumcircle(const Elem & elem,
+                     const Point & p,
+                     const Real tol = 0)
 {
   libmesh_assert_equal_to(elem.n_vertices(), 3);
 
@@ -77,15 +83,7 @@ Real distance_from_circumcircle(const Elem & elem,
   const Real radius = (elem.point(0) - circumcenter).norm();
   const Real p_dist = (p - circumcenter).norm();
 
-  return p_dist - radius;
-}
-
-
-bool in_circumcircle(const Elem & elem,
-                     const Point & p,
-                     const Real tol = 0)
-{
-  return (distance_from_circumcircle(elem, p) < tol);
+  return (p_dist - radius < tol * radius);
 
   /*
   libmesh_assert_equal_to(elem.n_vertices(), 3);
