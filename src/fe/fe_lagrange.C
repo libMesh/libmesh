@@ -581,6 +581,7 @@ unsigned int lagrange_n_dofs(const ElemType t, const Elem * e, const Order o)
 
           case QUAD9:
           case QUADSHELL9:
+          case QUAD16:
             return 9;
 
           case TET10:
@@ -625,6 +626,9 @@ unsigned int lagrange_n_dofs(const ElemType t, const Elem * e, const Order o)
 
           case EDGE4:
             return 4;
+
+          case QUAD16:
+            return 16;
 
           case PRISM20:
             return 20;
