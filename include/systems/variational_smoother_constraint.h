@@ -128,7 +128,7 @@ public:
   /**
    * Constructor
    * @param point A point on the constraining line.
-   * @param direction the direction of the constraining line.
+   * @param direction the unit direction of the constraining line.
    * @param tol The tolerance to use for numerical comparisons.
    */
   LineConstraint(const Point &point, const Point &direction,
@@ -228,7 +228,7 @@ public:
   /**
    * Constructor
    * @param point A point on the constraining plane.
-   * @param normal the direction normal to the constraining plane.
+   * @param normal the unit normal of the constraining plane.
    * @param tol The tolerance to use for numerical comparisons.
    */
   PlaneConstraint(const Point &point, const Point &normal,

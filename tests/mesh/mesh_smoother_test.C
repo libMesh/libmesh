@@ -1094,7 +1094,7 @@ public:
     LOG_UNIT_TEST;
 
     const PlaneConstraint plane(Point(0, 0, 0), Point(0, 0, 1));
-    const LineConstraint line(Point(0, 0, 1), Point(1, 0, -1));
+    const LineConstraint line(Point(0, 0, 1), Point(1, 0, -1).unit());
     CPPUNIT_ASSERT(!line.is_parallel(plane));
 
     for (const auto & intersection :

@@ -23,10 +23,11 @@
 namespace libMesh
 {
 
-// Helper function to orient a vector in the positive x/y/z direction
+// Helper function to orient a unit vector in the positive x/y/z direction
 auto get_positive_vector = [](const Point & vec) -> Point {
-  libmesh_error_msg_if(vec.norm() < TOLERANCE,
-                       "Can't define a positively-oriented vector with a zero vector.");
+  // unit() rounds to within a few ulps of length 1, so TOLERANCE only
+  // rejects vectors that were never normalized
+  libmesh_assert(absolute_fuzzy_equals(vec.norm(), 1., TOLERANCE));
 
   // Choose sign such that direction vector points in the positive x/y/z
   // direction This helps to eliminate duplicate lines/planes
@@ -42,7 +43,7 @@ auto get_positive_vector = [](const Point & vec) -> Point {
   const auto dot_prod = vec * canonical;
   libmesh_assert(!absolute_fuzzy_equals(dot_prod, 0.));
 
-  return (dot_prod > 0) ? vec.unit() : -vec.unit();
+  return (dot_prod > 0) ? vec : Point(-vec);
 };
 
 PointConstraint::PointConstraint(const Point & point, const Real & tol) : _point(point), _tol(tol)
@@ -79,8 +80,8 @@ ConstraintVariant PointConstraint::intersect(const ConstraintVariant & other) co
 LineConstraint::LineConstraint(const Point & point, const Point & direction, const Real & tol)
   : _point(point), _direction(get_positive_vector(direction)), _tol(tol)
 {
-  libmesh_error_msg_if(_direction.norm() < _tol,
-                       "Can't define a line with zero magnitude direction vector.");
+  libmesh_assert_msg(_direction.norm() >= _tol,
+                     "Can't define a line with zero magnitude direction vector.");
 }
 
 bool LineConstraint::operator<(const LineConstraint & other) const
@@ -179,8 +180,8 @@ ConstraintVariant LineConstraint::intersect(const ConstraintVariant & other) con
 PlaneConstraint::PlaneConstraint(const Point & point, const Point & normal, const Real & tol)
   : _point(point), _normal(get_positive_vector(normal)), _tol(tol)
 {
-  libmesh_error_msg_if(_normal.norm() < _tol,
-                       "Can't define a plane with zero magnitude direction vector.");
+  libmesh_assert_msg(_normal.norm() >= _tol,
+                     "Can't define a plane with zero magnitude direction vector.");
 }
 
 bool PlaneConstraint::operator<(const PlaneConstraint & other) const
@@ -274,9 +275,6 @@ ConstraintVariant PlaneConstraint::intersect(const ConstraintVariant & other) co
             const Real s = -(n1_dot_n2 * n2_dot_w - n2_dot_n2 * n1_dot_w) / denom;
             const Point p0 = _point + s * _normal;
 
-            // |dir| is the sine of the angle between the planes, which may be
-            // smaller than the zero-length threshold of the LineConstraint
-            // constructor, so pass it a unit vector
             return LineConstraint{p0, dir.unit()};
           }
 
@@ -862,7 +860,7 @@ ConstraintVariant VariationalSmootherConstraint::determine_constraint(
               if (candidate_normal.norm() <= TOLERANCE)
                 continue;
 
-              const PlaneConstraint candidate_plane{node, candidate_normal};
+              const PlaneConstraint candidate_plane{node, candidate_normal.unit()};
               valid_planes.emplace(candidate_plane);
             }
         }
