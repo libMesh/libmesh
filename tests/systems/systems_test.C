@@ -453,7 +453,7 @@ public:
   CPPUNIT_TEST( testAddVectorProjChange );
   CPPUNIT_TEST( testAddVectorTypeChange );
   CPPUNIT_TEST( testPostInitAddVectorTypeChange );
-#if defined(LIBMESH_HAVE_PETSC) && defined(LIBMESH_ENABLE_AMR)
+#ifdef LIBMESH_HAVE_PETSC
   CPPUNIT_TEST( testPetscOptionsPrefix );
 #endif
 
@@ -781,7 +781,7 @@ public:
 
 
 
-#if defined(LIBMESH_HAVE_PETSC) && defined(LIBMESH_ENABLE_AMR)
+#ifdef LIBMESH_HAVE_PETSC
   void testPetscOptionsPrefix()
   {
     if (default_solver_package() != PETSC_SOLVERS)
@@ -827,10 +827,12 @@ public:
     es.init();
     check();
 
+#ifdef LIBMESH_ENABLE_AMR
     // Refinement rebuilds every vector and matrix
     MeshRefinement(mesh).uniformly_refine(1);
     es.reinit();
     check();
+#endif
   }
 #endif
 
