@@ -396,6 +396,7 @@ am__libmesh_dbg_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
 	src/ghosting/ghost_point_neighbors.C \
 	src/ghosting/non_manifold_coupling.C \
 	src/ghosting/overlap_coupling.C \
+	src/ghosting/periodic_point_neighbors.C \
 	src/ghosting/point_neighbor_coupling.C \
 	src/ghosting/sibling_coupling.C src/mesh/abaqus_io.C \
 	src/mesh/boundary_info.C src/mesh/boundary_mesh.C \
@@ -812,6 +813,7 @@ am__objects_1 = src/base/libmesh_dbg_la-dirichlet_boundary.lo \
 	src/ghosting/libmesh_dbg_la-ghost_point_neighbors.lo \
 	src/ghosting/libmesh_dbg_la-non_manifold_coupling.lo \
 	src/ghosting/libmesh_dbg_la-overlap_coupling.lo \
+	src/ghosting/libmesh_dbg_la-periodic_point_neighbors.lo \
 	src/ghosting/libmesh_dbg_la-point_neighbor_coupling.lo \
 	src/ghosting/libmesh_dbg_la-sibling_coupling.lo \
 	src/mesh/libmesh_dbg_la-abaqus_io.lo \
@@ -1220,6 +1222,7 @@ am__libmesh_devel_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
 	src/ghosting/ghost_point_neighbors.C \
 	src/ghosting/non_manifold_coupling.C \
 	src/ghosting/overlap_coupling.C \
+	src/ghosting/periodic_point_neighbors.C \
 	src/ghosting/point_neighbor_coupling.C \
 	src/ghosting/sibling_coupling.C src/mesh/abaqus_io.C \
 	src/mesh/boundary_info.C src/mesh/boundary_mesh.C \
@@ -1635,6 +1638,7 @@ am__objects_2 = src/base/libmesh_devel_la-dirichlet_boundary.lo \
 	src/ghosting/libmesh_devel_la-ghost_point_neighbors.lo \
 	src/ghosting/libmesh_devel_la-non_manifold_coupling.lo \
 	src/ghosting/libmesh_devel_la-overlap_coupling.lo \
+	src/ghosting/libmesh_devel_la-periodic_point_neighbors.lo \
 	src/ghosting/libmesh_devel_la-point_neighbor_coupling.lo \
 	src/ghosting/libmesh_devel_la-sibling_coupling.lo \
 	src/mesh/libmesh_devel_la-abaqus_io.lo \
@@ -2040,6 +2044,7 @@ am__libmesh_oprof_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
 	src/ghosting/ghost_point_neighbors.C \
 	src/ghosting/non_manifold_coupling.C \
 	src/ghosting/overlap_coupling.C \
+	src/ghosting/periodic_point_neighbors.C \
 	src/ghosting/point_neighbor_coupling.C \
 	src/ghosting/sibling_coupling.C src/mesh/abaqus_io.C \
 	src/mesh/boundary_info.C src/mesh/boundary_mesh.C \
@@ -2455,6 +2460,7 @@ am__objects_3 = src/base/libmesh_oprof_la-dirichlet_boundary.lo \
 	src/ghosting/libmesh_oprof_la-ghost_point_neighbors.lo \
 	src/ghosting/libmesh_oprof_la-non_manifold_coupling.lo \
 	src/ghosting/libmesh_oprof_la-overlap_coupling.lo \
+	src/ghosting/libmesh_oprof_la-periodic_point_neighbors.lo \
 	src/ghosting/libmesh_oprof_la-point_neighbor_coupling.lo \
 	src/ghosting/libmesh_oprof_la-sibling_coupling.lo \
 	src/mesh/libmesh_oprof_la-abaqus_io.lo \
@@ -2860,6 +2866,7 @@ am__libmesh_opt_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
 	src/ghosting/ghost_point_neighbors.C \
 	src/ghosting/non_manifold_coupling.C \
 	src/ghosting/overlap_coupling.C \
+	src/ghosting/periodic_point_neighbors.C \
 	src/ghosting/point_neighbor_coupling.C \
 	src/ghosting/sibling_coupling.C src/mesh/abaqus_io.C \
 	src/mesh/boundary_info.C src/mesh/boundary_mesh.C \
@@ -3275,6 +3282,7 @@ am__objects_4 = src/base/libmesh_opt_la-dirichlet_boundary.lo \
 	src/ghosting/libmesh_opt_la-ghost_point_neighbors.lo \
 	src/ghosting/libmesh_opt_la-non_manifold_coupling.lo \
 	src/ghosting/libmesh_opt_la-overlap_coupling.lo \
+	src/ghosting/libmesh_opt_la-periodic_point_neighbors.lo \
 	src/ghosting/libmesh_opt_la-point_neighbor_coupling.lo \
 	src/ghosting/libmesh_opt_la-sibling_coupling.lo \
 	src/mesh/libmesh_opt_la-abaqus_io.lo \
@@ -3679,6 +3687,7 @@ am__libmesh_prof_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
 	src/ghosting/ghost_point_neighbors.C \
 	src/ghosting/non_manifold_coupling.C \
 	src/ghosting/overlap_coupling.C \
+	src/ghosting/periodic_point_neighbors.C \
 	src/ghosting/point_neighbor_coupling.C \
 	src/ghosting/sibling_coupling.C src/mesh/abaqus_io.C \
 	src/mesh/boundary_info.C src/mesh/boundary_mesh.C \
@@ -4094,6 +4103,7 @@ am__objects_5 = src/base/libmesh_prof_la-dirichlet_boundary.lo \
 	src/ghosting/libmesh_prof_la-ghost_point_neighbors.lo \
 	src/ghosting/libmesh_prof_la-non_manifold_coupling.lo \
 	src/ghosting/libmesh_prof_la-overlap_coupling.lo \
+	src/ghosting/libmesh_prof_la-periodic_point_neighbors.lo \
 	src/ghosting/libmesh_prof_la-point_neighbor_coupling.lo \
 	src/ghosting/libmesh_prof_la-sibling_coupling.lo \
 	src/mesh/libmesh_prof_la-abaqus_io.lo \
@@ -6021,30 +6031,35 @@ am__depfiles_remade = src/apps/$(DEPDIR)/amr_dbg-amr.Po \
 	src/ghosting/$(DEPDIR)/libmesh_dbg_la-ghost_point_neighbors.Plo \
 	src/ghosting/$(DEPDIR)/libmesh_dbg_la-non_manifold_coupling.Plo \
 	src/ghosting/$(DEPDIR)/libmesh_dbg_la-overlap_coupling.Plo \
+	src/ghosting/$(DEPDIR)/libmesh_dbg_la-periodic_point_neighbors.Plo \
 	src/ghosting/$(DEPDIR)/libmesh_dbg_la-point_neighbor_coupling.Plo \
 	src/ghosting/$(DEPDIR)/libmesh_dbg_la-sibling_coupling.Plo \
 	src/ghosting/$(DEPDIR)/libmesh_devel_la-default_coupling.Plo \
 	src/ghosting/$(DEPDIR)/libmesh_devel_la-ghost_point_neighbors.Plo \
 	src/ghosting/$(DEPDIR)/libmesh_devel_la-non_manifold_coupling.Plo \
 	src/ghosting/$(DEPDIR)/libmesh_devel_la-overlap_coupling.Plo \
+	src/ghosting/$(DEPDIR)/libmesh_devel_la-periodic_point_neighbors.Plo \
 	src/ghosting/$(DEPDIR)/libmesh_devel_la-point_neighbor_coupling.Plo \
 	src/ghosting/$(DEPDIR)/libmesh_devel_la-sibling_coupling.Plo \
 	src/ghosting/$(DEPDIR)/libmesh_oprof_la-default_coupling.Plo \
 	src/ghosting/$(DEPDIR)/libmesh_oprof_la-ghost_point_neighbors.Plo \
 	src/ghosting/$(DEPDIR)/libmesh_oprof_la-non_manifold_coupling.Plo \
 	src/ghosting/$(DEPDIR)/libmesh_oprof_la-overlap_coupling.Plo \
+	src/ghosting/$(DEPDIR)/libmesh_oprof_la-periodic_point_neighbors.Plo \
 	src/ghosting/$(DEPDIR)/libmesh_oprof_la-point_neighbor_coupling.Plo \
 	src/ghosting/$(DEPDIR)/libmesh_oprof_la-sibling_coupling.Plo \
 	src/ghosting/$(DEPDIR)/libmesh_opt_la-default_coupling.Plo \
 	src/ghosting/$(DEPDIR)/libmesh_opt_la-ghost_point_neighbors.Plo \
 	src/ghosting/$(DEPDIR)/libmesh_opt_la-non_manifold_coupling.Plo \
 	src/ghosting/$(DEPDIR)/libmesh_opt_la-overlap_coupling.Plo \
+	src/ghosting/$(DEPDIR)/libmesh_opt_la-periodic_point_neighbors.Plo \
 	src/ghosting/$(DEPDIR)/libmesh_opt_la-point_neighbor_coupling.Plo \
 	src/ghosting/$(DEPDIR)/libmesh_opt_la-sibling_coupling.Plo \
 	src/ghosting/$(DEPDIR)/libmesh_prof_la-default_coupling.Plo \
 	src/ghosting/$(DEPDIR)/libmesh_prof_la-ghost_point_neighbors.Plo \
 	src/ghosting/$(DEPDIR)/libmesh_prof_la-non_manifold_coupling.Plo \
 	src/ghosting/$(DEPDIR)/libmesh_prof_la-overlap_coupling.Plo \
+	src/ghosting/$(DEPDIR)/libmesh_prof_la-periodic_point_neighbors.Plo \
 	src/ghosting/$(DEPDIR)/libmesh_prof_la-point_neighbor_coupling.Plo \
 	src/ghosting/$(DEPDIR)/libmesh_prof_la-sibling_coupling.Plo \
 	src/mesh/$(DEPDIR)/libmesh_dbg_la-abaqus_io.Plo \
@@ -8355,6 +8370,7 @@ libmesh_SOURCES = \
         src/ghosting/ghost_point_neighbors.C \
         src/ghosting/non_manifold_coupling.C \
         src/ghosting/overlap_coupling.C \
+        src/ghosting/periodic_point_neighbors.C \
         src/ghosting/point_neighbor_coupling.C \
         src/ghosting/sibling_coupling.C \
         src/mesh/abaqus_io.C \
@@ -9635,6 +9651,9 @@ src/ghosting/libmesh_dbg_la-non_manifold_coupling.lo:  \
 src/ghosting/libmesh_dbg_la-overlap_coupling.lo:  \
 	src/ghosting/$(am__dirstamp) \
 	src/ghosting/$(DEPDIR)/$(am__dirstamp)
+src/ghosting/libmesh_dbg_la-periodic_point_neighbors.lo:  \
+	src/ghosting/$(am__dirstamp) \
+	src/ghosting/$(DEPDIR)/$(am__dirstamp)
 src/ghosting/libmesh_dbg_la-point_neighbor_coupling.lo:  \
 	src/ghosting/$(am__dirstamp) \
 	src/ghosting/$(DEPDIR)/$(am__dirstamp)
@@ -10882,6 +10901,9 @@ src/ghosting/libmesh_devel_la-non_manifold_coupling.lo:  \
 src/ghosting/libmesh_devel_la-overlap_coupling.lo:  \
 	src/ghosting/$(am__dirstamp) \
 	src/ghosting/$(DEPDIR)/$(am__dirstamp)
+src/ghosting/libmesh_devel_la-periodic_point_neighbors.lo:  \
+	src/ghosting/$(am__dirstamp) \
+	src/ghosting/$(DEPDIR)/$(am__dirstamp)
 src/ghosting/libmesh_devel_la-point_neighbor_coupling.lo:  \
 	src/ghosting/$(am__dirstamp) \
 	src/ghosting/$(DEPDIR)/$(am__dirstamp)
@@ -12064,6 +12086,9 @@ src/ghosting/libmesh_oprof_la-non_manifold_coupling.lo:  \
 	src/ghosting/$(am__dirstamp) \
 	src/ghosting/$(DEPDIR)/$(am__dirstamp)
 src/ghosting/libmesh_oprof_la-overlap_coupling.lo:  \
+	src/ghosting/$(am__dirstamp) \
+	src/ghosting/$(DEPDIR)/$(am__dirstamp)
+src/ghosting/libmesh_oprof_la-periodic_point_neighbors.lo:  \
 	src/ghosting/$(am__dirstamp) \
 	src/ghosting/$(DEPDIR)/$(am__dirstamp)
 src/ghosting/libmesh_oprof_la-point_neighbor_coupling.lo:  \
@@ -13250,6 +13275,9 @@ src/ghosting/libmesh_opt_la-non_manifold_coupling.lo:  \
 src/ghosting/libmesh_opt_la-overlap_coupling.lo:  \
 	src/ghosting/$(am__dirstamp) \
 	src/ghosting/$(DEPDIR)/$(am__dirstamp)
+src/ghosting/libmesh_opt_la-periodic_point_neighbors.lo:  \
+	src/ghosting/$(am__dirstamp) \
+	src/ghosting/$(DEPDIR)/$(am__dirstamp)
 src/ghosting/libmesh_opt_la-point_neighbor_coupling.lo:  \
 	src/ghosting/$(am__dirstamp) \
 	src/ghosting/$(DEPDIR)/$(am__dirstamp)
@@ -14429,6 +14457,9 @@ src/ghosting/libmesh_prof_la-non_manifold_coupling.lo:  \
 	src/ghosting/$(am__dirstamp) \
 	src/ghosting/$(DEPDIR)/$(am__dirstamp)
 src/ghosting/libmesh_prof_la-overlap_coupling.lo:  \
+	src/ghosting/$(am__dirstamp) \
+	src/ghosting/$(DEPDIR)/$(am__dirstamp)
+src/ghosting/libmesh_prof_la-periodic_point_neighbors.lo:  \
 	src/ghosting/$(am__dirstamp) \
 	src/ghosting/$(DEPDIR)/$(am__dirstamp)
 src/ghosting/libmesh_prof_la-point_neighbor_coupling.lo:  \
@@ -16872,30 +16903,35 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_dbg_la-ghost_point_neighbors.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_dbg_la-non_manifold_coupling.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_dbg_la-overlap_coupling.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_dbg_la-periodic_point_neighbors.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_dbg_la-point_neighbor_coupling.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_dbg_la-sibling_coupling.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_devel_la-default_coupling.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_devel_la-ghost_point_neighbors.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_devel_la-non_manifold_coupling.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_devel_la-overlap_coupling.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_devel_la-periodic_point_neighbors.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_devel_la-point_neighbor_coupling.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_devel_la-sibling_coupling.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_oprof_la-default_coupling.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_oprof_la-ghost_point_neighbors.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_oprof_la-non_manifold_coupling.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_oprof_la-overlap_coupling.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_oprof_la-periodic_point_neighbors.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_oprof_la-point_neighbor_coupling.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_oprof_la-sibling_coupling.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_opt_la-default_coupling.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_opt_la-ghost_point_neighbors.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_opt_la-non_manifold_coupling.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_opt_la-overlap_coupling.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_opt_la-periodic_point_neighbors.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_opt_la-point_neighbor_coupling.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_opt_la-sibling_coupling.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_prof_la-default_coupling.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_prof_la-ghost_point_neighbors.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_prof_la-non_manifold_coupling.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_prof_la-overlap_coupling.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_prof_la-periodic_point_neighbors.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_prof_la-point_neighbor_coupling.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/ghosting/$(DEPDIR)/libmesh_prof_la-sibling_coupling.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/mesh/$(DEPDIR)/libmesh_dbg_la-abaqus_io.Plo@am__quote@ # am--include-marker
@@ -19723,6 +19759,13 @@ src/ghosting/libmesh_dbg_la-overlap_coupling.lo: src/ghosting/overlap_coupling.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/ghosting/overlap_coupling.C' object='src/ghosting/libmesh_dbg_la-overlap_coupling.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/ghosting/libmesh_dbg_la-overlap_coupling.lo `test -f 'src/ghosting/overlap_coupling.C' || echo '$(srcdir)/'`src/ghosting/overlap_coupling.C
+
+src/ghosting/libmesh_dbg_la-periodic_point_neighbors.lo: src/ghosting/periodic_point_neighbors.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/ghosting/libmesh_dbg_la-periodic_point_neighbors.lo -MD -MP -MF src/ghosting/$(DEPDIR)/libmesh_dbg_la-periodic_point_neighbors.Tpo -c -o src/ghosting/libmesh_dbg_la-periodic_point_neighbors.lo `test -f 'src/ghosting/periodic_point_neighbors.C' || echo '$(srcdir)/'`src/ghosting/periodic_point_neighbors.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/ghosting/$(DEPDIR)/libmesh_dbg_la-periodic_point_neighbors.Tpo src/ghosting/$(DEPDIR)/libmesh_dbg_la-periodic_point_neighbors.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/ghosting/periodic_point_neighbors.C' object='src/ghosting/libmesh_dbg_la-periodic_point_neighbors.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/ghosting/libmesh_dbg_la-periodic_point_neighbors.lo `test -f 'src/ghosting/periodic_point_neighbors.C' || echo '$(srcdir)/'`src/ghosting/periodic_point_neighbors.C
 
 src/ghosting/libmesh_dbg_la-point_neighbor_coupling.lo: src/ghosting/point_neighbor_coupling.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/ghosting/libmesh_dbg_la-point_neighbor_coupling.lo -MD -MP -MF src/ghosting/$(DEPDIR)/libmesh_dbg_la-point_neighbor_coupling.Tpo -c -o src/ghosting/libmesh_dbg_la-point_neighbor_coupling.lo `test -f 'src/ghosting/point_neighbor_coupling.C' || echo '$(srcdir)/'`src/ghosting/point_neighbor_coupling.C
@@ -23091,6 +23134,13 @@ src/ghosting/libmesh_devel_la-overlap_coupling.lo: src/ghosting/overlap_coupling
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/ghosting/libmesh_devel_la-overlap_coupling.lo `test -f 'src/ghosting/overlap_coupling.C' || echo '$(srcdir)/'`src/ghosting/overlap_coupling.C
 
+src/ghosting/libmesh_devel_la-periodic_point_neighbors.lo: src/ghosting/periodic_point_neighbors.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/ghosting/libmesh_devel_la-periodic_point_neighbors.lo -MD -MP -MF src/ghosting/$(DEPDIR)/libmesh_devel_la-periodic_point_neighbors.Tpo -c -o src/ghosting/libmesh_devel_la-periodic_point_neighbors.lo `test -f 'src/ghosting/periodic_point_neighbors.C' || echo '$(srcdir)/'`src/ghosting/periodic_point_neighbors.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/ghosting/$(DEPDIR)/libmesh_devel_la-periodic_point_neighbors.Tpo src/ghosting/$(DEPDIR)/libmesh_devel_la-periodic_point_neighbors.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/ghosting/periodic_point_neighbors.C' object='src/ghosting/libmesh_devel_la-periodic_point_neighbors.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/ghosting/libmesh_devel_la-periodic_point_neighbors.lo `test -f 'src/ghosting/periodic_point_neighbors.C' || echo '$(srcdir)/'`src/ghosting/periodic_point_neighbors.C
+
 src/ghosting/libmesh_devel_la-point_neighbor_coupling.lo: src/ghosting/point_neighbor_coupling.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/ghosting/libmesh_devel_la-point_neighbor_coupling.lo -MD -MP -MF src/ghosting/$(DEPDIR)/libmesh_devel_la-point_neighbor_coupling.Tpo -c -o src/ghosting/libmesh_devel_la-point_neighbor_coupling.lo `test -f 'src/ghosting/point_neighbor_coupling.C' || echo '$(srcdir)/'`src/ghosting/point_neighbor_coupling.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/ghosting/$(DEPDIR)/libmesh_devel_la-point_neighbor_coupling.Tpo src/ghosting/$(DEPDIR)/libmesh_devel_la-point_neighbor_coupling.Plo
@@ -26457,6 +26507,13 @@ src/ghosting/libmesh_oprof_la-overlap_coupling.lo: src/ghosting/overlap_coupling
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/ghosting/overlap_coupling.C' object='src/ghosting/libmesh_oprof_la-overlap_coupling.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/ghosting/libmesh_oprof_la-overlap_coupling.lo `test -f 'src/ghosting/overlap_coupling.C' || echo '$(srcdir)/'`src/ghosting/overlap_coupling.C
+
+src/ghosting/libmesh_oprof_la-periodic_point_neighbors.lo: src/ghosting/periodic_point_neighbors.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/ghosting/libmesh_oprof_la-periodic_point_neighbors.lo -MD -MP -MF src/ghosting/$(DEPDIR)/libmesh_oprof_la-periodic_point_neighbors.Tpo -c -o src/ghosting/libmesh_oprof_la-periodic_point_neighbors.lo `test -f 'src/ghosting/periodic_point_neighbors.C' || echo '$(srcdir)/'`src/ghosting/periodic_point_neighbors.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/ghosting/$(DEPDIR)/libmesh_oprof_la-periodic_point_neighbors.Tpo src/ghosting/$(DEPDIR)/libmesh_oprof_la-periodic_point_neighbors.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/ghosting/periodic_point_neighbors.C' object='src/ghosting/libmesh_oprof_la-periodic_point_neighbors.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/ghosting/libmesh_oprof_la-periodic_point_neighbors.lo `test -f 'src/ghosting/periodic_point_neighbors.C' || echo '$(srcdir)/'`src/ghosting/periodic_point_neighbors.C
 
 src/ghosting/libmesh_oprof_la-point_neighbor_coupling.lo: src/ghosting/point_neighbor_coupling.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/ghosting/libmesh_oprof_la-point_neighbor_coupling.lo -MD -MP -MF src/ghosting/$(DEPDIR)/libmesh_oprof_la-point_neighbor_coupling.Tpo -c -o src/ghosting/libmesh_oprof_la-point_neighbor_coupling.lo `test -f 'src/ghosting/point_neighbor_coupling.C' || echo '$(srcdir)/'`src/ghosting/point_neighbor_coupling.C
@@ -29825,6 +29882,13 @@ src/ghosting/libmesh_opt_la-overlap_coupling.lo: src/ghosting/overlap_coupling.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/ghosting/libmesh_opt_la-overlap_coupling.lo `test -f 'src/ghosting/overlap_coupling.C' || echo '$(srcdir)/'`src/ghosting/overlap_coupling.C
 
+src/ghosting/libmesh_opt_la-periodic_point_neighbors.lo: src/ghosting/periodic_point_neighbors.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/ghosting/libmesh_opt_la-periodic_point_neighbors.lo -MD -MP -MF src/ghosting/$(DEPDIR)/libmesh_opt_la-periodic_point_neighbors.Tpo -c -o src/ghosting/libmesh_opt_la-periodic_point_neighbors.lo `test -f 'src/ghosting/periodic_point_neighbors.C' || echo '$(srcdir)/'`src/ghosting/periodic_point_neighbors.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/ghosting/$(DEPDIR)/libmesh_opt_la-periodic_point_neighbors.Tpo src/ghosting/$(DEPDIR)/libmesh_opt_la-periodic_point_neighbors.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/ghosting/periodic_point_neighbors.C' object='src/ghosting/libmesh_opt_la-periodic_point_neighbors.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/ghosting/libmesh_opt_la-periodic_point_neighbors.lo `test -f 'src/ghosting/periodic_point_neighbors.C' || echo '$(srcdir)/'`src/ghosting/periodic_point_neighbors.C
+
 src/ghosting/libmesh_opt_la-point_neighbor_coupling.lo: src/ghosting/point_neighbor_coupling.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/ghosting/libmesh_opt_la-point_neighbor_coupling.lo -MD -MP -MF src/ghosting/$(DEPDIR)/libmesh_opt_la-point_neighbor_coupling.Tpo -c -o src/ghosting/libmesh_opt_la-point_neighbor_coupling.lo `test -f 'src/ghosting/point_neighbor_coupling.C' || echo '$(srcdir)/'`src/ghosting/point_neighbor_coupling.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/ghosting/$(DEPDIR)/libmesh_opt_la-point_neighbor_coupling.Tpo src/ghosting/$(DEPDIR)/libmesh_opt_la-point_neighbor_coupling.Plo
@@ -33191,6 +33255,13 @@ src/ghosting/libmesh_prof_la-overlap_coupling.lo: src/ghosting/overlap_coupling.
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/ghosting/overlap_coupling.C' object='src/ghosting/libmesh_prof_la-overlap_coupling.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/ghosting/libmesh_prof_la-overlap_coupling.lo `test -f 'src/ghosting/overlap_coupling.C' || echo '$(srcdir)/'`src/ghosting/overlap_coupling.C
+
+src/ghosting/libmesh_prof_la-periodic_point_neighbors.lo: src/ghosting/periodic_point_neighbors.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/ghosting/libmesh_prof_la-periodic_point_neighbors.lo -MD -MP -MF src/ghosting/$(DEPDIR)/libmesh_prof_la-periodic_point_neighbors.Tpo -c -o src/ghosting/libmesh_prof_la-periodic_point_neighbors.lo `test -f 'src/ghosting/periodic_point_neighbors.C' || echo '$(srcdir)/'`src/ghosting/periodic_point_neighbors.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/ghosting/$(DEPDIR)/libmesh_prof_la-periodic_point_neighbors.Tpo src/ghosting/$(DEPDIR)/libmesh_prof_la-periodic_point_neighbors.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/ghosting/periodic_point_neighbors.C' object='src/ghosting/libmesh_prof_la-periodic_point_neighbors.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/ghosting/libmesh_prof_la-periodic_point_neighbors.lo `test -f 'src/ghosting/periodic_point_neighbors.C' || echo '$(srcdir)/'`src/ghosting/periodic_point_neighbors.C
 
 src/ghosting/libmesh_prof_la-point_neighbor_coupling.lo: src/ghosting/point_neighbor_coupling.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/ghosting/libmesh_prof_la-point_neighbor_coupling.lo -MD -MP -MF src/ghosting/$(DEPDIR)/libmesh_prof_la-point_neighbor_coupling.Tpo -c -o src/ghosting/libmesh_prof_la-point_neighbor_coupling.lo `test -f 'src/ghosting/point_neighbor_coupling.C' || echo '$(srcdir)/'`src/ghosting/point_neighbor_coupling.C
@@ -37827,30 +37898,35 @@ distclean: distclean-recursive
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_dbg_la-ghost_point_neighbors.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_dbg_la-non_manifold_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_dbg_la-overlap_coupling.Plo
+	-rm -f src/ghosting/$(DEPDIR)/libmesh_dbg_la-periodic_point_neighbors.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_dbg_la-point_neighbor_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_dbg_la-sibling_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_devel_la-default_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_devel_la-ghost_point_neighbors.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_devel_la-non_manifold_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_devel_la-overlap_coupling.Plo
+	-rm -f src/ghosting/$(DEPDIR)/libmesh_devel_la-periodic_point_neighbors.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_devel_la-point_neighbor_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_devel_la-sibling_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_oprof_la-default_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_oprof_la-ghost_point_neighbors.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_oprof_la-non_manifold_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_oprof_la-overlap_coupling.Plo
+	-rm -f src/ghosting/$(DEPDIR)/libmesh_oprof_la-periodic_point_neighbors.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_oprof_la-point_neighbor_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_oprof_la-sibling_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_opt_la-default_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_opt_la-ghost_point_neighbors.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_opt_la-non_manifold_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_opt_la-overlap_coupling.Plo
+	-rm -f src/ghosting/$(DEPDIR)/libmesh_opt_la-periodic_point_neighbors.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_opt_la-point_neighbor_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_opt_la-sibling_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_prof_la-default_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_prof_la-ghost_point_neighbors.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_prof_la-non_manifold_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_prof_la-overlap_coupling.Plo
+	-rm -f src/ghosting/$(DEPDIR)/libmesh_prof_la-periodic_point_neighbors.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_prof_la-point_neighbor_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_prof_la-sibling_coupling.Plo
 	-rm -f src/mesh/$(DEPDIR)/libmesh_dbg_la-abaqus_io.Plo
@@ -40363,30 +40439,35 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_dbg_la-ghost_point_neighbors.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_dbg_la-non_manifold_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_dbg_la-overlap_coupling.Plo
+	-rm -f src/ghosting/$(DEPDIR)/libmesh_dbg_la-periodic_point_neighbors.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_dbg_la-point_neighbor_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_dbg_la-sibling_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_devel_la-default_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_devel_la-ghost_point_neighbors.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_devel_la-non_manifold_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_devel_la-overlap_coupling.Plo
+	-rm -f src/ghosting/$(DEPDIR)/libmesh_devel_la-periodic_point_neighbors.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_devel_la-point_neighbor_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_devel_la-sibling_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_oprof_la-default_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_oprof_la-ghost_point_neighbors.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_oprof_la-non_manifold_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_oprof_la-overlap_coupling.Plo
+	-rm -f src/ghosting/$(DEPDIR)/libmesh_oprof_la-periodic_point_neighbors.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_oprof_la-point_neighbor_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_oprof_la-sibling_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_opt_la-default_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_opt_la-ghost_point_neighbors.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_opt_la-non_manifold_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_opt_la-overlap_coupling.Plo
+	-rm -f src/ghosting/$(DEPDIR)/libmesh_opt_la-periodic_point_neighbors.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_opt_la-point_neighbor_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_opt_la-sibling_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_prof_la-default_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_prof_la-ghost_point_neighbors.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_prof_la-non_manifold_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_prof_la-overlap_coupling.Plo
+	-rm -f src/ghosting/$(DEPDIR)/libmesh_prof_la-periodic_point_neighbors.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_prof_la-point_neighbor_coupling.Plo
 	-rm -f src/ghosting/$(DEPDIR)/libmesh_prof_la-sibling_coupling.Plo
 	-rm -f src/mesh/$(DEPDIR)/libmesh_dbg_la-abaqus_io.Plo

@@ -22,20 +22,19 @@
 
 // Local Includes
 #include "libmesh/ghosting_functor.h"
+#include "libmesh/periodic_point_neighbors.h"
 
 // C++ Includes
 #include <memory>
 
 namespace libMesh
 {
-#ifdef LIBMESH_ENABLE_PERIODIC
-class PeriodicBoundaries;
-#endif
 
 /**
  * This class implements the original default geometry ghosting
  * requirements in libMesh: point neighbors on the same manifold,
- * including across periodic boundaries, and interior_parent elements.
+ * including across any periodic boundaries passed to
+ * set_periodic_boundaries(), and interior_parent elements.
  *
  * \author Roy H. Stogner
  * \date 2016
@@ -51,7 +50,7 @@ public:
       GhostingFunctor(mesh)
 #ifdef LIBMESH_ENABLE_PERIODIC
       ,
-      _periodic_bcs(nullptr)
+      _periodic_neighbors(mesh)
 #endif
     {}
 
@@ -65,7 +64,7 @@ public:
       // We do not simply want to copy over the other's periodic bcs because
       // they may very well correspond to periodic bcs from a \p DofMap entirely
       // unrelated to any \p DofMaps that depend on this objects ghosting
-      _periodic_bcs(nullptr)
+      _periodic_neighbors(other._periodic_neighbors)
 #endif
     {}
 
@@ -79,8 +78,10 @@ public:
 #ifdef LIBMESH_ENABLE_PERIODIC
   // Set PeriodicBoundaries to couple
   void set_periodic_boundaries(const PeriodicBoundaries * periodic_bcs) override
-  { _periodic_bcs = periodic_bcs; }
+  { _periodic_neighbors.set_periodic_boundaries(periodic_bcs); }
 #endif
+
+  virtual void set_mesh(const MeshBase * mesh) override;
 
   /**
    * If we have periodic boundaries, then we'll need the mesh to have
@@ -106,7 +107,8 @@ public:
 
 private:
 #ifdef LIBMESH_ENABLE_PERIODIC
-  const PeriodicBoundaries * _periodic_bcs;
+  /// Ghosts point neighbors across the periodic boundaries passed to set_periodic_boundaries()
+  PeriodicPointNeighbors _periodic_neighbors;
 #endif
 };
 

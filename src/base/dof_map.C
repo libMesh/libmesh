@@ -37,6 +37,7 @@
 #include "libmesh/numeric_vector.h"
 #include "libmesh/periodic_boundary_base.h"
 #include "libmesh/periodic_boundaries.h"
+#include "libmesh/periodic_point_neighbors.h"
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/sparsity_pattern.h"
 #include "libmesh/threads.h"
@@ -157,6 +158,9 @@ DofMap::DofMap(const unsigned int number,
   _extra_send_list_context(nullptr),
   _default_coupling(std::make_unique<DefaultCoupling>()),
   _default_evaluating(std::make_unique<DefaultCoupling>()),
+#ifdef LIBMESH_ENABLE_PERIODIC
+  _periodic_ghosting(std::make_unique<PeriodicPointNeighbors>(mesh)),
+#endif
   _need_full_sparsity_pattern(false),
   _need_ghost_constraints(false),
   _n_SCALAR_dofs(0)
@@ -193,6 +197,7 @@ DofMap::DofMap(const unsigned int number,
 #ifdef LIBMESH_ENABLE_PERIODIC
   _default_coupling->set_periodic_boundaries(_periodic_boundaries.get());
   _default_evaluating->set_periodic_boundaries(_periodic_boundaries.get());
+  _periodic_ghosting->set_periodic_boundaries(_periodic_boundaries.get());
 #endif
 
   this->add_coupling_functor(*_default_coupling);
@@ -210,6 +215,9 @@ DofMap::~DofMap()
   // need to remove those from the mesh too before we die.
   _mesh.remove_ghosting_functor(*_default_coupling);
   _mesh.remove_ghosting_functor(*_default_evaluating);
+#ifdef LIBMESH_ENABLE_PERIODIC
+  _mesh.remove_ghosting_functor(*_periodic_ghosting);
+#endif
 }
 
 
