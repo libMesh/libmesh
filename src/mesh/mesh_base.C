@@ -238,7 +238,12 @@ MeshBase& MeshBase::operator= (MeshBase && other_mesh)
   // Move assign as a ParallelObject.
   this->ParallelObject::operator=(other_mesh);
 
-  // Any stored ranges we had are invalid now
+  // We can safely clear stored ranges, rebuilding them on-demand
+  // whenever they're requested later.
+  //
+  // We *might* be able to safely move stored ranges from other_mesh,
+  // but I'm less confident about that and I don't want to try it
+  // without more test coverage.
   this->clear_stored_ranges();
 
   _n_parts = other_mesh.n_partitions();
