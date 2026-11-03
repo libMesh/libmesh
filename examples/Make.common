@@ -12,7 +12,7 @@ AM_CPPFLAGS  = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include $(libmesh_
 AM_CFLAGS    = $(libmesh_CFLAGS)
 AM_CXXFLAGS  = $(libmesh_CXXFLAGS)
 AM_LDFLAGS   = $(libmesh_LDFLAGS) $(libmesh_contrib_LDFLAGS)
-LIBS         = $(libmesh_optional_LIBS)
+LIBS         = $(libmesh_optional_LIBS) $(EXECUTION_LIBS)
 
 # We might have turned on -Werror and/or paranoid warnings.  We need
 # this to be done in CPPFLAGS, not CXXFLAGS; see ../Makefile.am

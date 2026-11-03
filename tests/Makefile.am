@@ -6,7 +6,7 @@ AM_CPPFLAGS  = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include \
                $(libmesh_contrib_INCLUDES) $(CPPUNIT_CFLAGS) \
 	       -DLIBMESH_IS_UNIT_TESTING
 AM_LDFLAGS   = $(libmesh_LDFLAGS) $(libmesh_contrib_LDFLAGS)
-LIBS         = $(libmesh_optional_LIBS) $(CPPUNIT_LIBS)
+LIBS         = $(libmesh_optional_LIBS) $(CPPUNIT_LIBS) $(EXECUTION_LIBS)
 KOKKOS_TEST_CPPFLAGS =
 
 # We might have turned on -Werror and/or paranoid warnings.  We need
