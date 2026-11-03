@@ -137,6 +137,8 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
   _default_mapping_type(other_mesh._default_mapping_type),
   _default_mapping_data(other_mesh._default_mapping_data),
   _preparation (other_mesh._preparation),
+  // Clear cached ranges; we can't copy them and it's most efficient
+  // to regenerate them on demand vs in advance
   _element_stored_range (),
   _const_element_stored_range (),
   _active_local_element_stored_range (),
