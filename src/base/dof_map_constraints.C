@@ -264,6 +264,14 @@ private:
 
   const AddConstraint     & add_fn;
 
+  // Whether to record each element on which this functor applies a
+  // DirichletBoundary
+  const bool record_elems;
+
+  // The elements on which this functor applied a DirichletBoundary,
+  // if record_elems is true
+  std::vector<const Elem *> acted_on_elems;
+
   static Number f_component (FunctionBase<Number> * f,
                              FEMFunctionBase<Number> * f_fem,
                              const FEMContext * c,
@@ -1548,12 +1556,24 @@ public:
                       const MeshBase & mesh_in,
                       const Real time_in,
                       const DirichletBoundaries & dirichlets_in,
-                      const AddConstraint & add_in) :
+                      const AddConstraint & add_in,
+                      const bool record_elems_in) :
     dof_map(dof_map_in),
     mesh(mesh_in),
     time(time_in),
     dirichlets(dirichlets_in),
-    add_fn(add_in) { }
+    add_fn(add_in),
+    record_elems(record_elems_in) { }
+
+  // Splitting constructor for Threads::parallel_reduce(). Each thread
+  // records its elements in its own list, so no lock is necessary.
+  ConstrainDirichlet (ConstrainDirichlet & other, Threads::split) :
+    dof_map(other.dof_map),
+    mesh(other.mesh),
+    time(other.time),
+    dirichlets(other.dirichlets),
+    add_fn(other.add_fn),
+    record_elems(other.record_elems) { }
 
   // This class can be default copy/move constructed.
   ConstrainDirichlet (ConstrainDirichlet &&) = default;
@@ -1564,7 +1584,16 @@ public:
   ConstrainDirichlet & operator= (const ConstrainDirichlet &) = delete;
   ConstrainDirichlet & operator= (ConstrainDirichlet &&) = delete;
 
-  void operator()(const ConstElemRange & range) const
+  void join (ConstrainDirichlet & other)
+  {
+    acted_on_elems.insert(acted_on_elems.end(),
+                          other.acted_on_elems.begin(),
+                          other.acted_on_elems.end());
+  }
+
+  std::vector<const Elem *> & get_acted_on_elems() { return acted_on_elems; }
+
+  void operator()(const ConstElemRange & range)
   {
     /**
      * This method examines an arbitrary boundary solution to calculate
@@ -1646,6 +1675,9 @@ public:
         // If this Elem has no boundary ids, go to the next one.
         if (!has_dirichlet_constraint)
           continue;
+
+        if (record_elems)
+          acted_on_elems.push_back(elem);
 
         for (const auto & db_pair : sebi.ordered_dbs)
           {
@@ -1786,6 +1818,9 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
 #ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
   _node_constraints.clear();
 #endif
+#ifdef LIBMESH_ENABLE_DIRICHLET
+  _dirichlet_cache = DirichletConstraintCache();
+#endif
 
   if (!possible_global_constraints)
     return;
@@ -1856,27 +1891,18 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
         for (const auto & dirichlet : *_dirichlet_boundaries)
           this->check_dirichlet_bcid_consistency(mesh, *dirichlet);
 
-      // Threaded loop over local over elems applying all Dirichlet BCs
-      Threads::parallel_for
-        (range,
-         ConstrainDirichlet(*this, mesh, time, *_dirichlet_boundaries,
-                            AddPrimalConstraint(*this)));
-
-      // Threaded loop over local over elems per QOI applying all adjoint
-      // Dirichlet BCs.  Note that the ConstElemRange is reset before each
-      // execution of Threads::parallel_for().
-
-      for (auto qoi_index : index_range(_adjoint_dirichlet_boundaries))
-        {
-          const DirichletBoundaries & adb_q =
-            *(_adjoint_dirichlet_boundaries[qoi_index]);
-
-          if (!adb_q.empty())
-            Threads::parallel_for
-              (range.reset(),
-               ConstrainDirichlet(*this, mesh, time, adb_q,
-                                  AddAdjointConstraint(*this, qoi_index)));
-        }
+      // The constraints that this method built so far do not depend on
+      // time. Keep a copy of them for reinit_dirichlet_constraint_values(),
+      // with the elements that the Dirichlet loops below act on.
+      _dirichlet_cache.dof_constraints = _dof_constraints;
+      _dirichlet_cache.primal_constraint_values = _primal_constraint_values;
+      _dirichlet_cache.adjoint_constraint_values = _adjoint_constraint_values;
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+      _dirichlet_cache.node_constraints = _node_constraints;
+#endif
+      _dirichlet_cache.boundary_elems =
+        this->apply_dirichlet_boundaries(mesh, time, range, /*record_elems=*/true);
+      _dirichlet_cache.valid = true;
     }
 
 #endif // LIBMESH_ENABLE_DIRICHLET
@@ -1884,6 +1910,93 @@ void DofMap::create_dof_constraints(const MeshBase & mesh, Real time)
   // Handle spline node constraints last, so we can try to move
   // existing constraints onto the spline basis if necessary.
   this->process_mesh_constraint_rows(mesh);
+}
+
+
+
+#ifdef LIBMESH_ENABLE_DIRICHLET
+std::vector<const Elem *>
+DofMap::apply_dirichlet_boundaries(const MeshBase & mesh,
+                                   const Real time,
+                                   ConstElemRange & range,
+                                   const bool record_elems)
+{
+  // Threaded loop over local elems applying all Dirichlet BCs
+  const AddPrimalConstraint add_primal(*this);
+  ConstrainDirichlet primal(*this, mesh, time, *_dirichlet_boundaries,
+                            add_primal, record_elems);
+  Threads::parallel_reduce(range, primal);
+  std::vector<const Elem *> acted_on_elems = std::move(primal.get_acted_on_elems());
+
+  // Threaded loop over local elems per QOI applying all adjoint
+  // Dirichlet BCs.  Note that the ConstElemRange is reset before each
+  // execution of Threads::parallel_reduce().
+
+  for (auto qoi_index : index_range(_adjoint_dirichlet_boundaries))
+    {
+      const DirichletBoundaries & adb_q =
+        *(_adjoint_dirichlet_boundaries[qoi_index]);
+
+      if (!adb_q.empty())
+        {
+          const AddAdjointConstraint add_adjoint(*this, qoi_index);
+          ConstrainDirichlet adjoint(*this, mesh, time, adb_q,
+                                     add_adjoint, record_elems);
+          Threads::parallel_reduce(range.reset(), adjoint);
+          const auto & adjoint_elems = adjoint.get_acted_on_elems();
+          acted_on_elems.insert(acted_on_elems.end(),
+                                adjoint_elems.begin(), adjoint_elems.end());
+        }
+    }
+
+  // The list joins the primal and adjoint lists. Thus an element on
+  // primal and adjoint boundaries appears more than once, and the list
+  // is not in range order. Each element applies its boundaries in the
+  // same order at any position in the range. The first DofMap
+  // constraint on a degree of freedom stays, and later constraints do
+  // not overwrite it. Thus only the relative order of elements
+  // matters, and only where two elements share a degree of freedom.
+  // Sorting by id gives the order in which the local element range
+  // visits the elements.
+  std::sort(acted_on_elems.begin(), acted_on_elems.end(),
+            [](const Elem * a, const Elem * b) { return a->id() < b->id(); });
+  acted_on_elems.erase(std::unique(acted_on_elems.begin(), acted_on_elems.end()),
+                       acted_on_elems.end());
+  return acted_on_elems;
+}
+#endif // LIBMESH_ENABLE_DIRICHLET
+
+
+
+void DofMap::reinit_dirichlet_constraint_values(const MeshBase & mesh, const Real time)
+{
+  parallel_object_only();
+
+  LOG_SCOPE("reinit_dirichlet_constraint_values()", "DofMap");
+
+#ifdef LIBMESH_ENABLE_DIRICHLET
+  // Each branch below is collective. Thus every processor must take
+  // the same branch.
+  bool reuse = _dirichlet_cache.valid;
+  this->comm().min(reuse);
+
+  if (reuse)
+    {
+      _dof_constraints = _dirichlet_cache.dof_constraints;
+      _primal_constraint_values = _dirichlet_cache.primal_constraint_values;
+      _adjoint_constraint_values = _dirichlet_cache.adjoint_constraint_values;
+#ifdef LIBMESH_ENABLE_NODE_CONSTRAINTS
+      _node_constraints = _dirichlet_cache.node_constraints;
+#endif
+
+      ConstElemRange range(&_dirichlet_cache.boundary_elems);
+      this->apply_dirichlet_boundaries(mesh, time, range, /*record_elems=*/false);
+      this->process_mesh_constraint_rows(mesh);
+      return;
+    }
+#endif // LIBMESH_ENABLE_DIRICHLET
+
+  this->create_dof_constraints(mesh, time);
 }
 
 
@@ -5437,6 +5550,8 @@ void DofMap::constrain_p_dofs (unsigned int var,
 #ifdef LIBMESH_ENABLE_DIRICHLET
 void DofMap::add_dirichlet_boundary (const DirichletBoundary & dirichlet_boundary)
 {
+  _dirichlet_cache.valid = false;
+
   _dirichlet_boundaries->push_back(std::make_unique<DirichletBoundary>(dirichlet_boundary));
 }
 
@@ -5444,6 +5559,8 @@ void DofMap::add_dirichlet_boundary (const DirichletBoundary & dirichlet_boundar
 void DofMap::add_adjoint_dirichlet_boundary (const DirichletBoundary & dirichlet_boundary,
                                              unsigned int qoi_index)
 {
+  _dirichlet_cache.valid = false;
+
   unsigned int old_size = cast_int<unsigned int>
     (_adjoint_dirichlet_boundaries.size());
   for (unsigned int i = old_size; i <= qoi_index; ++i)
@@ -5486,6 +5603,8 @@ DofMap::get_adjoint_dirichlet_boundaries(unsigned int q)
 
 void DofMap::remove_dirichlet_boundary (const DirichletBoundary & boundary_to_remove)
 {
+  _dirichlet_cache.valid = false;
+
   // Find a boundary condition matching the one to be removed
   auto lam = [&boundary_to_remove](const auto & bdy)
     {return bdy->b == boundary_to_remove.b && bdy->variables == boundary_to_remove.variables;};
@@ -5501,6 +5620,8 @@ void DofMap::remove_dirichlet_boundary (const DirichletBoundary & boundary_to_re
 void DofMap::remove_adjoint_dirichlet_boundary (const DirichletBoundary & boundary_to_remove,
                                                 unsigned int qoi_index)
 {
+  _dirichlet_cache.valid = false;
+
   libmesh_assert_greater(_adjoint_dirichlet_boundaries.size(),
                          qoi_index);
 
@@ -5566,6 +5687,10 @@ void DofMap::add_periodic_boundary (const PeriodicBoundaryBase & periodic_bounda
 void DofMap::add_periodic_boundary (const PeriodicBoundaryBase & boundary,
                                     const PeriodicBoundaryBase & inverse_boundary)
 {
+#ifdef LIBMESH_ENABLE_DIRICHLET
+  _dirichlet_cache.valid = false;
+#endif
+
   libmesh_assert_equal_to (boundary.myboundary, inverse_boundary.pairedboundary);
   libmesh_assert_equal_to (boundary.pairedboundary, inverse_boundary.myboundary);
   libmesh_assert(boundary.get_variables() == inverse_boundary.get_variables());

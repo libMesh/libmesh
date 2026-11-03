@@ -496,6 +496,22 @@ void System::reinit_constraints()
 }
 
 
+
+void System::reinit_dirichlet_constraint_values()
+{
+  parallel_object_only();
+
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
+  get_dof_map().reinit_dirichlet_constraint_values(_mesh, this->time);
+  user_constrain();
+  get_dof_map().process_constraints(_mesh);
+  if (libMesh::on_command_line ("--print-constraints"))
+    get_dof_map().print_dof_constraints(libMesh::out);
+#endif
+  get_dof_map().prepare_send_list();
+}
+
+
 void System::update ()
 {
   parallel_object_only();
