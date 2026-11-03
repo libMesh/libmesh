@@ -426,7 +426,7 @@ bool MeshRefinement::test_level_one (bool libmesh_dbg_var(libmesh_assert_pass)) 
       // We didn't pass the level one test, so libmesh_assert that
       // we're allowed not to
 #ifndef NDEBUG
-      if (libmesh_assert_pass)
+      if (libmesh_assert_pass && failed_elem)
         {
           libMesh::out << "MeshRefinement Level one failure, element: "
                        << *failed_elem
@@ -485,7 +485,7 @@ bool MeshRefinement::test_unflagged (bool libmesh_dbg_var(libmesh_assert_pass)) 
   if (found_some_flag)
     {
 #ifndef NDEBUG
-      if (libmesh_assert_pass)
+      if (libmesh_assert_pass && failed_elem)
         {
           libMesh::out <<
             "MeshRefinement test_unflagged failure, element: " <<
