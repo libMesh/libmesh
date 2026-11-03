@@ -435,6 +435,8 @@ bool MeshRefinement::test_level_one (bool libmesh_dbg_var(libmesh_assert_pass)) 
                        << *failed_neighbor
                        << std::endl;
         }
+      if (libmesh_assert_pass)
+        this->comm().barrier(); // Wait for output
 #endif // !NDEBUG
       libmesh_assert(!libmesh_assert_pass);
       return false;
@@ -491,6 +493,8 @@ bool MeshRefinement::test_unflagged (bool libmesh_dbg_var(libmesh_assert_pass)) 
             "MeshRefinement test_unflagged failure, element: " <<
             *failed_elem << std::endl;
         }
+      if (libmesh_assert_pass)
+        this->comm().barrier(); // Wait for output
 #endif
       // We didn't pass the "elements are unflagged" test,
       // so libmesh_assert that we're allowed not to
