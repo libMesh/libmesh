@@ -67,6 +67,7 @@ public:
   // These cover more recent tolerance issues when verifying holes
   CPPUNIT_TEST( testPoly2TriHolePerturbed );
   CPPUNIT_TEST( testPoly2TriHoleTangentPerturbed );
+  CPPUNIT_TEST( testPoly2TriLargeCocircular );
 
   CPPUNIT_TEST( testPoly2TriNonUniformRefined );
   CPPUNIT_TEST( testPoly2TriHolesNonUniformRefined );
@@ -1126,6 +1127,39 @@ public:
     Mesh mesh(*TestCommWorld);
     Poly2TriTriangulator p2t_tri(mesh);
     testTriangulatorHoleTangentPerturbed(mesh, p2t_tri);
+  }
+
+
+  void testPoly2TriLargeCocircular()
+  {
+    LOG_UNIT_TEST;
+
+    // The four vertices of a rectangle lie on one circle, so either
+    // diagonal is Delaunay.  With a circumradius of order 1e5 the
+    // rounding error in the distance from a circumcircle exceeds
+    // TOLERANCE*TOLERANCE, which lets both diagonals call for a swap
+    // if the swap tolerance is fixed.  The vertex coordinates are
+    // exact in binary, so the rounding does not depend on how they are
+    // computed.
+    const Real scale = 1e5;
+    Mesh mesh(*TestCommWorld);
+    mesh.add_point(scale * Point(-0.5, -0.7), 0);
+    mesh.add_point(scale * Point(1, -0.7), 1);
+    mesh.add_point(scale * Point(1, 1), 2);
+    mesh.add_point(scale * Point(-0.5, 1), 3);
+
+    Poly2TriTriangulator triangulator(mesh);
+    commonSettings(triangulator);
+    triangulator.desired_area() = 0;
+    triangulator.triangulate();
+
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), static_cast<dof_id_type>(2));
+
+    Real area = 0;
+    for (const auto & elem : mesh.active_local_element_ptr_range())
+      area += elem->volume();
+    mesh.comm().sum(area);
+    LIBMESH_ASSERT_FP_EQUAL(area, 1.5 * 1.7 * scale * scale, TOLERANCE * scale * scale);
   }
 
 
