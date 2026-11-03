@@ -104,6 +104,7 @@ am__aclocal_m4_deps =  \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_compiler_control_args.m4 \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_compiler_flags.m4 \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_cxx_compiler_standard.m4 \
+	$(top_srcdir)/m4/autoconf-submodule/acsm_cxx_execution_policies.m4 \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_enable_paranoid.m4 \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_enable_werror.m4 \
 	$(top_srcdir)/m4/autoconf-submodule/acsm_kokkos.m4 \
@@ -397,6 +398,7 @@ ECHO_T = @ECHO_T@
 EGREP = @EGREP@
 EIGEN_INCLUDE = @EIGEN_INCLUDE@
 ETAGS = @ETAGS@
+EXECUTION_LIBS = @EXECUTION_LIBS@
 EXEEXT = @EXEEXT@
 EXODUS_INCLUDE = @EXODUS_INCLUDE@
 EXODUS_NOT_NETCDF4_FLAG = @EXODUS_NOT_NETCDF4_FLAG@
