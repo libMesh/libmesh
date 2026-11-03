@@ -850,13 +850,6 @@ void PetscVector<T>::init (const numeric_index_type n,
   LibmeshPetscCall(VecCreateGhost (this->comm().get(), petsc_n_local, petsc_n,
                                    petsc_n_ghost, petsc_ghost,
                                    &_vec));
-
-  // Add a prefix so that we can at least distinguish a ghosted vector from a
-  // nonghosted vector when using a petsc option.
-  // PETSc does not fully support VecGhost on GPU yet. This change allows us to
-  // trigger a nonghosted vector to use GPU without bothering the ghosted vectors.
-  LibmeshPetscCall(PetscObjectAppendOptionsPrefix((PetscObject)_vec,"ghost_"));
-
   LibmeshPetscCall(VecSetFromOptions (_vec));
 
   this->_is_initialized = true;
