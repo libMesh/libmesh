@@ -1221,24 +1221,24 @@ void MeshBase::update_post_partitioning()
 {
   // Any range over local objects is obsolete if our partitioner
   // changed the definition of "local".
-  _active_local_element_stored_range.reset(nullptr);
-  _const_active_local_element_stored_range.reset(nullptr);
-  _local_element_stored_range.reset(nullptr);
-  _const_local_element_stored_range.reset(nullptr);
-  _local_node_stored_range.reset(nullptr);
-  _const_local_node_stored_range.reset(nullptr);
-  _unpartitioned_node_stored_range.reset(nullptr);
-  _const_unpartitioned_node_stored_range.reset(nullptr);
+  _active_local_element_stored_range.reset();
+  _const_active_local_element_stored_range.reset();
+  _local_element_stored_range.reset();
+  _const_local_element_stored_range.reset();
+  _local_node_stored_range.reset();
+  _const_local_node_stored_range.reset();
+  _unpartitioned_node_stored_range.reset();
+  _const_unpartitioned_node_stored_range.reset();
 
   // A range over all elements or nodes might still be fine here, but
   // not if there's a possibility that we've remoted or gathered
   // previously-remote objects.
   if (!this->is_replicated())
     {
-      _element_stored_range.reset(nullptr);
-      _const_element_stored_range.reset(nullptr);
-      _node_stored_range.reset(nullptr);
-      _const_node_stored_range.reset(nullptr);
+      _element_stored_range.reset();
+      _const_element_stored_range.reset();
+      _node_stored_range.reset();
+      _const_node_stored_range.reset();
     }
 }
 
@@ -2211,18 +2211,18 @@ const ConstNodeRange & MeshBase::unpartitioned_node_stored_range() const
 
 void MeshBase::clear_stored_ranges()
 {
-  _element_stored_range.reset(nullptr);
-  _const_element_stored_range.reset(nullptr);
-  _active_local_element_stored_range.reset(nullptr);
-  _const_active_local_element_stored_range.reset(nullptr);
-  _local_element_stored_range.reset(nullptr);
-  _const_local_element_stored_range.reset(nullptr);
-  _node_stored_range.reset(nullptr);
-  _const_node_stored_range.reset(nullptr);
-  _local_node_stored_range.reset(nullptr);
-  _const_local_node_stored_range.reset(nullptr);
-  _unpartitioned_node_stored_range.reset(nullptr);
-  _const_unpartitioned_node_stored_range.reset(nullptr);
+  _element_stored_range.reset();
+  _const_element_stored_range.reset();
+  _active_local_element_stored_range.reset();
+  _const_active_local_element_stored_range.reset();
+  _local_element_stored_range.reset();
+  _const_local_element_stored_range.reset();
+  _node_stored_range.reset();
+  _const_node_stored_range.reset();
+  _local_node_stored_range.reset();
+  _const_local_node_stored_range.reset();
+  _unpartitioned_node_stored_range.reset();
+  _const_unpartitioned_node_stored_range.reset();
 }
 
 
