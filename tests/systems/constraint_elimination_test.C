@@ -280,6 +280,11 @@ private:
             DirichletBoundary({3}, {u}, ConstFunction<Number>(1.)));
       }
 
+    // Ghost the point neighbors of periodic images, which periodic constraints need on a
+    // distributed mesh. Both systems have the same periodic boundaries.
+    mesh.default_ghosting().set_periodic_boundaries(
+        full_sys.get_dof_map().get_periodic_boundaries());
+
     // Refine one element to create hanging nodes
     mesh.allow_remote_element_removal(true);
     mesh.delete_remote_elements();
@@ -354,6 +359,10 @@ private:
         sys->nonlinear_solver->relative_residual_tolerance = TOLERANCE * TOLERANCE;
       }
 
+    // Ghost the point neighbors of periodic images, which periodic constraints need on a
+    // distributed mesh. Both systems have the same periodic boundaries.
+    mesh.default_ghosting().set_periodic_boundaries(
+        full_sys.get_dof_map().get_periodic_boundaries());
     mesh.allow_remote_element_removal(true);
     mesh.delete_remote_elements();
 
@@ -486,6 +495,9 @@ private:
     sys.nonlinear_solver->nullspace_object = &constants;
     sys.nonlinear_solver->relative_residual_tolerance = TOLERANCE * TOLERANCE;
 
+    // Ghost the point neighbors of periodic images, which periodic constraints need on a
+    // distributed mesh
+    mesh.default_ghosting().set_periodic_boundaries(sys.get_dof_map().get_periodic_boundaries());
     mesh.allow_remote_element_removal(true);
     mesh.delete_remote_elements();
 
@@ -555,6 +567,10 @@ private:
         sys->nonlinear_solver->relative_residual_tolerance = TOLERANCE * TOLERANCE;
       }
 
+    // Ghost the point neighbors of periodic images, which periodic constraints need on a
+    // distributed mesh. Both systems have the same periodic boundaries.
+    mesh.default_ghosting().set_periodic_boundaries(
+        plain_sys.get_dof_map().get_periodic_boundaries());
     mesh.allow_remote_element_removal(true);
     mesh.delete_remote_elements();
 
