@@ -2047,6 +2047,13 @@ const ConstElemRange & MeshBase::element_stored_range() const
 }
 
 
+const ConstElemRange & MeshBase::const_element_stored_range() const
+{
+  return const_shim(*this, &MeshBase::element_stored_range,
+                    _const_element_stored_range);
+}
+
+
 const ElemRange & MeshBase::active_local_element_stored_range()
 {
   if (!_active_local_element_stored_range)
@@ -2075,6 +2082,13 @@ const ElemRange & MeshBase::active_local_element_stored_range()
 
 
 const ConstElemRange & MeshBase::active_local_element_stored_range() const
+{
+  return const_shim(*this, &MeshBase::active_local_element_stored_range,
+                    _const_active_local_element_stored_range);
+}
+
+
+const ConstElemRange & MeshBase::const_active_local_element_stored_range() const
 {
   return const_shim(*this, &MeshBase::active_local_element_stored_range,
                     _const_active_local_element_stored_range);
@@ -2115,6 +2129,13 @@ const ConstElemRange & MeshBase::local_element_stored_range() const
 }
 
 
+const ConstElemRange & MeshBase::const_local_element_stored_range() const
+{
+  return const_shim(*this, &MeshBase::local_element_stored_range,
+                    _const_local_element_stored_range);
+}
+
+
 const NodeRange & MeshBase::node_stored_range()
 {
   if (!_node_stored_range)
@@ -2142,6 +2163,13 @@ const NodeRange & MeshBase::node_stored_range()
 
 
 const ConstNodeRange & MeshBase::node_stored_range() const
+{
+  return const_shim(*this, &MeshBase::node_stored_range,
+                    _const_node_stored_range);
+}
+
+
+const ConstNodeRange & MeshBase::const_node_stored_range() const
 {
   return const_shim(*this, &MeshBase::node_stored_range,
                     _const_node_stored_range);
@@ -2182,6 +2210,13 @@ const ConstNodeRange & MeshBase::local_node_stored_range() const
 }
 
 
+const ConstNodeRange & MeshBase::const_local_node_stored_range() const
+{
+  return const_shim(*this, &MeshBase::local_node_stored_range,
+                    _const_local_node_stored_range);
+}
+
+
 const NodeRange & MeshBase::unpartitioned_node_stored_range()
 {
   if (!_unpartitioned_node_stored_range)
@@ -2210,6 +2245,13 @@ const NodeRange & MeshBase::unpartitioned_node_stored_range()
 
 
 const ConstNodeRange & MeshBase::unpartitioned_node_stored_range() const
+{
+  return const_shim(*this, &MeshBase::unpartitioned_node_stored_range,
+                    _const_unpartitioned_node_stored_range);
+}
+
+
+const ConstNodeRange & MeshBase::const_unpartitioned_node_stored_range() const
 {
   return const_shim(*this, &MeshBase::unpartitioned_node_stored_range,
                     _const_unpartitioned_node_stored_range);

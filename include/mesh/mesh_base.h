@@ -1906,6 +1906,7 @@ public:
    */
   const ElemRange & element_stored_range();
   const ConstElemRange & element_stored_range() const;
+  const ConstElemRange & const_element_stored_range() const;
 
   /**
    * \returns A reference to a cached vector copy of a range of
@@ -1913,6 +1914,7 @@ public:
    */
   const ElemRange & active_local_element_stored_range();
   const ConstElemRange & active_local_element_stored_range() const;
+  const ConstElemRange & const_active_local_element_stored_range() const;
 
   /**
    * \returns A reference to a cached vector copy of a range of
@@ -1920,6 +1922,7 @@ public:
    */
   const ElemRange & local_element_stored_range();
   const ConstElemRange & local_element_stored_range() const;
+  const ConstElemRange & const_local_element_stored_range() const;
 
   /**
    * \returns A reference to a cached vector copy of a range of
@@ -1927,6 +1930,7 @@ public:
    */
   const NodeRange & node_stored_range();
   const ConstNodeRange & node_stored_range() const;
+  const ConstNodeRange & const_node_stored_range() const;
 
   /**
    * \returns A reference to a cached vector copy of a range of
@@ -1934,6 +1938,7 @@ public:
    */
   const NodeRange & local_node_stored_range();
   const ConstNodeRange & local_node_stored_range() const;
+  const ConstNodeRange & const_local_node_stored_range() const;
 
   /**
    * \returns A reference to a cached vector copy of a range of
@@ -1941,6 +1946,7 @@ public:
    */
   const NodeRange & unpartitioned_node_stored_range();
   const ConstNodeRange & unpartitioned_node_stored_range() const;
+  const ConstNodeRange & const_unpartitioned_node_stored_range() const;
 
   /**
    * Clears stored ranges, to indicate that the mesh has changed and
