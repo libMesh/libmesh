@@ -112,8 +112,7 @@ public:
    */
   StoredRange (vec_type * objs,
                const unsigned int new_grainsize = libMesh::default_grainsize()) :
-    // Handle empty objs with pre-C++26-compliant code
-    _end(objs->size() ? (objs->data()+objs->size()) : objs->data()),
+    _end(end_of(*objs)),
     _begin(objs->data()),
     _last(objs->size()),
     _first(0),
@@ -137,7 +136,6 @@ public:
   StoredRange (const nonconst_object_type * begin,
                const nonconst_object_type * end,
                const unsigned int new_grainsize = libMesh::default_grainsize()) :
-    // Handle empty objs with pre-C++26-compliant code
     _end(end),
     _begin(begin),
     _last(std::distance(begin, end)),
@@ -256,8 +254,7 @@ public:
       _objs->push_back(*it);
 
     _begin = _objs->data();
-    // Handle empty objs with pre-C++26-compliant code
-    _end   = _objs->size() ? (_objs->data()+_objs->size()) : _objs->data();
+    _end   = end_of(*_objs);
 
     _first = 0;
     _last  = _objs->size();
@@ -279,8 +276,7 @@ public:
     libmesh_assert(_objs);
 
     _begin = _objs->data();
-    // Handle empty objs with pre-C++26-compliant code
-    _end   = _objs->size() ? (_objs->data()+_objs->size()) : _objs->data();
+    _end   = end_of(*_objs);
 
     _first = 0;
     _last  = _objs->size();
@@ -357,6 +353,15 @@ public:
   bool is_divisible() const { return this->grainsize() < static_cast<unsigned int>(std::distance(_begin, _end)); }
 
 private:
+
+  /**
+   * Helper for pre-C++26 compiles, where the compiler may have
+   * empty_vector.data() return nullptr and technically pointer
+   * arithmetic on nullptr may be Undefined Behavior.
+   */
+  static const_iterator end_of(vec_type & objs) {
+    return objs.size() ? (objs.data()+objs.size()) : objs.data();
+  }
 
   const_iterator _end;
   const_iterator _begin;
