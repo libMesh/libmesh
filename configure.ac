@@ -189,6 +189,11 @@ ACSM_CXX_COMPILER_STANDARD([2017], [2017], [defaultnoext])
 # --------------------------------------------------------------
 LIBMESH_SET_BUILD_FLAGS
 
+#----------------------------------------------------------
+# Checks for #include <execution> support and required LIBS
+#----------------------------------------------------------
+ACSM_CXX_EXECUTION_POLICIES
+
 #------------------------------------------------------
 # Checks for code coverage
 # this must be done after we look for our own compilers
