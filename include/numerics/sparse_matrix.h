@@ -36,6 +36,7 @@
 #include <iomanip>
 #include <vector>
 #include <memory>
+#include <string>
 
 namespace libMesh
 {
@@ -634,6 +635,18 @@ public:
   bool use_hash_table() const { return _use_hash_table; }
 
   /**
+   * Sets the prefix that solver packages prepend to option names when
+   * they configure this matrix, e.g. a PETSc options prefix. The
+   * prefix takes effect at the next init() of the matrix.
+   */
+  void set_options_prefix(std::string prefix) { _options_prefix = std::move(prefix); }
+
+  /**
+   * \returns The options prefix of this matrix. See set_options_prefix().
+   */
+  const std::string & options_prefix() const { return _options_prefix; }
+
+  /**
    * Reset the memory storage of the matrix. Unlike \p clear(), this does not destroy the matrix but
    * rather will reset the matrix to use the original preallocation or when using hash table matrix
    * assembly (see \p use_hash_table()) will reset (clear) the hash table used for assembly. In the
@@ -681,6 +694,11 @@ protected:
    * Flag indicating whether the matrix is assembled using a hash table
    */
   bool _use_hash_table;
+
+  /**
+   * Prefix for solver-package options. See set_options_prefix().
+   */
+  std::string _options_prefix;
 };
 
 

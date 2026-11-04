@@ -816,6 +816,7 @@ NumericVector<Number> & System::add_vector (std::string_view vec_name,
                   // simpler.  If anyone actually ever uses this case
                   // for real we can look into optimizing it.
                   auto new_vec = NumericVector<Number>::build(this->comm());
+                  new_vec->set_options_prefix(_options_prefix);
 #ifdef LIBMESH_ENABLE_GHOSTED
                   new_vec->init (this->n_dofs(), this->n_local_dofs(),
                                  _dof_map->get_send_list(), /*fast=*/false,
@@ -850,6 +851,7 @@ NumericVector<Number> & System::add_vector (std::string_view vec_name,
                                                   libMesh::default_solver_package(),
                                                   type));
   auto buf = pr.first->second.get();
+  buf->set_options_prefix(_options_prefix);
   _vector_projections.emplace(vec_name, projections);
 
   // Vectors are primal by default
@@ -1042,6 +1044,7 @@ SparseMatrix<Number> & System::add_matrix (std::string_view mat_name,
   else
     matrix = SparseMatrix<Number>::build(this->comm(), libMesh::default_solver_package());
   auto & mat = *matrix;
+  mat.set_options_prefix(_options_prefix);
 
   _matrices.emplace(mat_name, std::move(matrix));
 
@@ -1067,6 +1070,7 @@ SparseMatrix<Number> & System::add_matrix (std::string_view mat_name,
   libmesh_assert(this->comm().verify(int(type)));
 
   SparseMatrix<Number> & mat = *matrix;
+  mat.set_options_prefix(_options_prefix);
 
   _matrices[namestr] = std::move(matrix);
   _matrix_types[namestr] = type;
@@ -1085,6 +1089,20 @@ void System::late_matrix_init(SparseMatrix<Number> & mat,
       this->get_dof_map().attach_matrix(mat);
       mat.init(type);
     }
+}
+
+
+
+void System::set_options_prefix(std::string options_prefix)
+{
+  _options_prefix = std::move(options_prefix);
+
+  solution->set_options_prefix(_options_prefix);
+  current_local_solution->set_options_prefix(_options_prefix);
+  for (auto & pr : _vectors)
+    pr.second->set_options_prefix(_options_prefix);
+  for (auto & pr : _matrices)
+    pr.second->set_options_prefix(_options_prefix);
 }
 
 
