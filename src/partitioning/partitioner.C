@@ -973,10 +973,21 @@ void Partitioner::set_node_processor_ids(MeshBase & mesh)
     // overwriting valid active node pids with pids from subactive
     // elements.
     std::unordered_set<dof_id_type> bad_pids;
+    Threads::spin_mutex pid_mtx;
 
-    for (auto & node : mesh.node_ptr_range())
-      if (node->processor_id() == DofObject::invalid_processor_id)
-        bad_pids.insert(node->id());
+    Threads::parallel_for
+      (mesh.node_stored_range(),
+       [&bad_pids, &pid_mtx](const NodeRange & range)
+       {
+         std::unordered_set<dof_id_type> my_bad_pids;
+         for (const Node * node : range)
+           if (node->processor_id() == DofObject::invalid_processor_id)
+             my_bad_pids.insert(node->id());
+
+         Threads::spin_mutex::scoped_lock lock(pid_mtx);
+
+         bad_pids.merge(my_bad_pids);
+       });
 
     // If we assign our temporary ids by looping from finer elements
     // to coarser elements, we'll always get an id from the finest

@@ -462,8 +462,11 @@ std::set<MeshTetInterface::SurfaceIntegrity> MeshTetInterface::check_hull_integr
 
   TriChecker checker (ref_area, this->_verbosity);
 
+  // Don't grab a non-Const range by mistake
+  const MeshBase & mesh = this->_mesh;
+
   Threads::parallel_reduce
-    (this->_mesh.active_local_element_stored_range(), checker);
+    (mesh.active_local_element_stored_range(), checker);
 
   // Join problems found in threaded loop
   returnval.merge(checker.my_returnval);

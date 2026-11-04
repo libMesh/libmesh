@@ -51,9 +51,9 @@ public:
     std::vector<const Elem *> twice(all);
     twice.insert(twice.end(), all.begin(), all.end());
     const ConstElemRange twice_range(&twice);
-    const auto middle = twice.cbegin() + all.size();
-    const ConstElemRange first_half(twice_range, twice.cbegin(), middle),
-      second_half(twice_range, middle, twice.cend());
+    const auto middle = twice_range.begin() + all.size();
+    const ConstElemRange first_half(twice_range, twice_range.begin(), middle),
+      second_half(twice_range, middle, twice_range.end());
 
     CPPUNIT_ASSERT(first_half == second_half);
     CPPUNIT_ASSERT(second_half == first_half);

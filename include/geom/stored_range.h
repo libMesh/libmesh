@@ -24,6 +24,7 @@
 #include "libmesh/threads.h"
 
 // C++ includes
+#include <type_traits> // std::remove*
 #include <vector>
 #include <memory> // std::unique_ptr
 #include <functional> // std::function
@@ -58,8 +59,13 @@ public:
    * Allows an \p StoredRange to behave like an STL container.
    */
   typedef typename std::vector<object_type> vec_type;
-  typedef typename vec_type::const_iterator const_iterator;
+  typedef const object_type * const_iterator;
   typedef typename std::unique_ptr<vec_type, std::function<void (vec_type *)>> ptr_type;
+
+  /**
+   * Allows conversion from non-const to const pointer objects
+   */
+  typedef std::remove_const_t<std::remove_pointer_t<object_type>> * nonconst_object_type;
 
   /**
    * Constructor. Optionally takes the \p grainsize parameter, which is the
@@ -106,12 +112,36 @@ public:
    */
   StoredRange (vec_type * objs,
                const unsigned int new_grainsize = libMesh::default_grainsize()) :
-    _end(objs->end()),
-    _begin(objs->begin()),
+    _end(end_of(*objs)),
+    _begin(objs->data()),
     _last(objs->size()),
     _first(0),
     _grainsize(new_grainsize),
     _objs(ptr_type(objs, [](vec_type *){/*don't delete*/}))
+  {
+  }
+
+  /**
+   * Constructor.  Takes pointers to objects, which are expected to
+   * themselves be pointers but with const removed.  This lets us
+   * create a const range view of a saved non-const range.
+   *
+   * Optionally takes the \p grainsize parameter, which is the
+   * smallest chunk the range may be broken into for parallel
+   * execution.
+   *
+   * \note The pointer range passed in here MUST be dereferenceable
+   * for the lifetime of this StoredRange!
+   */
+  StoredRange (const nonconst_object_type * begin,
+               const nonconst_object_type * end,
+               const unsigned int new_grainsize = libMesh::default_grainsize()) :
+    _end(end),
+    _begin(begin),
+    _last(std::distance(begin, end)),
+    _first(0),
+    _grainsize(new_grainsize),
+    _objs(nullptr)
   {
   }
 
@@ -223,8 +253,8 @@ public:
     for (iterator_type it=first; it!=last; ++it)
       _objs->push_back(*it);
 
-    _begin = _objs->begin();
-    _end   = _objs->end();
+    _begin = _objs->data();
+    _end   = end_of(*_objs);
 
     _first = 0;
     _last  = _objs->size();
@@ -245,8 +275,8 @@ public:
     // _objs must be initialized in order to call reset()
     libmesh_assert(_objs);
 
-    _begin = _objs->begin();
-    _end   = _objs->end();
+    _begin = _objs->data();
+    _end   = end_of(*_objs);
 
     _first = 0;
     _last  = _objs->size();
@@ -323,6 +353,15 @@ public:
   bool is_divisible() const { return this->grainsize() < static_cast<unsigned int>(std::distance(_begin, _end)); }
 
 private:
+
+  /**
+   * Helper for pre-C++26 compiles, where the compiler may have
+   * empty_vector.data() return nullptr and technically pointer
+   * arithmetic on nullptr may be Undefined Behavior.
+   */
+  static const_iterator end_of(vec_type & objs) {
+    return objs.size() ? (objs.data()+objs.size()) : objs.data();
+  }
 
   const_iterator _end;
   const_iterator _begin;
