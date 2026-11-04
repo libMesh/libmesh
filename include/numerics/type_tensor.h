@@ -137,8 +137,7 @@ public:
   /**
    * Destructor.
    */
-  LIBMESH_DEVICE_INLINE
-  ~TypeTensor();
+  ~TypeTensor() = default;
 
   /**
    * Assign to this tensor without creating a temporary.
@@ -708,14 +707,6 @@ TypeTensor<T>::TypeTensor(const TypeVector<T2> & vx,
 #endif
 }
 
-
-
-
-template <typename T>
-LIBMESH_DEVICE_INLINE
-TypeTensor<T>::~TypeTensor ()
-{
-}
 
 
 
