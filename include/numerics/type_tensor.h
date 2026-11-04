@@ -1308,7 +1308,7 @@ template <typename T>
 LIBMESH_DEVICE_INLINE
 auto TypeTensor<T>::norm() const
 {
-  using std::sqrt;
+  using portable_math::sqrt;
   return sqrt(this->norm_sq());
 }
 
@@ -1389,29 +1389,31 @@ template <typename T>
 LIBMESH_DEVICE_INLINE
 bool TypeTensor<T>::operator == (const TypeTensor<T> & rhs) const
 {
+  using portable_math::abs;
+
 #if LIBMESH_DIM == 1
-  return (std::abs(_coords[0] - rhs._coords[0])
+  return (abs(_coords[0] - rhs._coords[0])
           < TOLERANCE);
 #endif
 
 #if LIBMESH_DIM == 2
-  return ((std::abs(_coords[0] - rhs._coords[0]) +
-           std::abs(_coords[1] - rhs._coords[1]) +
-           std::abs(_coords[2] - rhs._coords[2]) +
-           std::abs(_coords[3] - rhs._coords[3]))
+  return ((abs(_coords[0] - rhs._coords[0]) +
+           abs(_coords[1] - rhs._coords[1]) +
+           abs(_coords[2] - rhs._coords[2]) +
+           abs(_coords[3] - rhs._coords[3]))
           < 4.*TOLERANCE);
 #endif
 
 #if LIBMESH_DIM == 3
-  return ((std::abs(_coords[0] - rhs._coords[0]) +
-           std::abs(_coords[1] - rhs._coords[1]) +
-           std::abs(_coords[2] - rhs._coords[2]) +
-           std::abs(_coords[3] - rhs._coords[3]) +
-           std::abs(_coords[4] - rhs._coords[4]) +
-           std::abs(_coords[5] - rhs._coords[5]) +
-           std::abs(_coords[6] - rhs._coords[6]) +
-           std::abs(_coords[7] - rhs._coords[7]) +
-           std::abs(_coords[8] - rhs._coords[8]))
+  return ((abs(_coords[0] - rhs._coords[0]) +
+           abs(_coords[1] - rhs._coords[1]) +
+           abs(_coords[2] - rhs._coords[2]) +
+           abs(_coords[3] - rhs._coords[3]) +
+           abs(_coords[4] - rhs._coords[4]) +
+           abs(_coords[5] - rhs._coords[5]) +
+           abs(_coords[6] - rhs._coords[6]) +
+           abs(_coords[7] - rhs._coords[7]) +
+           abs(_coords[8] - rhs._coords[8]))
           < 9.*TOLERANCE);
 #endif
 

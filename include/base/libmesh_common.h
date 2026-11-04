@@ -208,10 +208,10 @@ LIBMESH_DEVICE_INLINE std::complex<T> libmesh_conj(std::complex<T> a) { return s
 // for std::complex.
 
 template <typename T>
-LIBMESH_DEVICE_INLINE bool libmesh_isinf(T x) { using std::isinf; return isinf(x); }
+LIBMESH_DEVICE_INLINE bool libmesh_isinf(T x) { using portable_math::isinf; return isinf(x); }
 
 template <typename T>
-LIBMESH_DEVICE_INLINE bool libmesh_isnan(T x) { using std::isnan; return isnan(x); }
+LIBMESH_DEVICE_INLINE bool libmesh_isnan(T x) { using portable_math::isnan; return isnan(x); }
 
 // You'd think we'd treat inf,NaN pairs as NaN rather than infinite,
 // but that's not what the C/C++ standards recommend (ever since C99

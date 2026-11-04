@@ -29,6 +29,7 @@
 #  include "libmesh/ignore_warnings.h"
 #  include <Kokkos_Macros.hpp>
 #  include <Kokkos_Abort.hpp>
+#  include <Kokkos_MathematicalFunctions.hpp>
 #  include "libmesh/restore_warnings.h"
 #  define LIBMESH_DEVICE_INLINE KOKKOS_INLINE_FUNCTION
 
@@ -69,6 +70,23 @@
 #else
 #  define LIBMESH_DEVICE_INLINE inline
 #  define LIBMESH_IN_DEVICE_CODE 0
+
+namespace std {}
 #endif
+
+namespace libMesh
+{
+// Namespace providing the math functions (sqrt, abs, ...) for
+// LIBMESH_DEVICE_INLINE functions: std:: functions are not callable from
+// device code, while their Kokkos counterparts are callable from both host
+// and device.  Use as `using portable_math::sqrt; sqrt(x);` so that
+// argument-dependent lookup still finds overloads for non-arithmetic types
+// such as MetaPhysicL::DualNumber.
+#ifdef ACSM_KOKKOS_COMPILATION
+namespace portable_math = ::Kokkos;
+#else
+namespace portable_math = std;
+#endif
+}
 
 #endif // LIBMESH_LIBMESH_DEVICE_H
