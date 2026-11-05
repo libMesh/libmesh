@@ -93,11 +93,16 @@ map_hi_order_node(unsigned int hon,
   return adj_vertices_to_ho_nodes.try_emplace(adjacent_vertices_ids, nullptr).first;
 }
 
+// With unique ids enabled, \p previous_max_unique_id is an upper bound on the
+// unique_id values in the mesh before the order increase. New node unique_id
+// values start above it. \p max_new_node_unique_id is updated to the largest
+// unique_id given to a new node.
 void transfer_elem(Elem & lo_elem,
                    std::unique_ptr<Elem> hi_elem,
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-                   unique_id_type max_unique_id,
+                   unique_id_type previous_max_unique_id,
                    unique_id_type max_new_nodes_per_elem,
+                   unique_id_type & max_new_node_unique_id,
 #endif
                    UnstructuredMesh & mesh,
                    std::map<std::vector<dof_id_type>, Node *> & adj_vertices_to_ho_nodes,
@@ -179,11 +184,12 @@ void transfer_elem(Elem & lo_elem,
            * by the same process elsewhere.
            */
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-          unique_id_type new_unique_id = max_unique_id +
+          unique_id_type new_unique_id = previous_max_unique_id +
             max_new_nodes_per_elem * lo_elem.id() +
             hon - hon_begin;
 
           hi_node->set_unique_id(new_unique_id);
+          max_new_node_unique_id = std::max(max_new_node_unique_id, new_unique_id);
 #endif
 
           /*
@@ -408,7 +414,7 @@ all_increased_order_range (UnstructuredMesh & mesh,
    * enabled.
    */
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-  unique_id_type max_unique_id = mesh.parallel_max_unique_id();
+  unique_id_type previous_max_unique_id = mesh.parallel_max_unique_id();
 #endif
 
   /**
@@ -418,6 +424,11 @@ all_increased_order_range (UnstructuredMesh & mesh,
    * let's keep track to make sure we're not in any in-between state.
    */
   dof_id_type n_unpartitioned_elem = 0;
+
+#ifdef LIBMESH_ENABLE_UNIQUE_ID
+  // The largest unique_id that this processor assigns to a new node
+  unique_id_type max_new_node_unique_id = previous_max_unique_id;
+#endif
 
   /**
    * Loop over the elements in the given range.  If any are
@@ -524,7 +535,8 @@ all_increased_order_range (UnstructuredMesh & mesh,
 
       transfer_elem(*lo_elem, std::move(ho_elem),
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-                    max_unique_id, max_new_nodes_per_elem,
+                    previous_max_unique_id, max_new_nodes_per_elem,
+                    max_new_node_unique_id,
 #endif
                     mesh, adj_vertices_to_ho_nodes,
                     exterior_children_of);
@@ -534,9 +546,11 @@ all_increased_order_range (UnstructuredMesh & mesh,
   adj_vertices_to_ho_nodes.clear();
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
-  const unique_id_type new_max_unique_id = max_unique_id +
-    max_new_nodes_per_elem * mesh.n_elem();
-  mesh.set_next_unique_id(new_max_unique_id);
+  // make_nodes_parallel_consistent() can give a node the unique_id that
+  // another processor assigned, so the next unique_id must exceed the
+  // largest one assigned on any processor.
+  mesh.comm().max(max_new_node_unique_id);
+  mesh.set_next_unique_id(max_new_node_unique_id + 1);
 #endif
 
   // On a DistributedMesh our ghost node processor ids may be bad,
