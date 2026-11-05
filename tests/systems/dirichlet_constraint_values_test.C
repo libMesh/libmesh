@@ -118,8 +118,7 @@ public:
   LIBMESH_CPPUNIT_TEST_SUITE(DirichletConstraintValuesTest);
 
 #if LIBMESH_DIM > 1
-#if defined(LIBMESH_ENABLE_DIRICHLET) && defined(LIBMESH_ENABLE_PERIODIC) && \
-    defined(LIBMESH_ENABLE_AMR)
+#if defined(LIBMESH_ENABLE_DIRICHLET) && defined(LIBMESH_ENABLE_PERIODIC)
   CPPUNIT_TEST(testUpdateMatchesRebuild);
 #endif
 #endif
@@ -240,6 +239,7 @@ private:
     sys.get_dof_map().add_dirichlet_boundary(
         DirichletBoundary({left_id, right_id}, {u}, RampFunction(-3.)));
 
+#ifdef LIBMESH_ENABLE_AMR // We can do more testing here
     // Refine the elements near the left boundary. Then the hanging
     // nodes on the refined/unrefined interface reach the Dirichlet and
     // periodic boundaries.
@@ -250,6 +250,7 @@ private:
           elem->set_refinement_flag(Elem::REFINE);
       }
     refinement.refine_elements();
+#endif // LIBMESH_ENABLE_AMR
 
     es.init();
 
