@@ -404,12 +404,10 @@ void PetscMatrix<T>::zero ()
 
   semiparallel_only();
 
-  PetscInt m_l, n_l;
-
-  LibmeshPetscCall(MatGetLocalSize(this->_mat,&m_l,&n_l));
-
-  if (n_l)
-    LibmeshPetscCall(MatZeroEntries(this->_mat));
+  // MatZeroEntries() must be called on every rank, including ranks with no
+  // local entries: on a matrix that is not yet preallocated it calls
+  // MatSetUp(), which communicates for some types (e.g. MATHYPRE).
+  LibmeshPetscCall(MatZeroEntries(this->_mat));
 }
 
 template <typename T>
