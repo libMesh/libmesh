@@ -117,13 +117,13 @@ class DirichletConstraintValuesTest : public CppUnit::TestCase
 public:
   LIBMESH_CPPUNIT_TEST_SUITE(DirichletConstraintValuesTest);
 
-#if LIBMESH_DIM > 1
-#if defined(LIBMESH_ENABLE_DIRICHLET) && defined(LIBMESH_ENABLE_PERIODIC)
+#ifdef LIBMESH_ENABLE_DIRICHLET
+#  if LIBMESH_DIM > 1 && defined(LIBMESH_ENABLE_PERIODIC)
   CPPUNIT_TEST(testUpdateMatchesRebuild);
-#endif
-#endif
-#if defined(LIBMESH_ENABLE_DIRICHLET) && defined(LIBMESH_HAVE_SOLVER)
+#  endif
+#  ifdef LIBMESH_HAVE_SOLVER
   CPPUNIT_TEST(testSplineConstraintRows);
+#  endif
 #endif
 
   CPPUNIT_TEST_SUITE_END();
@@ -150,7 +150,7 @@ private:
 
     Mesh mesh(*TestCommWorld);
     EquationSystems es(mesh);
-    auto & sys = es.add_system<LinearImplicitSystem>("sys");
+    auto & sys = es.add_system<ExplicitSystem>("sys");
     const auto u = sys.add_variable("u", FIRST);
 
     // The constraint operator below uses the node numbering of
@@ -217,7 +217,7 @@ private:
     MeshTools::Generation::build_square(mesh, n, n, 0., 1., 0., 1., QUAD9);
 
     EquationSystems es(mesh);
-    auto & sys = es.add_system<LinearImplicitSystem>("sys");
+    auto & sys = es.add_system<ExplicitSystem>("sys");
     const auto u = sys.add_variable("u", SECOND, HIERARCHIC);
     const auto v = sys.add_variable("v", SECOND, LAGRANGE);
 
