@@ -420,6 +420,7 @@ BUILT_SOURCES = \
         petsc_dm_wrapper.h \
         petsc_linear_solver.h \
         petsc_nonlinear_solver.h \
+        petsc_solve_reduction.h \
         petscdmlibmesh.h \
         second_order_unsteady_solver.h \
         slepc_eigen_solver.h \
@@ -1873,6 +1874,9 @@ petsc_linear_solver.h: $(top_srcdir)/include/solvers/petsc_linear_solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 petsc_nonlinear_solver.h: $(top_srcdir)/include/solvers/petsc_nonlinear_solver.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+petsc_solve_reduction.h: $(top_srcdir)/include/solvers/petsc_solve_reduction.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 petscdmlibmesh.h: $(top_srcdir)/include/solvers/petscdmlibmesh.h

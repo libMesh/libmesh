@@ -423,6 +423,7 @@ include_HEADERS =  \
         solvers/petsc_dm_wrapper.h \
         solvers/petsc_linear_solver.h \
         solvers/petsc_nonlinear_solver.h \
+        solvers/petsc_solve_reduction.h \
         solvers/petscdmlibmesh.h \
         solvers/second_order_unsteady_solver.h \
         solvers/slepc_eigen_solver.h \
