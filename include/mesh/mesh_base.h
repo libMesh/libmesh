@@ -2120,8 +2120,7 @@ public:
    * should contain all the subdomain ids across processors. Relies on the mesh
    * being prepared
    */
-  const std::set<subdomain_id_type> & get_mesh_local_subdomains() const
-  { libmesh_assert(this->preparation().has_cached_elem_data); return _mesh_local_subdomains; }
+  const std::set<subdomain_id_type> & get_mesh_local_subdomains() const;
 
 #ifdef LIBMESH_ENABLE_PERIODIC
   /**
@@ -2815,6 +2814,14 @@ const std::set<subdomain_id_type> & MeshBase::get_mesh_subdomains() const
 {
   libmesh_assert(_preparation.has_cached_elem_data);
   return _mesh_subdomains;
+}
+
+
+inline
+const std::set<subdomain_id_type> & MeshBase::get_mesh_local_subdomains() const
+{
+  libmesh_assert(_preparation.has_cached_elem_data);
+  return _mesh_local_subdomains;
 }
 
 
