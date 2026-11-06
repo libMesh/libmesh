@@ -79,7 +79,6 @@ void NonlinearNeoHookeCurrentConfig::calculate_stress()
   RealTensor Ft = F.transpose();
 
   RealTensor C = Ft * F;
-  RealTensor b = F * Ft;
   RealTensor identity;
   identity(0, 0) = 1.0; identity(1, 1) = 1.0; identity(2, 2) = 1.0;
   RealTensor invC = C.inverse();

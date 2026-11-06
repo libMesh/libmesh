@@ -72,10 +72,10 @@ inner_product(const TypeNTensor<N,T> & a, const TypeNTensor<N,T2> & b)
 template<typename T>
 LIBMESH_DEVICE_INLINE
 auto norm(const T & a)
-{ using std::abs; return abs(a); }
+{ using portable_math::abs; return abs(a); }
 
 template<typename T>
-LIBMESH_DEVICE_INLINE
+inline
 T norm(std::complex<T> a) { using std::abs; return abs(a); }
 
 template <typename T>
@@ -105,7 +105,7 @@ auto norm_sq(const T & a)
 { return a * libmesh_conj(a); }
 
 template<typename T>
-LIBMESH_DEVICE_INLINE
+inline
 T norm_sq(std::complex<T> a) { using std::norm; return norm(a); }
 
 template <typename T>
