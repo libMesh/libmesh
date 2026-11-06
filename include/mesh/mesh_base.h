@@ -1476,6 +1476,7 @@ public:
    * here.
    */
   typedef std::vector<GhostingFunctor *>::const_iterator GhostingFunctorIterator;
+  typedef std::vector<GhostingFunctor *>::iterator NonConstGhostingFunctorIterator;
 
   /**
    * Beginning of range of ghosting functors
@@ -1483,10 +1484,16 @@ public:
   GhostingFunctorIterator ghosting_functors_begin() const
   { return _ghosting_functors.begin(); }
 
+  NonConstGhostingFunctorIterator ghosting_functors_begin()
+  { return _ghosting_functors.begin(); }
+
   /**
    * End of range of ghosting functors
    */
   GhostingFunctorIterator ghosting_functors_end() const
+  { return _ghosting_functors.end(); }
+
+  NonConstGhostingFunctorIterator ghosting_functors_end()
   { return _ghosting_functors.end(); }
 
   /**

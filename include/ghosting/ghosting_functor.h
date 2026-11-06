@@ -227,8 +227,14 @@ public:
   virtual void set_mesh(const MeshBase * mesh) { _mesh = mesh; }
 
 #ifdef LIBMESH_ENABLE_PERIODIC
-  // Set PeriodicBoundaries to couple
+  // Set/get PeriodicBoundaries being coupled.
+  // This will eventually be replaced with methods for handling
+  // multiple PeriodicBoundaries sets (e.g. from multiple systems on
+  // the same mesh)
   virtual void set_periodic_boundaries(const PeriodicBoundaries *) {}
+
+  virtual const PeriodicBoundaries * get_periodic_boundaries()
+  {return nullptr;}
 #endif
 
   /**
