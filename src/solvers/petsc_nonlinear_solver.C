@@ -157,7 +157,7 @@ extern "C"
     const bool zero_out_jacobian = rc.solver->_zero_out_jacobian;
     auto & reduction = rc.solver->reduction();
 
-    reduction.residual(x, r, [&](NumericVector<Number> & R) {
+    const bool evaluated = reduction.residual(x, r, [&](NumericVector<Number> & R) {
     if (zero_out_residual)
       R.zero();
 
@@ -188,6 +188,11 @@ extern "C"
       libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");
     });
 
+    // The reduction cannot form the full iterate, e.g. a local solve failed. The line search then
+    // backtracks
+    if (!evaluated)
+      LibmeshPetscCall2(rc.sys.comm(), SNESSetFunctionDomainError(snes));
+
     PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
   }
 
@@ -206,7 +211,7 @@ extern "C"
 
     const bool zero_out_residual = rc.solver->_zero_out_residual;
 
-    rc.solver->reduction().residual(x, r, [&](NumericVector<Number> & R) {
+    const bool evaluated = rc.solver->reduction().residual(x, r, [&](NumericVector<Number> & R) {
     if (zero_out_residual)
       R.zero();
 
@@ -219,6 +224,9 @@ extern "C"
     else
       libmesh_error_msg("Error! Unable to compute residual for forming finite difference Jacobian!");
     });
+
+    if (!evaluated)
+      LibmeshPetscCall2(rc.sys.comm(), SNESSetFunctionDomainError(snes));
 
     PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
   }
@@ -239,7 +247,7 @@ extern "C"
 
     const bool zero_out_residual = rc.solver->_zero_out_residual;
 
-    rc.solver->reduction().residual(x, r, [&](NumericVector<Number> & R) {
+    const bool evaluated = rc.solver->reduction().residual(x, r, [&](NumericVector<Number> & R) {
     if (zero_out_residual)
       R.zero();
 
@@ -253,6 +261,9 @@ extern "C"
       libmesh_error_msg("Error! Unable to compute residual for forming finite differenced"
                         "Jacobian-vector products!");
     });
+
+    if (!evaluated)
+      LibmeshPetscCall2(rc.sys.comm(), SNESSetFunctionDomainError(snes));
 
     PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
   }
@@ -415,7 +426,7 @@ extern "C"
 
     const bool zero_out_jacobian = solver->_zero_out_jacobian;
 
-    solver->reduction().jacobian(x, *Jac, *PC, [&](SparseMatrix<Number> & J) {
+    const bool evaluated = solver->reduction().jacobian(x, *Jac, *PC, [&](SparseMatrix<Number> & J) {
     if (zero_out_jacobian)
       J.zero();
 
@@ -432,6 +443,9 @@ extern "C"
     else
       libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");
     });
+
+    if (!evaluated)
+      LibmeshPetscCall2(sys.comm(), SNESSetJacobianDomainError(snes));
 
     PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
   }
@@ -526,8 +540,12 @@ extern "C"
     // changes keeps each change to an entry SNES solves for
     auto & reduction = solver->reduction();
     const auto old_soln = reduction.prolong_iterate(x);
+    libmesh_error_msg_if(!old_soln, "The reduction cannot form the full previous iterate");
     const auto search_direction = reduction.prolong_step(y);
     const auto new_soln = reduction.prolong_iterate(w);
+    // P(w) does not exist. The evaluation of the residual at w reports it to the line search
+    if (!new_soln)
+      PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
 
     call_postcheck(*old_soln, *search_direction, *new_soln);
 
@@ -579,7 +597,7 @@ extern "C"
     // The user sees the full iterate in the system's current_local_solution and the full search
     // direction P' Y. A change to the search direction is injected back
     auto & reduction = solver->reduction();
-    reduction.prolong(X);
+    libmesh_error_msg_if(!reduction.prolong(X), "The reduction cannot form the full iterate");
     libmesh_assert(sys.current_local_solution.get());
     auto & local_soln = *sys.current_local_solution.get();
     const auto search_direction = reduction.prolong_step(Y);
@@ -711,7 +729,7 @@ void PetscNonlinearSolver<T>::init (const char * name)
           this->_solver_configuration->set_options_during_init();
         }
 
-      if (this->_preconditioner)
+      if (this->_preconditioner && this->reduction().uses_linear_preconditioner())
         {
           KSP ksp;
           LibmeshPetscCall(SNESGetKSP (_snes, &ksp));
@@ -892,7 +910,10 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // Jacobian operator
   // Only set the jacobian function if we've been provided with something to call.
   // This allows a user to set their own jacobian function if they want to
   if (this->jacobian || this->jacobian_object || this->matvec || this->residual_and_jacobian_object)
-    LibmeshPetscCall(SNESSetJacobian (_snes, jac->mat(), pre->mat(), libmesh_petsc_snes_jacobian, this));
+    {
+      const auto [snes_jac, snes_pre] = reduction.operators(jac->mat(), pre->mat());
+      LibmeshPetscCall(SNESSetJacobian (_snes, snes_jac, snes_pre, libmesh_petsc_snes_jacobian, this));
+    }
 
   // Have the Krylov subspace method use our good initial guess rather than 0
   KSP ksp;
@@ -948,7 +969,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // Jacobian operator
     this->user_presolve(this->system());
 
   //Set the preconditioning matrix
-  if (this->_preconditioner)
+  if (this->_preconditioner && reduction.uses_linear_preconditioner())
     {
       this->_preconditioner->set_matrix(pre_in);
       this->_preconditioner->init();
@@ -1139,11 +1160,23 @@ void PetscNonlinearSolver<T>::force_new_preconditioner()
 template <typename T>
 void PetscNonlinearSolver<T>::setup_reduction()
 {
-  if (this->system().get_dof_map().has_constraint_elimination())
-    _reduction = std::make_unique<PetscConstraintEliminationReduction<T>>(this->system());
+  sys_type & sys = this->system();
+  if (sys.get_dof_map().has_constraint_elimination())
+    _reduction = std::make_unique<PetscConstraintEliminationReduction<T>>(sys);
   else
-    _reduction = std::make_unique<PetscIdentityReduction<T>>(this->system(),
+    _reduction = std::make_unique<PetscIdentityReduction<T>>(sys,
                                                              this->_exact_constraint_enforcement);
+
+  if (this->elimination_object && sys.has_static_condensation())
+    {
+#ifdef LIBMESH_HAVE_EIGEN
+      _reduction = std::make_unique<PetscNonlinearStaticCondensationReduction<T>>(
+          sys, *this->elimination_object, std::move(_reduction));
+#else
+      libmesh_error_msg("Nonlinear elimination of statically condensed degrees of freedom "
+                        "requires Eigen");
+#endif
+    }
 }
 
 //------------------------------------------------------------------

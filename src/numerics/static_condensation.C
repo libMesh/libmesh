@@ -425,7 +425,7 @@ void StaticCondensation::forward_elimination(const NumericVector<Number> & paren
   _reduced_rhs->close();
 }
 
-void StaticCondensation::backwards_substitution(const NumericVector<Number> & parent_rhs,
+void StaticCondensation::backwards_substitution(const NumericVector<Number> * const parent_rhs,
                                                 NumericVector<Number> & parent_sol)
 {
   std::vector<Number> elem_condensed_rhs_vec, elem_uncondensed_sol_vec;
@@ -436,15 +436,22 @@ void StaticCondensation::backwards_substitution(const NumericVector<Number> & pa
       auto & matrix_data = libmesh_map_find(_elem_to_matrix_data, elem->id());
       const auto & dof_data = libmesh_map_find(_reduced_dof_map._elem_to_dof_data, elem->id());
 
-      set_local_vectors(
-          parent_rhs, dof_data.condensed_parent_dofs, elem_condensed_rhs_vec, elem_condensed_rhs);
       set_local_vectors(*_ghosted_parent_sol,
                         dof_data.uncondensed_parent_dofs,
                         elem_uncondensed_sol_vec,
                         elem_uncondensed_sol);
 
-      elem_condensed_sol =
-          matrix_data.AccFactor.solve(elem_condensed_rhs - matrix_data.Acu * elem_uncondensed_sol);
+      if (parent_rhs)
+        {
+          set_local_vectors(*parent_rhs,
+                            dof_data.condensed_parent_dofs,
+                            elem_condensed_rhs_vec,
+                            elem_condensed_rhs);
+          elem_condensed_sol = matrix_data.AccFactor.solve(elem_condensed_rhs -
+                                                           matrix_data.Acu * elem_uncondensed_sol);
+        }
+      else
+        elem_condensed_sol = -matrix_data.AccFactor.solve(matrix_data.Acu * elem_uncondensed_sol);
       parent_sol.insert(elem_condensed_sol.data(), dof_data.condensed_parent_dofs);
     }
 
@@ -466,7 +473,13 @@ void StaticCondensation::apply(const NumericVector<Number> & parent_rhs,
   parent_sol.restore_subvector(std::move(_reduced_sol),
                                _reduced_dof_map.local_retained_parent_dofs());
   *_ghosted_parent_sol = parent_sol;
-  backwards_substitution(parent_rhs, parent_sol);
+  backwards_substitution(&parent_rhs, parent_sol);
+}
+
+void StaticCondensation::homogeneous_backwards_substitution(NumericVector<Number> & parent_sol)
+{
+  *_ghosted_parent_sol = parent_sol;
+  backwards_substitution(nullptr, parent_sol);
 }
 
 SolverPackage StaticCondensation::solver_package() { return libMesh::default_solver_package(); }

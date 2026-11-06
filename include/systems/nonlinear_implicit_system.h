@@ -240,6 +240,27 @@ public:
   };
 
   /**
+   * Abstract base class for nonlinear elimination of the statically condensed degrees of freedom.
+   * When a system with static condensation has this object, SNES iterates on the uncondensed
+   * degrees of freedom x2 only, and each function evaluation first solves the condensed equations
+   * F1(x1, x2) = 0 for x1. The residual is then F2(x1(x2), x2) and its Jacobian is the static
+   * condensation Schur complement at (x1(x2), x2)
+   */
+  class ComputeEliminatedSolution
+  {
+  public:
+    virtual ~ComputeEliminatedSolution () = default;
+
+    /**
+     * Solves the condensed equations for the condensed degrees of freedom, given the uncondensed
+     * ones. The system's \p current_local_solution holds the iterate, with the previous condensed
+     * values as the initial guess. Write the condensed solution into the system's \p solution
+     * @returns Whether every local solve converged
+     */
+    virtual bool eliminate(sys_type & S) = 0;
+  };
+
+  /**
    * \returns A reference to *this.
    */
   sys_type & system () { return *this; }
