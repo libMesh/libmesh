@@ -1858,13 +1858,16 @@ void DistributedMesh::delete_remote_elements()
       ++n_it;
 
   // We may have deleted no-longer-connected nodes or coarsened-away
-  // elements; let's update our caches.
-  this->update_parallel_id_counts();
+  // elements; let's update our caches if they're expected to be up to
+  // date.
+  if (_preparation.has_synched_id_counts)
+    this->update_parallel_id_counts();
 
   // We may have deleted nodes or elements that were the only local
   // representatives of some particular boundary id(s); let's update
-  // those caches.
-  this->get_boundary_info().regenerate_id_sets();
+  // those caches if they're expected to be up to date.
+  if (_preparation.has_boundary_id_sets)
+    this->get_boundary_info().regenerate_id_sets();
 
 #ifdef DEBUG
   // We might not have well-packed objects if the user didn't allow us
