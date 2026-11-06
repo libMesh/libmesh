@@ -1521,6 +1521,8 @@ public:
    * materials in a solid mechanics application, or regions where different
    * physical processes are important.  The subdomain mapping is independent
    * from the parallel decomposition.
+   *
+   * This relies on the mesh cached element data being prepared.
    */
   subdomain_id_type n_subdomains () const;
 
@@ -1530,6 +1532,8 @@ public:
    * materials in a solid mechanics application, or regions where different
    * physical processes are important.  The subdomain mapping is independent
    * from the parallel decomposition.
+   *
+   * This relies on the mesh cached element data being prepared.
    */
   subdomain_id_type n_local_subdomains () const;
 
@@ -2115,6 +2119,13 @@ public:
    */
   const std::set<subdomain_id_type> & get_mesh_subdomains() const;
 
+  /**
+   * \return The cached mesh subdomains. As long as the mesh is prepared, this
+   * should contain all the subdomain ids across processors. Relies on the mesh
+   * being prepared
+   */
+  const std::set<subdomain_id_type> & get_mesh_local_subdomains() const;
+
 #ifdef LIBMESH_ENABLE_PERIODIC
   /**
    * Register a pair of boundaries as disjoint neighbor boundary pairs.
@@ -2471,6 +2482,12 @@ protected:
   std::set<subdomain_id_type> _mesh_subdomains;
 
   /**
+   * We also cache the subdomain ids of the elements owned by this
+   * processor.
+   */
+  std::set<subdomain_id_type> _mesh_local_subdomains;
+
+  /**
    * Map from "element set code" to list of set ids to which that element
    * belongs (and vice-versa). Remarks:
    * 1.) The elemset code is a dof_id_type because (if used) it is
@@ -2801,6 +2818,14 @@ const std::set<subdomain_id_type> & MeshBase::get_mesh_subdomains() const
 {
   libmesh_assert(_preparation.has_cached_elem_data);
   return _mesh_subdomains;
+}
+
+
+inline
+const std::set<subdomain_id_type> & MeshBase::get_mesh_local_subdomains() const
+{
+  libmesh_assert(_preparation.has_cached_elem_data);
+  return _mesh_local_subdomains;
 }
 
 
