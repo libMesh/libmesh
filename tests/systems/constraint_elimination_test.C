@@ -11,6 +11,7 @@
 #include <libmesh/nonlinear_solver.h>
 #include <libmesh/numeric_vector.h>
 #include <libmesh/dense_vector.h>
+#include <limits>
 #include <tuple>
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_generation.h>
@@ -49,49 +50,75 @@ namespace
 class NonlinearDiffusion : public NonlinearImplicitSystem::ComputeResidualandJacobian
 {
 public:
+  /**
+   * Builds the finite element objects for the system's single variable
+   */
+  void init(const NonlinearImplicitSystem & sys)
+  {
+    if (_fe)
+      return;
+    const FEType fe_type = sys.get_dof_map().variable_type(0);
+    _fe = FEBase::build(2, fe_type);
+    _qrule = std::make_unique<QGauss>(2, fe_type.default_quadrature_order());
+    _fe->attach_quadrature_rule(_qrule.get());
+    _fe->get_JxW();
+    _fe->get_phi();
+    _fe->get_dphi();
+  }
+
+  /**
+   * Computes the unconstrained element residual \p Re and Jacobian \p Ke on \p elem, whose degree
+   * of freedom values are \p ue
+   */
+  void element(const Elem & elem, const DenseVector<Number> & ue, DenseVector<Number> & Re,
+               DenseMatrix<Number> & Ke)
+  {
+    _fe->reinit(&elem);
+    const auto & JxW = _fe->get_JxW();
+    const auto & phi = _fe->get_phi();
+    const auto & dphi = _fe->get_dphi();
+    const auto n = ue.size();
+    Re.resize(n);
+    Ke.resize(n, n);
+    for (const auto qp : index_range(JxW))
+      {
+        Number u = 0;
+        Gradient grad_u;
+        for (const auto j : make_range(n))
+          {
+            u += phi[j][qp] * ue(j);
+            grad_u.add_scaled(dphi[j][qp], ue(j));
+          }
+        const Number k = 1. + u * u;
+        for (const auto i : make_range(n))
+          {
+            Re(i) += JxW[qp] * (k * grad_u * dphi[i][qp] + (grad_u(0) - 1.) * phi[i][qp]);
+            for (const auto j : make_range(n))
+              Ke(i, j) += JxW[qp] * (k * dphi[j][qp] * dphi[i][qp] +
+                                     2. * u * phi[j][qp] * (grad_u * dphi[i][qp]) +
+                                     dphi[j][qp](0) * phi[i][qp]);
+          }
+      }
+  }
+
   virtual void residual_and_jacobian(const NumericVector<Number> & soln,
                                      NumericVector<Number> * residual,
                                      SparseMatrix<Number> * jacobian,
                                      NonlinearImplicitSystem & sys) override
   {
     const DofMap & dof_map = sys.get_dof_map();
-    const FEType fe_type = dof_map.variable_type(0);
-    std::unique_ptr<FEBase> fe(FEBase::build(2, fe_type));
-    QGauss qrule(2, fe_type.default_quadrature_order());
-    fe->attach_quadrature_rule(&qrule);
-    const auto & JxW = fe->get_JxW();
-    const auto & phi = fe->get_phi();
-    const auto & dphi = fe->get_dphi();
+    this->init(sys);
 
     std::vector<dof_id_type> dofs;
-    DenseVector<Number> Re;
+    DenseVector<Number> ue, Re;
     DenseMatrix<Number> Ke;
     for (const Elem * elem : sys.get_mesh().active_local_element_ptr_range())
       {
         dof_map.dof_indices(elem, dofs);
-        fe->reinit(elem);
-        const auto n = dofs.size();
-        Re.resize(n);
-        Ke.resize(n, n);
-        for (const auto qp : index_range(JxW))
-          {
-            Number u = 0;
-            Gradient grad_u;
-            for (const auto j : make_range(n))
-              {
-                u += phi[j][qp] * soln(dofs[j]);
-                grad_u.add_scaled(dphi[j][qp], soln(dofs[j]));
-              }
-            const Number k = 1. + u * u;
-            for (const auto i : make_range(n))
-              {
-                Re(i) += JxW[qp] * (k * grad_u * dphi[i][qp] + (grad_u(0) - 1.) * phi[i][qp]);
-                for (const auto j : make_range(n))
-                  Ke(i, j) += JxW[qp] * (k * dphi[j][qp] * dphi[i][qp] +
-                                         2. * u * phi[j][qp] * (grad_u * dphi[i][qp]) +
-                                         dphi[j][qp](0) * phi[i][qp]);
-              }
-          }
+        ue.resize(dofs.size());
+        for (const auto j : index_range(dofs))
+          ue(j) = soln(dofs[j]);
+        this->element(*elem, ue, Re, Ke);
         dof_map.constrain_element_matrix_and_vector(Ke, Re, dofs, false);
         if (residual)
           residual->add_vector(Re, dofs);
@@ -106,7 +133,107 @@ public:
           }
       }
   }
+
+private:
+  std::unique_ptr<FEBase> _fe;
+  std::unique_ptr<QBase> _qrule;
 };
+
+#ifdef LIBMESH_HAVE_EIGEN
+/**
+ * Nonlinear elimination of the element interior degrees of freedom of \p NonlinearDiffusion: on
+ * each element, Newton's method solves the interior rows of the element residual for the interior
+ * values, given the element boundary values. Interior degrees of freedom belong to one element
+ * and are never constrained, so each local problem is independent of the others
+ */
+class InteriorElimination : public NonlinearImplicitSystem::ComputeEliminatedSolution
+{
+public:
+  explicit InteriorElimination(NonlinearDiffusion & assembly) : _assembly(assembly) {}
+
+  virtual bool eliminate(NonlinearImplicitSystem & sys) override
+  {
+    _assembly.init(sys);
+    const DofMap & dof_map = sys.get_dof_map();
+    const auto & sc_map = dof_map.get_static_condensation();
+    const NumericVector<Number> & soln = *sys.current_local_solution;
+
+    std::vector<dof_id_type> dofs, interior;
+    std::vector<unsigned int> interior_local;
+    DenseVector<Number> ue, Re, R1, du;
+    DenseMatrix<Number> Ke, K11;
+    for (const Elem * elem : sys.get_mesh().active_local_element_ptr_range())
+      {
+        dof_map.dof_indices(elem, dofs);
+        ue.resize(dofs.size());
+        interior.clear();
+        interior_local.clear();
+        for (const auto j : index_range(dofs))
+          {
+            ue(j) = soln(dofs[j]);
+            // Condensed degrees of freedom are those the parent space retains and static
+            // condensation does not. Constrained degrees of freedom are in neither space
+            if (sc_map.parent_dof(dofs[j]) != DofObject::invalid_id &&
+                sc_map.find_reduced_dof(dofs[j]) == DofObject::invalid_id)
+              {
+                interior.push_back(dofs[j]);
+                interior_local.push_back(j);
+              }
+          }
+        const auto n1 = interior_local.size();
+        if (!n1)
+          continue;
+
+        // Newton's method on the interior rows. It converges quadratically, so iterating to
+        // roundoff costs only a few iterations more than a loose tolerance and keeps the reduced
+        // residual a smooth function of the boundary values
+        bool converged = false;
+        Real initial_norm = -1;
+        for (unsigned int it = 0; it < max_its && !converged; ++it)
+          {
+            _assembly.element(*elem, ue, Re, Ke);
+            R1.resize(n1);
+            K11.resize(n1, n1);
+            for (const auto a : make_range(n1))
+              {
+                R1(a) = Re(interior_local[a]);
+                for (const auto b : make_range(n1))
+                  K11(a, b) = Ke(interior_local[a], interior_local[b]);
+              }
+            const Real norm = R1.l2_norm();
+            if (initial_norm < 0)
+              initial_norm = norm;
+            if (norm <= tolerance * initial_norm || norm < absolute_tolerance)
+              {
+                converged = true;
+                break;
+              }
+            K11.lu_solve(R1, du);
+            for (const auto a : make_range(n1))
+              ue(interior_local[a]) -= du(a);
+          }
+        if (!converged)
+          return false;
+
+        for (const auto a : make_range(n1))
+          sys.solution->set(interior[a], ue(interior_local[a]));
+        ++n_solves;
+      }
+    return true;
+  }
+
+  /// Relative tolerance on the interior residual, near machine precision
+  Real tolerance = 1e2 * std::numeric_limits<Real>::epsilon();
+  /// Absolute tolerance on the interior residual, for interior values that are already converged
+  Real absolute_tolerance = 1e-14;
+  unsigned int max_its = 20;
+  /// The number of element solves performed, to check that elimination ran
+  unsigned int n_solves = 0;
+
+private:
+  NonlinearDiffusion & _assembly;
+};
+#endif
 
 /**
  * Caps the solution from above, so a variational inequality solve has active bounds
@@ -246,6 +373,8 @@ public:
   CPPUNIT_TEST(testReducedNullSpace);
 #ifdef LIBMESH_HAVE_EIGEN
   CPPUNIT_TEST(testCondensedReducedSolve);
+  CPPUNIT_TEST(testNonlinearElimination);
+  CPPUNIT_TEST(testNonlinearEliminationEnforcedConstraints);
 #endif
 
   CPPUNIT_TEST_SUITE_END();
@@ -604,6 +733,147 @@ private:
     for (const auto i : make_range(dof_map.first_dof(), dof_map.end_dof()))
       LIBMESH_ASSERT_NUMBERS_EQUAL(
           (*plain_sys.solution)(i), (*condensed_sys.solution)(i), std::sqrt(TOLERANCE) * TOLERANCE);
+  }
+
+  /**
+   * Nonlinear elimination of the element interior degrees of freedom: SNES solves for the element
+   * boundary degrees of freedom only, and each function evaluation first solves the interior
+   * equations element by element. The solution must match a plain Newton solve. The Jacobian of
+   * the reduced residual is the static condensation Schur complement at the eliminated state, so
+   * it must match a finite difference Jacobian of the reduced residual
+   */
+  void testNonlinearElimination()
+  {
+    LOG_UNIT_TEST;
+    nonlinearElimination(/*eliminate_constraints=*/true);
+  }
+
+  /**
+   * Nonlinear elimination of a system that keeps its constrained degrees of freedom. The
+   * constraint rows of the reduced residual and the Schur complement are enforced instead
+   */
+  void testNonlinearEliminationEnforcedConstraints()
+  {
+    LOG_UNIT_TEST;
+    nonlinearElimination(/*eliminate_constraints=*/false);
+  }
+
+  void nonlinearElimination(const bool eliminate_constraints)
+  {
+#if !defined(LIBMESH_PETSC_HAVE_MUMPS) && !defined(LIBMESH_PETSC_HAVE_SUPERLU_DIST)
+    // The solves use LU, which needs a parallel direct solver when the matrices are distributed
+    if (TestCommWorld->size() > 1)
+      return;
+#endif
+
+    Mesh mesh(*TestCommWorld);
+    mesh.allow_remote_element_removal(false);
+    MeshTools::Generation::build_square(mesh, 4, 4, 0., 1., 0., 1., QUAD9);
+
+    EquationSystems es(mesh);
+    auto & plain_sys = es.add_system<NonlinearImplicitSystem>("plain");
+    auto & ne_sys = es.add_system<NonlinearImplicitSystem>("ne");
+    if (eliminate_constraints)
+      {
+        plain_sys.create_constraint_elimination();
+        ne_sys.create_constraint_elimination();
+      }
+    ne_sys.create_static_condensation();
+
+    NonlinearDiffusion plain_assembly, ne_assembly;
+    InteriorElimination elimination(ne_assembly);
+    for (auto [sys, assembly] : {std::make_pair(&plain_sys, &plain_assembly),
+                                 std::make_pair(&ne_sys, &ne_assembly)})
+      {
+        // Third order hierarchic shape functions have interior dofs to eliminate
+        const auto u = sys->add_variable("u", THIRD, HIERARCHIC);
+        PeriodicBoundary periodic(RealVectorValue(0., 1.));
+        periodic.myboundary = 0;
+        periodic.pairedboundary = 2;
+        sys->get_dof_map().add_periodic_boundary(periodic);
+        sys->get_dof_map().add_dirichlet_boundary(
+            DirichletBoundary({3}, {u}, ConstFunction<Number>(2.)));
+        sys->nonlinear_solver->residual_and_jacobian_object = assembly;
+        sys->nonlinear_solver->relative_residual_tolerance = TOLERANCE * TOLERANCE;
+      }
+    ne_sys.nonlinear_solver->elimination_object = &elimination;
+
+    mesh.default_ghosting().set_periodic_boundaries(
+        plain_sys.get_dof_map().get_periodic_boundaries());
+    mesh.allow_remote_element_removal(true);
+    mesh.delete_remote_elements();
+
+    if (Elem * elem = mesh.query_elem_ptr(5); elem && elem->active())
+      elem->set_refinement_flag(Elem::REFINE);
+    MeshRefinement(mesh).refine_elements();
+    es.init();
+
+    // Nonlinear elimination solves the reduced system with an ordinary linear solver
+    const std::vector<std::pair<const char *, const char *>> options = {
+        {"-ne_ksp_type", "preonly"}, {"-ne_pc_type", "lu"}, {"-plain_pc_type", "lu"}};
+    for (const auto & [name, value] : options)
+      LibmeshPetscCall2(mesh.comm(), PetscOptionsSetValue(nullptr, name, value));
+    // Compares the Schur complement with a finite difference Jacobian of the reduced residual at
+    // the first Newton iterate, after the interior equations have been solved once
+    struct JacobianTest
+    {
+      static PetscErrorCode monitor(SNES snes, PetscInt its, PetscReal, void * ctx)
+      {
+        PetscFunctionBeginUser;
+        auto & self = *static_cast<JacobianTest *>(ctx);
+        if (its == 1)
+          {
+            // SNESTestJacobian compares the Jacobian SNES holds, so assemble it at this iterate
+            Vec x;
+            Mat J, P;
+            PetscCall(SNESGetSolution(snes, &x));
+            PetscCall(SNESGetJacobian(snes, &J, &P, nullptr, nullptr));
+            PetscCall(SNESComputeJacobian(snes, x, J, P));
+            PetscCall(SNESTestJacobian(snes, &self.jac_norm, &self.diff_norm));
+            self.tested = true;
+          }
+        PetscFunctionReturn(PETSC_SUCCESS);
+      }
+      PetscReal jac_norm = 0, diff_norm = 0;
+      bool tested = false;
+    } jacobian_test;
+
+    for (auto * sys : {&plain_sys, &ne_sys})
+      {
+        sys->prefix_with_name(true);
+        sys->solution->zero();
+        sys->solution->close();
+        sys->update();
+        if (sys == &ne_sys)
+          {
+            auto & solver = cast_ref<PetscNonlinearSolver<Number> &>(*sys->nonlinear_solver);
+            LibmeshPetscCall2(mesh.comm(),
+                              SNESMonitorSet(solver.snes(sys->prefix().c_str()),
+                                             JacobianTest::monitor,
+                                             &jacobian_test,
+                                             nullptr));
+          }
+        sys->solve();
+        CPPUNIT_ASSERT(sys->nonlinear_solver->converged);
+      }
+    for (const auto & [name, value] : options)
+      {
+        libmesh_ignore(value);
+        LibmeshPetscCall2(mesh.comm(), PetscOptionsClearValue(nullptr, name));
+      }
+
+    CPPUNIT_ASSERT(elimination.n_solves > 0);
+
+    // Finite differences of the reduced residual re-solve the interior equations at each perturbed
+    // iterate, so they include the dependence of the interior values on the boundary ones. Forward
+    // differences are accurate to about the square root of machine precision
+    CPPUNIT_ASSERT(jacobian_test.tested);
+    CPPUNIT_ASSERT_LESS(1e-6 * jacobian_test.jac_norm, jacobian_test.diff_norm);
+
+    const auto & dof_map = plain_sys.get_dof_map();
+    for (const auto i : make_range(dof_map.first_dof(), dof_map.end_dof()))
+      LIBMESH_ASSERT_NUMBERS_EQUAL(
+          (*plain_sys.solution)(i), (*ne_sys.solution)(i), std::sqrt(TOLERANCE) * TOLERANCE);
   }
 
   /**

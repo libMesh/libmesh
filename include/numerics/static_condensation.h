@@ -171,6 +171,13 @@ public:
   const SparseMatrix<Number> & get_condensed_mat() const;
 
   /**
+   * Sets the condensed entries of the parent-space vector \p parent_sol to \f$ -A_{cc}^{-1} A_{cu}
+   * u \f$, where \f$ u \f$ holds its uncondensed entries. This is \p backwards_substitution() with
+   * a zero right-hand side. It uses the element blocks of the last closed matrix
+   */
+  void homogeneous_backwards_substitution(NumericVector<Number> & parent_sol);
+
+  /**
    * Set the current element. This enables fast lookups of local indices from global indices
    */
   void set_current_elem(const Elem & elem);
@@ -221,9 +228,10 @@ private:
    * After performing the solve with the \p _reduced_rhs and Schur complement matrix (\p
    * _reduced_sys_mat) to determine the \p _reduced_sol, we use the parent-space \p parent_rhs
    * along with the \p _reduced_sol to back substitute into the parent-space \p parent_sol, which
-   * is the final output data of the static condensation preconditioner application
+   * is the final output data of the static condensation preconditioner application. A null \p
+   * parent_rhs is a zero right-hand side
    */
-  void backwards_substitution(const NumericVector<Number> & parent_rhs,
+  void backwards_substitution(const NumericVector<Number> * parent_rhs,
                               NumericVector<Number> & parent_sol);
 
   /**

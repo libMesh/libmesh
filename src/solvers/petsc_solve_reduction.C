@@ -23,9 +23,55 @@
 #include "libmesh/constraint_elimination_dof_map.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/dof_object.h"
+#include "libmesh/libmesh_logging.h"
 #include "libmesh/nonlinear_implicit_system.h"
 #include "libmesh/petsc_matrix_base.h"
 #include "libmesh/petsc_vector.h"
+#include "libmesh/static_condensation.h"
+#include "libmesh/static_condensation_dof_map.h"
+
+namespace
+{
+using namespace libMesh;
+
+/**
+ * \returns A new parallel vector of the type of \p sys's solution, with \p n_local entries on
+ * this processor and \p n in total
+ */
+template <typename T>
+Vec create_reduced_vector(const NonlinearImplicitSystem & sys,
+                          const numeric_index_type n_local,
+                          const numeric_index_type n)
+{
+  const auto & comm = sys.comm();
+  VecType vec_type;
+  LibmeshPetscCall2(comm, VecGetType(cast_ref<PetscVector<T> &>(*sys.solution).vec(), &vec_type));
+
+  Vec v;
+  LibmeshPetscCall2(comm, VecCreate(comm.get(), &v));
+  LibmeshPetscCall2(comm, VecSetSizes(v, cast_int<PetscInt>(n_local), cast_int<PetscInt>(n)));
+  LibmeshPetscCall2(comm, VecSetType(v, vec_type));
+  LibmeshPetscCall2(comm, VecSetUp(v));
+  return v;
+}
+
+/**
+ * Sets \p is to the indices \p indices on the communicator of \p sys
+ */
+template <typename Indices>
+void create_index_set(const NonlinearImplicitSystem & sys,
+                      const Indices & indices,
+                      WrappedPetsc<IS> & is)
+{
+  std::vector<PetscInt> petsc_indices(indices.begin(), indices.end());
+  LibmeshPetscCall2(sys.comm(),
+                    ISCreateGeneral(sys.comm().get(),
+                                    cast_int<PetscInt>(petsc_indices.size()),
+                                    petsc_indices.data(),
+                                    PETSC_COPY_VALUES,
+                                    is.get()));
+}
+}
 
 namespace libMesh
 {
@@ -43,21 +89,25 @@ template <typename T>
 PetscSolveReduction<T>::~PetscSolveReduction() = default;
 
 template <typename T>
-void PetscSolveReduction<T>::jacobian(Vec y,
+bool PetscSolveReduction<T>::jacobian(Vec y,
                                       SparseMatrix<T> & jac,
                                       SparseMatrix<T> & pc,
                                       const AssembleJacobian & assemble)
 {
-  this->prolong(y);
-  assemble(pc);
-  pc.close();
-  this->finish_jacobian(pc);
+  if (!this->prolong(y))
+    return false;
+
+  SparseMatrix<T> & matrix = this->assembly_matrix(pc);
+  assemble(matrix);
+  matrix.close();
+  this->finish_jacobian(matrix);
 
   if (&jac != &pc)
     {
       this->check_jacobian_operator(jac);
       jac.close();
     }
+  return true;
 }
 
 //------------------------------------------------------------------
@@ -101,7 +151,7 @@ void PetscIdentityReduction<T>::begin_solve(PetscVector<T> & x, PetscVector<T> &
 }
 
 template <typename T>
-void PetscIdentityReduction<T>::prolong(Vec y)
+bool PetscIdentityReduction<T>::prolong(Vec y)
 {
   NonlinearImplicitSystem & sys = this->_sys;
   PetscVector<T> & X_sys = *cast_ptr<PetscVector<T> *>(sys.solution.get());
@@ -121,10 +171,12 @@ void PetscIdentityReduction<T>::prolong(Vec y)
   // not locked by debug-enabled PETSc the way that "y" is.
   if (_exact_constraint_enforcement)
     sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
+
+  return true;
 }
 
 template <typename T>
-std::unique_ptr<NumericVector<T>> PetscIdentityReduction<T>::prolong_iterate(Vec y) const
+std::unique_ptr<NumericVector<T>> PetscIdentityReduction<T>::prolong_iterate(Vec y)
 {
   return this->prolong_step(y);
 }
@@ -144,7 +196,7 @@ void PetscIdentityReduction<T>::inject(const NumericVector<T> & x, Vec y) const
 }
 
 template <typename T>
-void PetscIdentityReduction<T>::residual(
+bool PetscIdentityReduction<T>::residual(
     Vec y, Vec r, const typename PetscSolveReduction<T>::AssembleResidual & assemble)
 {
   NonlinearImplicitSystem & sys = this->_sys;
@@ -168,6 +220,7 @@ void PetscIdentityReduction<T>::residual(
           sys, &R, sys.current_local_solution.get(), /*homogeneous=*/false);
       R.close();
     }
+  return true;
 }
 
 template <typename T>
@@ -207,14 +260,7 @@ PetscConstraintEliminationReduction<T>::PetscConstraintEliminationReduction(
     NonlinearImplicitSystem & sys)
   : PetscSolveReduction<T>(sys), _dof_map(sys.get_dof_map().get_constraint_elimination())
 {
-  const auto & retained = _dof_map.local_retained_dofs();
-  std::vector<PetscInt> indices(retained.begin(), retained.end());
-  LibmeshPetscCall2(sys.comm(),
-                    ISCreateGeneral(sys.comm().get(),
-                                    cast_int<PetscInt>(indices.size()),
-                                    indices.data(),
-                                    PETSC_COPY_VALUES,
-                                    _retained_is.get()));
+  create_index_set(sys, _dof_map.local_retained_dofs(), _retained_is);
 }
 
 template <typename T>
@@ -238,20 +284,7 @@ dof_id_type PetscConstraintEliminationReduction<T>::reduced_dof(const dof_id_typ
 template <typename T>
 Vec PetscConstraintEliminationReduction<T>::create_vector() const
 {
-  const auto & comm = this->_sys.comm();
-  VecType vec_type;
-  LibmeshPetscCall2(
-      comm, VecGetType(cast_ref<PetscVector<T> &>(*this->_sys.solution).vec(), &vec_type));
-
-  Vec v;
-  LibmeshPetscCall2(comm, VecCreate(comm.get(), &v));
-  LibmeshPetscCall2(comm,
-                    VecSetSizes(v,
-                                cast_int<PetscInt>(this->n_local_dofs()),
-                                cast_int<PetscInt>(this->n_dofs())));
-  LibmeshPetscCall2(comm, VecSetType(v, vec_type));
-  LibmeshPetscCall2(comm, VecSetUp(v));
-  return v;
+  return create_reduced_vector<T>(this->_sys, this->n_local_dofs(), this->n_dofs());
 }
 
 template <typename T>
@@ -292,14 +325,15 @@ void PetscConstraintEliminationReduction<T>::prolong_into(Vec y,
 }
 
 template <typename T>
-void PetscConstraintEliminationReduction<T>::prolong(Vec y)
+bool PetscConstraintEliminationReduction<T>::prolong(Vec y)
 {
   this->prolong_into(y, *this->_sys.solution, /*step=*/false);
   this->_sys.update();
+  return true;
 }
 
 template <typename T>
-std::unique_ptr<NumericVector<T>> PetscConstraintEliminationReduction<T>::prolong_iterate(Vec y) const
+std::unique_ptr<NumericVector<T>> PetscConstraintEliminationReduction<T>::prolong_iterate(Vec y)
 {
   auto x = this->_sys.solution->zero_clone();
   this->prolong_into(y, *x, /*step=*/false);
@@ -323,7 +357,7 @@ void PetscConstraintEliminationReduction<T>::inject(const NumericVector<T> & x, 
 }
 
 template <typename T>
-void PetscConstraintEliminationReduction<T>::residual(
+bool PetscConstraintEliminationReduction<T>::residual(
     Vec y, Vec r, const typename PetscSolveReduction<T>::AssembleResidual & assemble)
 {
   this->prolong(y);
@@ -331,13 +365,188 @@ void PetscConstraintEliminationReduction<T>::residual(
   assemble(F);
   F.close();
   this->inject(F, r);
+  return true;
 }
+
+#ifdef LIBMESH_HAVE_EIGEN
+//------------------------------------------------------------------
+// PetscNonlinearStaticCondensationReduction
+
+template <typename T>
+PetscNonlinearStaticCondensationReduction<T>::PetscNonlinearStaticCondensationReduction(
+    NonlinearImplicitSystem & sys,
+    NonlinearImplicitSystem::ComputeEliminatedSolution & eliminator,
+    std::unique_ptr<PetscSolveReduction<T>> parent)
+  : PetscSolveReduction<T>(sys),
+    _eliminator(eliminator),
+    _parent(std::move(parent)),
+    _dof_map(sys.get_dof_map().get_static_condensation()),
+    _sc(sys.get_static_condensation())
+{
+  libmesh_assert(_parent);
+  libmesh_assert_equal_to(_dof_map.parent_n_local_dofs(), _parent->n_local_dofs());
+  create_index_set(sys, _dof_map.local_retained_dofs(), _retained_is);
+  create_index_set(sys, _dof_map.local_retained_parent_dofs(), _retained_parent_is);
+}
+
+template <typename T>
+numeric_index_type PetscNonlinearStaticCondensationReduction<T>::n_local_dofs() const
+{
+  return _dof_map.n_local_dofs();
+}
+
+template <typename T>
+numeric_index_type PetscNonlinearStaticCondensationReduction<T>::n_dofs() const
+{
+  return _dof_map.n_dofs();
+}
+
+template <typename T>
+dof_id_type PetscNonlinearStaticCondensationReduction<T>::reduced_dof(const dof_id_type full_dof) const
+{
+  return _dof_map.find_reduced_dof(full_dof);
+}
+
+template <typename T>
+Vec PetscNonlinearStaticCondensationReduction<T>::create_vector() const
+{
+  return create_reduced_vector<T>(this->_sys, this->n_local_dofs(), this->n_dofs());
+}
+
+template <typename T>
+void PetscNonlinearStaticCondensationReduction<T>::begin_solve(PetscVector<T> & x, PetscVector<T> &)
+{
+  this->_solution = &x;
+  for (auto * v : {&_y, &_r, &_z, &_parent_r})
+    v->reset_to_zero();
+  *_y.get() = this->create_vector();
+  *_r.get() = this->create_vector();
+  *_z.get() = _parent->create_vector();
+  *_parent_r.get() = _parent->create_vector();
+  this->_snes_solution = _y;
+  this->_snes_residual = _r;
+
+  // The condensed entries of the current solution are the initial guess of the first local solves
+  x.close();
+  _parent->inject(x, _z);
+  this->inject(x, _y);
+}
+
+template <typename T>
+void PetscNonlinearStaticCondensationReduction<T>::end_solve()
+{
+  libmesh_assert(this->_solution);
+  // The last evaluation may be a rejected trial iterate, so solve the condensed equations again at
+  // the final one
+  this->prolong(_y);
+  *this->_solution = *this->_sys.solution;
+}
+
+template <typename T>
+bool PetscNonlinearStaticCondensationReduction<T>::prolong(Vec y)
+{
+  NonlinearImplicitSystem & sys = this->_sys;
+
+  // _z keeps the condensed values of the last successful prolongation
+  LibmeshPetscCall2(sys.comm(), VecISCopy(_z, _retained_parent_is, SCATTER_FORWARD, y));
+  _parent->prolong(_z);
+
+  // The eliminator reads current_local_solution and writes the condensed values into solution
+  *sys.solution = *sys.current_local_solution;
+  bool converged;
+  {
+    LOG_SCOPE("eliminate()", "PetscNonlinearStaticCondensationReduction");
+    converged = _eliminator.eliminate(sys);
+  }
+  sys.solution->close();
+  sys.comm().min(converged);
+  if (!converged)
+    return false;
+
+  sys.update();
+
+  // Keep the condensed values for the next prolongation. The uncondensed entries of _z stay y: the
+  // parent may change them in the system solution, e.g. by enforcing constraints, but its residual
+  // must see the iterate SNES holds
+  _parent->inject(*sys.solution, _z);
+  LibmeshPetscCall2(sys.comm(), VecISCopy(_z, _retained_parent_is, SCATTER_FORWARD, y));
+  return true;
+}
+
+template <typename T>
+std::unique_ptr<NumericVector<T>>
+PetscNonlinearStaticCondensationReduction<T>::prolong_iterate(Vec y)
+{
+  if (!this->prolong(y))
+    return nullptr;
+  return this->_sys.solution->clone();
+}
+
+template <typename T>
+std::unique_ptr<NumericVector<T>> PetscNonlinearStaticCondensationReduction<T>::prolong_step(Vec y) const
+{
+  // dz = [-A11^{-1} A12 y; y] in the parent space
+  WrappedPetsc<Vec> dz;
+  *dz.get() = _parent->create_vector();
+  LibmeshPetscCall2(this->_sys.comm(), VecZeroEntries(dz));
+  LibmeshPetscCall2(this->_sys.comm(), VecISCopy(dz, _retained_parent_is, SCATTER_FORWARD, y));
+  PetscVector<T> parent_step(dz, this->_sys.comm());
+  _sc.homogeneous_backwards_substitution(parent_step);
+
+  // The parent's result may share storage with dz, which goes out of scope
+  return _parent->prolong_step(dz)->clone();
+}
+
+template <typename T>
+void PetscNonlinearStaticCondensationReduction<T>::inject(const NumericVector<T> & x, Vec y) const
+{
+  const auto & petsc_x = cast_ref<const PetscVector<T> &>(x);
+  LibmeshPetscCall2(this->_sys.comm(), VecISCopy(petsc_x.vec(), _retained_is, SCATTER_REVERSE, y));
+}
+
+template <typename T>
+bool PetscNonlinearStaticCondensationReduction<T>::residual(
+    Vec y, Vec r, const typename PetscSolveReduction<T>::AssembleResidual & assemble)
+{
+  if (!this->prolong(y))
+    return false;
+
+  // _z now holds P(y) in the parent space. Its condensed rows of the parent residual vanish
+  if (!_parent->residual(_z, _parent_r, assemble))
+    return false;
+  LibmeshPetscCall2(this->_sys.comm(),
+                    VecISCopy(_parent_r, _retained_parent_is, SCATTER_REVERSE, r));
+  return true;
+}
+
+template <typename T>
+std::pair<Mat, Mat> PetscNonlinearStaticCondensationReduction<T>::operators(Mat, Mat) const
+{
+  const Mat schur = cast_ref<const PetscMatrixBase<T> &>(_sc.get_condensed_mat()).mat();
+  return {schur, schur};
+}
+
+template <typename T>
+SparseMatrix<T> & PetscNonlinearStaticCondensationReduction<T>::assembly_matrix(SparseMatrix<T> &)
+{
+  return _sc;
+}
+
+template <typename T>
+void PetscNonlinearStaticCondensationReduction<T>::finish_jacobian(SparseMatrix<T> & matrix)
+{
+  _parent->finish_jacobian(matrix);
+}
+#endif // LIBMESH_HAVE_EIGEN
 
 //------------------------------------------------------------------
 // Explicit instantiations
 template class LIBMESH_EXPORT PetscSolveReduction<Number>;
 template class LIBMESH_EXPORT PetscIdentityReduction<Number>;
 template class LIBMESH_EXPORT PetscConstraintEliminationReduction<Number>;
+#ifdef LIBMESH_HAVE_EIGEN
+template class LIBMESH_EXPORT PetscNonlinearStaticCondensationReduction<Number>;
+#endif
 
 } // namespace libMesh
 
