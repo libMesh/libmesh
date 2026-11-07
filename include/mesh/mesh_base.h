@@ -2839,22 +2839,6 @@ Order MeshBase::supported_nodal_order() const
 
 
 inline
-const std::set<subdomain_id_type> & MeshBase::get_mesh_subdomains() const
-{
-  libmesh_assert(_preparation.has_cached_elem_data);
-  return _mesh_subdomains;
-}
-
-
-inline
-const std::set<subdomain_id_type> & MeshBase::get_mesh_local_subdomains() const
-{
-  libmesh_assert(_preparation.has_cached_elem_data);
-  return _mesh_local_subdomains;
-}
-
-
-inline
 unsigned int MeshBase::spatial_dimension () const
 {
   libmesh_assert(_preparation.has_cached_elem_data);

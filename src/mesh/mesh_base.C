@@ -1306,6 +1306,38 @@ subdomain_id_type MeshBase::n_local_subdomains() const
 
 
 
+const std::set<subdomain_id_type> & MeshBase::get_mesh_subdomains() const
+{
+  libmesh_assert(_preparation.has_cached_elem_data);
+
+#ifdef DEBUG
+  // Hit local dbg test; global cache test would need parallel_only()
+  this->get_mesh_local_subdomains();
+#endif
+
+  return _mesh_subdomains;
+}
+
+
+
+const std::set<subdomain_id_type> & MeshBase::get_mesh_local_subdomains() const
+{
+  libmesh_assert(_preparation.has_cached_elem_data);
+
+#ifdef DEBUG
+  // This is O(N) instead of O(1), but that's what dbg is for, and
+  // it's not worse than this call was before the cache was added
+  SBDInserter inserter;
+  Threads::parallel_reduce
+    (this->const_active_local_element_stored_range(), inserter);
+
+  libmesh_assert(inserter.my_ids == _mesh_local_subdomains);
+#endif
+
+  return _mesh_local_subdomains;
+}
+
+
 
 dof_id_type MeshBase::n_nodes_on_proc (const processor_id_type proc_id) const
 {
