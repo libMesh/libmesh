@@ -211,6 +211,7 @@ public:
             K11.lu_solve(R1, du);
             for (const auto a : make_range(n1))
               ue(interior_local[a]) -= du(a);
+            ++n_updates;
           }
         if (!converged)
           return false;
@@ -222,6 +223,8 @@ public:
     return true;
   }
 
+  virtual bool use_tangent_predictor() const override { return predict; }
+
   /// Relative tolerance on the interior residual, near machine precision
   Real tolerance = 1e2 * std::numeric_limits<Real>::epsilon();
   /// Absolute tolerance on the interior residual, for interior values that are already converged
@@ -229,6 +232,9 @@ public:
   unsigned int max_its = 20;
   /// The number of element solves performed, to check that elimination ran
   unsigned int n_solves = 0;
+  /// The number of local Newton updates, to check that the tangent predictor saves some
+  unsigned int n_updates = 0;
+  bool predict = true;
 
 private:
   NonlinearDiffusion & _assembly;
@@ -838,23 +844,38 @@ private:
       bool tested = false;
     } jacobian_test;
 
-    for (auto * sys : {&plain_sys, &ne_sys})
+    plain_sys.prefix_with_name(true);
+    ne_sys.prefix_with_name(true);
+    {
+      auto & solver = cast_ref<PetscNonlinearSolver<Number> &>(*ne_sys.nonlinear_solver);
+      LibmeshPetscCall2(
+          mesh.comm(),
+          SNESMonitorSet(
+              solver.snes(ne_sys.prefix().c_str()), JacobianTest::monitor, &jacobian_test, nullptr));
+    }
+    const auto solve = [](NonlinearImplicitSystem & sys)
+    {
+      sys.solution->zero();
+      sys.solution->close();
+      sys.update();
+      sys.solve();
+      CPPUNIT_ASSERT(sys.nonlinear_solver->converged);
+    };
+    solve(plain_sys);
+
+    // Solve with and without the tangent predictor. Each must match plain Newton
+    const auto & dof_map = plain_sys.get_dof_map();
+    std::map<bool, unsigned int> n_updates;
+    for (const bool predict : {false, true})
       {
-        sys->prefix_with_name(true);
-        sys->solution->zero();
-        sys->solution->close();
-        sys->update();
-        if (sys == &ne_sys)
-          {
-            auto & solver = cast_ref<PetscNonlinearSolver<Number> &>(*sys->nonlinear_solver);
-            LibmeshPetscCall2(mesh.comm(),
-                              SNESMonitorSet(solver.snes(sys->prefix().c_str()),
-                                             JacobianTest::monitor,
-                                             &jacobian_test,
-                                             nullptr));
-          }
-        sys->solve();
-        CPPUNIT_ASSERT(sys->nonlinear_solver->converged);
+        elimination.predict = predict;
+        elimination.n_updates = 0;
+        solve(ne_sys);
+        n_updates[predict] = elimination.n_updates;
+        mesh.comm().sum(n_updates[predict]);
+        for (const auto i : make_range(dof_map.first_dof(), dof_map.end_dof()))
+          LIBMESH_ASSERT_NUMBERS_EQUAL(
+              (*plain_sys.solution)(i), (*ne_sys.solution)(i), std::sqrt(TOLERANCE) * TOLERANCE);
       }
     for (const auto & [name, value] : options)
       {
@@ -870,10 +891,8 @@ private:
     CPPUNIT_ASSERT(jacobian_test.tested);
     CPPUNIT_ASSERT_LESS(1e-6 * jacobian_test.jac_norm, jacobian_test.diff_norm);
 
-    const auto & dof_map = plain_sys.get_dof_map();
-    for (const auto i : make_range(dof_map.first_dof(), dof_map.end_dof()))
-      LIBMESH_ASSERT_NUMBERS_EQUAL(
-          (*plain_sys.solution)(i), (*ne_sys.solution)(i), std::sqrt(TOLERANCE) * TOLERANCE);
+    // The predictor is first order accurate in the step, so it saves local Newton updates
+    CPPUNIT_ASSERT_LESS(n_updates[false], n_updates[true]);
   }
 
   /**

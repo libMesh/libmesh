@@ -447,7 +447,24 @@ bool PetscNonlinearStaticCondensationReduction<T>::prolong(Vec y)
 {
   NonlinearImplicitSystem & sys = this->_sys;
 
-  // _z keeps the condensed values of the last successful prolongation
+  // _z keeps the condensed values of the last successful prolongation. Once a Jacobian has been
+  // assembled, the tangent predictor dz1 = -A11^{-1} A12 (y - y_old) moves them toward the new
+  // solution of the condensed equations
+  if (_have_factors && _eliminator.use_tangent_predictor())
+    {
+      // dz = [0; y - y_old], with y_old the uncondensed entries of _z
+      WrappedPetsc<Vec> dz;
+      LibmeshPetscCall2(sys.comm(), VecDuplicate(_z, dz.get()));
+      LibmeshPetscCall2(sys.comm(), VecCopy(_z, dz));
+      LibmeshPetscCall2(sys.comm(), VecISCopy(dz, _retained_parent_is, SCATTER_FORWARD, y));
+      LibmeshPetscCall2(sys.comm(), VecAXPY(dz, -1, _z));
+      {
+        PetscVector<T> parent_step(dz, sys.comm());
+        _sc.homogeneous_backwards_substitution(parent_step);
+      }
+      LibmeshPetscCall2(sys.comm(), VecAXPY(_z, 1, dz));
+    }
+  // Copy y exactly. y_old + (y - y_old) can differ from y by roundoff
   LibmeshPetscCall2(sys.comm(), VecISCopy(_z, _retained_parent_is, SCATTER_FORWARD, y));
   _parent->prolong(_z);
 
@@ -536,6 +553,8 @@ template <typename T>
 void PetscNonlinearStaticCondensationReduction<T>::finish_jacobian(SparseMatrix<T> & matrix)
 {
   _parent->finish_jacobian(matrix);
+  // Closing the static condensation matrix factored the condensed blocks
+  _have_factors = true;
 }
 #endif // LIBMESH_HAVE_EIGEN
 

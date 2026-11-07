@@ -338,7 +338,9 @@ public:
   /**
    * Prolongs \f$ (z_1, y) \f$ through the parent, with the last converged condensed values \f$ z_1
    * \f$ as the initial guess, and then solves the condensed equations. On success the condensed
-   * values become the initial guess of the next prolongation
+   * values become the initial guess of the next prolongation. After the first Jacobian, the initial
+   * guess adds the tangent predictor \f$ -A_{11}^{-1} A_{12} (y - y_{old}) \f$, unless the
+   * eliminator disables it
    */
   virtual bool prolong(Vec y) override;
 
@@ -401,6 +403,9 @@ private:
 
   /// The parent iterate \f$ z \f$ and the parent residual
   WrappedPetsc<Vec> _z, _parent_r;
+
+  /// Whether \p _sc holds the factored condensed blocks of an assembled Jacobian
+  bool _have_factors = false;
 };
 #endif // LIBMESH_HAVE_EIGEN
 

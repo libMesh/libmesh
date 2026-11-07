@@ -258,6 +258,13 @@ public:
      * @returns Whether every local solve converged
      */
     virtual bool eliminate(sys_type & S) = 0;
+
+    /**
+     * @returns Whether the initial guess of the condensed values adds the tangent predictor
+     * -A11^{-1} A12 (x2 - x2_old) from the last Jacobian. Disable it when the linear prediction can
+     * leave the admissible set, e.g. make a positive variable negative
+     */
+    virtual bool use_tangent_predictor() const { return true; }
   };
 
   /**
