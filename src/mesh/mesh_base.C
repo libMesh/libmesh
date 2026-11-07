@@ -1449,10 +1449,13 @@ std::string MeshBase::get_info(const unsigned int verbosity /* = 0 */, const boo
 #ifdef LIBMESH_ENABLE_AMR
   oss << "    n_active_elem()="       << this->n_active_elem()                                << '\n';
 #endif
-  if (global)
-    oss << "  n_subdomains()="        << static_cast<std::size_t>(this->n_subdomains())       << '\n';
-  else
-    oss << "  n_local_subdomains()= " << static_cast<std::size_t>(this->n_local_subdomains()) << '\n';
+  if (!this->preparation().has_cached_elem_data)
+    {
+      if (global)
+        oss << "  n_subdomains()="        << static_cast<std::size_t>(this->n_subdomains())       << '\n';
+      else
+        oss << "  n_local_subdomains()= " << static_cast<std::size_t>(this->n_local_subdomains()) << '\n';
+    }
   oss << "  n_elemsets()="            << static_cast<std::size_t>(this->n_elemsets())         << '\n';
   if (!_elemset_codes.empty())
     oss << "    n_elemset_codes="     << _elemset_codes.size()                                << '\n';
