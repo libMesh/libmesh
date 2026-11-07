@@ -55,7 +55,7 @@ void DefaultCoupling::mesh_reinit()
   // Unless we have periodic boundary conditions, we don't need
   // anything precomputed.
 #ifdef LIBMESH_ENABLE_PERIODIC
-  if (!_periodic_bcs || _periodic_bcs->empty())
+  if (this->periodic_boundaries_used(_periodic_bcs).empty())
     return;
 #endif
 
@@ -86,8 +86,12 @@ void DefaultCoupling::operator()
   //libmesh_assert(_mesh);
 
 #ifdef LIBMESH_ENABLE_PERIODIC
-  bool check_periodic_bcs =
-    (_periodic_bcs && !_periodic_bcs->empty());
+  const std::vector<const PeriodicBoundaries *> periodic_bc_sets =
+    this->periodic_boundaries_used(_periodic_bcs);
+  bool check_periodic_bcs = !periodic_bc_sets.empty();
+
+  // A side with a regular neighbor is examined once, without periodic boundaries
+  const std::vector<const PeriodicBoundaries *> no_periodic_bcs {nullptr};
 
   std::unique_ptr<PointLocatorBase> point_locator;
   if (check_periodic_bcs)
@@ -129,17 +133,24 @@ void DefaultCoupling::operator()
             coupled_elements.emplace(elem, _dof_coupling);
 
           for (auto s : elem->side_index_range())
+#ifdef LIBMESH_ENABLE_PERIODIC
+            // A side without a regular neighbor may have a periodic
+            // neighbor for each periodic boundary set
+            for (const auto periodic_bcs :
+                   (!elem->neighbor_ptr(s) && check_periodic_bcs) ?
+                   periodic_bc_sets : no_periodic_bcs)
+#endif
             {
               const Elem * neigh = elem->neighbor_ptr(s);
 
 #ifdef LIBMESH_ENABLE_PERIODIC
               // We might still have a periodic neighbor here
-              if (!neigh && check_periodic_bcs)
+              if (periodic_bcs)
                 {
                   libmesh_assert(_mesh);
 
                   neigh = elem->topological_neighbor
-                    (s, *_mesh, *point_locator, _periodic_bcs);
+                    (s, *_mesh, *point_locator, periodic_bcs);
                 }
 #endif
 
@@ -159,7 +170,7 @@ void DefaultCoupling::operator()
 #  ifdef LIBMESH_ENABLE_PERIODIC
               else
                 neigh->active_family_tree_by_topological_neighbor
-                  (active_neighbors,elem,*_mesh,*point_locator,_periodic_bcs);
+                  (active_neighbors,elem,*_mesh,*point_locator,periodic_bcs);
 #  endif
 #else
               active_neighbors.clear();

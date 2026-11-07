@@ -193,6 +193,8 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
           continue;
         }
 
+      const bool use_all_pbcs = other_mesh._use_all_pbcs_functors.count(gf);
+
       std::shared_ptr<GhostingFunctor> clone_gf = gf->clone();
       // Some subclasses of GhostingFunctor might not override the
       // clone function yet. If this is the case, GhostingFunctor will
@@ -203,12 +205,12 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
       if (clone_gf)
         {
           clone_gf->set_mesh(this);
-          add_ghosting_functor(clone_gf);
+          add_ghosting_functor(clone_gf, use_all_pbcs);
         }
       else
         {
           libmesh_deprecated();
-          add_ghosting_functor(*gf);
+          add_ghosting_functor(*gf, use_all_pbcs);
         }
     }
 
@@ -1124,7 +1126,8 @@ void MeshBase::unset_is_prepared()
 }
 
 
-void MeshBase::add_ghosting_functor(GhostingFunctor & ghosting_functor)
+void MeshBase::add_ghosting_functor(GhostingFunctor & ghosting_functor,
+                                    bool use_all_pbcs)
 {
   // We used to implicitly support duplicate inserts to std::set
 #ifdef LIBMESH_ENABLE_DEPRECATED
@@ -1142,6 +1145,11 @@ void MeshBase::add_ghosting_functor(GhostingFunctor & ghosting_functor)
                  _ghosting_functors.end());
 
   _ghosting_functors.push_back(&ghosting_functor);
+
+  if (use_all_pbcs)
+    _use_all_pbcs_functors.insert(&ghosting_functor);
+  else
+    _use_all_pbcs_functors.erase(&ghosting_functor);
 }
 
 
@@ -1168,6 +1176,8 @@ void MeshBase::remove_ghosting_functor(GhostingFunctor & ghosting_functor)
   if (const auto it = _shared_functors.find(&ghosting_functor);
       it != _shared_functors.end())
     _shared_functors.erase(it);
+
+  _use_all_pbcs_functors.erase(&ghosting_functor);
 }
 
 
@@ -2638,6 +2648,28 @@ void MeshBase::detect_interior_parents()
     }
 
 
+
+void MeshBase::add_periodic_boundaries(const PeriodicBoundaries & periodic_bcs)
+{
+  libmesh_assert(std::find(_periodic_boundary_sets.begin(),
+                           _periodic_boundary_sets.end(),
+                           &periodic_bcs) == _periodic_boundary_sets.end());
+
+  _periodic_boundary_sets.push_back(&periodic_bcs);
+}
+
+
+
+void MeshBase::remove_periodic_boundaries(const PeriodicBoundaries & periodic_bcs)
+{
+  auto it = std::find(_periodic_boundary_sets.begin(),
+                      _periodic_boundary_sets.end(), &periodic_bcs);
+  libmesh_assert(it != _periodic_boundary_sets.end());
+  _periodic_boundary_sets.erase(it);
+}
+
+
+
 #endif
 
 
@@ -2718,6 +2750,8 @@ MeshBase::post_dofobject_moves(MeshBase && other_mesh)
   {
     gf->set_mesh(this);
   }
+
+  _use_all_pbcs_functors = std::move(other_mesh._use_all_pbcs_functors);
 
   // _shared_functors
   _shared_functors = std::move(other_mesh._shared_functors);

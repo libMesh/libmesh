@@ -27,8 +27,14 @@
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/dof_object.h"
 
+#ifdef LIBMESH_ENABLE_PERIODIC
+#include "libmesh/periodic_boundaries.h"
+#endif
+
 // C++ Includes
+#include <algorithm>
 #include <unordered_map>
+#include <vector>
 
 namespace libMesh
 {
@@ -227,10 +233,11 @@ public:
   virtual void set_mesh(const MeshBase * mesh) { _mesh = mesh; }
 
 #ifdef LIBMESH_ENABLE_PERIODIC
-  // Set/get PeriodicBoundaries being coupled.
-  // This will eventually be replaced with methods for handling
-  // multiple PeriodicBoundaries sets (e.g. from multiple systems on
-  // the same mesh)
+  // Set/get this functor's own PeriodicBoundaries to couple.  For a
+  // functor added with
+  // MeshBase::add_ghosting_functor(gf, /*use_all_pbcs=*/true), the
+  // mesh also supplies the periodic boundary sets of every DofMap on
+  // the mesh.
   virtual void set_periodic_boundaries(const PeriodicBoundaries *) {}
 
   virtual const PeriodicBoundaries * get_periodic_boundaries()
@@ -299,8 +306,45 @@ public:
   virtual void delete_remote_elements () {};
 
 protected:
+#ifdef LIBMESH_ENABLE_PERIODIC
+  /**
+   * \returns The nonempty periodic boundary sets this functor searches
+   * for periodic neighbors, without duplicates: \p own, which may be
+   * null, plus every set registered with the mesh if
+   * MeshBase::uses_all_periodic_boundaries() is true for this functor.
+   * Without a mesh, only \p own applies.
+   */
+  std::vector<const PeriodicBoundaries *>
+  periodic_boundaries_used(const PeriodicBoundaries * own) const;
+#endif
+
   const MeshBase * _mesh;
 };
+
+
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+inline
+std::vector<const PeriodicBoundaries *>
+GhostingFunctor::periodic_boundaries_used(const PeriodicBoundaries * own) const
+{
+  std::vector<const PeriodicBoundaries *> sets;
+  auto add_set = [&sets](const PeriodicBoundaries * pbs)
+    {
+      if (pbs && !pbs->empty() &&
+          std::find(sets.begin(), sets.end(), pbs) == sets.end())
+        sets.push_back(pbs);
+    };
+
+  add_set(own);
+
+  if (_mesh && _mesh->uses_all_periodic_boundaries(*this))
+    for (const auto pbs : _mesh->periodic_boundary_sets())
+      add_set(pbs);
+
+  return sets;
+}
+#endif
 
 } // namespace libMesh
 

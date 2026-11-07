@@ -194,14 +194,9 @@ DofMap::DofMap(const unsigned int number,
   _default_coupling->set_periodic_boundaries(_periodic_boundaries.get());
   _default_evaluating->set_periodic_boundaries(_periodic_boundaries.get());
 
-  for (auto & gf : as_range(_mesh.ghosting_functors_begin(),
-                            _mesh.ghosting_functors_end()))
-  {
-    // FIXME - we need to handle multiple systems properly here, not
-    // just "assume the first system has every PBC".
-    if (!gf->get_periodic_boundaries())
-      gf->set_periodic_boundaries(_periodic_boundaries.get());
-  }
+  // Mesh ghosting functors that use every set, e.g. the default
+  // ghosting functor, can now see this DofMap's periodic boundaries
+  _mesh.add_periodic_boundaries(*_periodic_boundaries);
 #endif
 
   this->add_coupling_functor(*_default_coupling);
@@ -219,6 +214,10 @@ DofMap::~DofMap()
   // need to remove those from the mesh too before we die.
   _mesh.remove_ghosting_functor(*_default_coupling);
   _mesh.remove_ghosting_functor(*_default_evaluating);
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+  _mesh.remove_periodic_boundaries(*_periodic_boundaries);
+#endif
 }
 
 

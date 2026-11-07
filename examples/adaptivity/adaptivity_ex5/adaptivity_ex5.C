@@ -365,11 +365,6 @@ int main (int argc, char ** argv)
   const Real dt = 0.025;
   system.time = init_timestep*dt;
 
-  // Tell the MeshRefinement object about the periodic boundaries so
-  // that it can get heuristics like level-one conformity and
-  // unrefined island elimination right.
-  mesh_refinement.set_periodic_boundaries_ptr(dof_map.get_periodic_boundaries());
-
   // We do 25 timesteps both before and after writing out the
   // intermediate solution
   for (unsigned int t_step=init_timestep; t_step<(init_timestep+n_timesteps); t_step++)

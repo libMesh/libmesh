@@ -36,7 +36,7 @@ void PointNeighborCoupling::mesh_reinit()
   // Unless we have periodic boundary conditions, we don't need
   // anything precomputed.
 #ifdef LIBMESH_ENABLE_PERIODIC
-  if (_periodic_bcs && !_periodic_bcs->empty())
+  if (!this->periodic_boundaries_used(_periodic_bcs).empty())
 #endif
     {
       // If we do have periodic boundary conditions, we'll need a master
@@ -64,7 +64,7 @@ void PointNeighborCoupling::operator()
 
 #ifdef LIBMESH_ENABLE_PERIODIC
   bool check_periodic_bcs =
-    (_periodic_bcs && !_periodic_bcs->empty());
+    !this->periodic_boundaries_used(_periodic_bcs).empty();
   std::unique_ptr<PointLocatorBase> point_locator;
   if (check_periodic_bcs)
     {

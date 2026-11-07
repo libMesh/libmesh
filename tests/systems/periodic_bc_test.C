@@ -6,10 +6,12 @@
 #include <libmesh/equation_systems.h>
 #include <libmesh/exodusII_io.h>
 #include <libmesh/function_base.h>
+#include <libmesh/ghost_point_neighbors.h>
 #include <libmesh/linear_implicit_system.h>
 #include <libmesh/partitioner.h>
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_generation.h>
+#include <libmesh/mesh_refinement.h>
 #include <libmesh/numeric_vector.h>
 #include <libmesh/periodic_boundary.h>
 #include <libmesh/quadrature_gauss.h>
@@ -200,6 +202,12 @@ public:
   CPPUNIT_TEST( testPeriodicLagrange2 );
 #endif
   CPPUNIT_TEST( testRedistributeToGhosts );
+#ifdef LIBMESH_ENABLE_AMR
+  CPPUNIT_TEST( testDistributedRefinedConstraints );
+  CPPUNIT_TEST( testSecondSystemConstraints );
+  CPPUNIT_TEST( testReplacedDefaultGhosting );
+  CPPUNIT_TEST( testRefinementAcrossSets );
+#endif
 #endif // LIBMESH_DIM > 1
 
   CPPUNIT_TEST_SUITE_END();
@@ -331,6 +339,139 @@ private:
   }
 
   void testPeriodicLagrange2() { LOG_UNIT_TEST; testPeriodicBC(FEType(SECOND, LAGRANGE)); }
+
+#ifdef LIBMESH_ENABLE_AMR
+  /**
+   * On a refined distributed mesh, each processor chooses which side of a periodic vertex to
+   * constrain from the elements at the vertex and at its image. Missing ghost elements give
+   * processors different choices, and both vertices are then constrained in terms of each other.
+   *
+   * \p n_systems_before systems with no periodic boundaries precede the periodic system. If
+   * \p replace_default_ghosting is true, a GhostPointNeighbors that uses every periodic boundary
+   * set on the mesh replaces the default ghosting.
+   */
+  void checkDistributedRefinedConstraints(const unsigned int n_systems_before,
+                                          const bool replace_default_ghosting)
+  {
+    DistributedMesh mesh(*TestCommWorld);
+    mesh.allow_remote_element_removal(false);
+    MeshTools::Generation::build_square(mesh, 4, 4, 0., 1., 0., 1., QUAD9);
+
+    EquationSystems es(mesh);
+    for (const auto i : make_range(n_systems_before))
+      es.add_system<LinearImplicitSystem>("Sys" + std::to_string(i)).add_variable("v", FIRST, LAGRANGE);
+
+    auto & sys = es.add_system<LinearImplicitSystem>("PBCSys");
+    sys.add_variable("u", SECOND, LAGRANGE);
+
+    // build_square() puts boundary 0 at the bottom and boundary 2 at the top
+    PeriodicBoundary vert(RealVectorValue(0., 1.));
+    vert.myboundary = 0;
+    vert.pairedboundary = 2;
+    sys.get_dof_map().add_periodic_boundary(vert);
+
+    if (replace_default_ghosting)
+      {
+        es.enable_default_ghosting(false);
+        mesh.add_ghosting_functor(std::make_shared<GhostPointNeighbors>(mesh),
+                                  /*use_all_pbcs=*/true);
+      }
+
+    mesh.allow_remote_element_removal(true);
+    mesh.delete_remote_elements();
+
+    // Refine one element, selected by position so that the mesh is independent of the
+    // partitioning
+    for (auto & elem : mesh.active_element_ptr_range())
+      if (elem->vertex_average().absolute_fuzzy_equals(Point(0.375, 0.375)))
+        elem->set_refinement_flag(Elem::REFINE);
+    MeshRefinement(mesh).refine_elements();
+
+    es.init();
+
+    // Constraint rows are fully resolved, so no constrained dof appears in any row
+    for (const auto s : make_range(es.n_systems()))
+      {
+        const DofMap & dof_map = es.get_system(s).get_dof_map();
+        for (const auto & [dof, row] : dof_map.get_dof_constraints())
+          for (const auto & [row_dof, coef] : row)
+            {
+              libmesh_ignore(dof, coef);
+              CPPUNIT_ASSERT(!dof_map.is_constrained_dof(row_dof));
+            }
+      }
+  }
+
+  void testDistributedRefinedConstraints()
+  {
+    LOG_UNIT_TEST;
+    checkDistributedRefinedConstraints(0, false);
+  }
+
+  // The default ghosting must use the periodic boundaries of a system other than the first
+  void testSecondSystemConstraints()
+  {
+    LOG_UNIT_TEST;
+    checkDistributedRefinedConstraints(1, false);
+  }
+
+  // A replacement for the default ghosting sees periodic boundaries added before it
+  void testReplacedDefaultGhosting()
+  {
+    LOG_UNIT_TEST;
+    checkDistributedRefinedConstraints(0, true);
+  }
+
+  // MeshRefinement keeps level one across the periodic boundaries of every system
+  void testRefinementAcrossSets()
+  {
+    LOG_UNIT_TEST;
+
+    DistributedMesh mesh(*TestCommWorld);
+    mesh.allow_remote_element_removal(false);
+    MeshTools::Generation::build_square(mesh, 4, 4, 0., 1., 0., 1., QUAD4);
+
+    // build_square() numbers the sides 0 (bottom), 1 (right), 2 (top) and 3 (left)
+    EquationSystems es(mesh);
+    auto & vert_sys = es.add_system<System>("VertSys");
+    vert_sys.add_variable("u", FIRST, LAGRANGE);
+    PeriodicBoundary vert(RealVectorValue(0., 1.));
+    vert.myboundary = 0;
+    vert.pairedboundary = 2;
+    vert_sys.get_dof_map().add_periodic_boundary(vert);
+
+    auto & horiz_sys = es.add_system<System>("HorizSys");
+    horiz_sys.add_variable("v", FIRST, LAGRANGE);
+    PeriodicBoundary horiz(RealVectorValue(1., 0.));
+    horiz.myboundary = 3;
+    horiz.pairedboundary = 1;
+    horiz_sys.get_dof_map().add_periodic_boundary(horiz);
+
+    mesh.allow_remote_element_removal(true);
+    mesh.delete_remote_elements();
+
+    // Refine an element on the left boundary, then refine its child on that boundary. The
+    // periodic image of the child's side is the unrefined element on the right boundary, which
+    // the level-one rule must then refine too.
+    MeshRefinement mesh_refinement(mesh);
+    for (const Point & p : {Point(0.125, 0.375), Point(0.0625, 0.4375)})
+      {
+        for (auto & elem : mesh.active_element_ptr_range())
+          if (elem->vertex_average().absolute_fuzzy_equals(p))
+            elem->set_refinement_flag(Elem::REFINE);
+        mesh_refinement.refine_elements();
+      }
+
+    CPPUNIT_ASSERT(mesh_refinement.test_level_one());
+
+    bool image_refined = false;
+    for (const auto & elem : mesh.local_level_element_ptr_range(0))
+      if (elem->vertex_average().absolute_fuzzy_equals(Point(0.875, 0.375)))
+        image_refined = elem->has_children();
+    mesh.comm().max(image_refined);
+    CPPUNIT_ASSERT(image_refined);
+  }
+#endif
 };
 
 CPPUNIT_TEST_SUITE_REGISTRATION( PeriodicBCTest );

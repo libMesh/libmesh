@@ -1449,8 +1449,20 @@ public:
    * GhostingFunctor memory must be managed by the code which calls
    * this function; the GhostingFunctor lifetime is expected to extend
    * until either the functor is removed or the Mesh is destructed.
+   *
+   * If \p use_all_pbcs is true, a functor that supports periodic
+   * boundaries uses every set registered with
+   * add_periodic_boundaries(), in addition to its own set.  This
+   * argument has no effect if periodic boundary support is disabled.
+   *
+   * Periodic constraints on a distributed mesh need every element
+   * point neighbor of a periodic vertex and its image.  The default
+   * ghosting functor ghosts those elements.  A functor that replaces
+   * it should also ghost them, and the functor should be added with
+   * \p use_all_pbcs = true.
    */
-  void add_ghosting_functor(GhostingFunctor & ghosting_functor);
+  void add_ghosting_functor(GhostingFunctor & ghosting_functor,
+                            bool use_all_pbcs = false);
 
   /**
    * Adds a functor which can specify ghosting requirements for use on
@@ -1459,10 +1471,13 @@ public:
    *
    * GhostingFunctor memory when using this method is managed by the
    * shared_ptr mechanism.
+   *
+   * See the other overload for \p use_all_pbcs.
    */
-  void add_ghosting_functor(std::shared_ptr<GhostingFunctor> ghosting_functor)
+  void add_ghosting_functor(std::shared_ptr<GhostingFunctor> ghosting_functor,
+                            bool use_all_pbcs = false)
   { _shared_functors[ghosting_functor.get()] = ghosting_functor;
-    this->add_ghosting_functor(*ghosting_functor); }
+    this->add_ghosting_functor(*ghosting_functor, use_all_pbcs); }
 
   /**
    * Removes a functor which was previously added to the set of
@@ -1498,6 +1513,13 @@ public:
 
   /**
    * Default ghosting functor
+   *
+   * Periodic constraints on a distributed mesh need every element
+   * point neighbor of a periodic vertex and its image.  The default
+   * ghosting functor ghosts those elements, using every set
+   * registered with add_periodic_boundaries().  A functor that
+   * replaces it should also ghost them, and the functor should be added with
+   * \p use_all_pbcs = true.
    */
   GhostingFunctor & default_ghosting() { return *_default_ghosting; }
 
@@ -2129,6 +2151,33 @@ public:
 
   void remove_disjoint_boundary_pair(const boundary_id_type b1,
                                      const boundary_id_type b2);
+
+  /**
+   * Registers a set of periodic boundaries, e.g. a DofMap's.  The
+   * caller keeps ownership of \p periodic_bcs and must remove the
+   * set from the mesh before the set is destroyed.
+   */
+  void add_periodic_boundaries(const PeriodicBoundaries & periodic_bcs);
+
+  /**
+   * Removes a periodic boundary set registered with
+   * add_periodic_boundaries().
+   */
+  void remove_periodic_boundaries(const PeriodicBoundaries & periodic_bcs);
+
+  /**
+   * \returns Every set registered with add_periodic_boundaries().
+   */
+  const std::vector<const PeriodicBoundaries *> & periodic_boundary_sets() const
+  { return _periodic_boundary_sets; }
+
+  /**
+   * \returns \p true if \p gf is the default ghosting functor or was
+   * added with \p use_all_pbcs = true.  Such a functor uses every set
+   * registered with add_periodic_boundaries().
+   */
+  bool uses_all_periodic_boundaries(const GhostingFunctor & gf) const
+  { return &gf == _default_ghosting.get() || _use_all_pbcs_functors.count(&gf); }
 #endif
 
   /**
@@ -2175,7 +2224,17 @@ protected:
 #ifdef LIBMESH_ENABLE_PERIODIC
   /// @brief The disjoint neighbor boundary id pairs.
   std::unique_ptr<PeriodicBoundaries> _disjoint_neighbor_boundary_pairs;
+
+  /**
+   * The periodic boundary sets registered with add_periodic_boundaries().
+   */
+  std::vector<const PeriodicBoundaries *> _periodic_boundary_sets;
 #endif
+
+  /**
+   * The ghosting functors added with \p use_all_pbcs = true.
+   */
+  std::set<const GhostingFunctor *> _use_all_pbcs_functors;
 
   /**
    * This class holds the boundary information.  It can store nodes, edges,
