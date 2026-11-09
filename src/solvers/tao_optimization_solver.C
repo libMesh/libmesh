@@ -25,12 +25,19 @@
 // C++ includes
 
 // Local Includes
-#include "libmesh/libmesh_logging.h"
-#include "libmesh/petsc_vector.h"
-#include "libmesh/petsc_matrix.h"
-#include "libmesh/dof_map.h"
 #include "libmesh/tao_optimization_solver.h"
+
+#include "libmesh/dof_map.h"
+#include "libmesh/enum_preconditioner_type.h"
 #include "libmesh/equation_systems.h"
+#include "libmesh/libmesh_logging.h"
+#include "libmesh/linear_solver.h"
+#include "libmesh/petsc_matrix.h"
+#include "libmesh/petsc_preconditioner.h"
+#include "libmesh/petsc_vector.h"
+
+// PETSc includes
+#include <petscksp.h>
 
 namespace libMesh
 {
@@ -450,6 +457,20 @@ void TaoOptimizationSolver<T>::init ()
       this->_is_initialized = true;
 
       LibmeshPetscCall(TaoCreate(this->comm().get(),&_tao));
+
+      // We call TaoSetFromOptions twice: once here, before setting
+      // custom options programmatically, and a second time in
+      // solve(), after.
+      //
+      // This works around a bug where TaoSetFromOptions *reset*
+      // programmatically set tolerance and max. function evaluation
+      // values when "-tao_type ipm" was specified on the command
+      // line, and for KSP-using methods it creates a KSP we can
+      // access in set_preconditioner_type().
+      LibmeshPetscCall(TaoSetFromOptions(_tao));
+
+      this->set_preconditioner_type
+        (LinearSolver<T>::default_preconditioner_type(this->n_processors()));
     }
 }
 
@@ -474,13 +495,6 @@ void TaoOptimizationSolver<T>::solve ()
 
   // Set the starting guess to zero.
   x->zero();
-
-  // Workaround for bug where TaoSetFromOptions *reset*
-  // programmatically set tolerance and max. function evaluation
-  // values when "-tao_type ipm" was specified on the command line: we
-  // call TaoSetFromOptions twice (both before and after setting
-  // custom options programmatically)
-  LibmeshPetscCall(TaoSetFromOptions(_tao));
 
   // Set convergence tolerances
   // f(X) - f(X*) (estimated)            <= fatol
@@ -630,6 +644,21 @@ int TaoOptimizationSolver<T>::get_converged_reason()
   return static_cast<int>(_reason);
 }
 
+template <typename T>
+void
+TaoOptimizationSolver<T>::set_preconditioner_type(const PreconditionerType pct)
+{
+  KSP ksp;
+  LibmeshPetscCall(TaoGetKSP(_tao,&ksp));
+
+  if (!ksp)
+    return;
+
+  PC pc;
+  LibmeshPetscCall(KSPGetPC(ksp,&pc));
+
+  PetscPreconditioner<T>::set_petsc_preconditioner_type(pct,pc);
+}
 
 //------------------------------------------------------------------
 // Explicit instantiations

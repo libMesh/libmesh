@@ -54,6 +54,9 @@ extern "C"
   PetscErrorCode __libmesh_tao_inequality_constraints_jacobian(Tao tao, Vec x, Mat J, Mat Jpre, void * ctx);
 }
 
+// forward declarations
+enum PreconditionerType : int;
+
 /**
  * This class provides an interface to the Tao optimization solvers.
  *
@@ -122,6 +125,11 @@ public:
    * Refer to Tao docs for the meaning of different TaoConvergedReason.
    */
   virtual int get_converged_reason() override;
+
+  /**
+   * Sets the type of preconditioner to use.
+   */
+  void set_preconditioner_type (const PreconditionerType pct);
 
 protected:
 
