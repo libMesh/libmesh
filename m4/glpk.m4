@@ -100,7 +100,7 @@ AC_DEFUN([CONFIGURE_GLPK],
                           GLPK_INCLUDE="-I$GLPK_INC"
                           GLPK_LIBRARY="-L$GLPK_LIB -lglpk"
                           dnl add the GLPK_LIB to the linker run path, if it is a directory
-                          AS_IF([test "x$RPATHFLAG" != "x" && test -d $GLPK_LIB],
+                          AS_IF([test "x$RPATHFLAG" != "x" && test -d "$GLPK_LIB"],
                                 [
                                   AS_IF([test "$GLPK_LIB" != "/usr/lib" && test "$GLPK_LIB" != "/usr/lib64"],
                                         [GLPK_LIBRARY="${RPATHFLAG}${GLPK_LIB} $GLPK_LIBRARY"])

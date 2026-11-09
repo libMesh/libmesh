@@ -89,7 +89,7 @@ AC_DEFUN([CONFIGURE_CURL],
                         [
                           CURL_INCLUDE="-I$CURL_INC"
                           CURL_LIBRARY="-L$CURL_LIB -lcurl"
-                          AS_IF([test "x$RPATHFLAG" != "x" && test -d $CURL_LIB],
+                          AS_IF([test "x$RPATHFLAG" != "x" && test -d "$CURL_LIB"],
                                 [AS_IF([test "$CURL_LIB" != "/usr/lib" && test "$CURL_LIB" != "/usr/lib64"], [CURL_LIBRARY="${RPATHFLAG}${CURL_LIB} $CURL_LIBRARY"])])
                           AC_DEFINE(HAVE_CURL, 1, [Flag indicating whether the library will be compiled with CURL support])
                           AC_MSG_RESULT([<<< Configuring library with CURL support >>>])

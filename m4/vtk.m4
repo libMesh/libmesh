@@ -73,16 +73,16 @@ AC_DEFUN([CONFIGURE_VTK],
     AS_IF([test "x$VTK_INC" = "x"],
           [
             AS_IF([test "x$VTK_INCLUDE" != "x"],
-                  [AS_IF([test -d $VTK_INCLUDE],
-                         [AC_MSG_NOTICE([Trying \$VTK_INCLUDE dir $VTK_INCLUDE])
+                  [AS_IF([test -d "$VTK_INCLUDE"],
+                         [AC_MSG_NOTICE([Trying \$VTK_INCLUDE dir "$VTK_INCLUDE"])
                           VTK_INC=$VTK_INCLUDE])],
-                  [test -d $VTK_LS_CHECK],
-                  [AC_MSG_NOTICE([Trying \$VTK_DIR include dir $VTK_LS_CHECK])
+                  [test -d "$VTK_LS_CHECK"],
+                  [AC_MSG_NOTICE([Trying \$VTK_DIR include dir "$VTK_LS_CHECK"])
                    VTK_INC=$VTK_LS_CHECK],
                   [test "x$VTK_DIR" != "x"],
-                  [AC_MSG_NOTICE([Trying \$VTK_DIR include dir $VTK_DIR/include])
+                  [AC_MSG_NOTICE([Trying \$VTK_DIR include dir "$VTK_DIR/include"])
                    VTK_INC=$VTK_DIR/include],
-                  [AC_MSG_NOTICE([Trying VTK include dir /usr/include/vtk])
+                  [AC_MSG_NOTICE([Trying VTK include dir "/usr/include/vtk"])
                    VTK_INC="/usr/include/vtk"])
           ])
 
@@ -184,7 +184,7 @@ AC_DEFUN([CONFIGURE_VTK],
          #   The -rpath option is also used when locating shared objects
          #   which are needed by shared objects explicitly included in
          #   the link; see the description of the -rpath-link option.
-         AS_IF([test "x$RPATHFLAG" != "x" && test -d $VTK_LIB],
+         AS_IF([test "x$RPATHFLAG" != "x" && test -d "$VTK_LIB"],
                [VTK_RPATH_FLAGS="${RPATHFLAG}${VTK_LIB}"])
 
          dnl VTK 5.x
@@ -291,7 +291,7 @@ AC_DEFUN([CONFIGURE_VTK],
                VTK_INCLUDE="-I$VTK_INC"
 
                dnl add the VTK_LIB to the linker run path, if it is a directory
-               AS_IF([test "x$RPATHFLAG" != "x" && test -d $VTK_LIB],
+               AS_IF([test "x$RPATHFLAG" != "x" && test -d "$VTK_LIB"],
                       [VTK_LIBRARY="${RPATHFLAG}${VTK_LIB} $VTK_LIBRARY"])
 
                AC_SUBST(vtkversion)
