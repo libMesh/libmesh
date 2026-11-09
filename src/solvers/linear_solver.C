@@ -133,26 +133,20 @@ LinearSolver<T>::set_default_preconditioner_type ()
 {
   // Default to ILU for robustness
   //
-  // But let users choose faster options via PETSc-compatible
+  // But let users choose faster options via PETSc-style
   // command-line options
-  const std::string pc_type =
-    libMesh::command_line_next("-pc_type", std::string("ilu"));
+  const std::string preconditioner =
+    libMesh::command_line_next("--preconditioner", std::string("ilu"));
 
-  // try/catch to make sure we're forward compatible with PETSc
-  // preconditioners that our enum lacks
+  // try/catch to add a slightly better error message than string_to_enum's
   libmesh_try {
     const PreconditionerType pct =
-      Utility::string_to_enum<PreconditionerType>(pc_type);
+      Utility::string_to_enum<PreconditionerType>(preconditioner);
     this->_preconditioner_type = pct;
   }
   libmesh_catch (...)
   {
-    libmesh_warning("We don't recognize pc_type " << pc_type <<
-      "; hopefully you're using a solver backend which does.");
-
-    // Fall back on ILU again for the sake of non-PETSc backends;
-    // PETSc will override this from the command line.
-    this->_preconditioner_type = ILU_PRECOND;
+    libmesh_error_msg ("We don't recognize --preconditioner option" << preconditioner);
   }
 }
 
