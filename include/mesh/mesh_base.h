@@ -2218,6 +2218,10 @@ protected:
   /**
    * Shim to allow operator == (&) to behave like a virtual function
    * without having to be one.
+   *
+   * \returns a string describing the first difference found when
+   * comparing subclass-specific data between \p this and \p
+   * other_mesh, or an empty string if no differences are found.
    */
   virtual std::string_view subclass_first_difference_from (const MeshBase & other_mesh) const = 0;
 
@@ -2228,10 +2232,14 @@ protected:
   bool nodes_and_elements_equal(const MeshBase & other_mesh) const;
 
   /**
-   *
+   * \returns A string describing the first difference found on this
+   * rank, in either \p MeshBase data or subclass-specific data,
+   * between \p this and \p other_mesh, or an empty string if no
+   * differences are found.  Used by \p operator== to determine whether
+   * differences exist, and by \p assert_equal_to to give debugging
+   * feedback.
    */
   std::string_view first_difference_from(const MeshBase & other_mesh) const;
-
 
   /**
    * \returns A writable reference to the number of partitions.
