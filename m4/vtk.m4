@@ -72,10 +72,18 @@ AC_DEFUN([CONFIGURE_VTK],
     VTK_LS_CHECK=$(dirname $(ls -d $VTK_DIR/include/vtk*/vtkConfigure.h $VTK_DIR/include/vtk*/vtkVersionMacros.h 2>/dev/null | tail -n 1) 2>/dev/null)
     AS_IF([test "x$VTK_INC" = "x"],
           [
-            AS_IF([test "x$VTK_INCLUDE" != "x"], [AS_IF([test -d $VTK_INCLUDE], [VTK_INC=$VTK_INCLUDE])],
-                  [test -d $VTK_LS_CHECK],       [VTK_INC=$VTK_LS_CHECK],
-                  [test "x$VTK_DIR" != "x"],     [VTK_INC=$VTK_DIR/include],
-                  [VTK_INC="/usr/include/vtk"])
+            AS_IF([test "x$VTK_INCLUDE" != "x"],
+                  [AS_IF([test -d $VTK_INCLUDE],
+                         [AC_MSG_NOTICE([Trying \$VTK_INCLUDE dir $VTK_INCLUDE])
+                          VTK_INC=$VTK_INCLUDE])],
+                  [test -d $VTK_LS_CHECK],
+                  [AC_MSG_NOTICE([Trying \$VTK_DIR include dir $VTK_LS_CHECK])
+                   VTK_INC=$VTK_LS_CHECK],
+                  [test "x$VTK_DIR" != "x"],
+                  [AC_MSG_NOTICE([Trying \$VTK_DIR include dir $VTK_DIR/include])
+                   VTK_INC=$VTK_DIR/include],
+                  [AC_MSG_NOTICE([Trying VTK include dir /usr/include/vtk])
+                   VTK_INC="/usr/include/vtk"])
           ])
 
     AS_IF([test "x$VTK_LIB" = "x"],
