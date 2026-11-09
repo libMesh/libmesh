@@ -396,7 +396,7 @@ void clear_spline_nodes(MeshBase &);
  * A function for testing whether a mesh's cached is_prepared() setting
  * is not a false positive, and that its preparation() values are not
  * false positives.  If the mesh is marked as completely not prepared, or
- * if preparing a already-prepared mesh (without any repartitioning or
+ * if preparing an already-prepared mesh (without any repartitioning or
  * renumbering) or preparing after a complete_preparation() (likewise)
  * does not change the mesh, then we return true.  If the mesh believes it
  * is prepared but prepare_for_use() would change it, or if the mesh
