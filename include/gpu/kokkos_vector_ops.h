@@ -341,7 +341,7 @@ template <typename VectorA, typename VectorB, typename VectorC>
 LIBMESH_DEVICE_INLINE
 auto vector_solid_angle(const VectorA & v01, const VectorB & v02, const VectorC & v03)
 {
-  using std::atan;
+  using portable_math::atan;
 
   const auto norm01 = v01.norm();
   const auto norm02 = v02.norm();
@@ -454,7 +454,7 @@ template <typename ViewType>
 LIBMESH_DEVICE_INLINE
 auto vector_ref<ViewType>::norm() const
 {
-  using std::sqrt;
+  using portable_math::sqrt;
   return sqrt(this->norm_sq());
 }
 
@@ -476,7 +476,7 @@ template <typename ViewType>
 LIBMESH_DEVICE_INLINE
 auto vector_ref<ViewType>::l1_norm() const
 {
-  using std::abs;
+  using portable_math::abs;
   using norm_type = detail::remove_cvref_t<decltype(abs((*this)(0)))>;
 
   norm_type sum = norm_type(0);

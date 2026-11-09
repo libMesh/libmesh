@@ -195,23 +195,23 @@ template<typename T> LIBMESH_DEVICE_INLINE T libmesh_imag(T /*a*/) { return 0; }
 template<typename T> LIBMESH_DEVICE_INLINE T libmesh_conj(T a) { return a; }
 
 template<typename T>
-LIBMESH_DEVICE_INLINE T libmesh_real(std::complex<T> a) { return std::real(a); }
+inline T libmesh_real(std::complex<T> a) { return std::real(a); }
 
 template<typename T>
-LIBMESH_DEVICE_INLINE T libmesh_imag(std::complex<T> a) { return std::imag(a); }
+inline T libmesh_imag(std::complex<T> a) { return std::imag(a); }
 
 template<typename T>
-LIBMESH_DEVICE_INLINE std::complex<T> libmesh_conj(std::complex<T> a) { return std::conj(a); }
+inline std::complex<T> libmesh_conj(std::complex<T> a) { return std::conj(a); }
 
 // Helper functions for complex/real number classification, because
 // for some reason std:: never added isfinite/isinf/isnan overloads
 // for std::complex.
 
 template <typename T>
-LIBMESH_DEVICE_INLINE bool libmesh_isinf(T x) { using std::isinf; return isinf(x); }
+LIBMESH_DEVICE_INLINE bool libmesh_isinf(T x) { using portable_math::isinf; return isinf(x); }
 
 template <typename T>
-LIBMESH_DEVICE_INLINE bool libmesh_isnan(T x) { using std::isnan; return isnan(x); }
+LIBMESH_DEVICE_INLINE bool libmesh_isnan(T x) { using portable_math::isnan; return isnan(x); }
 
 // You'd think we'd treat inf,NaN pairs as NaN rather than infinite,
 // but that's not what the C/C++ standards recommend (ever since C99
@@ -222,29 +222,29 @@ LIBMESH_DEVICE_INLINE bool libmesh_isnan(T x) { using std::isnan; return isnan(x
 // speed up their arithmetic greatly by using -fcx-limited-range
 // and/or -fcx-fortran-rules
 template <typename T>
-LIBMESH_DEVICE_INLINE bool libmesh_isinf(std::complex<T> a)
+inline bool libmesh_isinf(std::complex<T> a)
 { return (std::isinf(std::real(a)) || std::isinf(std::imag(a))); }
 
 // Treats inf,NaN pairs as infinite rather than NaN
 template <typename T>
-LIBMESH_DEVICE_INLINE bool libmesh_isnan(std::complex<T> a)
+inline bool libmesh_isnan(std::complex<T> a)
 { return ((std::isnan(std::real(a)) || std::isnan(std::imag(a))) &&
           !std::isinf(std::real(a)) && !std::isinf(std::imag(a))); }
 
 template <typename T>
-LIBMESH_DEVICE_INLINE bool isfinite(std::complex<T> a)
+inline bool isfinite(std::complex<T> a)
 {
   return (std::isfinite(std::real(a)) && std::isfinite(std::imag(a)));
 }
 
 template <typename T>
-LIBMESH_DEVICE_INLINE bool isinf(std::complex<T> a)
+inline bool isinf(std::complex<T> a)
 {
   return (std::isinf(std::real(a)) || std::isinf(std::imag(a)));
 }
 
 template <typename T>
-LIBMESH_DEVICE_INLINE bool isnan(std::complex<T> a)
+inline bool isnan(std::complex<T> a)
 {
 { return ((std::isnan(std::real(a)) || std::isnan(std::imag(a))) &&
           !std::isinf(std::real(a)) && !std::isinf(std::imag(a))); }
