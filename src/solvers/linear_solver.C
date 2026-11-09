@@ -51,7 +51,8 @@ LinearSolver<T>::LinearSolver (const libMesh::Parallel::Communicator & comm_in) 
   same_preconditioner  (false),
   _solver_configuration(nullptr)
 {
-  this->set_default_preconditioner_type();
+  this->set_preconditioner_type
+    (LinearSolver<T>::default_preconditioner_type());
 }
 
 
@@ -103,7 +104,8 @@ void LinearSolver<T>::clear ()
 {
   this->_is_initialized = false;
   this->_solver_type    = GMRES;
-  this->set_default_preconditioner_type();
+  this->set_preconditioner_type
+    (LinearSolver<T>::default_preconditioner_type());
 }
 
 
@@ -128,8 +130,8 @@ LinearSolver<T>::set_preconditioner_type (const PreconditionerType pct)
 }
 
 template <typename T>
-void
-LinearSolver<T>::set_default_preconditioner_type ()
+PreconditionerType
+LinearSolver<T>::default_preconditioner_type ()
 {
   // Default to ILU for robustness
   //
@@ -137,17 +139,18 @@ LinearSolver<T>::set_default_preconditioner_type ()
   // command-line options
   const std::string preconditioner =
     libMesh::command_line_next("--preconditioner", std::string("ilu"));
+  PreconditionerType pct;
 
   // try/catch to add a slightly better error message than string_to_enum's
   libmesh_try {
-    const PreconditionerType pct =
-      Utility::string_to_enum<PreconditionerType>(preconditioner);
-    this->_preconditioner_type = pct;
+    pct = Utility::string_to_enum<PreconditionerType>(preconditioner);
   }
   libmesh_catch (...)
   {
     libmesh_error_msg ("We don't recognize --preconditioner option" << preconditioner);
   }
+
+  return pct;
 }
 
 template <typename T>

@@ -129,10 +129,10 @@ public:
   void set_preconditioner_type (const PreconditionerType pct);
 
   /**
-   * Sets the preconditioner to use a default type or to use a type
-   * specified via a PETSc-style command line argument..
+   * \returns a default PreconditionerType, overrideable with a
+   * --preconditioner pctype command line argument
    */
-  void set_default_preconditioner_type ();
+  static PreconditionerType default_preconditioner_type ();
 
   /**
    * Attaches a Preconditioner object to be used
