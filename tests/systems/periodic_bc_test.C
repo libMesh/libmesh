@@ -207,6 +207,7 @@ public:
   CPPUNIT_TEST( testSecondSystemConstraints );
   CPPUNIT_TEST( testReplacedDefaultGhosting );
   CPPUNIT_TEST( testRefinementAcrossSets );
+  CPPUNIT_TEST( testRedundantSets );
 #endif
 #endif // LIBMESH_DIM > 1
 
@@ -470,6 +471,40 @@ private:
         image_refined = elem->has_children();
     mesh.comm().max(image_refined);
     CPPUNIT_ASSERT(image_refined);
+  }
+
+  // Sets with the same mapping for every boundary are searched once
+  void testRedundantSets()
+  {
+    LOG_UNIT_TEST;
+
+    auto add_pair = [](PeriodicBoundaries & pbs, const RealVectorValue & translation)
+      {
+        PeriodicBoundary forward(translation);
+        forward.myboundary = 0;
+        forward.pairedboundary = 2;
+        pbs.emplace(0, forward.clone());
+        pbs.emplace(2, forward.clone(PeriodicBoundaryBase::INVERSE));
+      };
+
+    PeriodicBoundaries a, same_as_a, shifted, empty;
+    add_pair(a, RealVectorValue(0., 1.));
+    add_pair(same_as_a, RealVectorValue(0., 1.));
+    add_pair(shifted, RealVectorValue(0., 2.));
+
+    std::vector<const PeriodicBoundaries *> sets {&a, nullptr, &same_as_a, &empty, &a, &shifted};
+    remove_redundant_periodic_boundaries(sets);
+    CPPUNIT_ASSERT(sets == (std::vector<const PeriodicBoundaries *>{&a, &shifted}));
+
+    // A subset is covered, a superset is not
+    PeriodicBoundaries superset;
+    add_pair(superset, RealVectorValue(0., 1.));
+    PeriodicBoundary horiz(RealVectorValue(1., 0.));
+    horiz.myboundary = 3;
+    horiz.pairedboundary = 1;
+    superset.emplace(3, horiz.clone());
+    CPPUNIT_ASSERT(superset.covers(a));
+    CPPUNIT_ASSERT(!a.covers(superset));
   }
 #endif
 };

@@ -95,6 +95,14 @@ public:
    */
   virtual std::unique_ptr<PeriodicBoundaryBase> clone(TransformationType t = FORWARD) const = 0;
 
+  /**
+   * \returns \p true if \p other maps \p myboundary to \p pairedboundary
+   * by the same transformation, so both find the same periodic
+   * neighbors.  The default returns \p false, which is always safe.
+   */
+  virtual bool same_mapping(const PeriodicBoundaryBase & /*other*/) const
+  { return false; }
+
   void set_variable(unsigned int var);
 
   void merge(const PeriodicBoundaryBase & pb);

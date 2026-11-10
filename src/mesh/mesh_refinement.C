@@ -1858,16 +1858,9 @@ std::vector<const PeriodicBoundaries *> MeshRefinement::periodic_boundaries_used
 {
   std::vector<const PeriodicBoundaries *> sets;
 #ifdef LIBMESH_ENABLE_PERIODIC
-  auto add_set = [&sets](const PeriodicBoundaries * pbs)
-    {
-      if (pbs && !pbs->empty() &&
-          std::find(sets.begin(), sets.end(), pbs) == sets.end())
-        sets.push_back(pbs);
-    };
-
-  for (const auto pbs : _mesh.periodic_boundary_sets())
-    add_set(pbs);
-  add_set(_periodic_boundaries);
+  sets = _mesh.periodic_boundary_sets();
+  sets.push_back(_periodic_boundaries);
+  remove_redundant_periodic_boundaries(sets);
 #endif
   return sets;
 }

@@ -29,6 +29,7 @@
 // C++ Includes
 #include <map>
 #include <memory>
+#include <vector>
 
 namespace libMesh
 {
@@ -69,7 +70,24 @@ public:
                         const Elem * e,
                         unsigned int side,
                         unsigned int * neigh_side = nullptr) const;
+
+  /**
+   * \returns \p true if this set maps each boundary id of \p other the
+   * same way as \p other does.  This set then finds every periodic
+   * neighbor that \p other finds.
+   */
+  bool covers(const PeriodicBoundaries & other) const;
 };
+
+
+
+/**
+ * Removes null, empty and redundant sets from \p sets.  A set is
+ * redundant if an earlier set covers() it.  Searching the remaining
+ * sets for periodic neighbors gives every neighbor that the original
+ * sets gave.
+ */
+void remove_redundant_periodic_boundaries(std::vector<const PeriodicBoundaries *> & sets);
 
 } // namespace libMesh
 

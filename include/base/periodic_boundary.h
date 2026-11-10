@@ -78,6 +78,13 @@ public:
    */
   virtual std::unique_ptr<PeriodicBoundaryBase> clone(TransformationType t = FORWARD) const override;
 
+  /**
+   * \returns \p true if this object and \p other are both exactly
+   * PeriodicBoundary, i.e. neither is an object of a derived class, and
+   * they have the same boundary ids and translation vector.
+   */
+  virtual bool same_mapping(const PeriodicBoundaryBase & other) const override;
+
 protected:
 
   // The vector which is added to points in myboundary

@@ -28,6 +28,9 @@
 #include "libmesh/point_locator_base.h"
 #include "libmesh/remote_elem.h"
 
+// C++ includes
+#include <algorithm>
+
 namespace libMesh
 {
 
@@ -51,6 +54,32 @@ const PeriodicBoundaryBase * PeriodicBoundaries::boundary(boundary_id_type id) c
   if (i == this->end())
     return nullptr;
   return i->second.get();
+}
+
+
+
+bool PeriodicBoundaries::covers(const PeriodicBoundaries & other) const
+{
+  for (const auto & [id, pb] : other)
+    {
+      const PeriodicBoundaryBase * mine = this->boundary(id);
+      if (!mine || !pb || !mine->same_mapping(*pb))
+        return false;
+    }
+  return true;
+}
+
+
+
+void remove_redundant_periodic_boundaries(std::vector<const PeriodicBoundaries *> & sets)
+{
+  std::vector<const PeriodicBoundaries *> kept;
+  for (const auto pbs : sets)
+    if (pbs && !pbs->empty() &&
+        std::none_of(kept.begin(), kept.end(),
+                     [pbs](const PeriodicBoundaries * k) { return k == pbs || k->covers(*pbs); }))
+      kept.push_back(pbs);
+  sets.swap(kept);
 }
 
 

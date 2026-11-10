@@ -32,7 +32,6 @@
 #endif
 
 // C++ Includes
-#include <algorithm>
 #include <unordered_map>
 #include <vector>
 
@@ -308,11 +307,11 @@ public:
 protected:
 #ifdef LIBMESH_ENABLE_PERIODIC
   /**
-   * \returns The nonempty periodic boundary sets this functor searches
-   * for periodic neighbors, without duplicates: \p own, which may be
-   * null, plus every set registered with the mesh if
-   * MeshBase::uses_all_periodic_boundaries() is true for this functor.
-   * Without a mesh, only \p own applies.
+   * \returns The periodic boundary sets this functor searches for
+   * periodic neighbors.  These are \p own, which may be null, and, if
+   * MeshBase::uses_all_periodic_boundaries() is true for this functor,
+   * every set registered with the mesh.  Without a mesh, only \p own
+   * applies.  remove_redundant_periodic_boundaries() reduces the result.
    */
   std::vector<const PeriodicBoundaries *>
   periodic_boundaries_used(const PeriodicBoundaries * own) const;
@@ -328,20 +327,13 @@ inline
 std::vector<const PeriodicBoundaries *>
 GhostingFunctor::periodic_boundaries_used(const PeriodicBoundaries * own) const
 {
-  std::vector<const PeriodicBoundaries *> sets;
-  auto add_set = [&sets](const PeriodicBoundaries * pbs)
-    {
-      if (pbs && !pbs->empty() &&
-          std::find(sets.begin(), sets.end(), pbs) == sets.end())
-        sets.push_back(pbs);
-    };
-
-  add_set(own);
+  std::vector<const PeriodicBoundaries *> sets {own};
 
   if (_mesh && _mesh->uses_all_periodic_boundaries(*this))
-    for (const auto pbs : _mesh->periodic_boundary_sets())
-      add_set(pbs);
+    sets.insert(sets.end(), _mesh->periodic_boundary_sets().begin(),
+                _mesh->periodic_boundary_sets().end());
 
+  remove_redundant_periodic_boundaries(sets);
   return sets;
 }
 #endif
