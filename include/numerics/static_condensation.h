@@ -35,6 +35,7 @@ namespace libMesh {
 #include "libmesh/dense_matrix.h"
 #include "libmesh/variable.h"
 #include "libmesh/sparsity_pattern.h"
+#include "libmesh/static_condensation_dof_map.h"
 
 #include <unordered_map>
 #include <memory>
@@ -211,6 +212,13 @@ private:
                                 EigenVector & elem_dof_values);
 
   /**
+   * Whether the parent space eliminates row \p full_i or column \p full_j. Insertion drops such
+   * entries because the element matrix should already carry the parent reduction, e.g. \f$ C^T K C
+   * \f$ \p via constraint_element_matrix() for eliminated constraints
+   */
+  bool parent_eliminates(dof_id_type full_i, dof_id_type full_j) const;
+
+  /**
    * Takes an incoming RHS from the solver on the parent space of the static condensation dof map,
    * which holds both uncondensed and condensed dofs, and condenses it down into the condensed \p
    * _reduced_rhs data member using element Schur complements
@@ -267,12 +275,15 @@ private:
   // e.g. this may correspond to the solution for the Newton *update*
   std::unique_ptr<NumericVector<Number>> _ghosted_parent_sol;
 
-  /// The current element ID. This is one half of a key, along with the global index, that maps to a
-  /// local index
-  dof_id_type _current_elem_id;
+  /// Adds \p value to the entry of global indices \p global_i and \p global_j in the block data of
+  /// the current element
+  void add_to_current_elem(dof_id_type global_i, dof_id_type global_j, Number value);
 
-  /// Helper data member for adding individual matrix elements
-  DenseMatrix<Number> _size_one_mat;
+  /// The matrix data of the current element
+  MatrixData * _current_matrix_data;
+
+  /// The degree of freedom data of the current element
+  const StaticCondensationDofMap::DofData * _current_dof_data;
 
   /// Preconditioner object which will call back to us for the preconditioning action
   std::unique_ptr<StaticCondensationPreconditioner> _scp;
