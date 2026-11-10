@@ -28,6 +28,7 @@
 #include "libmesh/sparse_matrix.h"
 #include "libmesh/enum_to_string.h"
 #include "libmesh/solver_configuration.h"
+#include "libmesh/string_to_enum.h"
 #include "libmesh/enum_solver_package.h"
 #include "libmesh/enum_preconditioner_type.h"
 #include "libmesh/enum_solver_type.h"
@@ -44,7 +45,7 @@ template <typename T>
 LinearSolver<T>::LinearSolver (const libMesh::Parallel::Communicator & comm_in) :
   ParallelObject       (comm_in),
   _solver_type         (GMRES),
-  _preconditioner_type (ILU_PRECOND),
+  _preconditioner_type (LinearSolver<T>::default_preconditioner_type(this->n_processors())),
   _is_initialized      (false),
   _preconditioner      (nullptr),
   same_preconditioner  (false),
@@ -95,6 +96,17 @@ LinearSolver<T>::build(const libMesh::Parallel::Communicator & comm,
   return std::unique_ptr<LinearSolver<T>>();
 }
 
+
+template <typename T>
+void LinearSolver<T>::clear ()
+{
+  this->_is_initialized = false;
+  this->_solver_type    = GMRES;
+  this->set_preconditioner_type
+    (LinearSolver<T>::default_preconditioner_type(this->n_processors()));
+}
+
+
 template <typename T>
 PreconditionerType
 LinearSolver<T>::preconditioner_type () const
@@ -111,8 +123,34 @@ LinearSolver<T>::set_preconditioner_type (const PreconditionerType pct)
 {
   if (_preconditioner)
     _preconditioner->set_type(pct);
-  else
-    _preconditioner_type = pct;
+
+  _preconditioner_type = pct;
+}
+
+template <typename T>
+PreconditionerType
+LinearSolver<T>::default_preconditioner_type (processor_id_type n_procs)
+{
+  static const std::string ilu{"ilu"}, block_jacobi{"block_jacobi"};
+  // Default to ILU for robustness
+  //
+  // But let users choose faster options via PETSc-style
+  // command-line options
+  const std::string preconditioner =
+    libMesh::command_line_next("--preconditioner",
+                               n_procs > 1 ? block_jacobi : ilu);
+  PreconditionerType pct;
+
+  // try/catch to add a slightly better error message than string_to_enum's
+  libmesh_try {
+    pct = Utility::string_to_enum<PreconditionerType>(preconditioner);
+  }
+  libmesh_catch (...)
+  {
+    libmesh_error_msg ("We don't recognize --preconditioner option" << preconditioner);
+  }
+
+  return pct;
 }
 
 template <typename T>

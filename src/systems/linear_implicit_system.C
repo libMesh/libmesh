@@ -92,6 +92,10 @@ void LinearImplicitSystem::init_data ()
 
   // re-initialize the linear solver interface
   linear_solver->clear();
+
+  // But restore any StaticCondensation to defaults
+  if (this->has_static_condensation())
+    this->setup_static_condensation_preconditioner(*linear_solver);
 }
 
 
@@ -100,6 +104,10 @@ void LinearImplicitSystem::reinit ()
 {
   // re-initialize the linear solver interface
   linear_solver->clear();
+
+  // But restore any StaticCondensation to defaults
+  if (this->has_static_condensation())
+    this->setup_static_condensation_preconditioner(*linear_solver);
 
   // initialize parent data
   Parent::reinit();

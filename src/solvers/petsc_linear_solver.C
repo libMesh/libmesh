@@ -92,10 +92,6 @@ PetscLinearSolver<T>::PetscLinearSolver(const libMesh::Parallel::Communicator & 
   _restrict_solve_to_is_complement(nullptr),
   _subset_solve_mode(SUBSET_ZERO)
 {
-  if (this->n_processors() == 1)
-    this->_preconditioner_type = ILU_PRECOND;
-  else
-    this->_preconditioner_type = BLOCK_JACOBI_PRECOND;
 }
 
 
@@ -105,8 +101,6 @@ void PetscLinearSolver<T>::clear ()
 {
   if (this->initialized())
     {
-      this->_is_initialized = false;
-
       // Calls specialized destroy() functions
       if (_restrict_solve_to_is)
         _restrict_solve_to_is.reset_to_zero();
@@ -117,16 +111,7 @@ void PetscLinearSolver<T>::clear ()
       // to nullptr, so that behavior is maintained here.
       _ksp.destroy();
 
-      // Mimic PETSc default solver and preconditioner
-      this->_solver_type = GMRES;
-
-      if (!this->_preconditioner)
-        {
-          if (this->n_processors() == 1)
-            this->_preconditioner_type = ILU_PRECOND;
-          else
-            this->_preconditioner_type = BLOCK_JACOBI_PRECOND;
-        }
+      LinearSolver<T>::clear();
     }
 }
 
