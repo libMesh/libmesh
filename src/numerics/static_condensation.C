@@ -44,13 +44,13 @@ StaticCondensation::StaticCondensation(const MeshBase & mesh,
     _mesh(mesh),
     _system(system),
     _reduced_dof_map(reduced_dof_map),
-    _current_elem_id(DofObject::invalid_id),
+    _current_matrix_data(nullptr),
+    _current_dof_data(nullptr),
     _sc_is_initialized(false),
     _have_cached_values(false),
     _parallel_type(INVALID_PARALLELIZATION),
     _uncondensed_dofs_only(false)
 {
-  _size_one_mat.resize(1, 1);
   _scp = std::make_unique<StaticCondensationPreconditioner>(*this);
 }
 
@@ -80,7 +80,8 @@ void StaticCondensation::clear() noexcept
   _reduced_sol.reset();
   _reduced_rhs.reset();
   _reduced_solver.reset();
-  _current_elem_id = DofObject::invalid_id;
+  _current_matrix_data = nullptr;
+  _current_dof_data = nullptr;
   _have_cached_values = false;
   _sc_is_initialized = false;
 }
@@ -281,36 +282,24 @@ void StaticCondensation::set(const numeric_index_type full_i,
 void StaticCondensation::set_current_elem(const Elem & elem)
 {
   libmesh_assert(!Threads::in_threads || libMesh::n_threads() == 1);
-  _current_elem_id = elem.id();
+  _current_matrix_data = &libmesh_map_find(_elem_to_matrix_data, elem.id());
+  _current_dof_data = &libmesh_map_find(_reduced_dof_map._elem_to_dof_data, elem.id());
 }
 
-void StaticCondensation::add(const numeric_index_type i,
-                             const numeric_index_type j,
-                             const Number value)
+void StaticCondensation::add_to_current_elem(const dof_id_type global_i,
+                                             const dof_id_type global_j,
+                                             const Number value)
 {
-  _size_one_mat(0, 0) = value;
-  this->add_matrix(_size_one_mat, {i}, {j});
-}
-
-void StaticCondensation::add_matrix(const DenseMatrix<Number> & dm,
-                                    const std::vector<numeric_index_type> & rows,
-                                    const std::vector<numeric_index_type> & cols)
-{
-  if (rows.empty() || cols.empty())
-    return;
-
-  libmesh_assert(_current_elem_id != DofObject::invalid_id);
-  auto & matrix_data = libmesh_map_find(_elem_to_matrix_data, _current_elem_id);
-  const auto & dof_data = libmesh_map_find(_reduced_dof_map._elem_to_dof_data, _current_elem_id);
-  EigenMatrix * mat;
+  _have_cached_values = true;
 
   // Entries in rows or columns the parent space eliminates are dropped; the element matrix already
   // carries the parent reduction, e.g. C^T K C for eliminated constraints
-  const auto * const parent = _reduced_dof_map.parent();
-  auto in_parent = [parent](const auto global_index) {
-    return !parent || parent->find_reduced_dof(global_index) != DofObject::invalid_id;
-  };
+  if (const auto * const parent = _reduced_dof_map.parent();
+      parent && (parent->find_reduced_dof(global_i) == DofObject::invalid_id ||
+                 parent->find_reduced_dof(global_j) == DofObject::invalid_id))
+    return;
 
+  const auto & dof_data = *_current_dof_data;
   auto info_from_index = [&dof_data](const auto global_index) {
     auto index_it = dof_data.condensed_global_to_local_map.find(global_index);
     const bool index_is_condensed = index_it != dof_data.condensed_global_to_local_map.end();
@@ -333,33 +322,33 @@ void StaticCondensation::add_matrix(const DenseMatrix<Number> & dm,
     return std::make_pair(index_is_condensed, index_it->second);
   };
 
+  const auto [i_is_condensed, local_i] = info_from_index(global_i);
+  const auto [j_is_condensed, local_j] = info_from_index(global_j);
+  auto & matrix_data = *_current_matrix_data;
+  EigenMatrix & mat = i_is_condensed ? (j_is_condensed ? matrix_data.Acc : matrix_data.Acu)
+                                     : (j_is_condensed ? matrix_data.Auc : matrix_data.Auu);
+  mat(local_i, local_j) += value;
+}
+
+void StaticCondensation::add(const numeric_index_type i,
+                             const numeric_index_type j,
+                             const Number value)
+{
+  libmesh_assert(_current_matrix_data);
+  this->add_to_current_elem(i, j, value);
+}
+
+void StaticCondensation::add_matrix(const DenseMatrix<Number> & dm,
+                                    const std::vector<numeric_index_type> & rows,
+                                    const std::vector<numeric_index_type> & cols)
+{
+  if (rows.empty() || cols.empty())
+    return;
+
+  libmesh_assert(_current_matrix_data);
   for (const auto i : make_range(dm.m()))
     for (const auto j : make_range(dm.n()))
-      {
-        const auto global_i = rows[i];
-        const auto global_j = cols[j];
-        if (!in_parent(global_i) || !in_parent(global_j))
-          continue;
-        const auto [i_is_condensed, local_i] = info_from_index(global_i);
-        const auto [j_is_condensed, local_j] = info_from_index(global_j);
-        if (i_is_condensed)
-          {
-            if (j_is_condensed)
-              mat = &matrix_data.Acc;
-            else
-              mat = &matrix_data.Acu;
-          }
-        else
-          {
-            if (j_is_condensed)
-              mat = &matrix_data.Auc;
-            else
-              mat = &matrix_data.Auu;
-          }
-        (*mat)(local_i, local_j) += dm(i, j);
-      }
-
-  _have_cached_values = true;
+      this->add_to_current_elem(rows[i], cols[j], dm(i, j));
 }
 
 void StaticCondensation::add_matrix(const DenseMatrix<Number> & dm,
