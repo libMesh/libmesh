@@ -2502,6 +2502,31 @@ void MeshBase::detect_interior_parents()
       erase_if_match(b2, b1, pairs);
     }
 
+namespace
+{
+const std::string disjoint_neighbor_node_key_name = "disjoint_neighbor_node_key";
+}
+
+void MeshBase::add_disjoint_neighbor_node_keys()
+{
+  this->add_node_integer(disjoint_neighbor_node_key_name);
+}
+
+bool MeshBase::has_disjoint_neighbor_node_keys() const
+{
+  return this->has_node_integer(disjoint_neighbor_node_key_name);
+}
+
+dof_id_type MeshBase::disjoint_neighbor_node_key(const Node & node) const
+{
+  return node.get_extra_integer(this->get_node_integer_index(disjoint_neighbor_node_key_name));
+}
+
+void MeshBase::set_disjoint_neighbor_node_key(Node & node, const dof_id_type key) const
+{
+  node.set_extra_integer(this->get_node_integer_index(disjoint_neighbor_node_key_name), key);
+}
+
 
 #endif
 

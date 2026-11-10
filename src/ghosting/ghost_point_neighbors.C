@@ -190,8 +190,11 @@ void GhostPointNeighbors::operator()
               if (!_mesh->get_boundary_info().has_boundary_id(elem, s, id))
                 continue;
 
+              // With disjoint neighbor node keys, find_neighbors() has
+              // already set the neighbor without using coordinates.
               unsigned int neigh_side = invalid_uint;
               const Elem * neigh =
+                  _mesh->has_disjoint_neighbor_node_keys() ? elem->neighbor_ptr(s) :
                   db->neighbor(id, *point_locator, elem, s, &neigh_side);
 
               if (!neigh || neigh == remote_elem)

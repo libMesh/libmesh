@@ -48,6 +48,8 @@ public:
 #ifdef LIBMESH_ENABLE_PERIODIC
   CPPUNIT_TEST( testAsciiDisjointNeighborPairs );
   CPPUNIT_TEST( testBinaryDisjointNeighborPairs );
+  CPPUNIT_TEST( testAsciiDisjointNeighborKeys );
+  CPPUNIT_TEST( testBinaryDisjointNeighborKeys );
 #endif
 #endif
 
@@ -439,11 +441,15 @@ public:
 #ifdef LIBMESH_ENABLE_PERIODIC
   // Test that disjoint neighbor boundary pairs survive a checkpoint
   // round trip, so neighbors across a split interface are restored.
-  void testDisjointNeighborPairsCheckpoint(bool binary)
+  // With node_keys, the neighbors must also survive opening the
+  // interface and gathering the mesh.
+  template <typename MeshType = Mesh>
+  void testDisjointNeighborPairsCheckpoint(bool binary, bool node_keys = false)
   {
 #ifdef LIBMESH_HAVE_XDR
     const std::string filename =
-      std::string("checkpoint_disjoint_pairs.cp") + (binary ? "r" : "a");
+      std::string(node_keys ? "checkpoint_disjoint_keys.cp" : "checkpoint_disjoint_pairs.cp") +
+      (binary ? "r" : "a");
     const boundary_id_type left_id = 5, right_id = 6;
     const RealVectorValue translation(0.25, 0.);
     processor_id_type n_splits = 1;
@@ -451,7 +457,7 @@ public:
     {
       // Two unit quads whose facing sides share coordinates but not
       // nodes; only the disjoint pair makes them neighbors.
-      Mesh mesh(*TestCommWorld, 2);
+      MeshType mesh(*TestCommWorld, 2);
       mesh.allow_renumbering(false);
 
       for (auto i : make_range(2))
@@ -472,6 +478,18 @@ public:
       boundary_info.add_side(mesh.elem_ptr(0), 1, left_id);
       boundary_info.add_side(mesh.elem_ptr(1), 3, right_id);
       mesh.add_disjoint_neighbor_boundary_pairs(left_id, right_id, translation);
+
+      // Give the facing vertices of the two quads shared keys
+      if (node_keys)
+        {
+          mesh.add_disjoint_neighbor_node_keys();
+          for (const auto & [left, right] : {std::make_pair(1, 4), std::make_pair(2, 7)})
+            {
+              mesh.set_disjoint_neighbor_node_key(mesh.node_ref(left), left);
+              mesh.set_disjoint_neighbor_node_key(mesh.node_ref(right), left);
+            }
+        }
+
       mesh.prepare_for_use();
 
       n_splits = mesh.is_serial() ? 1 : mesh.n_processors();
@@ -480,7 +498,7 @@ public:
     }
 
     {
-      Mesh mesh(*TestCommWorld);
+      MeshType mesh(*TestCommWorld);
       mesh.allow_renumbering(false);
 
       // A stale pair on the mesh being read into must not survive
@@ -510,6 +528,26 @@ public:
           CPPUNIT_ASSERT(elem->neighbor_ptr(3));
           CPPUNIT_ASSERT_EQUAL(dof_id_type(0), elem->neighbor_ptr(3)->id());
         }
+
+      if (node_keys)
+        {
+          CPPUNIT_ASSERT(mesh.has_disjoint_neighbor_node_keys());
+
+          // Open the interface past the translation, so that a
+          // coordinate match fails. Then find the neighbors and gather
+          // the mesh, as Exodus output of a distributed mesh does.
+          for (auto & node : mesh.node_ptr_range())
+            if ((*node)(0) > 1.1)
+              (*node)(0) += 0.5;
+
+          mesh.find_neighbors();
+          mesh.allgather();
+
+          const Elem & left = mesh.elem_ref(0);
+          const Elem & right = mesh.elem_ref(1);
+          CPPUNIT_ASSERT_EQUAL(&right, left.neighbor_ptr(1));
+          CPPUNIT_ASSERT_EQUAL(&left, right.neighbor_ptr(3));
+        }
     }
 
     TestCommWorld->barrier();
@@ -530,6 +568,20 @@ public:
     LOG_UNIT_TEST;
 
     testDisjointNeighborPairsCheckpoint(true);
+  }
+
+  void testAsciiDisjointNeighborKeys()
+  {
+    LOG_UNIT_TEST;
+
+    testDisjointNeighborPairsCheckpoint<DistributedMesh>(false, true);
+  }
+
+  void testBinaryDisjointNeighborKeys()
+  {
+    LOG_UNIT_TEST;
+
+    testDisjointNeighborPairsCheckpoint<DistributedMesh>(true, true);
   }
 #endif // LIBMESH_ENABLE_PERIODIC
 

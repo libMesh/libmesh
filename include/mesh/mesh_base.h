@@ -2110,6 +2110,38 @@ public:
 
   void remove_disjoint_boundary_pair(const boundary_id_type b1,
                                      const boundary_id_type b2);
+
+  /**
+   * Register the node integer that stores disjoint neighbor node keys.
+   * This must be called on all processors at once.
+   *
+   * When this integer exists, find_neighbors() matches sides across
+   * disjoint neighbor boundary pairs by their sorted vertex keys.
+   * Matching then doesn't rely on node coordinates, so it gives the same neighbors
+   * after the nodes move, for example on a displaced mesh.
+   *
+   * Every vertex on a disjoint neighbor boundary needs a key. A mesh
+   * generator that duplicates a node along a disjoint interface must
+   * give each copy the same key. The id of the original node is one
+   * choice. Node renumbering doesn't change the keys.
+   */
+  void add_disjoint_neighbor_node_keys();
+
+  /**
+   * \returns true if this mesh has disjoint neighbor node keys.
+   */
+  bool has_disjoint_neighbor_node_keys() const;
+
+  /**
+   * \returns The disjoint neighbor key of \p node, or
+   * DofObject::invalid_id if \p node has no key.
+   */
+  dof_id_type disjoint_neighbor_node_key(const Node & node) const;
+
+  /**
+   * Set the disjoint neighbor key of \p node to \p key.
+   */
+  void set_disjoint_neighbor_node_key(Node & node, dof_id_type key) const;
 #endif
 
   /**
