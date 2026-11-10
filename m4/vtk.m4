@@ -64,8 +64,12 @@ AC_DEFUN([CONFIGURE_VTK],
                      [vtkrequired=no])
 
   AS_IF([test "$enablevtk" = "yes"],
-        [
-    dnl Honor VTK_DIR if it is set
+  [
+    AC_ARG_WITH(vtk,
+                AS_HELP_STRING([--with-vtk=PATH],[Specify the path where VTK is installed]),
+                [VTK_DIR=$withval])
+
+    dnl Honor --with-vtk if it is set, or $VTK_DIR if it is set, or just try /usr
     AS_IF([test "x$VTK_DIR" = "x"], [VTK_DIR=/usr])
 
     dnl Look for VTK location in the environment, then default paths
