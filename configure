@@ -1333,6 +1333,7 @@ enable_qhull_required
 enable_gmv
 enable_vtk
 enable_vtk_required
+with_vtk
 with_vtk_include
 with_vtk_lib
 enable_eigen
@@ -2279,6 +2280,7 @@ Optional Packages:
                           internal: build from contrib, PETSc: rely on PETSc
   --with-parmetis-include=</some/includedir>
 
+  --with-vtk=PATH         Specify the path where VTK is installed
   --with-vtk-include=PATH Specify the path for VTK header files
   --with-vtk-lib=PATH     Specify the path for VTK libs
   --with-eigen-include=PATH
@@ -38746,7 +38748,7 @@ then :
                   TBB_LIBRARY="-L$TBB_LIBS -ltbb -ltbbmalloc"
                   TBB_INCLUDE=-I$TBB_INCLUDE_PATH
 
-                                    if test "x$RPATHFLAG" != "x" && test -d $TBB_LIBS
+                                    if test "x$RPATHFLAG" != "x" && test -d "$TBB_LIBS"
 then :
   TBB_LIBRARY="${RPATHFLAG}${TBB_LIBS} $TBB_LIBRARY"
 fi
@@ -67023,7 +67025,7 @@ then :
 
 fi
 
-        if test "x$RPATHFLAG" != "x" && test -d ${withtrilinosdir}/lib
+        if test "x$RPATHFLAG" != "x" && test -d "${withtrilinosdir}/lib"
 then :
   TRILINOS_LIBS="${RPATHFLAG}${withtrilinosdir}/lib $TRILINOS_LIBS"
 fi
@@ -69431,6 +69433,14 @@ fi
   if test "$enablevtk" = "yes"
 then :
 
+
+# Check whether --with-vtk was given.
+if test ${with_vtk+y}
+then :
+  withval=$with_vtk; VTK_DIR=$withval
+fi
+
+
         if test "x$VTK_DIR" = "x"
 then :
   VTK_DIR=/usr
@@ -69442,18 +69452,26 @@ then :
 
             if test "x$VTK_INCLUDE" != "x"
 then :
-  if test -d $VTK_INCLUDE
+  if test -d "$VTK_INCLUDE"
 then :
-  VTK_INC=$VTK_INCLUDE
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Trying \$VTK_INCLUDE dir \"$VTK_INCLUDE\"" >&5
+printf "%s\n" "$as_me: Trying \$VTK_INCLUDE dir \"$VTK_INCLUDE\"" >&6;}
+                          VTK_INC=$VTK_INCLUDE
 fi
-elif test -d $VTK_LS_CHECK
+elif test -d "$VTK_LS_CHECK"
 then :
-  VTK_INC=$VTK_LS_CHECK
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Trying \$VTK_DIR include dir \"$VTK_LS_CHECK\"" >&5
+printf "%s\n" "$as_me: Trying \$VTK_DIR include dir \"$VTK_LS_CHECK\"" >&6;}
+                   VTK_INC=$VTK_LS_CHECK
 elif test "x$VTK_DIR" != "x"
 then :
-  VTK_INC=$VTK_DIR/include
+  { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Trying \$VTK_DIR include dir \"$VTK_DIR/include\"" >&5
+printf "%s\n" "$as_me: Trying \$VTK_DIR include dir \"$VTK_DIR/include\"" >&6;}
+                   VTK_INC=$VTK_DIR/include
 else case e in #(
-  e) VTK_INC="/usr/include/vtk" ;;
+  e) { printf "%s\n" "$as_me:${as_lineno-$LINENO}: Trying VTK include dir \"/usr/include/vtk\"" >&5
+printf "%s\n" "$as_me: Trying VTK include dir \"/usr/include/vtk\"" >&6;}
+                   VTK_INC="/usr/include/vtk" ;;
 esac
 fi
 
@@ -69596,7 +69614,7 @@ then :
          #   The -rpath option is also used when locating shared objects
          #   which are needed by shared objects explicitly included in
          #   the link; see the description of the -rpath-link option.
-         if test "x$RPATHFLAG" != "x" && test -d $VTK_LIB
+         if test "x$RPATHFLAG" != "x" && test -d "$VTK_LIB"
 then :
   VTK_RPATH_FLAGS="${RPATHFLAG}${VTK_LIB}"
 fi
@@ -69821,7 +69839,7 @@ then :
 
                VTK_INCLUDE="-I$VTK_INC"
 
-                              if test "x$RPATHFLAG" != "x" && test -d $VTK_LIB
+                              if test "x$RPATHFLAG" != "x" && test -d "$VTK_LIB"
 then :
   VTK_LIBRARY="${RPATHFLAG}${VTK_LIB} $VTK_LIBRARY"
 fi
@@ -70022,13 +70040,13 @@ fi
           if test "x$enableeigenincFound" = "xyes"
 then :
   EIGEN_INCLUDE="-I$EIGEN_INC"
-elif test -d $top_srcdir/contrib/eigen/eigen
+elif test -d "$top_srcdir/contrib/eigen/eigen"
 then :
   { printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: <<< external Eigen header files not found, using Eigen from ./contrib >>>" >&5
 printf "%s\n" "<<< external Eigen header files not found, using Eigen from ./contrib >>>" >&6; }
-                                                            EIGEN_INC=$top_srcdir/contrib/eigen/eigen
-                                                            EIGEN_INCLUDE="-I\$(top_srcdir)/contrib/eigen/eigen"
-                                                            install_internal_eigen=yes
+                                                              EIGEN_INC=$top_srcdir/contrib/eigen/eigen
+                                                              EIGEN_INCLUDE="-I\$(top_srcdir)/contrib/eigen/eigen"
+                                                              install_internal_eigen=yes
 else case e in #(
   e) enableeigen=no ;;
 esac
@@ -70404,7 +70422,7 @@ then :
 
                           GLPK_INCLUDE="-I$GLPK_INC"
                           GLPK_LIBRARY="-L$GLPK_LIB -lglpk"
-                                                    if test "x$RPATHFLAG" != "x" && test -d $GLPK_LIB
+                                                    if test "x$RPATHFLAG" != "x" && test -d "$GLPK_LIB"
 then :
 
                                   if test "$GLPK_LIB" != "/usr/lib" && test "$GLPK_LIB" != "/usr/lib64"
@@ -70651,7 +70669,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
             if test "x$enablenlopt" = "xyes"
 then :
 
-                            if test "x$RPATHFLAG" != "x" && test -d $NLOPT_LIB
+                            if test "x$RPATHFLAG" != "x" && test -d "$NLOPT_LIB"
 then :
   NLOPT_LIBRARY="${RPATHFLAG}${NLOPT_LIB} $NLOPT_LIBRARY"
 fi
@@ -70887,7 +70905,7 @@ then :
                   CAPNPROTO_INCLUDE="-I$CAPNPROTO_INC"
                   CAPNPROTO_LIBRARY="-L$CAPNPROTO_LIB -lcapnp -lkj"
 
-                                    if test "x$RPATHFLAG" != "x" && test -d $CAPNPROTO_LIB
+                                    if test "x$RPATHFLAG" != "x" && test -d "$CAPNPROTO_LIB"
 then :
   CAPNPROTO_LIBRARY="${RPATHFLAG}${CAPNPROTO_LIB} $CAPNPROTO_LIBRARY"
 fi
@@ -71097,7 +71115,7 @@ then :
 
                           CURL_INCLUDE="-I$CURL_INC"
                           CURL_LIBRARY="-L$CURL_LIB -lcurl"
-                          if test "x$RPATHFLAG" != "x" && test -d $CURL_LIB
+                          if test "x$RPATHFLAG" != "x" && test -d "$CURL_LIB"
 then :
   if test "$CURL_LIB" != "/usr/lib" && test "$CURL_LIB" != "/usr/lib64"
 then :
