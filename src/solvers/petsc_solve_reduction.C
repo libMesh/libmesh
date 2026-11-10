@@ -417,10 +417,12 @@ template <typename T>
 void PetscNonlinearStaticCondensationReduction<T>::begin_solve(PetscVector<T> & x, PetscVector<T> &)
 {
   this->_solution = &x;
-  for (auto * v : {&_y, &_r, &_z, &_parent_r})
+  for (auto * v : {&_y, &_r, &_z, &_parent_r, &_eliminated_y})
     v->reset_to_zero();
+  _have_eliminated_y = false;
   *_y.get() = this->create_vector();
   *_r.get() = this->create_vector();
+  *_eliminated_y.get() = this->create_vector();
   *_z.get() = _parent->create_vector();
   *_parent_r.get() = _parent->create_vector();
   this->_snes_solution = _y;
@@ -446,6 +448,21 @@ template <typename T>
 bool PetscNonlinearStaticCondensationReduction<T>::prolong(Vec y)
 {
   NonlinearImplicitSystem & sys = this->_sys;
+
+  // SNES evaluates the Jacobian at the iterate of the last residual. _z then already holds P(y), so
+  // the condensed equations need no second solve
+  if (_have_eliminated_y)
+    {
+      PetscBool same_y;
+      LibmeshPetscCall2(sys.comm(), VecEqual(y, _eliminated_y, &same_y));
+      if (same_y)
+        {
+          _parent->prolong(_z);
+          *sys.solution = *sys.current_local_solution;
+          return true;
+        }
+    }
+  _have_eliminated_y = false;
 
   // _z keeps the condensed values of the last successful prolongation. Once a Jacobian has been
   // assembled, the tangent predictor dz1 = -A11^{-1} A12 (y - y_old) moves them toward the new
@@ -487,6 +504,8 @@ bool PetscNonlinearStaticCondensationReduction<T>::prolong(Vec y)
   // must see the iterate SNES holds
   _parent->inject(*sys.solution, _z);
   LibmeshPetscCall2(sys.comm(), VecISCopy(_z, _retained_parent_is, SCATTER_FORWARD, y));
+  LibmeshPetscCall2(sys.comm(), VecCopy(y, _eliminated_y));
+  _have_eliminated_y = true;
   return true;
 }
 

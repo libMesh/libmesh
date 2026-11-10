@@ -340,7 +340,8 @@ public:
    * \f$ as the initial guess, and then solves the condensed equations. On success the condensed
    * values become the initial guess of the next prolongation. After the first Jacobian, the initial
    * guess adds the tangent predictor \f$ -A_{11}^{-1} A_{12} (y - y_{old}) \f$, unless the
-   * eliminator disables it
+   * eliminator disables it. If \p y equals the \f$ y \f$ of the last successful elimination, the
+   * stored \f$ P(y) \f$ is reused without a new solve
    */
   virtual bool prolong(Vec y) override;
 
@@ -403,6 +404,12 @@ private:
 
   /// The parent iterate \f$ z \f$ and the parent residual
   WrappedPetsc<Vec> _z, _parent_r;
+
+  /// The \f$ y \f$ of the last successful elimination, at which \p _z holds \f$ P(y) \f$
+  WrappedPetsc<Vec> _eliminated_y;
+
+  /// Whether \p _eliminated_y is valid
+  bool _have_eliminated_y = false;
 
   /// Whether \p _sc holds the factored condensed blocks of an assembled Jacobian
   bool _have_factors = false;
