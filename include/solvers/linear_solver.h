@@ -129,10 +129,11 @@ public:
   void set_preconditioner_type (const PreconditionerType pct);
 
   /**
-   * \returns a default PreconditionerType, overrideable with a
+   * \returns a default PreconditionerType suitable for
+   * \p n_procs processors, overrideable with a
    * --preconditioner pctype command line argument
    */
-  static PreconditionerType default_preconditioner_type ();
+  static PreconditionerType default_preconditioner_type (processor_id_type n_procs);
 
   /**
    * Attaches a Preconditioner object to be used

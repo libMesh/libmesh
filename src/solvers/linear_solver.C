@@ -45,14 +45,12 @@ template <typename T>
 LinearSolver<T>::LinearSolver (const libMesh::Parallel::Communicator & comm_in) :
   ParallelObject       (comm_in),
   _solver_type         (GMRES),
-  _preconditioner_type (ILU_PRECOND),
+  _preconditioner_type (LinearSolver<T>::default_preconditioner_type(this->n_processors())),
   _is_initialized      (false),
   _preconditioner      (nullptr),
   same_preconditioner  (false),
   _solver_configuration(nullptr)
 {
-  this->set_preconditioner_type
-    (LinearSolver<T>::default_preconditioner_type());
 }
 
 
@@ -105,7 +103,7 @@ void LinearSolver<T>::clear ()
   this->_is_initialized = false;
   this->_solver_type    = GMRES;
   this->set_preconditioner_type
-    (LinearSolver<T>::default_preconditioner_type());
+    (LinearSolver<T>::default_preconditioner_type(this->n_processors()));
 }
 
 
@@ -131,14 +129,16 @@ LinearSolver<T>::set_preconditioner_type (const PreconditionerType pct)
 
 template <typename T>
 PreconditionerType
-LinearSolver<T>::default_preconditioner_type ()
+LinearSolver<T>::default_preconditioner_type (processor_id_type n_procs)
 {
+  static const std::string ilu{"ilu"}, block_jacobi{"block_jacobi"};
   // Default to ILU for robustness
   //
   // But let users choose faster options via PETSc-style
   // command-line options
   const std::string preconditioner =
-    libMesh::command_line_next("--preconditioner", std::string("ilu"));
+    libMesh::command_line_next("--preconditioner",
+                               n_procs > 1 ? block_jacobi : ilu);
   PreconditionerType pct;
 
   // try/catch to add a slightly better error message than string_to_enum's
