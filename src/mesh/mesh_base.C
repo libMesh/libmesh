@@ -2987,6 +2987,13 @@ MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator,
   dof_id_type next_node_id = this->max_node_id();
   dof_id_type next_elem_id = this->max_elem_id();
 
+  // Make sure we don't screw up contiguous numbering of an input
+#ifndef NDEBUG
+  const bool mesh_was_contiguous =
+    this->max_elem_id() == this->n_elem() &&
+    this->max_node_id() == this->n_nodes();
+#endif
+
   for (auto j : make_range(constraint_operator.n()))
     {
       // If we already have a good node for this then we're done
@@ -3137,6 +3144,11 @@ MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator,
     }
 
   _n_constraint_rows = this->count_constraint_rows();
+
+  // Make sure we didn't screw up contiguous numbering of an input
+  libmesh_assert(!mesh_was_contiguous ||
+                 (this->max_elem_id() == this->n_elem() &&
+                  this->max_node_id() == this->n_nodes()));
 }
 
 
