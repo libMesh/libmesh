@@ -2980,6 +2980,13 @@ MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator,
 
   const subdomain_id_type new_sbd_id = *subdomain_ids.rbegin() + 1;
 
+  // If we're on a DistributedMesh, even when we're serialized the
+  // mesh may try to add new objects using the sparse id rule designed
+  // for distributed additions.  Manually choosing object ids will
+  // avoid creating non-contiguous ids unnecessarily.
+  dof_id_type next_node_id = this->max_node_id();
+  dof_id_type next_elem_id = this->max_elem_id();
+
   for (auto j : make_range(constraint_operator.n()))
     {
       // If we already have a good node for this then we're done
@@ -3026,10 +3033,11 @@ MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator,
       else
         newpt /= total_entries;
 
-      Node *n = this->add_point(newpt);
+      Node *n = this->add_point(newpt, next_node_id++);
       std::unique_ptr<Elem> elem = Elem::build(NODEELEM);
       elem->set_node(0, n);
       elem->subdomain_id() = new_sbd_id;
+      elem->set_id(next_elem_id++);
 
       Elem * added_elem = this->add_elem(std::move(elem));
       this->_elem_dims.insert(0);
