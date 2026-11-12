@@ -140,33 +140,49 @@ int gzstreambuf::sync() {
     return 0;
 }
 
-
-
 /**
- * The following function only works (so far) for reading
- * It was written by John W. Peterson.
+ * Fork-specific function, written by Claude via Roy Stogner.
  */
-gzstreambuf::pos_type gzstreambuf::seekoff(off_type ot,
-					   std::ios::seekdir,
-					   std::ios::openmode)
+gzstreambuf::pos_type gzstreambuf::seekoff(off_type off,
+                                           std::ios::seekdir way,
+                                           std::ios::openmode)
 {
-  // Correlation between C++ and C seek directions
-  // std::ios::beg <==> SEEK_SET
-  // std::ios::cur <==> SEEK_CUR
-  
-  pos_type pos = static_cast<pos_type> ( gzseek(file, ot, SEEK_SET) );
-  
-  // setp() sets the writing pointer.
-  // setg() sets the reading pointer.
+    const pos_type fail(off_type(-1));
+    if (!is_open()) return fail;
 
-  // Set the streambuf's internal pointer.
-  setg( buffer + pos,
-	buffer + pos,
-	buffer + pos);
-  
-  return pos;
+    if (mode & std::ios::out) {                      // write side: tellp() only
+        if (way == std::ios::cur && off == 0)
+            return pos_type(gztell(file) + (pptr() - pbase()));
+        return fail;
+    }
+
+    if (way == std::ios::end) {                      // seekg(0, end): read to EOF
+        if (off != 0) return fail;
+        char scratch[1 << 16];
+        int n;
+        while ((n = gzread(file, scratch, sizeof scratch)) > 0) {}
+        if (n < 0) return fail;
+        setg(buffer + 4, buffer + 4, buffer + 4);
+        return pos_type(gztell(file));
+    }
+
+    const off_type here = gztell(file) - (egptr() - gptr());
+    if (way == std::ios::cur) {
+        if (off == 0) return pos_type(here);         // tellg(), no side effects
+        off += here;
+    }
+    if (off < 0 || gzseek(file, off, SEEK_SET) < 0) return fail;
+    setg(buffer + 4, buffer + 4, buffer + 4);
+    return pos_type(off);
 }
 
+/**
+ * Fork-specific function, written by Claude via Roy Stogner.
+ */
+gzstreambuf::pos_type gzstreambuf::seekpos(pos_type pos, std::ios::openmode which)
+{
+    return seekoff(off_type(pos), std::ios::beg, which);
+}
 
 
   

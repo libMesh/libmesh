@@ -79,13 +79,14 @@ public:
   typedef streamoff off_type;
 #endif
     
-  // Implementation of the seekoff function.
-  // The following function only works (so far) for reading.
-  // It was written by John W. Peterson.
+  // Fork-specific function, written by Claude via Roy Stogner.
   virtual pos_type seekoff(off_type ot,
 			   std::ios::seekdir,
 			   std::ios::openmode);
-  
+
+  // Fork-specific function, written by Claude via Roy Stogner.
+  virtual pos_type seekpos(pos_type pos,
+                           std::ios::openmode which);
 };
 
 class gzstreambase : virtual public std::ios {
