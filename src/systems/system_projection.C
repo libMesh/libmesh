@@ -102,6 +102,7 @@ void convert_from_receive (SendT & received,
 #include "libmesh/dense_vector.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/elem.h"
+#include "libmesh/enum_to_string.h"
 #include "libmesh/fe_base.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/generic_projector.h"
@@ -2201,6 +2202,9 @@ void System::solve_for_unconstrained_dofs(NumericVector<Number> & vec,
   linear_solver->solve(*mat, vec, *rhs,
                        double(this->get_equation_systems().parameters.get<Real>("linear solver tolerance")),
                        this->get_equation_systems().parameters.get<unsigned int>("linear solver maximum iterations"));
+
+  LinearConvergenceReason conv_flag = linear_solver->get_converged_reason();
+  libmesh_error_msg_if(conv_flag < 0, "Projection to unconstrained DoF space failed: " << Utility::enum_to_string(conv_flag) << std::endl);
 }
 
 
