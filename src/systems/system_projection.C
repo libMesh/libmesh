@@ -2179,7 +2179,7 @@ void System::solve_for_unconstrained_dofs(NumericVector<Number> & vec,
           if (d < first_dof)
             continue;
           const std::size_t i = d - first_dof;
-          if (i > n_local_dofs ||
+          if (i >= n_local_dofs ||
               have_added[i])
             continue;
 
@@ -2205,7 +2205,7 @@ void System::solve_for_unconstrained_dofs(NumericVector<Number> & vec,
                   continue;
                 }
               const std::size_t i2 = d2 - first_dof;
-              if (i2 > n_local_dofs)
+              if (i2 >= n_local_dofs)
                 {
                   have_added_ghost.insert(d2);
                   continue;
