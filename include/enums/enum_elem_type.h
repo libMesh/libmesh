@@ -83,6 +83,7 @@ enum ElemType : int {
                C0POLYGON = 39,
                // An arbitrary polyhedron with C0POLYGON sides
                C0POLYHEDRON = 40,
+               QUAD16 = 41,
                // Invalid
                INVALID_ELEM};   // should always be last
 

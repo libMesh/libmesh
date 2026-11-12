@@ -721,6 +721,8 @@ public:
       invalid_uint,  // C0POLYGON
       invalid_uint,  // C0POLYHEDRON
 
+      16, // QUAD16
+
     };
 
   /**

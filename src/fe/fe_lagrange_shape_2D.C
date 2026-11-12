@@ -344,6 +344,7 @@ Real fe_lagrange_2D_shape(const ElemType type,
           case QUADSHELL8:
           case QUAD9:
           case QUADSHELL9:
+          case QUAD16:
             {
               // Compute quad shape functions as a tensor-product
               const Real xi  = p(0);
@@ -476,6 +477,7 @@ Real fe_lagrange_2D_shape(const ElemType type,
             libmesh_fallthrough();
           case QUAD9:
           case QUADSHELL9:
+          case QUAD16:
             {
 
               // Compute quad shape functions as a tensor-product
@@ -579,6 +581,79 @@ Real fe_lagrange_2D_shape(const ElemType type,
                 }
             }
 
+          case QUAD16:
+            {
+              const Real xi  = p(0);
+              const Real eta = p(1);
+
+              // 1D cubic Lagrange shape functions, nodes at -1, +1, -1/3, +1/3
+              const Real xi0  = -9./16.*(xi -1.)*(xi +1./3.)*(xi -1./3.);  // node at xi=-1
+              const Real xi1  =  9./16.*(xi +1.)*(xi +1./3.)*(xi -1./3.);  // node at xi=+1
+              const Real xi2  = 27./16.*(xi +1.)*(xi -1.)*(xi -1./3.);     // node at xi=-1/3
+              const Real xi3  = -27./16.*(xi +1.)*(xi -1.)*(xi +1./3.);    // node at xi=+1/3
+
+              const Real eta0 = -9./16.*(eta-1.)*(eta+1./3.)*(eta-1./3.);  // node at eta=-1
+              const Real eta1 =  9./16.*(eta+1.)*(eta+1./3.)*(eta-1./3.);  // node at eta=+1
+              const Real eta2 = 27./16.*(eta+1.)*(eta-1.)*(eta-1./3.);     // node at eta=-1/3
+              const Real eta3 = -27./16.*(eta+1.)*(eta-1.)*(eta+1./3.);    // node at eta=+1/3
+
+              libmesh_assert_less (i, 16);
+
+              switch(i)
+                {
+                case 0:
+                  return xi0*eta0;
+
+                case 1:
+                  return xi1*eta0;
+
+                case 2:
+                  return xi1*eta1;
+
+                case 3:
+                  return xi0*eta1;
+
+                case 4:
+                  return xi2*eta0;
+
+                case 5:
+                  return xi3*eta0;
+
+                case 6:
+                  return xi1*eta2;
+
+                case 7:
+                  return xi1*eta3;
+
+                case 8:
+                  return xi3*eta1;
+
+                case 9:
+                  return xi2*eta1;
+
+                case 10:
+                  return xi0*eta3;
+
+                case 11:
+                  return xi0*eta2;
+
+                case 12:
+                  return xi2*eta2;
+
+                case 13:
+                  return xi3*eta2;
+
+                case 14:
+                  return xi3*eta3;
+
+                case 15:
+                  return xi2*eta3;
+
+                default:
+                  libmesh_error_msg("Invalid shape function index i = " << i);
+                }
+            }
+
           default:
             libmesh_error_msg("ERROR: Unsupported 2D element type: " << Utility::enum_to_string(type));
           }
@@ -623,6 +698,7 @@ Real fe_lagrange_2D_shape_deriv(const ElemType type,
           case QUADSHELL8:
           case QUAD9:
           case QUADSHELL9:
+          case QUAD16:
             {
               // Compute quad shape functions as a tensor-product
               const Real xi  = p(0);
@@ -885,6 +961,7 @@ Real fe_lagrange_2D_shape_deriv(const ElemType type,
             libmesh_fallthrough();
           case QUAD9:
           case QUADSHELL9:
+          case QUAD16:
             {
               // Compute quad shape functions as a tensor-product
               const Real xi  = p(0);
@@ -1089,7 +1166,90 @@ Real fe_lagrange_2D_shape_deriv(const ElemType type,
                 default:
                   libmesh_error_msg("ERROR: Invalid derivative index j = " << j);
                 }
-            }
+            } //end TRI7
+            case QUAD16:
+              {
+                const Real xi  = p(0);
+                const Real eta = p(1);
+
+                // 1D cubic Lagrange shape functions, nodes at -1, +1, -1/3, +1/3
+                const Real xi0  = -9./16.*(xi -1.)*(xi +1./3.)*(xi -1./3.);
+                const Real xi1  =  9./16.*(xi +1.)*(xi +1./3.)*(xi -1./3.);
+                const Real xi2  = 27./16.*(xi +1.)*(xi -1.)*(xi -1./3.);
+                const Real xi3  = -27./16.*(xi +1.)*(xi -1.)*(xi +1./3.);
+
+                const Real eta0 = -9./16.*(eta-1.)*(eta+1./3.)*(eta-1./3.);
+                const Real eta1 =  9./16.*(eta+1.)*(eta+1./3.)*(eta-1./3.);
+                const Real eta2 = 27./16.*(eta+1.)*(eta-1.)*(eta-1./3.);
+                const Real eta3 = -27./16.*(eta+1.)*(eta-1.)*(eta+1./3.);
+
+                // Derivatives of the above w.r.t. their own argument
+                const Real dxi0  = -27./16.*xi*xi  + 9./8.*xi + 1./16.;
+                const Real dxi1  =  27./16.*xi*xi  + 9./8.*xi - 1./16.;
+                const Real dxi2  =  81./16.*xi*xi  - 9./8.*xi - 27./16.;
+                const Real dxi3  = -81./16.*xi*xi  - 9./8.*xi + 27./16.;
+
+                const Real deta0 = -27./16.*eta*eta + 9./8.*eta + 1./16.;
+                const Real deta1 =  27./16.*eta*eta + 9./8.*eta - 1./16.;
+                const Real deta2 =  81./16.*eta*eta - 9./8.*eta - 27./16.;
+                const Real deta3 = -81./16.*eta*eta - 9./8.*eta + 27./16.;
+
+                libmesh_assert_less (i, 16);
+
+                switch (j)
+                  {
+                  case 0: // d()/dxi
+                    switch (i)
+                      {
+                      case 0:  return dxi0*eta0;
+                      case 1:  return dxi1*eta0;
+                      case 2:  return dxi1*eta1;
+                      case 3:  return dxi0*eta1;
+                      case 4:  return dxi2*eta0;
+                      case 5:  return dxi3*eta0;
+                      case 6:  return dxi1*eta2;
+                      case 7:  return dxi1*eta3;
+                      case 8:  return dxi3*eta1;
+                      case 9:  return dxi2*eta1;
+                      case 10: return dxi0*eta3;
+                      case 11: return dxi0*eta2;
+                      case 12: return dxi2*eta2;
+                      case 13: return dxi3*eta2;
+                      case 14: return dxi3*eta3;
+                      case 15: return dxi2*eta3;
+
+                      default:
+                        libmesh_error_msg("Invalid shape function index i = " << i);
+                      }
+
+                  case 1: // d()/deta
+                    switch (i)
+                      {
+                      case 0:  return xi0*deta0;
+                      case 1:  return xi1*deta0;
+                      case 2:  return xi1*deta1;
+                      case 3:  return xi0*deta1;
+                      case 4:  return xi2*deta0;
+                      case 5:  return xi3*deta0;
+                      case 6:  return xi1*deta2;
+                      case 7:  return xi1*deta3;
+                      case 8:  return xi3*deta1;
+                      case 9:  return xi2*deta1;
+                      case 10: return xi0*deta3;
+                      case 11: return xi0*deta2;
+                      case 12: return xi2*deta2;
+                      case 13: return xi3*deta2;
+                      case 14: return xi3*deta3;
+                      case 15: return xi2*deta3;
+
+                      default:
+                        libmesh_error_msg("Invalid shape function index i = " << i);
+                      }
+
+                  default:
+                    libmesh_error_msg("Invalid derivative index j = " << j);
+                  }
+              } //end case QUAD16
 
           default:
             libmesh_error_msg("ERROR: Unsupported 2D element type: " << Utility::enum_to_string(type));
@@ -1587,6 +1747,32 @@ Real fe_lagrange_2D_shape_second_deriv(const ElemType type,
                   libmesh_error_msg("ERROR: Invalid derivative index j = " << j);
                 } // end switch (j)
             }  // end case TRI6+TRI7
+            case QUAD16:
+              {
+                const Real xi  = p(0);
+                const Real eta = p(1);
+
+                libmesh_assert_less (i, 16);
+
+                static const unsigned int i0[] = {0,1,1,0, 2,3, 1,1, 3,2, 0,0, 2,3,3,2};
+                static const unsigned int i1[] = {0,0,1,1, 0,0, 2,3, 1,1, 3,2, 2,2,3,3};
+
+                switch (j)
+                  {
+                  case 0:  // d^2/dxi^2
+                    return (fe_lagrange_1D_cubic_shape_second_deriv(i0[i], 0, xi)*
+                            fe_lagrange_1D_cubic_shape(i1[i], eta));
+                  case 1:  // d^2/dxi deta
+                    return (fe_lagrange_1D_cubic_shape_deriv(i0[i], 0, xi)*
+                            fe_lagrange_1D_cubic_shape_deriv(i1[i], 0, eta));
+                  case 2:  // d^2/deta^2
+                    return (fe_lagrange_1D_cubic_shape(i0[i], xi)*
+                            fe_lagrange_1D_cubic_shape_second_deriv(i1[i], 0, eta));
+                  default:
+                    libmesh_error_msg("Invalid j = " << j);
+                  }
+
+              } // end case QUAD16
 
           default:
             libmesh_error_msg("ERROR: Unsupported 2D element type: " << Utility::enum_to_string(type));
