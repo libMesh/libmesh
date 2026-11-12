@@ -25,7 +25,6 @@
 
 // C++ Includes
 #include <memory>
-#include <typeinfo>
 
 
 namespace libMesh
@@ -76,20 +75,18 @@ std::unique_ptr<PeriodicBoundaryBase> PeriodicBoundary::clone(TransformationType
 
 bool PeriodicBoundary::same_mapping(const PeriodicBoundaryBase & other) const
 {
-  // A derived class may override get_corresponding_pos() or add
-  // state, so only objects whose dynamic type is exactly
-  // PeriodicBoundary map by translation alone
-  if (typeid(*this) != typeid(PeriodicBoundary) ||
-      typeid(other) != typeid(PeriodicBoundary))
+#ifndef LIBMESH_HAVE_RTTI
+  libmesh_ignore(other);
+  return false;
+#else
+  const auto * const other_pb = dynamic_cast<const PeriodicBoundary *>(&other);
+  if (!other_pb)
     return false;
 
-  // The typeid test makes this cast safe.  The translation comparison
-  // is exact: a false result only costs a redundant neighbor search.
-
-  const auto & o = static_cast<const PeriodicBoundary &>(other);
-  return myboundary == o.myboundary &&
-    pairedboundary == o.pairedboundary &&
-    translation_vector == o.translation_vector;
+  return myboundary == other_pb->myboundary &&
+    pairedboundary == other_pb->pairedboundary &&
+    translation_vector == other_pb->translation_vector;
+#endif
 }
 
 

@@ -69,7 +69,7 @@ public:
    * define how one finds corresponding nodes on the periodic
    * boundary pair.
    */
-  virtual Point get_corresponding_pos(const Point & pt) const override;
+  virtual Point get_corresponding_pos(const Point & pt) const override final;
 
   /**
    * If we want the DofMap to be able to make copies of references and
@@ -79,9 +79,9 @@ public:
   virtual std::unique_ptr<PeriodicBoundaryBase> clone(TransformationType t = FORWARD) const override;
 
   /**
-   * \returns \p true if this object and \p other are both exactly
-   * PeriodicBoundary, i.e. neither is an object of a derived class, and
-   * they have the same boundary ids and translation vector.
+   * \returns \p true if \p other is a PeriodicBoundary with the same
+   * boundary ids and translation vector.  Without RTTI, this returns
+   * \p false.
    */
   virtual bool same_mapping(const PeriodicBoundaryBase & other) const override;
 
