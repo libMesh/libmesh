@@ -2177,7 +2177,7 @@ void System::solve_for_unconstrained_dofs(NumericVector<Number> & vec,
         {
           if (d < first_dof)
             continue;
-          std::size_t i = d - first_dof;
+          const std::size_t i = d - first_dof;
           if (i > n_local_dofs ||
               have_added[i])
             continue;
