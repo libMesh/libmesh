@@ -389,7 +389,7 @@ void UCDIO::write_soln(std::ostream & out_stream,
   // Now, for each node, write out the solution variables.
   // We use a 1-based node numbering for UCD.
   std::size_t nv = names.size();
-  for (auto n : IntRange<std::size_t>(1, mesh.n_nodes()))
+  for (auto n : IntRange<std::size_t>(1, mesh.n_nodes()+1))
     {
       libmesh_assert (out_stream.good());
       out_stream << n;
