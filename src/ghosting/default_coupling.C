@@ -27,6 +27,7 @@
 #include "libmesh/libmesh_logging.h"
 
 // C++ Includes
+#include <algorithm>
 #include <unordered_set>
 
 namespace libMesh
@@ -55,7 +56,10 @@ void DefaultCoupling::mesh_reinit()
   // Unless we have periodic boundary conditions, we don't need
   // anything precomputed.
 #ifdef LIBMESH_ENABLE_PERIODIC
-  if (this->periodic_boundaries_used(_periodic_bcs).empty())
+  const std::vector<const PeriodicBoundaries *> & periodic_bc_sets =
+    this->periodic_boundary_sets();
+  if (std::none_of(periodic_bc_sets.begin(), periodic_bc_sets.end(),
+                   [](const PeriodicBoundaries * pbs) { return !pbs->empty(); }))
     return;
 #endif
 
@@ -86,12 +90,11 @@ void DefaultCoupling::operator()
   //libmesh_assert(_mesh);
 
 #ifdef LIBMESH_ENABLE_PERIODIC
-  const std::vector<const PeriodicBoundaries *> periodic_bc_sets =
-    this->periodic_boundaries_used(_periodic_bcs);
-  bool check_periodic_bcs = !periodic_bc_sets.empty();
-
-  // A side with a regular neighbor is examined once, without periodic boundaries
-  const std::vector<const PeriodicBoundaries *> no_periodic_bcs {nullptr};
+  const std::vector<const PeriodicBoundaries *> & periodic_bc_sets =
+    this->periodic_boundary_sets();
+  const bool check_periodic_bcs =
+    std::any_of(periodic_bc_sets.begin(), periodic_bc_sets.end(),
+                [](const PeriodicBoundaries * pbs) { return !pbs->empty(); });
 
   std::unique_ptr<PointLocatorBase> point_locator;
   if (check_periodic_bcs)
@@ -132,27 +135,12 @@ void DefaultCoupling::operator()
           if (elem->processor_id() != p)
             coupled_elements.emplace(elem, _dof_coupling);
 
-          for (auto s : elem->side_index_range())
-#ifdef LIBMESH_ENABLE_PERIODIC
-            // A side without a regular neighbor may have a periodic
-            // neighbor for each periodic boundary set
-            for (const auto periodic_bcs :
-                   (!elem->neighbor_ptr(s) && check_periodic_bcs) ?
-                   periodic_bc_sets : no_periodic_bcs)
-#endif
+          // Couples to the active descendants of neigh on our side.
+          // A non-null periodic_bcs means neigh is a periodic neighbor.
+          auto couple_neighbor = [&](const Elem * const neigh,
+                                     const PeriodicBoundaries * const periodic_bcs)
             {
-              const Elem * neigh = elem->neighbor_ptr(s);
-
-#ifdef LIBMESH_ENABLE_PERIODIC
-              // We might still have a periodic neighbor here
-              if (periodic_bcs)
-                {
-                  libmesh_assert(_mesh);
-
-                  neigh = elem->topological_neighbor
-                    (s, *_mesh, *point_locator, periodic_bcs);
-                }
-#endif
+              libmesh_ignore(periodic_bcs);
 
               // With no regular *or* periodic neighbors we have nothing
               // to do. *Or* Mesh ghosting might ask us about what we want to
@@ -160,18 +148,18 @@ void DefaultCoupling::operator()
               // non-local elements might have remote neighbors, and
               // if they do then we can't say anything about them.
               if (!neigh || neigh == remote_elem)
-                continue;
+                return;
 
               // With any kind of neighbor, we need to couple to all the
               // active descendants on our side.
 #ifdef LIBMESH_ENABLE_AMR
-              if (neigh == elem->neighbor_ptr(s))
-                neigh->active_family_tree_by_neighbor(active_neighbors,elem);
 #  ifdef LIBMESH_ENABLE_PERIODIC
-              else
+              if (periodic_bcs)
                 neigh->active_family_tree_by_topological_neighbor
                   (active_neighbors,elem,*_mesh,*point_locator,periodic_bcs);
+              else
 #  endif
+                neigh->active_family_tree_by_neighbor(active_neighbors,elem);
 #else
               active_neighbors.clear();
               active_neighbors.push_back(neigh);
@@ -185,6 +173,24 @@ void DefaultCoupling::operator()
                   if (neighbor->processor_id() != p)
                     coupled_elements.emplace(neighbor, _dof_coupling);
                 }
+            };
+
+          for (auto s : elem->side_index_range())
+            {
+              if (const Elem * const neigh = elem->neighbor_ptr(s))
+                couple_neighbor(neigh, nullptr);
+#ifdef LIBMESH_ENABLE_PERIODIC
+              // We might still have a periodic neighbor here, for each
+              // periodic boundary set
+              else if (check_periodic_bcs)
+                for (const auto periodic_bcs : periodic_bc_sets)
+                  {
+                    libmesh_assert(_mesh);
+                    couple_neighbor(elem->topological_neighbor
+                                      (s, *_mesh, *point_locator, periodic_bcs),
+                                    periodic_bcs);
+                  }
+#endif
             }
         }
     }

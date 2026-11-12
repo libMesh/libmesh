@@ -1615,10 +1615,15 @@ public:
    */
   bool is_periodic_boundary (const boundary_id_type boundaryid) const;
 
-  PeriodicBoundaries * get_periodic_boundaries()
-  {
-    return _periodic_boundaries.get();
-  }
+#ifdef LIBMESH_ENABLE_DEPRECATED
+  /**
+   * This method is deprecated.  Changes through the returned pointer
+   * bypass the DofMap, so mesh data that depends on the set can go
+   * out of date. Use add_periodic_boundary() to change the set, and
+   * the const overload of \p get_periodic_boundaries() to read it.
+   */
+  PeriodicBoundaries * get_periodic_boundaries();
+#endif
 
   const PeriodicBoundaries * get_periodic_boundaries() const
   {

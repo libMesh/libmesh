@@ -21,6 +21,8 @@
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
 
+#include <utility>
+
 
 using namespace libMesh;
 
@@ -322,7 +324,7 @@ private:
     auto two_layers = std::make_shared<DefaultCoupling>();
     two_layers->set_mesh(&mesh);
     two_layers->set_n_levels(2);
-    two_layers->set_periodic_boundaries(sys.get_dof_map().get_periodic_boundaries());
+    two_layers->set_periodic_boundaries(std::as_const(sys.get_dof_map()).get_periodic_boundaries());
     mesh.add_ghosting_functor(two_layers);
 
     MeshTools::Generation::build_square(mesh, 4, 8, 0., 1., 0., 1., QUAD4);
@@ -374,8 +376,9 @@ private:
     if (replace_default_ghosting)
       {
         es.enable_default_ghosting(false);
-        mesh.add_ghosting_functor(std::make_shared<GhostPointNeighbors>(mesh),
-                                  /*use_all_pbcs=*/true);
+        auto ghosting = std::make_shared<GhostPointNeighbors>(mesh);
+        ghosting->use_mesh_periodic_boundaries(true);
+        mesh.add_ghosting_functor(ghosting);
       }
 
     mesh.allow_remote_element_removal(true);

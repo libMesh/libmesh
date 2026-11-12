@@ -135,11 +135,9 @@ public:
    * only safe for codes where no evaluations on neighbor cells (e.g.
    * no jump error estimators) are done.
    *
-   * Periodic constraints on a distributed mesh need every element
-   * point neighbor of a periodic vertex and its image.  The default
-   * ghosting functor ghosts those elements.  A functor that replaces
-   * it should also ghost them, and the functor should be added with
-   * MeshBase::add_ghosting_functor() with \p use_all_pbcs = true.
+   * Periodic constraints on a distributed mesh currently need every
+   * element point neighbor of a periodic vertex and its image.  The
+   * default ghosting functor ghosts those elements.
    */
   virtual void enable_default_ghosting (bool enable);
 

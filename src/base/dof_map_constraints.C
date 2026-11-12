@@ -5730,6 +5730,8 @@ void DofMap::add_periodic_boundary (const PeriodicBoundaryBase & boundary,
       libmesh_assert(typeid(inverse_boundary) == typeid(*existing_inverse_boundary));
 #endif
     }
+
+  _mesh.invalidate_periodic_boundary_sets();
 }
 
 

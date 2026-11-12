@@ -27,6 +27,7 @@
 #endif
 
 // C++ Includes
+#include <algorithm>
 #include <unordered_set>
 #include <set>
 #include <vector>
@@ -43,9 +44,11 @@ void GhostPointNeighbors::operator()
   libmesh_assert(_mesh);
 
 #ifdef LIBMESH_ENABLE_PERIODIC
-  const std::vector<const PeriodicBoundaries *> periodic_bc_sets =
-    this->periodic_boundaries_used(_periodic_bcs);
-  const bool check_periodic_bcs = !periodic_bc_sets.empty();
+  const std::vector<const PeriodicBoundaries *> & periodic_bc_sets =
+    this->periodic_boundary_sets();
+  const bool check_periodic_bcs =
+    std::any_of(periodic_bc_sets.begin(), periodic_bc_sets.end(),
+                [](const PeriodicBoundaries * pbs) { return !pbs->empty(); });
 
   auto * db = _mesh->get_disjoint_neighbor_boundary_pairs();
   const bool check_disjoint_bcs = (db && !db->empty());
@@ -227,8 +230,11 @@ void GhostPointNeighbors::mesh_reinit()
   // Unless we have periodic boundary conditions, we don't need
   // anything precomputed.
 #ifdef LIBMESH_ENABLE_PERIODIC
+  const std::vector<const PeriodicBoundaries *> & periodic_bc_sets =
+    this->periodic_boundary_sets();
   const bool check_periodic_bcs =
-    !this->periodic_boundaries_used(_periodic_bcs).empty();
+    std::any_of(periodic_bc_sets.begin(), periodic_bc_sets.end(),
+                [](const PeriodicBoundaries * pbs) { return !pbs->empty(); });
 
   auto * db = _mesh->get_disjoint_neighbor_boundary_pairs();
   const bool check_disjoint_bcs = (db && !db->empty());
