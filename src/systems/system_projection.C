@@ -102,6 +102,7 @@ void convert_from_receive (SendT & received,
 #include "libmesh/dense_vector.h"
 #include "libmesh/dof_map.h"
 #include "libmesh/elem.h"
+#include "libmesh/enum_to_string.h"
 #include "libmesh/fe_base.h"
 #include "libmesh/fe_interface.h"
 #include "libmesh/generic_projector.h"
@@ -2157,6 +2158,7 @@ void System::solve_for_unconstrained_dofs(NumericVector<Number> & vec,
   // efficiency
   std::size_t n_local_dofs = dof_map.n_local_dofs();
   std::vector<bool> have_added(n_local_dofs, false);
+  std::set<dof_id_type> have_added_ghost;
   std::size_t first_dof = dof_map.first_dof();
 
   std::vector<dof_id_type> di;
@@ -2176,8 +2178,8 @@ void System::solve_for_unconstrained_dofs(NumericVector<Number> & vec,
         {
           if (d < first_dof)
             continue;
-          std::size_t i = d - first_dof;
-          if (i > n_local_dofs ||
+          const std::size_t i = d - first_dof;
+          if (i >= n_local_dofs ||
               have_added[i])
             continue;
 
@@ -2191,8 +2193,61 @@ void System::solve_for_unconstrained_dofs(NumericVector<Number> & vec,
           mat->add_matrix(K, dof_indices);
           rhs->add_vector(F, dof_indices);
 
-          have_added[i] = true;
+          // Keep track of both constrained and constraining additions
+          // to mat, so we can fix any "leftovers" later.  Otherwise if
+          // someone puts a non-constraining DoF on a spline node we
+          // end up with a singular system.
+          for (auto d2 : dof_indices)
+            {
+              if (d2 < first_dof)
+                {
+                  have_added_ghost.insert(d2);
+                  continue;
+                }
+              const std::size_t i2 = d2 - first_dof;
+              if (i2 >= n_local_dofs)
+                {
+                  have_added_ghost.insert(d2);
+                  continue;
+                }
+
+              have_added[i2] = true;
+            }
         }
+    }
+
+  std::unordered_map<processor_id_type, std::vector<dof_id_type>> adds_to_push;
+  processor_id_type p=0;
+  dof_id_type end_p_dof = dof_map.end_dof(0);
+  for (auto d : have_added_ghost)
+    {
+      while (d >= end_p_dof)
+        {
+          ++p;
+          end_p_dof = dof_map.end_dof(p);
+        }
+      adds_to_push[p].push_back(d);
+    }
+
+  auto act_on_adds = [&have_added, first_dof]
+    (processor_id_type, const std::vector<dof_id_type> & dofs)
+    {
+      for (auto d : dofs)
+        have_added[d-first_dof] = true;
+    };
+
+  Parallel::push_parallel_vector_data
+    (this->comm(), adds_to_push, act_on_adds);
+
+  // Pin any unconstraining DoFs that lived on spline nodes
+  for (auto i : index_range(have_added))
+    {
+      if (have_added[i])
+        continue;
+
+      const std::size_t d = i + first_dof;
+      mat->add(d, d, 1);
+      rhs->add(d, (*this->solution)(d));
     }
 
   std::unique_ptr<LinearSolver<Number>> linear_solver =
@@ -2201,6 +2256,9 @@ void System::solve_for_unconstrained_dofs(NumericVector<Number> & vec,
   linear_solver->solve(*mat, vec, *rhs,
                        double(this->get_equation_systems().parameters.get<Real>("linear solver tolerance")),
                        this->get_equation_systems().parameters.get<unsigned int>("linear solver maximum iterations"));
+
+  LinearConvergenceReason conv_flag = linear_solver->get_converged_reason();
+  libmesh_error_msg_if(conv_flag < 0, "Projection to unconstrained DoF space failed: " << Utility::enum_to_string(conv_flag) << std::endl);
 }
 
 
