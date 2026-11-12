@@ -24,6 +24,10 @@
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
 
+#ifdef LIBMESH_HAVE_GZSTREAM
+# include "gzstream.h"
+#endif
+
 #include <regex>
 
 using namespace libMesh;
@@ -210,6 +214,9 @@ public:
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST( testGoodSTL );
   CPPUNIT_TEST( testGoodSTLBinary );
+#ifdef LIBMESH_HAVE_GZSTREAM
+  CPPUNIT_TEST( testGoodSTLGzipped );
+#endif
 
   CPPUNIT_TEST( testUCDWriteNodalData );
 
@@ -1998,6 +2005,41 @@ public:
     CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(426));
     CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), dof_id_type(215));
   }
+
+#ifdef LIBMESH_HAVE_GZSTREAM
+  void testSTLGzipped (const std::string & basename,
+                       dof_id_type n_elem,
+                       dof_id_type n_nodes)
+  {
+    Mesh mesh(*TestCommWorld);
+
+    STLIO stl_io(mesh);
+
+    if (mesh.processor_id() == 0)
+      {
+        const std::string gz_name = basename + "_test.stl.gz";
+        {
+          std::ifstream in("meshes/" + basename + ".stl", std::ios::binary);
+          ogzstream out(gz_name.c_str());
+          out << in.rdbuf();
+        }
+        stl_io.read(gz_name);
+      }
+    MeshCommunication().broadcast(mesh);
+
+    CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), n_elem);
+    CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), n_nodes);
+  }
+
+  void testGoodSTLGzipped ()
+  {
+    LOG_UNIT_TEST;
+
+    // Gzipped copies of the ASCII and the binary test files
+    testSTLGzipped("Cluster_34", 40, 60);
+    testSTLGzipped("engraving", 426, 215);
+  }
+#endif
 
   void testUCDWriteNodalData ()
   {
