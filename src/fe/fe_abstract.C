@@ -475,6 +475,28 @@ void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point> 
         nodes[2] = Point (0.,1.,0.);
         return;
       }
+    case QUAD16:
+      {
+        const Real third = Real(1)/3;
+
+        nodes[4]  = Point (-third,-1.,0.);
+        nodes[5]  = Point ( third,-1.,0.);
+
+        nodes[6]  = Point ( 1.,-third,0.);
+        nodes[7]  = Point ( 1., third,0.);
+
+        nodes[8]  = Point ( third, 1.,0.);
+        nodes[9]  = Point (-third, 1.,0.);
+
+        nodes[10] = Point (-1., third,0.);
+        nodes[11] = Point (-1.,-third,0.);
+
+        nodes[12] = Point (-third,-third,0.);
+        nodes[13] = Point ( third,-third,0.);
+        nodes[14] = Point ( third, third,0.);
+        nodes[15] = Point (-third, third,0.);
+        libmesh_fallthrough();
+      }
     case QUAD9:
     case QUADSHELL9:
       {

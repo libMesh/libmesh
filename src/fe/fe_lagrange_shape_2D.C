@@ -1747,6 +1747,32 @@ Real fe_lagrange_2D_shape_second_deriv(const ElemType type,
                   libmesh_error_msg("ERROR: Invalid derivative index j = " << j);
                 } // end switch (j)
             }  // end case TRI6+TRI7
+            case QUAD16:
+              {
+                const Real xi  = p(0);
+                const Real eta = p(1);
+
+                libmesh_assert_less (i, 16);
+
+                static const unsigned int i0[] = {0,1,1,0, 2,3, 1,1, 3,2, 0,0, 2,3,3,2};
+                static const unsigned int i1[] = {0,0,1,1, 0,0, 2,3, 1,1, 3,2, 2,2,3,3};
+
+                switch (j)
+                  {
+                  case 0:  // d^2/dxi^2
+                    return (fe_lagrange_1D_cubic_shape_second_deriv(i0[i], 0, xi)*
+                            fe_lagrange_1D_cubic_shape(i1[i], eta));
+                  case 1:  // d^2/dxi deta
+                    return (fe_lagrange_1D_cubic_shape_deriv(i0[i], 0, xi)*
+                            fe_lagrange_1D_cubic_shape_deriv(i1[i], 0, eta));
+                  case 2:  // d^2/deta^2
+                    return (fe_lagrange_1D_cubic_shape(i0[i], xi)*
+                            fe_lagrange_1D_cubic_shape_second_deriv(i1[i], 0, eta));
+                  default:
+                    libmesh_error_msg("Invalid j = " << j);
+                  }
+
+              } // end case QUAD16
 
           default:
             libmesh_error_msg("ERROR: Unsupported 2D element type: " << Utility::enum_to_string(type));
