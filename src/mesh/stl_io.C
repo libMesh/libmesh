@@ -203,29 +203,16 @@ void STLIO::read (const std::string & filename)
         }
     }
 
-  // Our gzstream wrapper can't seek, so we reopen a gzipped file
-  // rather than rewinding it.
-  const bool gzipped_file = Utility::ends_with(filename, ".gz");
-  if (gzipped_file)
-    fstream = this->open_file(filename);
-
   if (is_ascii_stl)
     {
-      if (!gzipped_file)
-        fstream->seekg(0);
+      fstream->seekg(0);
       this->read_ascii(*fstream);
     }
   else if (is_binary_stl)
     {
-      // We don't know the uncompressed size of a gzipped file, and
-      // read_binary() skips its size check when given 0.
-      std::size_t length = 0;
-      if (!gzipped_file)
-        {
-          fstream->seekg(0, std::ios_base::end);
-          length = fstream->tellg();
-          fstream->seekg(0);
-        }
+      fstream->seekg(0, std::ios_base::end);
+      std::size_t length = fstream->tellg();
+      fstream->seekg(0);
       this->read_binary(*fstream, length);
     }
   else
