@@ -2192,8 +2192,24 @@ void System::solve_for_unconstrained_dofs(NumericVector<Number> & vec,
           mat->add_matrix(K, dof_indices);
           rhs->add_vector(F, dof_indices);
 
-          have_added[i] = true;
+          // Keep track of both constrained and constraining additions
+          // to mat, so we can fix any "leftovers" later.  Otherwise if
+          // someone puts a non-constraining DoF on a spline node we
+          // end up with a singular system.
+          for (auto j : dof_indices)
+            have_added[j] = true;
         }
+    }
+
+  // Pin any unconstraining DoFs that lived on spline nodes
+  for (auto i : index_range(have_added))
+    {
+      if (have_added[i])
+        continue;
+
+      const std::size_t d = i + first_dof;
+      mat->add(d, d, 1);
+      rhs->add(d, (*this->solution)(d));
     }
 
   std::unique_ptr<LinearSolver<Number>> linear_solver =
