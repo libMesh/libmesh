@@ -80,6 +80,9 @@ public:
   // Set PeriodicBoundaries to couple
   void set_periodic_boundaries(const PeriodicBoundaries * periodic_bcs) override
   { _periodic_bcs = periodic_bcs; }
+
+  const PeriodicBoundaries * get_periodic_boundaries() override
+  { return _periodic_bcs; }
 #endif
 
   /**

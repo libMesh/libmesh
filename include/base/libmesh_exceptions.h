@@ -219,8 +219,10 @@ public:
 #define libmesh_noexcept noexcept
 
 #if LIBMESH_IN_DEVICE_CODE
-// Kokkos device code does not support C++ exceptions.
-#define LIBMESH_THROW(e) do { LIBMESH_DEVICE_ERROR_MSG((e).what()); } while (0)
+// Kokkos device code does not support C++ exceptions. The exception
+// expression is reported as text rather than constructed, since the
+// exception classes are host-only.
+#define LIBMESH_THROW(e) do { LIBMESH_DEVICE_ERROR_MSG(e); } while (0)
 #else
 #define LIBMESH_THROW(e) do { throw e; } while (0)
 #endif
@@ -232,7 +234,7 @@ public:
 #else
 
 #if LIBMESH_IN_DEVICE_CODE
-#define LIBMESH_THROW(e) do { LIBMESH_DEVICE_ERROR_MSG((e).what()); } while (0)
+#define LIBMESH_THROW(e) do { LIBMESH_DEVICE_ERROR_MSG(e); } while (0)
 #else
 #define LIBMESH_THROW(e) do { libMesh::err << e.what(); libMesh::libmesh_abort(); } while (0)
 #endif

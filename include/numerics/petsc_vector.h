@@ -751,6 +751,7 @@ void PetscVector<T>::init (const numeric_index_type n,
     {
       LibmeshPetscCallA(PETSC_COMM_SELF, VecCreate(PETSC_COMM_SELF, &_vec));
       LibmeshPetscCallA(PETSC_COMM_SELF, VecSetSizes(_vec, petsc_n, petsc_n));
+      LibmeshPetscCallA(PETSC_COMM_SELF, VecSetOptionsPrefix(_vec, this->options_prefix().c_str()));
       LibmeshPetscCallA(PETSC_COMM_SELF, VecSetFromOptions (_vec));
     }
   // or create an MPI-enabled PARALLEL vector w/o ghosting if asked
@@ -767,6 +768,7 @@ void PetscVector<T>::init (const numeric_index_type n,
       LibmeshPetscCallA(PETSC_COMM_SELF, VecCreate(PETSC_COMM_SELF, &_vec));
       LibmeshPetscCallA(PETSC_COMM_SELF, VecSetSizes(_vec, petsc_n, petsc_n));
 #endif
+      LibmeshPetscCall(VecSetOptionsPrefix(_vec, this->options_prefix().c_str()));
       LibmeshPetscCall(VecSetFromOptions(_vec));
     }
   // or yell because we don't know what to do
@@ -855,6 +857,7 @@ void PetscVector<T>::init (const numeric_index_type n,
   // nonghosted vector when using a petsc option.
   // PETSc does not fully support VecGhost on GPU yet. This change allows us to
   // trigger a nonghosted vector to use GPU without bothering the ghosted vectors.
+  LibmeshPetscCall(VecSetOptionsPrefix(_vec, this->options_prefix().c_str()));
   LibmeshPetscCall(PetscObjectAppendOptionsPrefix((PetscObject)_vec,"ghost_"));
 
   LibmeshPetscCall(VecSetFromOptions (_vec));
@@ -899,6 +902,11 @@ void PetscVector<T>::init (const NumericVector<T> & other,
 
   // We want to have a valid Vec, even if it's initially of size zero
   LibmeshPetscCall(VecDuplicate (v._vec, &this->_vec));
+  // VecDuplicate() keeps the type but not the options prefix
+  const char * prefix;
+  LibmeshPetscCall(PetscObjectGetOptionsPrefix((PetscObject)v._vec, &prefix));
+  LibmeshPetscCall(PetscObjectSetOptionsPrefix((PetscObject)this->_vec, prefix));
+  this->_options_prefix = v._options_prefix;
 
   if (fast == false)
     this->zero ();

@@ -922,7 +922,7 @@ template <typename T>
 LIBMESH_DEVICE_INLINE
 auto TypeVector<T>::norm() const
 {
-  using std::sqrt;
+  using portable_math::sqrt;
 
   // The norm is not differentiable at the origin: the directional
   // derivative there depends on the direction of approach, so there is no
@@ -974,26 +974,26 @@ auto TypeVector<T>::norm_sq() const
 // generic norm() above for these scalar types to avoid the extra branch in
 // the common case.
 template <>
-inline
+LIBMESH_DEVICE_INLINE
 auto TypeVector<float>::norm() const
 {
-  using std::sqrt;
+  using portable_math::sqrt;
   return sqrt(this->norm_sq());
 }
 
 template <>
-inline
+LIBMESH_DEVICE_INLINE
 auto TypeVector<double>::norm() const
 {
-  using std::sqrt;
+  using portable_math::sqrt;
   return sqrt(this->norm_sq());
 }
 
 template <>
-inline
+LIBMESH_DEVICE_INLINE
 auto TypeVector<long double>::norm() const
 {
-  using std::sqrt;
+  using portable_math::sqrt;
   return sqrt(this->norm_sq());
 }
 
@@ -1002,10 +1002,10 @@ auto TypeVector<long double>::norm() const
 // and long double, so it needs its own specialization to get the same
 // unbranched treatment as the other scalar types above.
 template <>
-inline
+LIBMESH_DEVICE_INLINE
 auto TypeVector<Real>::norm() const
 {
-  using std::sqrt;
+  using portable_math::sqrt;
   return sqrt(this->norm_sq());
 }
 #endif
@@ -1030,7 +1030,7 @@ LIBMESH_DEVICE_INLINE
 auto
 TypeVector<T>::l1_norm() const
 {
-  using std::abs;
+  using portable_math::abs;
   decltype(abs(T())) ret{};
   for (const auto i : make_range(libmesh_dim))
     ret += abs(_coords[i]);
@@ -1123,7 +1123,7 @@ T solid_angle(const TypeVector<T> & v01,
               const TypeVector<T> & v02,
               const TypeVector<T> & v03)
 {
-  using std::atan;
+  using portable_math::atan;
 
   const Real norm01 = v01.norm(),
              norm02 = v02.norm(),
@@ -1200,7 +1200,7 @@ LIBMESH_DEVICE_INLINE
 T cross_norm(const TypeVector<T> & b,
              const TypeVector<T> & c)
 {
-  using std::sqrt;
+  using portable_math::sqrt;
   return sqrt(cross_norm_sq(b,c));
 }
 

@@ -611,7 +611,7 @@ void VTKIO::nodes_to_vtk()
   vtkSmartPointer<vtkDoubleArray> pcoords = vtkSmartPointer<vtkDoubleArray>::New();
   // if this grid is to be used in VTK then the dimension of the points should be 3
   pcoords->SetNumberOfComponents(LIBMESH_DIM);
-  pcoords->Allocate(3*mesh.n_local_nodes());
+  pcoords->SetNumberOfTuples(mesh.n_local_nodes());
   points->SetNumberOfPoints(mesh.n_local_nodes()); // it seems that it needs this to prevent a segfault
 
   // SetRationalWeights() was introduced in VTK 9.0

@@ -135,7 +135,7 @@ BoundingBox MeshTetInterface::volume_to_surface_mesh(UnstructuredMesh & mesh)
 {
   // If we've been handed an unprepared mesh then we need to be made
   // aware of that and fix that; we're relying on neighbor pointers.
-  libmesh_assert(MeshTools::valid_is_prepared(mesh));
+  MeshTools::libmesh_assert_valid_is_prepared(mesh);
 
   if (!mesh.is_prepared())
     mesh.prepare_for_use();
@@ -462,8 +462,11 @@ std::set<MeshTetInterface::SurfaceIntegrity> MeshTetInterface::check_hull_integr
 
   TriChecker checker (ref_area, this->_verbosity);
 
+  // Don't grab a non-Const range by mistake
+  const MeshBase & mesh = this->_mesh;
+
   Threads::parallel_reduce
-    (this->_mesh.active_local_element_stored_range(), checker);
+    (mesh.active_local_element_stored_range(), checker);
 
   // Join problems found in threaded loop
   returnval.merge(checker.my_returnval);

@@ -48,7 +48,7 @@ AM_CPPFLAGS      = -DLIBMESH_IS_COMPILING_ITSELF \
 # others.  I don't know how to do that.
 AM_CPPFLAGS     += $(ACSM_ANY_WERROR_FLAG) $(ACSM_ANY_PARANOID_FLAGS)
 
-LIBS             = $(libmesh_optional_LIBS) $(libmesh_precision_LIBS)
+LIBS             = $(libmesh_optional_LIBS) $(libmesh_precision_LIBS) $(EXECUTION_LIBS)
 
 # additional files which must be included in 'make dist'
 EXTRA_DIST = reference_elements \

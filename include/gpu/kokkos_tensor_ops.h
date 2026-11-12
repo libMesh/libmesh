@@ -668,7 +668,7 @@ template <typename ViewType>
 LIBMESH_DEVICE_INLINE
 auto tensor_ref<ViewType>::norm() const
 {
-  using std::sqrt;
+  using portable_math::sqrt;
   return sqrt(this->norm_sq());
 }
 

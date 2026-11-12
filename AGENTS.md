@@ -77,6 +77,10 @@ When your changes create orphans:
 The test: Every changed line should trace to the user's request or to the design
 that request requires.
 
+Each commit addresses one concept or fix, so a reviewer can cherry-pick it on its
+own. Keep the steps of one change, such as an API declaration and
+implementation, in one commit.
+
 ## 4. Code Comments
 
 - Never delete correct preexisting code comments.

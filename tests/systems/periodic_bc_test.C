@@ -1,11 +1,15 @@
+#include <libmesh/default_coupling.h>
 #include <libmesh/dirichlet_boundaries.h>
+#include <libmesh/distributed_mesh.h>
 #include <libmesh/dof_map.h>
 #include <libmesh/elem.h>
 #include <libmesh/equation_systems.h>
 #include <libmesh/exodusII_io.h>
 #include <libmesh/function_base.h>
 #include <libmesh/linear_implicit_system.h>
+#include <libmesh/partitioner.h>
 #include <libmesh/mesh.h>
+#include <libmesh/mesh_generation.h>
 #include <libmesh/numeric_vector.h>
 #include <libmesh/periodic_boundary.h>
 #include <libmesh/quadrature_gauss.h>
@@ -153,6 +157,35 @@ void periodic_bc_test_poisson(EquationSystems& es,
 }
 
 
+// Assigns the element rows of an 8-row unit square to processors 0
+// and 1.  At first processor 1 owns only row 2.  With two layers of
+// ghosting it then holds the bottom row 0 but not the top row 7, which
+// is the periodic image of row 0.  The repartitioned assignment also
+// gives row 0 to processor 1.
+class RowPartitioner : public Partitioner
+{
+public:
+  RowPartitioner (bool repartitioned) : _repartitioned(repartitioned) {}
+
+  std::unique_ptr<Partitioner> clone () const override
+  { return std::make_unique<RowPartitioner>(*this); }
+
+protected:
+  void _do_partition (MeshBase & mesh, const unsigned int) override
+  {
+    for (auto & elem : mesh.active_element_ptr_range())
+      {
+        const auto row = static_cast<unsigned int>(elem->vertex_average()(1) * 8);
+        const bool on_proc_1 = _repartitioned ? (row == 0 || row == 2) : (row == 2);
+        elem->processor_id() = on_proc_1;
+      }
+  }
+
+private:
+  bool _repartitioned;
+};
+
+
 const boundary_id_type top_id    = 50;
 const boundary_id_type bottom_id = 60;
 const boundary_id_type side_id   = 70;
@@ -166,6 +199,7 @@ public:
 #if defined(LIBMESH_HAVE_SOLVER) && defined(LIBMESH_HAVE_EXODUS_API) && defined(LIBMESH_HAVE_GZSTREAM)
   CPPUNIT_TEST( testPeriodicLagrange2 );
 #endif
+  CPPUNIT_TEST( testRedistributeToGhosts );
 #endif // LIBMESH_DIM > 1
 
   CPPUNIT_TEST_SUITE_END();
@@ -248,6 +282,53 @@ private:
         }
   }
 
+
+  // Repartition a distributed periodic mesh so that a processor takes
+  // ownership of an element it only ghosted, before that element's
+  // periodic neighbor arrives.
+  void testRedistributeToGhosts()
+  {
+    LOG_UNIT_TEST;
+
+    // Repartitioning moves elements only between processors 0 and 1
+    if (TestCommWorld->size() < 2)
+      return;
+
+    DistributedMesh mesh(*TestCommWorld);
+    mesh.partitioner() = std::make_unique<RowPartitioner>(false);
+
+    EquationSystems es(mesh);
+    System & sys = es.add_system<System>("PBCSys");
+    sys.add_variable("u", FEType(FIRST, LAGRANGE));
+
+    // build_square() numbers the bottom and top sides 0 and 2
+    PeriodicBoundary vert(RealVectorValue(0., 1.));
+    vert.myboundary = 0;
+    vert.pairedboundary = 2;
+    sys.get_dof_map().add_periodic_boundary(vert);
+
+    // When processor 1 finds what processor 0 needs, the first layer
+    // reaches from row 1 into row 0.  The second layer then asks for
+    // the periodic neighbor of row 0, which processor 1 does not have.
+    auto two_layers = std::make_shared<DefaultCoupling>();
+    two_layers->set_mesh(&mesh);
+    two_layers->set_n_levels(2);
+    two_layers->set_periodic_boundaries(sys.get_dof_map().get_periodic_boundaries());
+    mesh.add_ghosting_functor(two_layers);
+
+    MeshTools::Generation::build_square(mesh, 4, 8, 0., 1., 0., 1., QUAD4);
+    es.init();
+
+    mesh.partitioner() = std::make_unique<RowPartitioner>(true);
+    mesh.partition();
+
+    CPPUNIT_ASSERT(!mesh.is_redistributing());
+    for (const auto & elem : mesh.active_local_element_ptr_range())
+      {
+        const auto row = static_cast<unsigned int>(elem->vertex_average()(1) * 8);
+        CPPUNIT_ASSERT_EQUAL(processor_id_type(row == 0 || row == 2), elem->processor_id());
+      }
+  }
 
   void testPeriodicLagrange2() { LOG_UNIT_TEST; testPeriodicBC(FEType(SECOND, LAGRANGE)); }
 };

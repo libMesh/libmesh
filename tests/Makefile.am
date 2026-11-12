@@ -6,7 +6,7 @@ AM_CPPFLAGS  = $(libmesh_optional_INCLUDES) -I$(top_builddir)/include \
                $(libmesh_contrib_INCLUDES) $(CPPUNIT_CFLAGS) \
 	       -DLIBMESH_IS_UNIT_TESTING
 AM_LDFLAGS   = $(libmesh_LDFLAGS) $(libmesh_contrib_LDFLAGS)
-LIBS         = $(libmesh_optional_LIBS) $(CPPUNIT_LIBS)
+LIBS         = $(libmesh_optional_LIBS) $(CPPUNIT_LIBS) $(EXECUTION_LIBS)
 KOKKOS_TEST_CPPFLAGS =
 
 # We might have turned on -Werror and/or paranoid warnings.  We need
@@ -36,8 +36,10 @@ unit_tests_sources = \
   fe/fe_l2_hierarchic_test.C \
   fe/fe_l2_lagrange_test.C \
   fe/fe_l2_lagrange_gll_test.C \
-  fe/fe_gll_collocation_test.C \
+  fe/fe_collocation_test.C \
+  fe/fe_lagrange_gll_test.C \
   fe/fe_gll_lagrange_agreement_test.C \
+  fe/fe_amr_constraint_test.C \
   fe/fe_lagrange_test.C \
   fe/fe_monomial_test.C \
   fe/fe_rational_map.C \
@@ -55,6 +57,7 @@ unit_tests_sources = \
   geom/point_test.C \
   geom/point_test.h \
   geom/side_test.C \
+  geom/stored_range_test.C \
   geom/volume_test.C \
   geom/side_vertex_average_normal_test.C \
   geom/which_node_am_i_test.C \
@@ -145,6 +148,7 @@ unit_tests_sources = \
   solvers/first_order_unsteady_solver_test.C \
   solvers/second_order_unsteady_solver_test.C \
   systems/constraint_operator_test.C \
+  systems/dirichlet_constraint_values_test.C \
   systems/equation_systems_test.C \
   systems/heterogeneous_nonlinear_constraint_test.C \
   systems/periodic_bc_test.C \

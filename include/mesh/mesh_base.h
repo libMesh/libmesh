@@ -130,7 +130,7 @@ public:
    * ids).
    *
    * Though this method is non-virtual, its implementation calls the
-   * virtual function \p subclass_locally_equals() to test for
+   * virtual function \p subclass_first_difference_from() to test for
    * equality of subclass-specific data as well.
    */
   bool operator== (const MeshBase & other_mesh) const;
@@ -139,6 +139,14 @@ public:
   {
     return !(*this == other_mesh);
   }
+
+  /**
+   * This behaves like libmesh_assert(*this == other_mesh), but gives
+   * a more useful accounting of the first difference found, if the
+   * assertion fails.
+   */
+  void assert_equal_to (const MeshBase & other_mesh,
+                        std::string_view failure_context) const;
 
   /**
    * This behaves the same as operator==, but only for the local and
@@ -1392,6 +1400,13 @@ public:
   bool allow_node_and_elem_unique_id_overlap() const { return _allow_node_and_elem_unique_id_overlap; }
 
   /**
+   * \returns \p true while this mesh redistributes elements to match
+   * new processor ids. During that time a processor may own an
+   * element whose neighbors have not arrived yet.
+   */
+  bool is_redistributing() const { return _is_redistributing; }
+
+  /**
    * If true is passed in then the elements on this mesh will no
    * longer be (re)partitioned, and the nodes on this mesh will only
    * be repartitioned if they are found "orphaned" via coarsening or
@@ -1469,6 +1484,7 @@ public:
    * here.
    */
   typedef std::vector<GhostingFunctor *>::const_iterator GhostingFunctorIterator;
+  typedef std::vector<GhostingFunctor *>::iterator NonConstGhostingFunctorIterator;
 
   /**
    * Beginning of range of ghosting functors
@@ -1476,10 +1492,16 @@ public:
   GhostingFunctorIterator ghosting_functors_begin() const
   { return _ghosting_functors.begin(); }
 
+  NonConstGhostingFunctorIterator ghosting_functors_begin()
+  { return _ghosting_functors.begin(); }
+
   /**
    * End of range of ghosting functors
    */
   GhostingFunctorIterator ghosting_functors_end() const
+  { return _ghosting_functors.end(); }
+
+  NonConstGhostingFunctorIterator ghosting_functors_end()
   { return _ghosting_functors.end(); }
 
   /**
@@ -1903,20 +1925,26 @@ public:
   /**
    * \returns A reference to a cached vector copy of a range of
    * pointers to all semilocal elements, suitable for threading.
-   *
-   * Iterating over all semilocal elements is most useful for
-   * modifying the mesh, so we only have a non-const version for now.
    */
   const ElemRange & element_stored_range();
+  const ConstElemRange & element_stored_range() const;
+  const ConstElemRange & const_element_stored_range() const;
 
   /**
    * \returns A reference to a cached vector copy of a range of
    * pointers to all active local elements, suitable for threading.
-   *
-   * Iterating over only local elements is most useful for computing
-   * on the mesh, so we only have a non-const version for now.
    */
+  const ElemRange & active_local_element_stored_range();
   const ConstElemRange & active_local_element_stored_range() const;
+  const ConstElemRange & const_active_local_element_stored_range() const;
+
+  /**
+   * \returns A reference to a cached vector copy of a range of
+   * pointers to all local elements, suitable for threading.
+   */
+  const ElemRange & local_element_stored_range();
+  const ConstElemRange & local_element_stored_range() const;
+  const ConstElemRange & const_local_element_stored_range() const;
 
   /**
    * \returns A reference to a cached vector copy of a range of
@@ -1924,24 +1952,23 @@ public:
    */
   const NodeRange & node_stored_range();
   const ConstNodeRange & node_stored_range() const;
+  const ConstNodeRange & const_node_stored_range() const;
 
   /**
    * \returns A reference to a cached vector copy of a range of
    * pointers to all local nodes, suitable for threading.
-   *
-   * Iterating over all local nodes is most useful for
-   * modifying the mesh, so we only have a non-const version for now.
    */
   const NodeRange & local_node_stored_range();
+  const ConstNodeRange & local_node_stored_range() const;
+  const ConstNodeRange & const_local_node_stored_range() const;
 
   /**
    * \returns A reference to a cached vector copy of a range of
    * pointers to all unpartitioned nodes, suitable for threading.
-   *
-   * Iterating over all unpartitioned nodes is most useful for
-   * modifying the mesh, so we only have a non-const version for now.
    */
   const NodeRange & unpartitioned_node_stored_range();
+  const ConstNodeRange & unpartitioned_node_stored_range() const;
+  const ConstNodeRange & const_unpartitioned_node_stored_range() const;
 
   /**
    * Clears stored ranges, to indicate that the mesh has changed and
@@ -2139,6 +2166,9 @@ public:
     bool operator== (const Preparation & other) const;
     bool operator!= (const Preparation & other) const;
 
+    // Assert that a Preparation object is identical across processors
+    void libmesh_assert_consistent (const Parallel::Communicator & libmesh_dbg_var(comm));
+
     bool is_partitioned;
     bool has_synched_id_counts;
     bool has_neighbor_ptrs;
@@ -2188,14 +2218,28 @@ protected:
   /**
    * Shim to allow operator == (&) to behave like a virtual function
    * without having to be one.
+   *
+   * \returns a string describing the first difference found when
+   * comparing subclass-specific data between \p this and \p
+   * other_mesh, or an empty string if no differences are found.
    */
-  virtual bool subclass_locally_equals (const MeshBase & other_mesh) const = 0;
+  virtual std::string_view subclass_first_difference_from (const MeshBase & other_mesh) const = 0;
 
   /**
    * Tests for equality of all elements and nodes in the mesh.  Helper
    * function for subclass_equals() in unstructured mesh subclasses.
    */
   bool nodes_and_elements_equal(const MeshBase & other_mesh) const;
+
+  /**
+   * \returns A string describing the first difference found on this
+   * rank, in either \p MeshBase data or subclass-specific data,
+   * between \p this and \p other_mesh, or an empty string if no
+   * differences are found.  Used by \p operator== to determine whether
+   * differences exist, and by \p assert_equal_to to give debugging
+   * feedback.
+   */
+  std::string_view first_difference_from(const MeshBase & other_mesh) const;
 
   /**
    * \returns A writable reference to the number of partitions.
@@ -2237,39 +2281,64 @@ protected:
    * A cached \p ElemRange for threaded mutation of all semilocal
    * elements of this mesh.
    *
-   * This will not actually be built unless needed.
+   * This will not actually be built unless needed.  We do need this
+   * to be mutable so that we can build it on the fly if a const elem
+   * range (using it) is requested
    */
-  std::unique_ptr<ElemRange> _element_stored_range;
+  mutable std::unique_ptr<ElemRange> _element_stored_range;
 
   /**
-   * A cached \p ConstElemRange for threaded calculation on all
+   * A shim to _element_stored_range
+   */
+  mutable std::unique_ptr<ConstElemRange> _const_element_stored_range;
+
+  /**
+   * A cached \p ElemRange for threaded calculation on all active
    * local elements of this mesh.
    *
-   * This will not actually be built unless needed. Further, since we
-   * want our \p active_local_element_stored_range() method to be \p
-   * const (yet do the dynamic allocating) this needs to be mutable.
+   * This will not actually be built unless needed.  We do need this
+   * to be mutable so that we can build it on the fly if a const elem
+   * range (using it) is requested
+   */
+  mutable std::unique_ptr<ElemRange>
+    _active_local_element_stored_range;
+
+  /**
+   * A shim to _active_local_element_stored_range
    */
   mutable std::unique_ptr<ConstElemRange>
     _const_active_local_element_stored_range;
 
   /**
-   * A cached \p NodeRange for threaded mutation of all semilocal
-   * nodes of this mesh.
+   * A cached \p ElemRange for threaded calculation on all
+   * local elements of this mesh.
    *
-   * This will not actually be built unless needed.
+   * This will not actually be built unless needed.  We do need this
+   * to be mutable so that we can build it on the fly if a const elem
+   * range (using it) is requested
    */
-  std::unique_ptr<NodeRange> _node_stored_range;
+  mutable std::unique_ptr<ElemRange>
+    _local_element_stored_range;
 
   /**
-   * A cached \p ConstNodeRange for threaded mutation on all semilocal
-   * nodes of this mesh.
+   * A shim to _local_element_stored_range
+   */
+  mutable std::unique_ptr<ConstElemRange>
+    _const_local_element_stored_range;
+
+  /**
+   * A cached \p NodeRange for threaded mutation of all semilocal
+   * nodes of this mesh, or (via a temporary shim) for read-only
+   * iteration over all nodes.
    *
-   * This will not actually be built unless needed. Further, since we
-   * want our \p const node_stored_range() method to be \p const (yet
-   * do the dynamic allocating) this needs to be mutable.
-   *
-   * It is a crime that the C++ language doesn't let us just get this
-   * via casting from _node_stored_range.
+   * This will not actually be built unless needed.  We do need this
+   * to be mutable so that we can build it on the fly if a const node
+   * range (using it) is requested
+   */
+  mutable std::unique_ptr<NodeRange> _node_stored_range;
+
+  /**
+   * A shim to _node_stored_range
    */
   mutable std::unique_ptr<ConstNodeRange> _const_node_stored_range;
 
@@ -2277,17 +2346,31 @@ protected:
    * A cached \p NodeRange for threaded mutation of all local
    * nodes of this mesh.
    *
-   * This will not actually be built unless needed.
+   * This will not actually be built unless needed.  We do need this
+   * to be mutable so that we can build it on the fly if a const node
+   * range (using it) is requested
    */
-  std::unique_ptr<NodeRange> _local_node_stored_range;
+  mutable std::unique_ptr<NodeRange> _local_node_stored_range;
+
+  /**
+   * A shim to _local_node_stored_range
+   */
+  mutable std::unique_ptr<ConstNodeRange> _const_local_node_stored_range;
 
   /**
    * A cached \p NodeRange for threaded mutation of all unpartitioned
    * nodes of this mesh.
    *
-   * This will not actually be built unless needed.
+   * This will not actually be built unless needed.  We do need this
+   * to be mutable so that we can build it on the fly if a const node
+   * range (using it) is requested
    */
-  std::unique_ptr<NodeRange> _unpartitioned_node_stored_range;
+  mutable std::unique_ptr<NodeRange> _unpartitioned_node_stored_range;
+
+  /**
+   * A shim to _unpartitioned_node_stored_range
+   */
+  mutable std::unique_ptr<ConstNodeRange> _const_unpartitioned_node_stored_range;
 
   /**
    * A \p PointLocator class for this mesh.
@@ -2373,6 +2456,12 @@ protected:
    * when checking the "uniqueness" of unique_ids.
    */
   bool _allow_node_and_elem_unique_id_overlap;
+
+  /**
+   * True while \p MeshCommunication::redistribute() moves elements
+   * to match new processor ids.
+   */
+  bool _is_redistributing;
 
   /**
    * This structure maintains the mapping of named blocks

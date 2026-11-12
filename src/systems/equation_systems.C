@@ -109,6 +109,14 @@ void EquationSystems::reinit_mesh ()
 
   libmesh_assert_not_equal_to (n_sys, 0);
 
+  // Our DofMaps are going to expect a prepared mesh later, but our
+  // older codes might have used some utilities that mark a mesh
+  // unprepared without re-preparing it.  At *this* point hopefully
+  // everybody's done changing the mesh and we can make sure it's
+  // prepared.
+  if (!_mesh.is_prepared())
+    _mesh.complete_preparation();
+
   // Tell all the \p DofObject entities how many systems
   // there are.
   Threads::parallel_for_each
@@ -1327,7 +1335,7 @@ EquationSystems::build_parallel_elemental_solution_vector (std::vector<std::stri
       Threads::parallel_for
         (_mesh.active_local_element_stored_range(),
          [&system, &dof_map, &variable, ne, var, var_ctr, n_comps, field_type,
-         need_quadrature_average, &parallel_soln, &sys_soln](const ConstElemRange & range)
+         need_quadrature_average, &parallel_soln, &sys_soln](const auto & range)
          {
            // The DOF indices for the finite element
            std::vector<dof_id_type> dof_indices;

@@ -29,6 +29,7 @@
 #  include "libmesh/ignore_warnings.h"
 #  include <Kokkos_Macros.hpp>
 #  include <Kokkos_Abort.hpp>
+#  include <Kokkos_MathematicalFunctions.hpp>
 #  include "libmesh/restore_warnings.h"
 #  define LIBMESH_DEVICE_INLINE KOKKOS_INLINE_FUNCTION
 
@@ -41,27 +42,36 @@
 #    define LIBMESH_IN_DEVICE_CODE 0
 #  endif
 
-// Device-safe assert: uses printf (supported on CUDA/HIP) and
-// Kokkos::abort() for backend-portable device termination.
-// Defined here (not in libmesh_common.h) because Kokkos headers
-// are only available in .K translation units.
+// Two-level stringification, so that a macro argument such as __LINE__
+// is expanded before it is turned into a string literal.
+#  define LIBMESH_STRINGIFY_IMPL(x) #x
+#  define LIBMESH_STRINGIFY(x) LIBMESH_STRINGIFY_IMPL(x)
+
+// Device-safe assert and error. Kokkos::abort() prints its message and
+// terminates portably on every backend, so the whole message, location
+// included, is assembled as a single string literal at compile time;
+// this avoids a separate formatted printf call in device code.
+// Defined here (not in libmesh_common.h) because Kokkos headers are
+// only available in .K translation units.
 #  ifndef NDEBUG
 #    define LIBMESH_DEVICE_ASSERT(asserted)                             \
        do { if (!(asserted)) {                                          \
-         printf("libMesh assert failed: %s, file %s, line %d\n",       \
-                #asserted, __FILE__, __LINE__);                         \
-         ::Kokkos::abort("libmesh_assert failed");                     \
+         ::Kokkos::abort("libMesh assert failed: " #asserted            \
+                         ", file " __FILE__                             \
+                         ", line " LIBMESH_STRINGIFY(__LINE__));        \
        } } while (0)
 #  else
 #    define LIBMESH_DEVICE_ASSERT(asserted) ((void) 0)
 #  endif
 
+// The message is stringified rather than evaluated: libMesh error
+// messages are often stream expressions (e.g. "text" << value), which
+// cannot be formatted in device code, and host-only inline functions
+// using them are still compiled in the device pass of a .K file.
 #  define LIBMESH_DEVICE_ERROR_MSG(msg)                                 \
-     do {                                                               \
-       printf("libMesh error: %s, file %s, line %d\n",                 \
-              msg, __FILE__, __LINE__);                                 \
-       ::Kokkos::abort(msg);                                            \
-     } while (0)
+     ::Kokkos::abort("libMesh error: " #msg                             \
+                     ", file " __FILE__                                 \
+                     ", line " LIBMESH_STRINGIFY(__LINE__))
 
 #  define LIBMESH_DEVICE_ERROR_MSG_IF(cond, msg)                        \
      do { if (cond) { LIBMESH_DEVICE_ERROR_MSG(msg); } } while (0)
@@ -69,6 +79,23 @@
 #else
 #  define LIBMESH_DEVICE_INLINE inline
 #  define LIBMESH_IN_DEVICE_CODE 0
+
+namespace std {}
 #endif
+
+namespace libMesh
+{
+// Namespace providing the math functions (sqrt, abs, ...) for
+// LIBMESH_DEVICE_INLINE functions: std:: functions are not callable from
+// device code, while their Kokkos counterparts are callable from both host
+// and device.  Use as `using portable_math::sqrt; sqrt(x);` so that
+// argument-dependent lookup still finds overloads for non-arithmetic types
+// such as MetaPhysicL::DualNumber.
+#ifdef ACSM_KOKKOS_COMPILATION
+namespace portable_math = ::Kokkos;
+#else
+namespace portable_math = std;
+#endif
+}
 
 #endif // LIBMESH_LIBMESH_DEVICE_H
