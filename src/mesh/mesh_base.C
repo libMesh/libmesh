@@ -75,6 +75,24 @@ namespace {
 
     return *shim_range;
   }
+
+
+struct SBDInserter {
+  std::set<subdomain_id_type> my_ids;
+
+  SBDInserter () {}
+  SBDInserter (SBDInserter &, Threads::split) {}
+
+  void operator()(const ConstElemRange & range) {
+    for (const Elem * elem : range)
+      my_ids.insert(elem->subdomain_id());
+  }
+
+  void join(SBDInserter & other) {
+    my_ids.merge(other.my_ids);
+  }
+};
+
 }
 
 namespace libMesh
@@ -174,6 +192,7 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
   _elem_default_orders(other_mesh._elem_default_orders),
   _supported_nodal_order(other_mesh._supported_nodal_order),
   _mesh_subdomains(other_mesh._mesh_subdomains),
+  _mesh_local_subdomains(other_mesh._mesh_local_subdomains),
   _elemset_codes_inverse_map(other_mesh._elemset_codes_inverse_map),
   _all_elemset_ids(other_mesh._all_elemset_ids),
   _spatial_dimension(other_mesh._spatial_dimension),
@@ -273,6 +292,7 @@ MeshBase& MeshBase::operator= (MeshBase && other_mesh)
   _elem_default_orders = std::move(other_mesh.elem_default_orders());
   _supported_nodal_order = other_mesh.supported_nodal_order();
   _mesh_subdomains = other_mesh._mesh_subdomains;
+  _mesh_local_subdomains = other_mesh._mesh_local_subdomains;
   _elemset_codes = std::move(other_mesh._elemset_codes);
   _elemset_codes_inverse_map = std::move(other_mesh._elemset_codes_inverse_map);
   _all_elemset_ids = std::move(other_mesh._all_elemset_ids);
@@ -427,6 +447,7 @@ std::string_view MeshBase::first_difference_from(const MeshBase & other_mesh) co
   CHECK_MEMBER(_elem_default_orders);
   CHECK_MEMBER(_supported_nodal_order);
   CHECK_MEMBER(_mesh_subdomains);
+  CHECK_MEMBER(_mesh_local_subdomains);
   CHECK_MEMBER(_all_elemset_ids);
   CHECK_MEMBER(_elem_integer_names);
   CHECK_MEMBER(_elem_integer_default_values);
@@ -1213,42 +1234,12 @@ void MeshBase::remove_ghosting_functor(GhostingFunctor & ghosting_functor)
 
 void MeshBase::subdomain_ids (std::set<subdomain_id_type> & ids, const bool global /* = true */) const
 {
-  // This requires an inspection on every processor
-  if (global)
-    parallel_object_only();
-
-  struct SBDInserter {
-    std::set<subdomain_id_type> my_ids;
-
-    SBDInserter () {}
-    SBDInserter (SBDInserter &, Threads::split) {}
-
-    void operator()(const ConstElemRange & range) {
-      for (const Elem * elem : range)
-        my_ids.insert(elem->subdomain_id());
-    }
-
-    void join(SBDInserter & other) {
-      my_ids.merge(other.my_ids);
-    }
-  };
-
-  SBDInserter inserter;
-  Threads::parallel_reduce(this->active_local_element_stored_range(), inserter);
-
-  ids.swap(inserter.my_ids);
+  libmesh_assert(this->preparation().has_cached_elem_data);
 
   if (global)
-    {
-      // Only include the unpartitioned elements if the user requests the global IDs.
-      // In the case of the local subdomain IDs, it doesn't make sense to include the
-      // unpartitioned elements because said elements do not have a sense of locality.
-      for (const auto & elem : this->active_unpartitioned_element_ptr_range())
-        ids.insert(elem->subdomain_id());
-
-      // Some subdomains may only live on other processors
-      this->comm().set_union(ids);
-    }
+    ids = this->get_mesh_subdomains();
+  else
+    ids = this->get_mesh_local_subdomains();
 }
 
 
@@ -1288,20 +1279,20 @@ void MeshBase::update_post_partitioning()
       _node_stored_range.reset();
       _const_node_stored_range.reset();
     }
+
+  _mesh_local_subdomains.clear();
+
+  SBDInserter inserter;
+  Threads::parallel_reduce(this->const_active_local_element_stored_range(), inserter);
+
+  _mesh_local_subdomains.swap(inserter.my_ids);
 }
 
 
 
 subdomain_id_type MeshBase::n_subdomains() const
 {
-  // This requires an inspection on every processor
-  parallel_object_only();
-
-  std::set<subdomain_id_type> ids;
-
-  this->subdomain_ids (ids);
-
-  return cast_int<subdomain_id_type>(ids.size());
+  return cast_int<subdomain_id_type>(this->get_mesh_subdomains().size());
 }
 
 
@@ -2335,6 +2326,7 @@ void MeshBase::cache_elem_data()
   _elem_dims.clear();
   _elem_default_orders.clear();
   _mesh_subdomains.clear();
+  _mesh_local_subdomains.clear();
   _supported_nodal_order = MAXIMUM;
 
   for (const auto & elem : this->active_element_ptr_range())
@@ -2342,6 +2334,8 @@ void MeshBase::cache_elem_data()
     _elem_dims.insert(cast_int<unsigned char>(elem->dim()));
     _elem_default_orders.insert(elem->default_order());
     _mesh_subdomains.insert(elem->subdomain_id());
+    if (elem->processor_id() == this->processor_id())
+      _mesh_local_subdomains.insert(elem->subdomain_id());
     _supported_nodal_order =
       static_cast<Order>
         (std::min(static_cast<int>(_supported_nodal_order),
@@ -2783,6 +2777,7 @@ MeshBase::copy_cached_data(const MeshBase & other_mesh)
   this->_elem_default_orders = other_mesh._elem_default_orders;
   this->_supported_nodal_order = other_mesh._supported_nodal_order;
   this->_mesh_subdomains = other_mesh._mesh_subdomains;
+  this->_mesh_local_subdomains = other_mesh._mesh_local_subdomains;
 }
 
 
@@ -3061,13 +3056,18 @@ MeshBase::copy_constraint_rows(const SparseMatrix<T> & constraint_operator,
       // DistributedMesh doesn't get confused and think you're not
       // adding them on all processors at once.
       int n_pids = 0;
+      processor_id_type best_pid = DofObject::invalid_processor_id;
       for (auto [pid, count] : pids)
         if (count >= n_pids)
           {
             n_pids = count;
-            added_elem->processor_id() = pid;
-            n->processor_id() = pid;
+            best_pid = pid;
           }
+      libmesh_assert_not_equal_to(best_pid, DofObject::invalid_processor_id);
+      added_elem->processor_id() = best_pid;
+      n->processor_id() = best_pid;
+      if (this->processor_id() == best_pid)
+        this->_mesh_local_subdomains.insert(new_sbd_id);
     }
 
   // Calculate constraint rows in an indexed form that's easy for us
