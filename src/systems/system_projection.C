@@ -2158,6 +2158,7 @@ void System::solve_for_unconstrained_dofs(NumericVector<Number> & vec,
   // efficiency
   std::size_t n_local_dofs = dof_map.n_local_dofs();
   std::vector<bool> have_added(n_local_dofs, false);
+  std::set<dof_id_type> have_added_ghost;
   std::size_t first_dof = dof_map.first_dof();
 
   std::vector<dof_id_type> di;
@@ -2196,10 +2197,47 @@ void System::solve_for_unconstrained_dofs(NumericVector<Number> & vec,
           // to mat, so we can fix any "leftovers" later.  Otherwise if
           // someone puts a non-constraining DoF on a spline node we
           // end up with a singular system.
-          for (auto j : dof_indices)
-            have_added[j] = true;
+          for (auto d2 : dof_indices)
+            {
+              if (d2 < first_dof)
+                {
+                  have_added_ghost.insert(d2);
+                  continue;
+                }
+              const std::size_t i2 = d2 - first_dof;
+              if (i2 > n_local_dofs)
+                {
+                  have_added_ghost.insert(d2);
+                  continue;
+                }
+
+              have_added[i2] = true;
+            }
         }
     }
+
+  std::unordered_map<processor_id_type, std::vector<dof_id_type>> adds_to_push;
+  processor_id_type p=0;
+  dof_id_type end_p_dof = dof_map.end_dof(0);
+  for (auto d : have_added_ghost)
+    {
+      while (d >= end_p_dof)
+        {
+          ++p;
+          end_p_dof = dof_map.end_dof(p);
+        }
+      adds_to_push[p].push_back(d);
+    }
+
+  auto act_on_adds = [&have_added, first_dof]
+    (processor_id_type, const std::vector<dof_id_type> & dofs)
+    {
+      for (auto d : dofs)
+        have_added[d-first_dof] = true;
+    };
+
+  Parallel::push_parallel_vector_data
+    (this->comm(), adds_to_push, act_on_adds);
 
   // Pin any unconstraining DoFs that lived on spline nodes
   for (auto i : index_range(have_added))
