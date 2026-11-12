@@ -493,7 +493,7 @@ private:
     add_pair(shifted, RealVectorValue(0., 2.));
 
     std::vector<const PeriodicBoundaries *> sets {&a, nullptr, &same_as_a, &empty, &a, &shifted};
-    remove_redundant_periodic_boundaries(sets);
+    PeriodicBoundaries::remove_redundant_sets(sets);
     CPPUNIT_ASSERT(sets == (std::vector<const PeriodicBoundaries *>{&a, &shifted}));
 
     // A subset is covered, a superset is not

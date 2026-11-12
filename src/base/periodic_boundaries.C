@@ -71,7 +71,8 @@ bool PeriodicBoundaries::covers(const PeriodicBoundaries & other) const
 
 
 
-void remove_redundant_periodic_boundaries(std::vector<const PeriodicBoundaries *> & sets)
+void
+PeriodicBoundaries::remove_redundant_sets(std::vector<const PeriodicBoundaries *> & sets)
 {
   std::vector<const PeriodicBoundaries *> kept;
   for (const auto pbs : sets)

@@ -1860,7 +1860,7 @@ std::vector<const PeriodicBoundaries *> MeshRefinement::periodic_boundaries_used
 #ifdef LIBMESH_ENABLE_PERIODIC
   sets = _mesh.periodic_boundary_sets();
   sets.push_back(_periodic_boundaries);
-  remove_redundant_periodic_boundaries(sets);
+  PeriodicBoundaries::remove_redundant_sets(sets);
 #endif
   return sets;
 }

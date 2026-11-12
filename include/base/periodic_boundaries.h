@@ -77,17 +77,13 @@ public:
    * neighbor that \p other finds.
    */
   bool covers(const PeriodicBoundaries & other) const;
+
+  /**
+   * Removes null, empty and redundant sets from \p sets.  A set is
+   * redundant if an earlier set covers() it.
+   */
+  static void remove_redundant_sets(std::vector<const PeriodicBoundaries *> & sets);
 };
-
-
-
-/**
- * Removes null, empty and redundant sets from \p sets.  A set is
- * redundant if an earlier set covers() it.  Searching the remaining
- * sets for periodic neighbors gives every neighbor that the original
- * sets gave.
- */
-void remove_redundant_periodic_boundaries(std::vector<const PeriodicBoundaries *> & sets);
 
 } // namespace libMesh
 

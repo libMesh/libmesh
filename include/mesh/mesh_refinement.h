@@ -735,7 +735,7 @@ private:
    * \returns The periodic boundary sets to respect: every set
    * registered with the mesh, plus the set from
    * set_periodic_boundaries_ptr(), reduced by
-   * remove_redundant_periodic_boundaries().
+   * PeriodicBoundaries::remove_redundant_sets().
    */
   std::vector<const PeriodicBoundaries *> periodic_boundaries_used() const;
 

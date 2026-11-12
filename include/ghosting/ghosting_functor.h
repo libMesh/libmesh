@@ -311,7 +311,8 @@ protected:
    * periodic neighbors.  These are \p own, which may be null, and, if
    * MeshBase::uses_all_periodic_boundaries() is true for this functor,
    * every set registered with the mesh.  Without a mesh, only \p own
-   * applies.  remove_redundant_periodic_boundaries() reduces the result.
+   * applies.  PeriodicBoundaries::remove_redundant_sets() reduces the
+   * result.
    */
   std::vector<const PeriodicBoundaries *>
   periodic_boundaries_used(const PeriodicBoundaries * own) const;
@@ -333,7 +334,7 @@ GhostingFunctor::periodic_boundaries_used(const PeriodicBoundaries * own) const
     sets.insert(sets.end(), _mesh->periodic_boundary_sets().begin(),
                 _mesh->periodic_boundary_sets().end());
 
-  remove_redundant_periodic_boundaries(sets);
+  PeriodicBoundaries::remove_redundant_sets(sets);
   return sets;
 }
 #endif
