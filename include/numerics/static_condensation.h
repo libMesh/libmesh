@@ -35,6 +35,7 @@ namespace libMesh {
 #include "libmesh/dense_matrix.h"
 #include "libmesh/variable.h"
 #include "libmesh/sparsity_pattern.h"
+#include "libmesh/static_condensation_dof_map.h"
 
 #include <unordered_map>
 #include <memory>
@@ -166,9 +167,16 @@ public:
    * Perform our three stages, \p forward_elimination(), a \p solve() on the condensed system, and
    * finally a \p backwards_substitution()
    */
-  void apply(const NumericVector<Number> & full_rhs, NumericVector<Number> & full_sol);
+  void apply(const NumericVector<Number> & parent_rhs, NumericVector<Number> & parent_sol);
 
   const SparseMatrix<Number> & get_condensed_mat() const;
+
+  /**
+   * Sets the condensed entries of the parent-space vector \p parent_sol to \f$ -A_{cc}^{-1} A_{cu}
+   * u \f$, where \f$ u \f$ holds its uncondensed entries. This is \p backwards_substitution() with
+   * a zero right-hand side. It uses the element blocks of the last closed matrix
+   */
+  void homogeneous_backwards_substitution(NumericVector<Number> & parent_sol);
 
   /**
    * Set the current element. This enables fast lookups of local indices from global indices
@@ -211,20 +219,21 @@ private:
                                 EigenVector & elem_dof_values);
 
   /**
-   * Takes an incoming "full" RHS from the solver, where full means the union of uncondensed and
-   * condennsed dofs, and condenses it down into the condensed \p _reduced_rhs data member using
-   * element Schur complements
+   * Takes an incoming RHS from the solver on the parent space of the static condensation dof map,
+   * which holds both uncondensed and condensed dofs, and condenses it down into the condensed \p
+   * _reduced_rhs data member using element Schur complements
    */
-  void forward_elimination(const NumericVector<Number> & full_rhs);
+  void forward_elimination(const NumericVector<Number> & parent_rhs);
 
   /**
    * After performing the solve with the \p _reduced_rhs and Schur complement matrix (\p
-   * _reduced_sys_mat) to determine the \p _reduced_sol, we use the uncondensed \p full_rhs along
-   * with the \p _reduced_sol to back substitute into the \p full_sol, which is the final output
-   * data of the static condensation preconditioner application
+   * _reduced_sys_mat) to determine the \p _reduced_sol, we use the parent-space \p parent_rhs
+   * along with the \p _reduced_sol to back substitute into the parent-space \p parent_sol, which
+   * is the final output data of the static condensation preconditioner application. A null \p
+   * parent_rhs is a zero right-hand side
    */
-  void backwards_substitution(const NumericVector<Number> & full_rhs,
-                              NumericVector<Number> & full_sol);
+  void backwards_substitution(const NumericVector<Number> * parent_rhs,
+                              NumericVector<Number> & parent_sol);
 
   /**
    * Data stored on a per-element basis used to compute element Schur complements and their
@@ -250,7 +259,6 @@ private:
 
   const MeshBase & _mesh;
   System & _system;
-  const DofMap & _full_dof_map;
   StaticCondensationDofMap & _reduced_dof_map;
 
   /// global sparse matrix for the uncondensed degrees of freedom
@@ -263,17 +271,20 @@ private:
   std::unique_ptr<NumericVector<Number>> _reduced_rhs;
   /// The solver for the uncondensed degrees of freedom
   std::unique_ptr<LinearSolver<Number>> _reduced_solver;
-  /// This is a ghosted representation of the full (uncondensed + condensed) solution. Note that
-  // this is, in general, *not equal* to the system solution, e.g. this may correspond to the
-  // solution for the Newton *update*
-  std::unique_ptr<NumericVector<Number>> _ghosted_full_sol;
+  /// This is a ghosted representation of the solution on the parent space, uncondensed and
+  // condensed dofs together. Note that this is, in general, *not equal* to the system solution,
+  // e.g. this may correspond to the solution for the Newton *update*
+  std::unique_ptr<NumericVector<Number>> _ghosted_parent_sol;
 
-  /// The current element ID. This is one half of a key, along with the global index, that maps to a
-  /// local index
-  dof_id_type _current_elem_id;
+  /// Adds \p value to the entry of global indices \p global_i and \p global_j in the block data of
+  /// the current element
+  void add_to_current_elem(dof_id_type global_i, dof_id_type global_j, Number value);
 
-  /// Helper data member for adding individual matrix elements
-  DenseMatrix<Number> _size_one_mat;
+  /// The matrix data of the current element
+  MatrixData * _current_matrix_data;
+
+  /// The degree of freedom data of the current element
+  const StaticCondensationDofMap::DofData * _current_dof_data;
 
   /// Preconditioner object which will call back to us for the preconditioning action
   std::unique_ptr<StaticCondensationPreconditioner> _scp;

@@ -283,6 +283,12 @@ public:
   NonlinearImplicitSystem::ComputePreCheck * precheck_object;
 
   /**
+   * Object that solves the statically condensed equations for the condensed degrees of freedom.
+   * When set, the solver performs nonlinear elimination of the condensed degrees of freedom
+   */
+  NonlinearImplicitSystem::ComputeEliminatedSolution * elimination_object;
+
+  /**
    * \returns A constant reference to the system we are solving.
    */
   const sys_type & system () const { return _system; }
@@ -487,6 +493,7 @@ NonlinearSolver<T>::NonlinearSolver (sys_type & s) :
   postcheck                    (nullptr),
   postcheck_object             (nullptr),
   precheck_object              (nullptr),
+  elimination_object           (nullptr),
   max_nonlinear_iterations(0),
   max_function_evaluations(0),
   absolute_residual_tolerance(0),
