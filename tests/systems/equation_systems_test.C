@@ -1,6 +1,8 @@
 #include <libmesh/dof_map.h>
 #include <libmesh/elem.h>
+#include <libmesh/enum_xdr_mode.h>
 #include <libmesh/equation_systems.h>
+#include <libmesh/int_range.h>
 #include <libmesh/ghost_point_neighbors.h>
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_generation.h>
@@ -29,6 +31,14 @@ Number bilinear_test (const Point& p,
   return 4*x*y - 3*x + 2*y - 1;
 }
 
+Number affine_test (const Point& p,
+                    const Parameters&,
+                    const std::string&,
+                    const std::string&)
+{
+  return 2*p(0) - 3*p(1) + 1;
+}
+
 }
 
 class EquationSystemsTest : public CppUnit::TestCase {
@@ -47,6 +57,7 @@ public:
 #ifdef LIBMESH_ENABLE_AMR // needs project_solution, even for reordering
   CPPUNIT_TEST( testRepartitionThenReinit );
   CPPUNIT_TEST( testSelectivePRefine );
+  CPPUNIT_TEST( testRefinedTriReadWrite );
 #endif
 #endif
   CPPUNIT_TEST( testDisableDefaultGhosting );
@@ -392,6 +403,50 @@ public:
     CPPUNIT_ASSERT_EQUAL(n_couplings(sys1), 1);
     CPPUNIT_ASSERT_EQUAL(n_evaluables(sys2), 0);
     CPPUNIT_ASSERT_EQUAL(n_couplings(sys2), 0);
+  }
+
+
+  void testRefinedTriReadWrite()
+  {
+#ifdef LIBMESH_ENABLE_AMR
+    LOG_UNIT_TEST;
+
+    // The center child of a refined triangle has the same vertex average as its parent, so a
+    // partition-agnostic read must distinguish them by more than location
+    {
+      Mesh mesh(*TestCommWorld);
+      MeshTools::Generation::build_square(mesh, 2, 2, 0., 1., 0., 1., TRI3);
+      MeshRefinement(mesh).uniformly_refine(1);
+
+      EquationSystems es(mesh);
+      System & sys = es.add_system<System>("SimpleSystem");
+      sys.add_variable("u", FIRST);
+      // Element degrees of freedom are read by element id
+      sys.add_variable("v", CONSTANT, MONOMIAL);
+      es.init();
+      sys.project_solution(affine_test, nullptr, es.parameters);
+
+      mesh.write("refined_tri.xda");
+      es.write("refined_tri_solution.xda", WRITE);
+    }
+
+    Mesh mesh(*TestCommWorld);
+    mesh.read("refined_tri.xda");
+    EquationSystems es(mesh);
+    es.read("refined_tri_solution.xda", READ);
+
+    // At a triangle's centroid, both the FIRST order interpolant and the CONSTANT projection of
+    // an affine function equal the function, so a mismatch in the restored numbering shows up as
+    // a wrong value
+    const System & sys = es.get_system("SimpleSystem");
+    for (const auto * const elem : mesh.active_local_element_ptr_range())
+      {
+        const Point p = elem->vertex_average();
+        const Number exact = affine_test(p, es.parameters, "", "");
+        for (const auto var : make_range(sys.n_vars()))
+          LIBMESH_ASSERT_NUMBERS_EQUAL(exact, sys.point_value(var, p, *elem), TOLERANCE * TOLERANCE);
+      }
+#endif
   }
 
 
