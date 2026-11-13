@@ -315,7 +315,7 @@ private:
     LOG_UNIT_TEST;
 
     Mesh mesh(*TestCommWorld, 2);
-    build_two_disjoint_elems(mesh, true, Point(0.0, 0.0, 0.0),
+    build_two_disjoint_elems(mesh, /*add_pair=*/true, /*translate_vec=*/Point(0.0, 0.0, 0.0),
                              /*add_node_keys=*/true, /*allow_renumbering=*/true);
 
     // Renumbering can change the ids, so find the elements by their
@@ -358,9 +358,11 @@ private:
     // node keys of the copies must stay distinct, so each element keeps
     // the neighbor from its own copy.
     Mesh mesh(*TestCommWorld, 2);
-    build_two_disjoint_elems(mesh, true, Point(0.0, 0.0, 0.0), /*add_node_keys=*/true);
+    build_two_disjoint_elems(mesh, /*add_pair=*/true, /*translate_vec=*/Point(0.0, 0.0, 0.0),
+                             /*add_node_keys=*/true);
     Mesh other_mesh(*TestCommWorld, 2);
-    build_two_disjoint_elems(other_mesh, true, Point(0.0, 0.0, 0.0), /*add_node_keys=*/true);
+    build_two_disjoint_elems(other_mesh, /*add_pair=*/true, /*translate_vec=*/Point(0.0, 0.0, 0.0),
+                             /*add_node_keys=*/true);
 
     // stitch_meshes() copies the neighbor links of each mesh, so find the
     // neighbors of the merged mesh again to match by the merged keys.

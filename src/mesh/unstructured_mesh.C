@@ -669,8 +669,7 @@ void UnstructuredMesh::copy_nodes_and_elements(const MeshBase & other_mesh,
   // Shift the disjoint neighbor node keys of other_mesh past the keys
   // on this mesh, so that keys from the two meshes stay distinct.
   dof_id_type node_key_offset = 0;
-  if (this->has_disjoint_neighbor_node_keys() &&
-      other_mesh.has_disjoint_neighbor_node_keys())
+  if (this->has_disjoint_neighbor_node_keys())
     {
       for (const Node * node : this->node_ptr_range())
         if (const dof_id_type key = this->disjoint_neighbor_node_key(*node);
@@ -729,7 +728,7 @@ void UnstructuredMesh::copy_nodes_and_elements(const MeshBase & other_mesh,
 
 #ifdef LIBMESH_ENABLE_PERIODIC
         if (node_key_offset)
-          if (const dof_id_type key = other_mesh.disjoint_neighbor_node_key(*oldn);
+          if (const dof_id_type key = this->disjoint_neighbor_node_key(*newn);
               key != DofObject::invalid_id)
             this->set_disjoint_neighbor_node_key(*newn, key + node_key_offset);
 #endif
@@ -1167,7 +1166,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
       // Collect the sides on disjoint neighbor boundaries by their keys
       for (const auto & [elem, side_bcid] : this->get_boundary_info().get_sideset_map())
         {
-          const auto [s, bcid] = side_bcid;
+          const auto [side, bcid] = side_bcid;
           if (elem->is_remote() || !db->boundary(bcid))
             continue;
 
@@ -1176,43 +1175,45 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
             libmesh_not_implemented_msg("Disjoint neighbor node keys don't support refined meshes");
 
           std::vector<dof_id_type> key;
-          for (const auto n : elem->nodes_on_side(s))
+          for (const auto n : elem->nodes_on_side(side))
             if (elem->is_vertex(n))
               {
                 const dof_id_type node_key =
                   this->disjoint_neighbor_node_key(elem->node_ref(n));
                 libmesh_error_msg_if(node_key == DofObject::invalid_id,
-                                     "Node " << elem->node_id(n) << " on side " << s
+                                     "Node " << elem->node_id(n) << " on side " << side
                                      << " of element " << elem->id()
                                      << " on disjoint neighbor boundary " << bcid
                                      << " has no disjoint neighbor node key");
                 key.push_back(node_key);
               }
           std::sort(key.begin(), key.end());
-          key_to_sides[std::move(key)].emplace_back(this->elem_ptr(elem->id()), s, bcid);
+          // Distinct vertices of one side must have distinct keys
+          libmesh_assert(std::adjacent_find(key.begin(), key.end()) == key.end());
+          key_to_sides[std::move(key)].emplace_back(this->elem_ptr(elem->id()), side, bcid);
         }
 
       for (const auto & [_, sides] : key_to_sides)
-        for (const auto & [elem, s, bcid] : sides)
+        for (const auto & [elem, side, bcid] : sides)
           {
             const boundary_id_type paired_bcid = db->boundary(bcid)->pairedboundary;
             Elem * neigh = nullptr;
-            for (const auto & [candidate, candidate_side, candidate_bcid] : sides)
-              if (candidate != elem && candidate_bcid == paired_bcid)
+            for (const auto & [candidate_elem, candidate_side, candidate_bcid] : sides)
+              if (candidate_elem != elem && candidate_bcid == paired_bcid)
                 {
                   libmesh_error_msg_if(neigh,
-                                       "Side " << s << " of element " << elem->id()
+                                       "Side " << side << " of element " << elem->id()
                                        << " on disjoint neighbor boundary " << bcid
                                        << " matches elements " << neigh->id() << " and "
-                                       << candidate->id() << " on boundary " << paired_bcid);
-                  neigh = candidate;
+                                       << candidate_elem->id() << " on boundary " << paired_bcid);
+                  neigh = candidate_elem;
                 }
 
             // A local element must have its disjoint neighbor at least
             // ghosted. A ghost element may have a remote one.
             libmesh_error_msg_if(!neigh && (this->is_serial() ||
                                             elem->processor_id() == this->processor_id()),
-                                 "Disjoint neighbor not found for side " << s
+                                 "Disjoint neighbor not found for side " << side
                                  << " of element " << elem->id()
                                  << " on disjoint neighbor boundary " << bcid);
 
@@ -1222,7 +1223,7 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
             if (neigh)
               {
                 bool conforming = true;
-                for (const auto n : elem->nodes_on_side(s))
+                for (const auto n : elem->nodes_on_side(side))
                   if (elem->is_vertex(n) &&
                       neigh->get_node_index(elem->node_ptr(n)) == invalid_uint)
                     {
@@ -1230,13 +1231,13 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
                       break;
                     }
                 libmesh_error_msg_if(conforming,
-                                     "Side " << s << " of element " << elem->id()
+                                     "Side " << side << " of element " << elem->id()
                                      << " on disjoint neighbor boundary " << bcid
                                      << " shares its nodes with element " << neigh->id()
                                      << " on boundary " << paired_bcid);
               }
 
-            elem->set_neighbor(s, neigh ? neigh : const_cast<RemoteElem *>(remote_elem));
+            elem->set_neighbor(side, neigh ? neigh : const_cast<RemoteElem *>(remote_elem));
           }
     }
   else if (db)

@@ -2128,17 +2128,6 @@ public:
   void add_disjoint_neighbor_node_keys();
 
   /**
-   * \returns true if this mesh has disjoint neighbor node keys.
-   */
-  bool has_disjoint_neighbor_node_keys() const;
-
-  /**
-   * \returns The disjoint neighbor key of \p node, or
-   * DofObject::invalid_id if \p node has no key.
-   */
-  dof_id_type disjoint_neighbor_node_key(const Node & node) const;
-
-  /**
    * Set the disjoint neighbor key of \p node to \p key.
    */
   void set_disjoint_neighbor_node_key(Node & node, dof_id_type key) const;
@@ -2182,6 +2171,25 @@ public:
     bool has_reinit_ghosting_functors;
     bool has_synched_subdomain_name_map;
   };
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+#ifdef LIBMESH_IS_UNIT_TESTING
+public:
+#else
+protected:
+#endif
+
+  /**
+   * \returns true if this mesh has disjoint neighbor node keys.
+   */
+  bool has_disjoint_neighbor_node_keys() const;
+
+  /**
+   * \returns The disjoint neighbor key of \p node, or
+   * DofObject::invalid_id if no key was set for \p node.
+   */
+  dof_id_type disjoint_neighbor_node_key(const Node & node) const;
+#endif // LIBMESH_ENABLE_PERIODIC
 
 protected:
 
@@ -2583,6 +2591,14 @@ protected:
    * it can directly broadcast *_integer_names
    */
   friend class MeshCommunication;
+
+  /**
+   * Make the \p GhostPointNeighbors class a friend so that it can
+   * check for disjoint neighbor node keys. We plan to remove this
+   * friend together with the geometric matching of disjoint neighbor
+   * boundary pairs.
+   */
+  friend class GhostPointNeighbors;
 
 
   /**

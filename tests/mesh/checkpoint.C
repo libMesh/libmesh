@@ -574,14 +574,14 @@ public:
   {
     LOG_UNIT_TEST;
 
-    testDisjointNeighborPairsCheckpoint<DistributedMesh>(false, true);
+    testDisjointNeighborPairsCheckpoint<DistributedMesh>(/*binary=*/false, /*node_keys=*/true);
   }
 
   void testBinaryDisjointNeighborKeys()
   {
     LOG_UNIT_TEST;
 
-    testDisjointNeighborPairsCheckpoint<DistributedMesh>(true, true);
+    testDisjointNeighborPairsCheckpoint<DistributedMesh>(/*binary=*/true, /*node_keys=*/true);
   }
 #endif // LIBMESH_ENABLE_PERIODIC
 
