@@ -134,6 +134,10 @@ public:
    * solves, and removing the default algebraic ghosting functor is
    * only safe for codes where no evaluations on neighbor cells (e.g.
    * no jump error estimators) are done.
+   *
+   * Periodic constraints on a distributed mesh currently need every
+   * element point neighbor of a periodic vertex and its image.  The
+   * default ghosting functor ghosts those elements.
    */
   virtual void enable_default_ghosting (bool enable);
 

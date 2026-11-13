@@ -99,10 +99,16 @@ public:
     virtual void flag_elements () = 0;
   };
 
+#ifdef LIBMESH_ENABLE_DEPRECATED
   /**
-   * Sets the \p PeriodicBoundaries pointer.
+   * Sets a \p PeriodicBoundaries pointer, used in addition to every
+   * set registered with MeshBase::add_periodic_boundaries().
+   *
+   * This method is deprecated.  Each DofMap registers its own set with
+   * the mesh, so this call is unnecessary.
    */
   void set_periodic_boundaries_ptr(PeriodicBoundaries * pb_ptr);
+#endif
 
   /**
    * Destructor. Deletes all the elements that are currently stored.
@@ -726,19 +732,38 @@ private:
   bool make_refinement_compatible ();
 
   /**
-   * Local dispatch function for getting the correct topological
-   * neighbor from the Elem class
+   * \returns The periodic boundary sets to respect: every set
+   * registered with the mesh, plus the set from
+   * set_periodic_boundaries_ptr(), reduced by
+   * PeriodicBoundaries::remove_redundant_sets().
    */
-  Elem * topological_neighbor (Elem * elem,
-                               const PointLocatorBase * point_locator,
-                               const unsigned int side) const;
+  std::vector<const PeriodicBoundaries *> periodic_boundaries_used() const;
+
+  /**
+   * Fills \p neighbors with the topological neighbors of \p elem
+   * across every side.  A side with a regular neighbor contributes the
+   * regular neighbor.  A side without a regular neighbor contributes its
+   * neighbor in each of
+   * \p periodic_bcs, because each system's hanging node constraints
+   * use that system's periodic neighbors.  \p neighbors has no null
+   * entries and no duplicates.
+   *
+   * \returns \p neighbors.
+   */
+  const std::vector<Elem *> &
+  topological_neighbors (Elem * elem,
+                         const PointLocatorBase * point_locator,
+                         const std::vector<const PeriodicBoundaries *> & periodic_bcs,
+                         std::vector<Elem *> & neighbors) const;
 
   /**
    * Local dispatch function for checking the correct has_neighbor
-   * function from the Elem class
+   * function from the Elem class.  \returns \p true if \p neighbor is
+   * a topological neighbor of \p elem in any of \p periodic_bcs.
    */
   bool has_topological_neighbor (const Elem * elem,
                                  const PointLocatorBase * point_locator,
+                                 const std::vector<const PeriodicBoundaries *> & periodic_bcs,
                                  const Elem * neighbor) const;
 
   /**

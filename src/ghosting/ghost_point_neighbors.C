@@ -27,6 +27,7 @@
 #endif
 
 // C++ Includes
+#include <algorithm>
 #include <unordered_set>
 #include <set>
 #include <vector>
@@ -43,8 +44,11 @@ void GhostPointNeighbors::operator()
   libmesh_assert(_mesh);
 
 #ifdef LIBMESH_ENABLE_PERIODIC
+  const std::vector<const PeriodicBoundaries *> & periodic_bc_sets =
+    this->periodic_boundary_sets();
   const bool check_periodic_bcs =
-    (_periodic_bcs && !_periodic_bcs->empty());
+    std::any_of(periodic_bc_sets.begin(), periodic_bc_sets.end(),
+                [](const PeriodicBoundaries * pbs) { return !pbs->empty(); });
 
   auto * db = _mesh->get_disjoint_neighbor_boundary_pairs();
   const bool check_disjoint_bcs = (db && !db->empty());
@@ -52,6 +56,17 @@ void GhostPointNeighbors::operator()
   std::unique_ptr<PointLocatorBase> point_locator;
   if (check_periodic_bcs || check_disjoint_bcs)
       point_locator = _mesh->sub_point_locator();
+
+  // A point neighbor is kept if it is on a boundary of any set.  The
+  // examined elements are shared by all sets, so the test uses the
+  // union of the sets.
+  auto is_periodic_id = [&periodic_bc_sets](const boundary_id_type bcid)
+    {
+      for (const auto pbs : periodic_bc_sets)
+        if (pbs->count(bcid))
+          return true;
+      return false;
+    };
 
   std::set<const Elem *> periodic_elems_examined;
   const BoundaryInfo & binfo = _mesh->get_boundary_info();
@@ -123,58 +138,61 @@ void GhostPointNeighbors::operator()
               if (elem->neighbor_ptr(s))
                 continue;
 
-              const Elem * const equal_level_periodic_neigh = elem->topological_neighbor
-                (s, *_mesh, *point_locator, _periodic_bcs);
+              for (const auto periodic_bcs : periodic_bc_sets)
+                {
+                  const Elem * const equal_level_periodic_neigh = elem->topological_neighbor
+                    (s, *_mesh, *point_locator, periodic_bcs);
 
-              if (!equal_level_periodic_neigh || equal_level_periodic_neigh == remote_elem)
-                continue;
+                  if (!equal_level_periodic_neigh || equal_level_periodic_neigh == remote_elem)
+                    continue;
 
 #ifdef LIBMESH_ENABLE_AMR
-              equal_level_periodic_neigh->active_family_tree_by_topological_neighbor(
-                active_periodic_neighbors,
-                elem,
-                *_mesh,
-                *point_locator,
-                _periodic_bcs,
-                /*reset=*/true);
+                  equal_level_periodic_neigh->active_family_tree_by_topological_neighbor(
+                    active_periodic_neighbors,
+                    elem,
+                    *_mesh,
+                    *point_locator,
+                    periodic_bcs,
+                    /*reset=*/true);
 #else
-              active_periodic_neighbors = { equal_level_periodic_neigh };
+                  active_periodic_neighbors = { equal_level_periodic_neigh };
 #endif
 
-              for (const Elem * const active_periodic_neigh : active_periodic_neighbors)
-                {
-                  std::set <const Elem *> active_periodic_point_neighbors;
-
-                  // This fills point neighbors *including*
-                  // active_periodic_neigh. The documentation for this method
-                  // states that this will return *active* point neighbors
-                  active_periodic_neigh->find_point_neighbors(active_periodic_point_neighbors);
-
-                  for (const Elem * const appn : active_periodic_point_neighbors)
+                  for (const Elem * const active_periodic_neigh : active_periodic_neighbors)
                     {
-                      // Don't need to ghost RemoteElem or an element we already own or an
-                      // element we've already examined
-                      if (appn == remote_elem || appn->processor_id() == p ||
-                          periodic_elems_examined.count(appn))
-                        continue;
+                      std::set <const Elem *> active_periodic_point_neighbors;
 
-                      // We only need to keep point neighbors that are along the periodic boundaries
-                      bool on_periodic_boundary = false;
-                      for (const auto appn_s : appn->side_index_range())
+                      // This fills point neighbors *including*
+                      // active_periodic_neigh. The documentation for this method
+                      // states that this will return *active* point neighbors
+                      active_periodic_neigh->find_point_neighbors(active_periodic_point_neighbors);
+
+                      for (const Elem * const appn : active_periodic_point_neighbors)
                         {
-                          binfo.boundary_ids(appn, appn_s, appn_bcids);
-                          for (const auto appn_bcid : appn_bcids)
-                            if (_periodic_bcs->find(appn_bcid) != _periodic_bcs->end())
-                              {
-                                on_periodic_boundary = true;
-                                goto jump;
-                              }
-                        }
-                      jump:
-                        if (on_periodic_boundary)
-                          coupled_elements.emplace(appn, nullcm);
+                          // Don't need to ghost RemoteElem or an element we already own or an
+                          // element we've already examined
+                          if (appn == remote_elem || appn->processor_id() == p ||
+                              periodic_elems_examined.count(appn))
+                            continue;
 
-                        periodic_elems_examined.insert(appn);
+                          // We only need to keep point neighbors that are along the periodic boundaries
+                          bool on_periodic_boundary = false;
+                          for (const auto appn_s : appn->side_index_range())
+                            {
+                              binfo.boundary_ids(appn, appn_s, appn_bcids);
+                              for (const auto appn_bcid : appn_bcids)
+                                if (is_periodic_id(appn_bcid))
+                                  {
+                                    on_periodic_boundary = true;
+                                    goto jump;
+                                  }
+                            }
+                          jump:
+                            if (on_periodic_boundary)
+                              coupled_elements.emplace(appn, nullcm);
+
+                            periodic_elems_examined.insert(appn);
+                        }
                     }
                 }
             }
@@ -212,8 +230,11 @@ void GhostPointNeighbors::mesh_reinit()
   // Unless we have periodic boundary conditions, we don't need
   // anything precomputed.
 #ifdef LIBMESH_ENABLE_PERIODIC
+  const std::vector<const PeriodicBoundaries *> & periodic_bc_sets =
+    this->periodic_boundary_sets();
   const bool check_periodic_bcs =
-    (_periodic_bcs && !_periodic_bcs->empty());
+    std::any_of(periodic_bc_sets.begin(), periodic_bc_sets.end(),
+                [](const PeriodicBoundaries * pbs) { return !pbs->empty(); });
 
   auto * db = _mesh->get_disjoint_neighbor_boundary_pairs();
   const bool check_disjoint_bcs = (db && !db->empty());

@@ -123,6 +123,9 @@ MeshBase::MeshBase (const Parallel::Communicator & comm_in,
   _point_locator_close_to_point_tol(0.)
 {
   _elem_dims.insert(d);
+#ifdef LIBMESH_ENABLE_PERIODIC
+  _default_ghosting->use_mesh_periodic_boundaries(true);
+#endif
   _ghosting_functors.push_back(_default_ghosting.get());
   libmesh_assert_less_equal (LIBMESH_DIM, 3);
   libmesh_assert_greater_equal (LIBMESH_DIM, d);
@@ -181,6 +184,10 @@ MeshBase::MeshBase (const MeshBase & other_mesh) :
   _n_constraint_rows(0),
   _point_locator_close_to_point_tol(other_mesh._point_locator_close_to_point_tol)
 {
+#ifdef LIBMESH_ENABLE_PERIODIC
+  _default_ghosting->use_mesh_periodic_boundaries(true);
+#endif
+
   const GhostingFunctor * const other_default_ghosting = other_mesh._default_ghosting.get();
 
   for (GhostingFunctor * const gf : other_mesh._ghosting_functors)
@@ -2675,6 +2682,45 @@ void MeshBase::detect_interior_parents()
       erase_if_match(b1, b2, pairs);
       erase_if_match(b2, b1, pairs);
     }
+
+
+
+void MeshBase::add_periodic_boundaries(const PeriodicBoundaries & periodic_bcs)
+{
+  libmesh_assert(std::find(_periodic_boundary_sets.begin(),
+                           _periodic_boundary_sets.end(),
+                           &periodic_bcs) == _periodic_boundary_sets.end());
+
+  _periodic_boundary_sets.push_back(&periodic_bcs);
+  this->invalidate_periodic_boundary_sets();
+}
+
+
+
+void MeshBase::remove_periodic_boundaries(const PeriodicBoundaries & periodic_bcs)
+{
+  auto it = std::find(_periodic_boundary_sets.begin(),
+                      _periodic_boundary_sets.end(), &periodic_bcs);
+  libmesh_assert(it != _periodic_boundary_sets.end());
+  _periodic_boundary_sets.erase(it);
+  this->invalidate_periodic_boundary_sets();
+}
+
+
+
+const std::vector<const PeriodicBoundaries *> &
+MeshBase::periodic_boundary_sets() const
+{
+  if (!_reduced_periodic_boundary_sets)
+    {
+      libmesh_assert(!Threads::in_threads);
+      _reduced_periodic_boundary_sets = _periodic_boundary_sets;
+      PeriodicBoundaries::remove_redundant_sets(*_reduced_periodic_boundary_sets);
+    }
+
+  return *_reduced_periodic_boundary_sets;
+}
+
 
 
 #endif
