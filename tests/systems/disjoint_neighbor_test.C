@@ -719,10 +719,8 @@ private:
     BoundaryInfo & boundary = mesh.get_boundary_info();
     boundary.add_side(mesh.elem_ptr(0), 1, interface_left_id);
     boundary.add_side(mesh.elem_ptr(1), 3, interface_right_id);
-    mesh.add_disjoint_neighbor_boundary_pairs(interface_left_id, interface_right_id,
-                                              RealVectorValue(0.0, 0.0, 0.0));
+    mesh.add_disjoint_neighbor_boundary_pairs(interface_left_id, interface_right_id);
 
-    mesh.add_disjoint_neighbor_node_keys();
     for (auto & node : mesh.node_ptr_range())
       mesh.set_disjoint_neighbor_node_key(*node, node->id());
 
@@ -809,13 +807,13 @@ private:
 
     // This is the key testing step: inform libMesh about the disjoint neighbor boundary pairs
     // And, in `prepare_for_use()`, libMesh will set up the disjoint neighbor relationships.
-    if (add_pair)
+    if (add_pair && !add_node_keys)
       mesh.add_disjoint_neighbor_boundary_pairs(interface_left_id, interface_right_id, RealVectorValue(0.0, 0.0, 0.0));
 
     // Give each pair of duplicated interface nodes a shared key
     if (add_node_keys)
       {
-        mesh.add_disjoint_neighbor_node_keys();
+        mesh.add_disjoint_neighbor_boundary_pairs(interface_left_id, interface_right_id);
         for (const auto & [left, right] : {std::make_pair(1, 4), std::make_pair(3, 6)})
           {
             mesh.set_disjoint_neighbor_node_key(mesh.node_ref(left), left);

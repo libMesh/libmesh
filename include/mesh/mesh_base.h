@@ -2104,6 +2104,22 @@ public:
                                    const boundary_id_type b2,
                                    const RealVectorValue & translation);
 
+  /**
+   * Register a pair of boundaries as disjoint neighbor boundary pairs
+   * that find_neighbors() matches by node keys. This is logically
+   * collective.
+   *
+   * find_neighbors() matches sides across the pair by their sorted
+   * vertex keys. Every vertex on a disjoint neighbor boundary needs a valid key, which
+   * is set through set_disjoint_neighbor_node_key(). A mesh generator that
+   * duplicates a node along a disjoint interface should give each copy
+   * the same key. The id of the original node is one example choice. Node
+   * renumbering doesn't change the keys, which are stored as stable
+   * extra node integers.
+   */
+  void add_disjoint_neighbor_boundary_pairs(const boundary_id_type b1,
+                                            const boundary_id_type b2);
+
   PeriodicBoundaries * get_disjoint_neighbor_boundary_pairs();
 
   const PeriodicBoundaries * get_disjoint_neighbor_boundary_pairs() const;
@@ -2112,23 +2128,10 @@ public:
                                      const boundary_id_type b2);
 
   /**
-   * Register the node integer that stores disjoint neighbor node keys.
-   * This must be called on all processors at once.
-   *
-   * When this integer exists, find_neighbors() matches sides across
-   * disjoint neighbor boundary pairs by their sorted vertex keys.
-   * Matching then doesn't rely on node coordinates, so it gives the same neighbors
-   * after the nodes move, for example on a displaced mesh.
-   *
-   * Every vertex on a disjoint neighbor boundary needs a key. A mesh
-   * generator that duplicates a node along a disjoint interface must
-   * give each copy the same key. The id of the original node is one
-   * choice. Node renumbering doesn't change the keys.
-   */
-  void add_disjoint_neighbor_node_keys();
-
-  /**
-   * Set the disjoint neighbor key of \p node to \p key.
+   * Set the disjoint neighbor key of \p node to \p key. The mesh must
+   * have had at least one call already to the two-argument
+   * add_disjoint_neighbor_boundary_pairs() in order to allocate the
+   * extra node integer used to store the disjoint key.
    */
   void set_disjoint_neighbor_node_key(Node & node, dof_id_type key) const;
 #endif

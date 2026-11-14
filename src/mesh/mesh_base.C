@@ -2440,8 +2440,8 @@ void MeshBase::detect_interior_parents()
    * Register a pair of boundaries as disjoint neighbor boundary pairs.
    */
   void MeshBase::add_disjoint_neighbor_boundary_pairs(const boundary_id_type b1,
-                                             const boundary_id_type b2,
-                                             const RealVectorValue & translation)
+                                                      const boundary_id_type b2,
+                                                      const RealVectorValue & translation)
     {
       // Lazily allocate the container the first time it’s needed
       if (!_disjoint_neighbor_boundary_pairs)
@@ -2507,8 +2507,12 @@ namespace
 const std::string disjoint_neighbor_node_key_name = "disjoint_neighbor_node_key";
 }
 
-void MeshBase::add_disjoint_neighbor_node_keys()
+void MeshBase::add_disjoint_neighbor_boundary_pairs(const boundary_id_type b1,
+                                                    const boundary_id_type b2)
 {
+  // Temporarily reuse the three-argument overload code before it's deprecated
+  // and then removed
+  this->add_disjoint_neighbor_boundary_pairs(b1, b2, RealVectorValue());
   this->add_node_integer(disjoint_neighbor_node_key_name);
 }
 

@@ -477,18 +477,19 @@ public:
       BoundaryInfo & boundary_info = mesh.get_boundary_info();
       boundary_info.add_side(mesh.elem_ptr(0), 1, left_id);
       boundary_info.add_side(mesh.elem_ptr(1), 3, right_id);
-      mesh.add_disjoint_neighbor_boundary_pairs(left_id, right_id, translation);
 
       // Give the facing vertices of the two quads shared keys
       if (node_keys)
         {
-          mesh.add_disjoint_neighbor_node_keys();
+          mesh.add_disjoint_neighbor_boundary_pairs(left_id, right_id);
           for (const auto & [left, right] : {std::make_pair(1, 4), std::make_pair(2, 7)})
             {
               mesh.set_disjoint_neighbor_node_key(mesh.node_ref(left), left);
               mesh.set_disjoint_neighbor_node_key(mesh.node_ref(right), left);
             }
         }
+      else
+        mesh.add_disjoint_neighbor_boundary_pairs(left_id, right_id, translation);
 
       mesh.prepare_for_use();
 
@@ -514,9 +515,11 @@ public:
       CPPUNIT_ASSERT_EQUAL(std::size_t(2), db->size());
       CPPUNIT_ASSERT_EQUAL(right_id, libmesh_map_find(*db, left_id)->pairedboundary);
       CPPUNIT_ASSERT_EQUAL(left_id, libmesh_map_find(*db, right_id)->pairedboundary);
+      // A pair matched by keys stores a zero translation
+      const RealVectorValue expected_translation = node_keys ? RealVectorValue() : translation;
       LIBMESH_ASSERT_FP_EQUAL
         (0., (libmesh_map_find(*db, left_id)->get_corresponding_pos(Point(0)) -
-              translation).norm(), TOLERANCE*TOLERANCE);
+              expected_translation).norm(), TOLERANCE*TOLERANCE);
 
       if (const Elem * elem = mesh.query_elem_ptr(0))
         {
@@ -533,9 +536,9 @@ public:
         {
           CPPUNIT_ASSERT(mesh.has_disjoint_neighbor_node_keys());
 
-          // Open the interface past the translation, so that a
-          // coordinate match fails. Then find the neighbors and gather
+          // Move the right quad. Then find the neighbors and gather
           // the mesh, as Exodus output of a distributed mesh does.
+          // Matching by keys must give the same neighbors.
           for (auto & node : mesh.node_ptr_range())
             if ((*node)(0) > 1.1)
               (*node)(0) += 0.5;
