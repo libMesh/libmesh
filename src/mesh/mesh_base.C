@@ -2507,8 +2507,8 @@ namespace
 const std::string disjoint_neighbor_node_key_name = "disjoint_neighbor_node_key";
 }
 
-void MeshBase::add_disjoint_neighbor_boundary_pairs(const boundary_id_type b1,
-                                                    const boundary_id_type b2)
+void MeshBase::add_disjoint_neighbor_boundary_pair(const boundary_id_type b1,
+                                                   const boundary_id_type b2)
 {
   // Temporarily reuse the three-argument overload code before it's deprecated
   // and then removed

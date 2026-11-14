@@ -719,7 +719,7 @@ private:
     BoundaryInfo & boundary = mesh.get_boundary_info();
     boundary.add_side(mesh.elem_ptr(0), 1, interface_left_id);
     boundary.add_side(mesh.elem_ptr(1), 3, interface_right_id);
-    mesh.add_disjoint_neighbor_boundary_pairs(interface_left_id, interface_right_id);
+    mesh.add_disjoint_neighbor_boundary_pair(interface_left_id, interface_right_id);
 
     for (auto & node : mesh.node_ptr_range())
       mesh.set_disjoint_neighbor_node_key(*node, node->id());
@@ -813,7 +813,7 @@ private:
     // Give each pair of duplicated interface nodes a shared key
     if (add_node_keys)
       {
-        mesh.add_disjoint_neighbor_boundary_pairs(interface_left_id, interface_right_id);
+        mesh.add_disjoint_neighbor_boundary_pair(interface_left_id, interface_right_id);
         for (const auto & [left, right] : {std::make_pair(1, 4), std::make_pair(3, 6)})
           {
             mesh.set_disjoint_neighbor_node_key(mesh.node_ref(left), left);

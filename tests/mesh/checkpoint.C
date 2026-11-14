@@ -481,7 +481,7 @@ public:
       // Give the facing vertices of the two quads shared keys
       if (node_keys)
         {
-          mesh.add_disjoint_neighbor_boundary_pairs(left_id, right_id);
+          mesh.add_disjoint_neighbor_boundary_pair(left_id, right_id);
           for (const auto & [left, right] : {std::make_pair(1, 4), std::make_pair(2, 7)})
             {
               mesh.set_disjoint_neighbor_node_key(mesh.node_ref(left), left);

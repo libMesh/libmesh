@@ -2105,7 +2105,7 @@ public:
                                    const RealVectorValue & translation);
 
   /**
-   * Register a pair of boundaries as disjoint neighbor boundary pairs
+   * Register a pair of boundaries as a disjoint neighbor boundary pair
    * that find_neighbors() matches by node keys. This is logically
    * collective.
    *
@@ -2117,8 +2117,8 @@ public:
    * renumbering doesn't change the keys, which are stored as stable
    * extra node integers.
    */
-  void add_disjoint_neighbor_boundary_pairs(const boundary_id_type b1,
-                                            const boundary_id_type b2);
+  void add_disjoint_neighbor_boundary_pair(const boundary_id_type b1,
+                                           const boundary_id_type b2);
 
   PeriodicBoundaries * get_disjoint_neighbor_boundary_pairs();
 
@@ -2129,8 +2129,8 @@ public:
 
   /**
    * Set the disjoint neighbor key of \p node to \p key. The mesh must
-   * have had at least one call already to the two-argument
-   * add_disjoint_neighbor_boundary_pairs() in order to allocate the
+   * have had at least one call already to
+   * add_disjoint_neighbor_boundary_pair() in order to allocate the
    * extra node integer used to store the disjoint key.
    */
   void set_disjoint_neighbor_node_key(Node & node, dof_id_type key) const;
