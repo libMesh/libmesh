@@ -2131,12 +2131,36 @@ public:
                                    const boundary_id_type b2,
                                    const RealVectorValue & translation);
 
+  /**
+   * Register a pair of boundaries as a disjoint neighbor boundary pair
+   * that find_neighbors() matches by node keys. This is logically
+   * collective.
+   *
+   * find_neighbors() matches sides across the pair by their sorted
+   * vertex keys. Every vertex on a disjoint neighbor boundary needs a valid key, which
+   * is set through set_disjoint_neighbor_node_key(). A mesh generator that
+   * duplicates a node along a disjoint interface should give each copy
+   * the same key. The id of the original node is one example choice. Node
+   * renumbering doesn't change the keys, which are stored as stable
+   * extra node integers.
+   */
+  void add_disjoint_neighbor_boundary_pair(const boundary_id_type b1,
+                                           const boundary_id_type b2);
+
   PeriodicBoundaries * get_disjoint_neighbor_boundary_pairs();
 
   const PeriodicBoundaries * get_disjoint_neighbor_boundary_pairs() const;
 
   void remove_disjoint_boundary_pair(const boundary_id_type b1,
                                      const boundary_id_type b2);
+
+  /**
+   * Set the disjoint neighbor key of \p node to \p key. The mesh must
+   * have had at least one call already to
+   * add_disjoint_neighbor_boundary_pair() in order to allocate the
+   * extra node integer used to store the disjoint key.
+   */
+  void set_disjoint_neighbor_node_key(Node & node, dof_id_type key) const;
 #endif
 
   /**
@@ -2180,6 +2204,25 @@ public:
     bool has_reinit_ghosting_functors;
     bool has_synched_subdomain_name_map;
   };
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+#ifdef LIBMESH_IS_UNIT_TESTING
+public:
+#else
+protected:
+#endif
+
+  /**
+   * \returns true if this mesh has disjoint neighbor node keys.
+   */
+  bool has_disjoint_neighbor_node_keys() const;
+
+  /**
+   * \returns The disjoint neighbor key of \p node, or
+   * DofObject::invalid_id if no key was set for \p node.
+   */
+  dof_id_type disjoint_neighbor_node_key(const Node & node) const;
+#endif // LIBMESH_ENABLE_PERIODIC
 
 protected:
 
@@ -2640,6 +2683,14 @@ protected:
    * it can directly broadcast *_integer_names
    */
   friend class MeshCommunication;
+
+  /**
+   * Make the \p GhostPointNeighbors class a friend so that it can
+   * check for disjoint neighbor node keys. We plan to remove this
+   * friend together with the geometric matching of disjoint neighbor
+   * boundary pairs.
+   */
+  friend class GhostPointNeighbors;
 
 
   /**
