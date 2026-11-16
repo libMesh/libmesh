@@ -1280,8 +1280,6 @@ void MeshBase::update_post_partitioning()
       _const_node_stored_range.reset();
     }
 
-  _mesh_local_subdomains.clear();
-
   SBDInserter inserter;
   Threads::parallel_reduce(this->const_active_local_element_stored_range(), inserter);
 
