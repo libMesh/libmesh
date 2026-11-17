@@ -36,11 +36,11 @@ namespace libMesh
  * \verbatim
  *          3   9   8   2
  *   QUAD4: o---o---o---o
- *          |   15  14  |           eta
+ *          |    15  14 |           eta
  *      10  o   o   o   o 7          ^
- *          |           |            |
+ *          |    12  13 |            |
  *      11  o   o   o   o 6          |
- *          |   12  13  |            o---> xi
+ *          |           |            o---> xi
  *          o---o---o---o
  *          0   4   5   1
  * \endverbatim
@@ -140,14 +140,15 @@ public:
   virtual bool has_invertible_map(Real tol) const override;
 
   /**
-   * \returns FIRST.
+   * \returns THIRD.
    */
-  virtual Order default_order() const override;
+  virtual Order default_order() const override
+  { return THIRD; }
 
   virtual std::unique_ptr<Elem> build_side_ptr (const unsigned int i) override;
 
   /**
-   * Rebuilds an EDGE2 coincident with face i.
+   * Rebuilds an EDGE4 coincident with face i.
    */
   virtual void build_side_ptr (std::unique_ptr<Elem> & elem,
                                const unsigned int i) override;
@@ -218,9 +219,6 @@ protected:
    */
   virtual Real embedding_matrix (const unsigned int, const unsigned int, const unsigned int) const override
   { libmesh_not_implemented(); return 0; }
-
-  // TODO delete?
-  //LIBMESH_ENABLE_TOPOLOGY_CACHES;
 
 #endif // LIBMESH_ENABLE_AMR
 

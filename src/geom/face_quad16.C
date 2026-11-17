@@ -204,15 +204,6 @@ bool Quad16::has_invertible_map(Real tol) const
 }
 
 
-
-Order Quad16::default_order() const
-// TODO does this make sense here?
-{
-  return THIRD;
-}
-
-
-
 std::unique_ptr<Elem> Quad16::build_side_ptr (const unsigned int i)
 {
   return this->simple_build_side_ptr<Edge4, Quad16>(i);
