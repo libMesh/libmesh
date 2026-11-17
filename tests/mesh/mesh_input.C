@@ -17,6 +17,7 @@
 #include <libmesh/gmsh_io.h>
 #include <libmesh/nemesis_io.h>
 #include <libmesh/stl_io.h>
+#include <libmesh/ucd_io.h>
 #include <libmesh/vtk_io.h>
 #include <libmesh/tetgen_io.h>
 
@@ -209,6 +210,8 @@ public:
 #if LIBMESH_DIM > 2
   CPPUNIT_TEST( testGoodSTL );
   CPPUNIT_TEST( testGoodSTLBinary );
+
+  CPPUNIT_TEST( testUCDWriteNodalData );
 
   CPPUNIT_TEST( testGmshBCIDOverlap );
 
@@ -1994,6 +1997,42 @@ public:
 
     CPPUNIT_ASSERT_EQUAL(mesh.n_elem(), dof_id_type(426));
     CPPUNIT_ASSERT_EQUAL(mesh.n_nodes(), dof_id_type(215));
+  }
+
+  void testUCDWriteNodalData ()
+  {
+    LOG_UNIT_TEST;
+
+    ReplicatedMesh mesh(*TestCommWorld);
+    MeshTools::Generation::build_cube(mesh, 1, 1, 1, 0., 1., 0., 1., 0., 1., HEX8);
+
+    std::vector<Number> soln(mesh.n_nodes());
+    for (auto i : index_range(soln))
+      soln[i] = i;
+
+    UCDIO(mesh).write_nodal_data("ucd_nodal_data.inp", soln, {"u"});
+
+    if (mesh.processor_id() != 0)
+      return;
+
+    // After the comments come a header line, one line per node, one
+    // line per element, two lines describing the variable, and then
+    // one line of nodal data per node.
+    std::ifstream in("ucd_nodal_data.inp");
+    std::vector<std::string> lines;
+    for (std::string line; std::getline(in, line);)
+      if (!line.empty() && line[0] != '#')
+        lines.push_back(line);
+
+    const std::size_t n_nodes = mesh.n_nodes();
+    const std::size_t first_data_line = 1 + n_nodes + mesh.n_elem() + 2;
+    CPPUNIT_ASSERT_EQUAL(first_data_line + n_nodes, lines.size());
+
+    // UCD node numbers are 1-based, so the last line is for node n_nodes
+    std::istringstream last_line(lines.back());
+    std::size_t node_num = 0;
+    last_line >> node_num;
+    CPPUNIT_ASSERT_EQUAL(n_nodes, node_num);
   }
 
   void testTetgenIO ()
