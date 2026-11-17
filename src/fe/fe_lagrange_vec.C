@@ -523,9 +523,9 @@ void lagrange_vec_nodal_soln(const Elem * elem,
               nodal_soln[41]  = .5*(elem_soln[14] + elem_soln[17]);
 
               // node 14 components
-              nodal_soln[42]  = .5*(elem_soln[12] + elem_soln[15]);
-              nodal_soln[43]  = .5*(elem_soln[13] + elem_soln[16]);
-              nodal_soln[44]  = .5*(elem_soln[14] + elem_soln[17]);
+              nodal_soln[42]  = .5*(elem_soln[9] + elem_soln[15]);
+              nodal_soln[43]  = .5*(elem_soln[10] + elem_soln[16]);
+              nodal_soln[44]  = .5*(elem_soln[11] + elem_soln[17]);
 
               return;
             }
