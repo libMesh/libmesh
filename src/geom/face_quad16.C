@@ -370,6 +370,9 @@ void Quad16::permute(unsigned int perm_num)
   for (unsigned int i = 0; i != perm_num; ++i)
     {
       swap4nodes(0,1,2,3);
+      swap4nodes(4,6,8,10);
+      swap4nodes(5,7,9,11);
+      swap4nodes(12,13,14,15);
       swap4neighbors(0,1,2,3);
     }
 }
