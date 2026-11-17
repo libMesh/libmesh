@@ -23,6 +23,7 @@
 // Local includes
 #include "libmesh/libmesh_common.h"
 #include "libmesh/face_quad.h"
+#include "libmesh/enum_order.h"
 
 namespace libMesh
 {

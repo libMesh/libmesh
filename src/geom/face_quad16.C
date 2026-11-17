@@ -155,38 +155,11 @@ void Quad16::build_side_ptr (std::unique_ptr<Elem> & side,
 
 void Quad16::connectivity(const unsigned int libmesh_dbg_var(sf),
                          const IOPackage iop,
-                         std::vector<dof_id_type> & conn) const
+                         std::vector<dof_id_type> &) const
 {
   libmesh_assert_less (sf, this->n_sub_elem());
   libmesh_assert_not_equal_to (iop, INVALID_IO_PACKAGE);
-
-  // Create storage.
-  conn.resize(4);
-
-  switch (iop)
-    {
-    case TECPLOT:
-      {
-        conn[0] = this->node_id(0)+1;
-        conn[1] = this->node_id(1)+1;
-        conn[2] = this->node_id(2)+1;
-        conn[3] = this->node_id(3)+1;
-        return;
-      }
-
-    case VTK:
-      {
-        conn[0] = this->node_id(0);
-        conn[1] = this->node_id(1);
-        conn[2] = this->node_id(2);
-        conn[3] = this->node_id(3);
-        return;
-      }
-
-    default:
-      libmesh_error_msg("Unsupported IO package " << iop);
-    }
-}
+  libmesh_error_msg("Unsupported IO package for Quad16 " << iop);
 }
 
 
