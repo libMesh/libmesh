@@ -135,11 +135,6 @@ public:
   virtual bool has_affine_map () const override;
 
   /**
-   * \returns \p true if the element convex, false otherwise.
-   */
-  virtual bool has_invertible_map(Real tol) const override;
-
-  /**
    * \returns THIRD.
    */
   virtual Order default_order() const override
@@ -178,19 +173,6 @@ public:
   static const unsigned int side_nodes_map[num_sides][nodes_per_side];
 
   /**
-   * An optimized method for computing the centroid of a
-   * 4-node quad with straight sides.
-   */
-  virtual Point true_centroid () const override;
-
-  /**
-   * An optimized method for computing the area of a
-   * 4-node quad with straight sides, but not necessarily a
-   * parallelogram.
-   */
-  virtual Real volume () const override;
-
-  /**
    * Builds a bounding box out of the nodal positions
    */
   virtual BoundingBox loose_bounding_box () const override;
@@ -200,8 +182,6 @@ public:
   virtual void flip(BoundaryInfo *) override final;
 
   ElemType side_type (const unsigned int s) const override final;
-
-  virtual Point side_vertex_average_normal(const unsigned int s) const override final;
 
 protected:
 
