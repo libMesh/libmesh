@@ -173,11 +173,6 @@ public:
    */
   static const unsigned int side_nodes_map[num_sides][nodes_per_side];
 
-  /**
-   * Builds a bounding box out of the nodal positions
-   */
-  virtual BoundingBox loose_bounding_box () const override;
-
   virtual void permute(unsigned int perm_num) override final;
 
   virtual void flip(BoundaryInfo *) override final;
