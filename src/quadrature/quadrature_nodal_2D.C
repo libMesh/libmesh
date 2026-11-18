@@ -137,6 +137,30 @@ void QNodal::init_2D()
         return;
       }
 
+    case QUAD16:
+      {
+        _points.resize(16);
+        _weights.resize(16);
+
+        const Real third = Real(1)/3;
+        const Real a = Real(1)/4, b = Real(3)/4;   // Simpson 3/8 weights on [-1,1]
+
+        // 1D node coordinates / weights indexed by position along the edge
+        const Real x1d[4] = {-1, -third, third, 1};
+        const Real w1d[4] = { a,  b,     b,     a};
+
+        // Map each Quad16 node to its (ix, iy) position on the 4x4 grid
+        static const unsigned int ix[16] = {0,3,3,0, 1,2, 3,3, 2,1, 0,0, 1,2,2,1};
+        static const unsigned int iy[16] = {0,0,3,3, 0,0, 1,2, 3,3, 2,1, 1,1,2,2};
+
+        for (unsigned int n = 0; n < 16; ++n)
+          {
+            _points[n]  = Point(x1d[ix[n]], x1d[iy[n]]);
+            _weights[n] = w1d[ix[n]] * w1d[iy[n]];
+          }
+        return;
+      }
+
     case QUAD9:
     case QUADSHELL9:
     case TRI6:
