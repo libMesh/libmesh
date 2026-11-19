@@ -135,6 +135,7 @@ libmesh_SOURCES =  \
         src/geom/cell_hex.C \
         src/geom/cell_hex20.C \
         src/geom/cell_hex27.C \
+        src/geom/cell_hex64.C \
         src/geom/cell_hex8.C \
         src/geom/cell_inf.C \
         src/geom/cell_inf_hex.C \

@@ -102,6 +102,7 @@ BUILT_SOURCES = \
         cell_hex.h \
         cell_hex20.h \
         cell_hex27.h \
+        cell_hex64.h \
         cell_hex8.h \
         cell_inf.h \
         cell_inf_hex.h \
@@ -917,6 +918,9 @@ cell_hex20.h: $(top_srcdir)/include/geom/cell_hex20.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_hex27.h: $(top_srcdir)/include/geom/cell_hex27.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+cell_hex64.h: $(top_srcdir)/include/geom/cell_hex64.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 cell_hex8.h: $(top_srcdir)/include/geom/cell_hex8.h

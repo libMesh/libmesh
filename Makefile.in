@@ -364,7 +364,7 @@ am__libmesh_dbg_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
 	src/fe/inf_fe_static.C src/geom/bounding_box.C src/geom/cell.C \
 	src/geom/cell_c0polyhedron.C src/geom/cell_hex.C \
 	src/geom/cell_hex20.C src/geom/cell_hex27.C \
-	src/geom/cell_hex8.C src/geom/cell_inf.C \
+	src/geom/cell_hex64.C src/geom/cell_hex8.C src/geom/cell_inf.C \
 	src/geom/cell_inf_hex.C src/geom/cell_inf_hex16.C \
 	src/geom/cell_inf_hex18.C src/geom/cell_inf_hex8.C \
 	src/geom/cell_inf_prism.C src/geom/cell_inf_prism12.C \
@@ -749,6 +749,7 @@ am__objects_1 = src/base/libmesh_dbg_la-dirichlet_boundary.lo \
 	src/geom/libmesh_dbg_la-cell_hex.lo \
 	src/geom/libmesh_dbg_la-cell_hex20.lo \
 	src/geom/libmesh_dbg_la-cell_hex27.lo \
+	src/geom/libmesh_dbg_la-cell_hex64.lo \
 	src/geom/libmesh_dbg_la-cell_hex8.lo \
 	src/geom/libmesh_dbg_la-cell_inf.lo \
 	src/geom/libmesh_dbg_la-cell_inf_hex.lo \
@@ -1190,7 +1191,7 @@ am__libmesh_devel_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
 	src/fe/inf_fe_static.C src/geom/bounding_box.C src/geom/cell.C \
 	src/geom/cell_c0polyhedron.C src/geom/cell_hex.C \
 	src/geom/cell_hex20.C src/geom/cell_hex27.C \
-	src/geom/cell_hex8.C src/geom/cell_inf.C \
+	src/geom/cell_hex64.C src/geom/cell_hex8.C src/geom/cell_inf.C \
 	src/geom/cell_inf_hex.C src/geom/cell_inf_hex16.C \
 	src/geom/cell_inf_hex18.C src/geom/cell_inf_hex8.C \
 	src/geom/cell_inf_prism.C src/geom/cell_inf_prism12.C \
@@ -1574,6 +1575,7 @@ am__objects_2 = src/base/libmesh_devel_la-dirichlet_boundary.lo \
 	src/geom/libmesh_devel_la-cell_hex.lo \
 	src/geom/libmesh_devel_la-cell_hex20.lo \
 	src/geom/libmesh_devel_la-cell_hex27.lo \
+	src/geom/libmesh_devel_la-cell_hex64.lo \
 	src/geom/libmesh_devel_la-cell_hex8.lo \
 	src/geom/libmesh_devel_la-cell_inf.lo \
 	src/geom/libmesh_devel_la-cell_inf_hex.lo \
@@ -2012,7 +2014,7 @@ am__libmesh_oprof_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
 	src/fe/inf_fe_static.C src/geom/bounding_box.C src/geom/cell.C \
 	src/geom/cell_c0polyhedron.C src/geom/cell_hex.C \
 	src/geom/cell_hex20.C src/geom/cell_hex27.C \
-	src/geom/cell_hex8.C src/geom/cell_inf.C \
+	src/geom/cell_hex64.C src/geom/cell_hex8.C src/geom/cell_inf.C \
 	src/geom/cell_inf_hex.C src/geom/cell_inf_hex16.C \
 	src/geom/cell_inf_hex18.C src/geom/cell_inf_hex8.C \
 	src/geom/cell_inf_prism.C src/geom/cell_inf_prism12.C \
@@ -2396,6 +2398,7 @@ am__objects_3 = src/base/libmesh_oprof_la-dirichlet_boundary.lo \
 	src/geom/libmesh_oprof_la-cell_hex.lo \
 	src/geom/libmesh_oprof_la-cell_hex20.lo \
 	src/geom/libmesh_oprof_la-cell_hex27.lo \
+	src/geom/libmesh_oprof_la-cell_hex64.lo \
 	src/geom/libmesh_oprof_la-cell_hex8.lo \
 	src/geom/libmesh_oprof_la-cell_inf.lo \
 	src/geom/libmesh_oprof_la-cell_inf_hex.lo \
@@ -2834,7 +2837,7 @@ am__libmesh_opt_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
 	src/fe/inf_fe_static.C src/geom/bounding_box.C src/geom/cell.C \
 	src/geom/cell_c0polyhedron.C src/geom/cell_hex.C \
 	src/geom/cell_hex20.C src/geom/cell_hex27.C \
-	src/geom/cell_hex8.C src/geom/cell_inf.C \
+	src/geom/cell_hex64.C src/geom/cell_hex8.C src/geom/cell_inf.C \
 	src/geom/cell_inf_hex.C src/geom/cell_inf_hex16.C \
 	src/geom/cell_inf_hex18.C src/geom/cell_inf_hex8.C \
 	src/geom/cell_inf_prism.C src/geom/cell_inf_prism12.C \
@@ -3218,6 +3221,7 @@ am__objects_4 = src/base/libmesh_opt_la-dirichlet_boundary.lo \
 	src/geom/libmesh_opt_la-cell_hex.lo \
 	src/geom/libmesh_opt_la-cell_hex20.lo \
 	src/geom/libmesh_opt_la-cell_hex27.lo \
+	src/geom/libmesh_opt_la-cell_hex64.lo \
 	src/geom/libmesh_opt_la-cell_hex8.lo \
 	src/geom/libmesh_opt_la-cell_inf.lo \
 	src/geom/libmesh_opt_la-cell_inf_hex.lo \
@@ -3655,7 +3659,7 @@ am__libmesh_prof_la_SOURCES_DIST = src/base/dirichlet_boundary.C \
 	src/fe/inf_fe_static.C src/geom/bounding_box.C src/geom/cell.C \
 	src/geom/cell_c0polyhedron.C src/geom/cell_hex.C \
 	src/geom/cell_hex20.C src/geom/cell_hex27.C \
-	src/geom/cell_hex8.C src/geom/cell_inf.C \
+	src/geom/cell_hex64.C src/geom/cell_hex8.C src/geom/cell_inf.C \
 	src/geom/cell_inf_hex.C src/geom/cell_inf_hex16.C \
 	src/geom/cell_inf_hex18.C src/geom/cell_inf_hex8.C \
 	src/geom/cell_inf_prism.C src/geom/cell_inf_prism12.C \
@@ -4039,6 +4043,7 @@ am__objects_5 = src/base/libmesh_prof_la-dirichlet_boundary.lo \
 	src/geom/libmesh_prof_la-cell_hex.lo \
 	src/geom/libmesh_prof_la-cell_hex20.lo \
 	src/geom/libmesh_prof_la-cell_hex27.lo \
+	src/geom/libmesh_prof_la-cell_hex64.lo \
 	src/geom/libmesh_prof_la-cell_hex8.lo \
 	src/geom/libmesh_prof_la-cell_inf.lo \
 	src/geom/libmesh_prof_la-cell_inf_hex.lo \
@@ -5700,6 +5705,7 @@ am__depfiles_remade = src/apps/$(DEPDIR)/amr_dbg-amr.Po \
 	src/geom/$(DEPDIR)/libmesh_dbg_la-cell_hex.Plo \
 	src/geom/$(DEPDIR)/libmesh_dbg_la-cell_hex20.Plo \
 	src/geom/$(DEPDIR)/libmesh_dbg_la-cell_hex27.Plo \
+	src/geom/$(DEPDIR)/libmesh_dbg_la-cell_hex64.Plo \
 	src/geom/$(DEPDIR)/libmesh_dbg_la-cell_hex8.Plo \
 	src/geom/$(DEPDIR)/libmesh_dbg_la-cell_inf.Plo \
 	src/geom/$(DEPDIR)/libmesh_dbg_la-cell_inf_hex.Plo \
@@ -5769,6 +5775,7 @@ am__depfiles_remade = src/apps/$(DEPDIR)/amr_dbg-amr.Po \
 	src/geom/$(DEPDIR)/libmesh_devel_la-cell_hex.Plo \
 	src/geom/$(DEPDIR)/libmesh_devel_la-cell_hex20.Plo \
 	src/geom/$(DEPDIR)/libmesh_devel_la-cell_hex27.Plo \
+	src/geom/$(DEPDIR)/libmesh_devel_la-cell_hex64.Plo \
 	src/geom/$(DEPDIR)/libmesh_devel_la-cell_hex8.Plo \
 	src/geom/$(DEPDIR)/libmesh_devel_la-cell_inf.Plo \
 	src/geom/$(DEPDIR)/libmesh_devel_la-cell_inf_hex.Plo \
@@ -5838,6 +5845,7 @@ am__depfiles_remade = src/apps/$(DEPDIR)/amr_dbg-amr.Po \
 	src/geom/$(DEPDIR)/libmesh_oprof_la-cell_hex.Plo \
 	src/geom/$(DEPDIR)/libmesh_oprof_la-cell_hex20.Plo \
 	src/geom/$(DEPDIR)/libmesh_oprof_la-cell_hex27.Plo \
+	src/geom/$(DEPDIR)/libmesh_oprof_la-cell_hex64.Plo \
 	src/geom/$(DEPDIR)/libmesh_oprof_la-cell_hex8.Plo \
 	src/geom/$(DEPDIR)/libmesh_oprof_la-cell_inf.Plo \
 	src/geom/$(DEPDIR)/libmesh_oprof_la-cell_inf_hex.Plo \
@@ -5907,6 +5915,7 @@ am__depfiles_remade = src/apps/$(DEPDIR)/amr_dbg-amr.Po \
 	src/geom/$(DEPDIR)/libmesh_opt_la-cell_hex.Plo \
 	src/geom/$(DEPDIR)/libmesh_opt_la-cell_hex20.Plo \
 	src/geom/$(DEPDIR)/libmesh_opt_la-cell_hex27.Plo \
+	src/geom/$(DEPDIR)/libmesh_opt_la-cell_hex64.Plo \
 	src/geom/$(DEPDIR)/libmesh_opt_la-cell_hex8.Plo \
 	src/geom/$(DEPDIR)/libmesh_opt_la-cell_inf.Plo \
 	src/geom/$(DEPDIR)/libmesh_opt_la-cell_inf_hex.Plo \
@@ -5976,6 +5985,7 @@ am__depfiles_remade = src/apps/$(DEPDIR)/amr_dbg-amr.Po \
 	src/geom/$(DEPDIR)/libmesh_prof_la-cell_hex.Plo \
 	src/geom/$(DEPDIR)/libmesh_prof_la-cell_hex20.Plo \
 	src/geom/$(DEPDIR)/libmesh_prof_la-cell_hex27.Plo \
+	src/geom/$(DEPDIR)/libmesh_prof_la-cell_hex64.Plo \
 	src/geom/$(DEPDIR)/libmesh_prof_la-cell_hex8.Plo \
 	src/geom/$(DEPDIR)/libmesh_prof_la-cell_inf.Plo \
 	src/geom/$(DEPDIR)/libmesh_prof_la-cell_inf_hex.Plo \
@@ -8312,6 +8322,7 @@ libmesh_SOURCES = \
         src/geom/cell_hex.C \
         src/geom/cell_hex20.C \
         src/geom/cell_hex27.C \
+        src/geom/cell_hex64.C \
         src/geom/cell_hex8.C \
         src/geom/cell_inf.C \
         src/geom/cell_inf_hex.C \
@@ -9519,6 +9530,8 @@ src/geom/libmesh_dbg_la-cell_hex.lo: src/geom/$(am__dirstamp) \
 src/geom/libmesh_dbg_la-cell_hex20.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_dbg_la-cell_hex27.lo: src/geom/$(am__dirstamp) \
+	src/geom/$(DEPDIR)/$(am__dirstamp)
+src/geom/libmesh_dbg_la-cell_hex64.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_dbg_la-cell_hex8.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
@@ -10777,6 +10790,8 @@ src/geom/libmesh_devel_la-cell_hex20.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_devel_la-cell_hex27.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
+src/geom/libmesh_devel_la-cell_hex64.lo: src/geom/$(am__dirstamp) \
+	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_devel_la-cell_hex8.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_devel_la-cell_inf.lo: src/geom/$(am__dirstamp) \
@@ -11964,6 +11979,8 @@ src/geom/libmesh_oprof_la-cell_hex.lo: src/geom/$(am__dirstamp) \
 src/geom/libmesh_oprof_la-cell_hex20.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_oprof_la-cell_hex27.lo: src/geom/$(am__dirstamp) \
+	src/geom/$(DEPDIR)/$(am__dirstamp)
+src/geom/libmesh_oprof_la-cell_hex64.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_oprof_la-cell_hex8.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
@@ -13153,6 +13170,8 @@ src/geom/libmesh_opt_la-cell_hex20.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_opt_la-cell_hex27.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
+src/geom/libmesh_opt_la-cell_hex64.lo: src/geom/$(am__dirstamp) \
+	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_opt_la-cell_hex8.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_opt_la-cell_inf.lo: src/geom/$(am__dirstamp) \
@@ -14337,6 +14356,8 @@ src/geom/libmesh_prof_la-cell_hex.lo: src/geom/$(am__dirstamp) \
 src/geom/libmesh_prof_la-cell_hex20.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_prof_la-cell_hex27.lo: src/geom/$(am__dirstamp) \
+	src/geom/$(DEPDIR)/$(am__dirstamp)
+src/geom/libmesh_prof_la-cell_hex64.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
 src/geom/libmesh_prof_la-cell_hex8.lo: src/geom/$(am__dirstamp) \
 	src/geom/$(DEPDIR)/$(am__dirstamp)
@@ -16584,6 +16605,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_dbg_la-cell_hex.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_dbg_la-cell_hex20.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_dbg_la-cell_hex27.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_dbg_la-cell_hex64.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_dbg_la-cell_hex8.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_dbg_la-cell_inf.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_dbg_la-cell_inf_hex.Plo@am__quote@ # am--include-marker
@@ -16653,6 +16675,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_devel_la-cell_hex.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_devel_la-cell_hex20.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_devel_la-cell_hex27.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_devel_la-cell_hex64.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_devel_la-cell_hex8.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_devel_la-cell_inf.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_devel_la-cell_inf_hex.Plo@am__quote@ # am--include-marker
@@ -16722,6 +16745,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_oprof_la-cell_hex.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_oprof_la-cell_hex20.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_oprof_la-cell_hex27.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_oprof_la-cell_hex64.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_oprof_la-cell_hex8.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_oprof_la-cell_inf.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_oprof_la-cell_inf_hex.Plo@am__quote@ # am--include-marker
@@ -16791,6 +16815,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_opt_la-cell_hex.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_opt_la-cell_hex20.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_opt_la-cell_hex27.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_opt_la-cell_hex64.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_opt_la-cell_hex8.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_opt_la-cell_inf.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_opt_la-cell_inf_hex.Plo@am__quote@ # am--include-marker
@@ -16860,6 +16885,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_prof_la-cell_hex.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_prof_la-cell_hex20.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_prof_la-cell_hex27.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_prof_la-cell_hex64.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_prof_la-cell_hex8.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_prof_la-cell_inf.Plo@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@src/geom/$(DEPDIR)/libmesh_prof_la-cell_inf_hex.Plo@am__quote@ # am--include-marker
@@ -19323,6 +19349,13 @@ src/geom/libmesh_dbg_la-cell_hex27.lo: src/geom/cell_hex27.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/geom/cell_hex27.C' object='src/geom/libmesh_dbg_la-cell_hex27.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_dbg_la-cell_hex27.lo `test -f 'src/geom/cell_hex27.C' || echo '$(srcdir)/'`src/geom/cell_hex27.C
+
+src/geom/libmesh_dbg_la-cell_hex64.lo: src/geom/cell_hex64.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_dbg_la-cell_hex64.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_dbg_la-cell_hex64.Tpo -c -o src/geom/libmesh_dbg_la-cell_hex64.lo `test -f 'src/geom/cell_hex64.C' || echo '$(srcdir)/'`src/geom/cell_hex64.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/geom/$(DEPDIR)/libmesh_dbg_la-cell_hex64.Tpo src/geom/$(DEPDIR)/libmesh_dbg_la-cell_hex64.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/geom/cell_hex64.C' object='src/geom/libmesh_dbg_la-cell_hex64.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_dbg_la-cell_hex64.lo `test -f 'src/geom/cell_hex64.C' || echo '$(srcdir)/'`src/geom/cell_hex64.C
 
 src/geom/libmesh_dbg_la-cell_hex8.lo: src/geom/cell_hex8.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_dbg_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_dbg_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_dbg_la-cell_hex8.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_dbg_la-cell_hex8.Tpo -c -o src/geom/libmesh_dbg_la-cell_hex8.lo `test -f 'src/geom/cell_hex8.C' || echo '$(srcdir)/'`src/geom/cell_hex8.C
@@ -22705,6 +22738,13 @@ src/geom/libmesh_devel_la-cell_hex27.lo: src/geom/cell_hex27.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_devel_la-cell_hex27.lo `test -f 'src/geom/cell_hex27.C' || echo '$(srcdir)/'`src/geom/cell_hex27.C
 
+src/geom/libmesh_devel_la-cell_hex64.lo: src/geom/cell_hex64.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_devel_la-cell_hex64.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_devel_la-cell_hex64.Tpo -c -o src/geom/libmesh_devel_la-cell_hex64.lo `test -f 'src/geom/cell_hex64.C' || echo '$(srcdir)/'`src/geom/cell_hex64.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/geom/$(DEPDIR)/libmesh_devel_la-cell_hex64.Tpo src/geom/$(DEPDIR)/libmesh_devel_la-cell_hex64.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/geom/cell_hex64.C' object='src/geom/libmesh_devel_la-cell_hex64.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_devel_la-cell_hex64.lo `test -f 'src/geom/cell_hex64.C' || echo '$(srcdir)/'`src/geom/cell_hex64.C
+
 src/geom/libmesh_devel_la-cell_hex8.lo: src/geom/cell_hex8.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_devel_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_devel_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_devel_la-cell_hex8.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_devel_la-cell_hex8.Tpo -c -o src/geom/libmesh_devel_la-cell_hex8.lo `test -f 'src/geom/cell_hex8.C' || echo '$(srcdir)/'`src/geom/cell_hex8.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/geom/$(DEPDIR)/libmesh_devel_la-cell_hex8.Tpo src/geom/$(DEPDIR)/libmesh_devel_la-cell_hex8.Plo
@@ -26085,6 +26125,13 @@ src/geom/libmesh_oprof_la-cell_hex27.lo: src/geom/cell_hex27.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/geom/cell_hex27.C' object='src/geom/libmesh_oprof_la-cell_hex27.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_oprof_la-cell_hex27.lo `test -f 'src/geom/cell_hex27.C' || echo '$(srcdir)/'`src/geom/cell_hex27.C
+
+src/geom/libmesh_oprof_la-cell_hex64.lo: src/geom/cell_hex64.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_oprof_la-cell_hex64.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_oprof_la-cell_hex64.Tpo -c -o src/geom/libmesh_oprof_la-cell_hex64.lo `test -f 'src/geom/cell_hex64.C' || echo '$(srcdir)/'`src/geom/cell_hex64.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/geom/$(DEPDIR)/libmesh_oprof_la-cell_hex64.Tpo src/geom/$(DEPDIR)/libmesh_oprof_la-cell_hex64.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/geom/cell_hex64.C' object='src/geom/libmesh_oprof_la-cell_hex64.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_oprof_la-cell_hex64.lo `test -f 'src/geom/cell_hex64.C' || echo '$(srcdir)/'`src/geom/cell_hex64.C
 
 src/geom/libmesh_oprof_la-cell_hex8.lo: src/geom/cell_hex8.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_oprof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_oprof_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_oprof_la-cell_hex8.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_oprof_la-cell_hex8.Tpo -c -o src/geom/libmesh_oprof_la-cell_hex8.lo `test -f 'src/geom/cell_hex8.C' || echo '$(srcdir)/'`src/geom/cell_hex8.C
@@ -29467,6 +29514,13 @@ src/geom/libmesh_opt_la-cell_hex27.lo: src/geom/cell_hex27.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_opt_la-cell_hex27.lo `test -f 'src/geom/cell_hex27.C' || echo '$(srcdir)/'`src/geom/cell_hex27.C
 
+src/geom/libmesh_opt_la-cell_hex64.lo: src/geom/cell_hex64.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_opt_la-cell_hex64.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_opt_la-cell_hex64.Tpo -c -o src/geom/libmesh_opt_la-cell_hex64.lo `test -f 'src/geom/cell_hex64.C' || echo '$(srcdir)/'`src/geom/cell_hex64.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/geom/$(DEPDIR)/libmesh_opt_la-cell_hex64.Tpo src/geom/$(DEPDIR)/libmesh_opt_la-cell_hex64.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/geom/cell_hex64.C' object='src/geom/libmesh_opt_la-cell_hex64.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_opt_la-cell_hex64.lo `test -f 'src/geom/cell_hex64.C' || echo '$(srcdir)/'`src/geom/cell_hex64.C
+
 src/geom/libmesh_opt_la-cell_hex8.lo: src/geom/cell_hex8.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_opt_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_opt_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_opt_la-cell_hex8.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_opt_la-cell_hex8.Tpo -c -o src/geom/libmesh_opt_la-cell_hex8.lo `test -f 'src/geom/cell_hex8.C' || echo '$(srcdir)/'`src/geom/cell_hex8.C
 @am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/geom/$(DEPDIR)/libmesh_opt_la-cell_hex8.Tpo src/geom/$(DEPDIR)/libmesh_opt_la-cell_hex8.Plo
@@ -32847,6 +32901,13 @@ src/geom/libmesh_prof_la-cell_hex27.lo: src/geom/cell_hex27.C
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/geom/cell_hex27.C' object='src/geom/libmesh_prof_la-cell_hex27.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_prof_la-cell_hex27.lo `test -f 'src/geom/cell_hex27.C' || echo '$(srcdir)/'`src/geom/cell_hex27.C
+
+src/geom/libmesh_prof_la-cell_hex64.lo: src/geom/cell_hex64.C
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_prof_la-cell_hex64.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_prof_la-cell_hex64.Tpo -c -o src/geom/libmesh_prof_la-cell_hex64.lo `test -f 'src/geom/cell_hex64.C' || echo '$(srcdir)/'`src/geom/cell_hex64.C
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) src/geom/$(DEPDIR)/libmesh_prof_la-cell_hex64.Tpo src/geom/$(DEPDIR)/libmesh_prof_la-cell_hex64.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='src/geom/cell_hex64.C' object='src/geom/libmesh_prof_la-cell_hex64.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -c -o src/geom/libmesh_prof_la-cell_hex64.lo `test -f 'src/geom/cell_hex64.C' || echo '$(srcdir)/'`src/geom/cell_hex64.C
 
 src/geom/libmesh_prof_la-cell_hex8.lo: src/geom/cell_hex8.C
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(libmesh_prof_la_CPPFLAGS) $(CPPFLAGS) $(libmesh_prof_la_CXXFLAGS) $(CXXFLAGS) -MT src/geom/libmesh_prof_la-cell_hex8.lo -MD -MP -MF src/geom/$(DEPDIR)/libmesh_prof_la-cell_hex8.Tpo -c -o src/geom/libmesh_prof_la-cell_hex8.lo `test -f 'src/geom/cell_hex8.C' || echo '$(srcdir)/'`src/geom/cell_hex8.C
@@ -37619,6 +37680,7 @@ distclean: distclean-recursive
 	-rm -f src/geom/$(DEPDIR)/libmesh_dbg_la-cell_hex.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_dbg_la-cell_hex20.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_dbg_la-cell_hex27.Plo
+	-rm -f src/geom/$(DEPDIR)/libmesh_dbg_la-cell_hex64.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_dbg_la-cell_hex8.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_dbg_la-cell_inf.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_dbg_la-cell_inf_hex.Plo
@@ -37688,6 +37750,7 @@ distclean: distclean-recursive
 	-rm -f src/geom/$(DEPDIR)/libmesh_devel_la-cell_hex.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_devel_la-cell_hex20.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_devel_la-cell_hex27.Plo
+	-rm -f src/geom/$(DEPDIR)/libmesh_devel_la-cell_hex64.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_devel_la-cell_hex8.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_devel_la-cell_inf.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_devel_la-cell_inf_hex.Plo
@@ -37757,6 +37820,7 @@ distclean: distclean-recursive
 	-rm -f src/geom/$(DEPDIR)/libmesh_oprof_la-cell_hex.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_oprof_la-cell_hex20.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_oprof_la-cell_hex27.Plo
+	-rm -f src/geom/$(DEPDIR)/libmesh_oprof_la-cell_hex64.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_oprof_la-cell_hex8.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_oprof_la-cell_inf.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_oprof_la-cell_inf_hex.Plo
@@ -37826,6 +37890,7 @@ distclean: distclean-recursive
 	-rm -f src/geom/$(DEPDIR)/libmesh_opt_la-cell_hex.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_opt_la-cell_hex20.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_opt_la-cell_hex27.Plo
+	-rm -f src/geom/$(DEPDIR)/libmesh_opt_la-cell_hex64.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_opt_la-cell_hex8.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_opt_la-cell_inf.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_opt_la-cell_inf_hex.Plo
@@ -37895,6 +37960,7 @@ distclean: distclean-recursive
 	-rm -f src/geom/$(DEPDIR)/libmesh_prof_la-cell_hex.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_prof_la-cell_hex20.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_prof_la-cell_hex27.Plo
+	-rm -f src/geom/$(DEPDIR)/libmesh_prof_la-cell_hex64.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_prof_la-cell_hex8.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_prof_la-cell_inf.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_prof_la-cell_inf_hex.Plo
@@ -40165,6 +40231,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f src/geom/$(DEPDIR)/libmesh_dbg_la-cell_hex.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_dbg_la-cell_hex20.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_dbg_la-cell_hex27.Plo
+	-rm -f src/geom/$(DEPDIR)/libmesh_dbg_la-cell_hex64.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_dbg_la-cell_hex8.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_dbg_la-cell_inf.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_dbg_la-cell_inf_hex.Plo
@@ -40234,6 +40301,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f src/geom/$(DEPDIR)/libmesh_devel_la-cell_hex.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_devel_la-cell_hex20.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_devel_la-cell_hex27.Plo
+	-rm -f src/geom/$(DEPDIR)/libmesh_devel_la-cell_hex64.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_devel_la-cell_hex8.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_devel_la-cell_inf.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_devel_la-cell_inf_hex.Plo
@@ -40303,6 +40371,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f src/geom/$(DEPDIR)/libmesh_oprof_la-cell_hex.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_oprof_la-cell_hex20.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_oprof_la-cell_hex27.Plo
+	-rm -f src/geom/$(DEPDIR)/libmesh_oprof_la-cell_hex64.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_oprof_la-cell_hex8.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_oprof_la-cell_inf.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_oprof_la-cell_inf_hex.Plo
@@ -40372,6 +40441,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f src/geom/$(DEPDIR)/libmesh_opt_la-cell_hex.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_opt_la-cell_hex20.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_opt_la-cell_hex27.Plo
+	-rm -f src/geom/$(DEPDIR)/libmesh_opt_la-cell_hex64.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_opt_la-cell_hex8.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_opt_la-cell_inf.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_opt_la-cell_inf_hex.Plo
@@ -40441,6 +40511,7 @@ maintainer-clean: maintainer-clean-recursive
 	-rm -f src/geom/$(DEPDIR)/libmesh_prof_la-cell_hex.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_prof_la-cell_hex20.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_prof_la-cell_hex27.Plo
+	-rm -f src/geom/$(DEPDIR)/libmesh_prof_la-cell_hex64.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_prof_la-cell_hex8.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_prof_la-cell_inf.Plo
 	-rm -f src/geom/$(DEPDIR)/libmesh_prof_la-cell_inf_hex.Plo
