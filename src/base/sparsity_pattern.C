@@ -30,7 +30,7 @@
 #include "libmesh/parallel.h"
 #include "libmesh/parallel_sync.h"
 #include "libmesh/utility.h"
-#include "libmesh/static_condensation_dof_map.h"
+#include "libmesh/reduced_dof_map.h"
 
 // TIMPI includes
 #include "timpi/communicator.h"
@@ -50,7 +50,7 @@ Build::Build (const DofMap & dof_map_in,
               const bool implicit_neighbor_dofs_in,
               const bool need_full_sparsity_pattern_in,
               const bool calculate_constrained_in,
-              const StaticCondensationDofMap * const sc_in) :
+              const ReducedDofMap * const reduced_in) :
   ParallelObject(dof_map_in),
   dof_map(dof_map_in),
   dof_coupling(dof_coupling_in),
@@ -58,7 +58,7 @@ Build::Build (const DofMap & dof_map_in,
   implicit_neighbor_dofs(implicit_neighbor_dofs_in),
   need_full_sparsity_pattern(need_full_sparsity_pattern_in),
   calculate_constrained(calculate_constrained_in),
-  sc(sc_in),
+  reduced(reduced_in),
   sparsity_pattern(),
   nonlocal_pattern(),
   n_nz(),
@@ -75,7 +75,7 @@ Build::Build (Build & other, Threads::split) :
   implicit_neighbor_dofs(other.implicit_neighbor_dofs),
   need_full_sparsity_pattern(other.need_full_sparsity_pattern),
   calculate_constrained(other.calculate_constrained),
-  sc(other.sc),
+  reduced(other.reduced),
   hashed_dof_sets(other.hashed_dof_sets),
   sparsity_pattern(),
   nonlocal_pattern(),
@@ -97,22 +97,28 @@ void Build::sorted_connected_dofs(const Elem * elem,
                                   std::vector<dof_id_type> & dofs_vi,
                                   unsigned int vi)
 {
-  if (this->sc)
+  if (this->reduced)
   {
-    // We build a sparsity pattern that will match the size of the condensed system. This is so that
+    // We build a sparsity pattern that will match the size of the reduced system. This is so that
     // we have the data necessary to init the reduced system matrix
     dofs_vi.clear();
 
-    auto total_and_uncondensed_from_scalar_dofs_functor =
-        [&dofs_vi](const Elem & /*elem*/,
-                   std::vector<dof_id_type> & dof_indices,
-                   const std::vector<dof_id_type> & scalar_dof_indices)
+    // Unretained dofs still couple their constraining dofs, which constrained element matrices
+    // and vectors act on
+    dummy_unretained.clear();
+
+    auto total_and_retained_from_scalar_dofs_functor =
+        [&dofs_vi, this](const Elem & /*elem*/,
+                         std::vector<dof_id_type> & dof_indices,
+                         const std::vector<dof_id_type> & scalar_dof_indices)
     {
       dof_indices.insert(dof_indices.end(), scalar_dof_indices.begin(), scalar_dof_indices.end());
-      dofs_vi.insert(dofs_vi.end(), scalar_dof_indices.begin(), scalar_dof_indices.end());
+      for (const auto scalar_dof : scalar_dof_indices)
+        (this->reduced->retains_scalar_dof(scalar_dof) ? dofs_vi : dummy_unretained)
+            .push_back(scalar_dof);
     };
 
-    auto total_and_uncondensed_from_field_dofs_functor =
+    auto total_and_retained_from_field_dofs_functor =
         [&dofs_vi, this](const Elem & functor_elem,
                         const unsigned int node_num,
                         const unsigned int var_num,
@@ -120,17 +126,30 @@ void Build::sorted_connected_dofs(const Elem * elem,
                         const dof_id_type field_dof)
     {
       dof_indices.push_back(field_dof);
-      if (this->sc->uncondensed_vars().count(var_num) ||
-          (node_num != invalid_uint && !functor_elem.is_internal(node_num)))
-        dofs_vi.push_back(field_dof);
+      (this->reduced->retains_field_dof(functor_elem, node_num, var_num, field_dof)
+           ? dofs_vi
+           : dummy_unretained)
+          .push_back(field_dof);
     };
 
     dof_map.dof_indices(elem,
                         dummy_vec,
                         vi,
-                        total_and_uncondensed_from_scalar_dofs_functor,
-                        total_and_uncondensed_from_field_dofs_functor,
+                        total_and_retained_from_scalar_dofs_functor,
+                        total_and_retained_from_field_dofs_functor,
                         elem->p_level());
+
+#ifdef LIBMESH_ENABLE_CONSTRAINTS
+    // Constraint rows reference unconstrained dofs only, so one level suffices
+    const auto & constraints = dof_map.get_dof_constraints();
+    for (const auto unretained : dummy_unretained)
+      if (const auto it = constraints.find(unretained); it != constraints.end())
+        for (const auto & [constraining_dof, weight] : it->second)
+          {
+            libmesh_ignore(weight);
+            dofs_vi.push_back(constraining_dof);
+          }
+#endif
   }
   else
     dof_map.dof_indices (elem, dofs_vi, vi);

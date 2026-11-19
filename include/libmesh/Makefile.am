@@ -6,6 +6,7 @@
 EXTRA_DIST = rebuild_makefile.sh
 
 BUILT_SOURCES = \
+        constraint_elimination_dof_map.h \
         dirichlet_boundaries.h \
         dof_map.h \
         dof_map_base.h \
@@ -30,6 +31,7 @@ BUILT_SOURCES = \
         periodic_boundary.h \
         periodic_boundary_base.h \
         print_trace.h \
+        reduced_dof_map.h \
         reference_counted_object.h \
         reference_counter.h \
         single_predicates.h \
@@ -284,6 +286,7 @@ BUILT_SOURCES = \
         petsc_vector.h \
         preconditioner.h \
         raw_accessor.h \
+        reduced_sparse_matrix.h \
         refinement_selector.h \
         shell_matrix.h \
         sparse_matrix.h \
@@ -417,6 +420,7 @@ BUILT_SOURCES = \
         petsc_dm_wrapper.h \
         petsc_linear_solver.h \
         petsc_nonlinear_solver.h \
+        petsc_solve_reduction.h \
         petscdmlibmesh.h \
         second_order_unsteady_solver.h \
         slepc_eigen_solver.h \
@@ -630,6 +634,9 @@ libmesh_config.h: $(top_builddir)/include/libmesh_config.h
 
 #
 # libMesh header rules
+constraint_elimination_dof_map.h: $(top_srcdir)/include/base/constraint_elimination_dof_map.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 dirichlet_boundaries.h: $(top_srcdir)/include/base/dirichlet_boundaries.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -700,6 +707,9 @@ periodic_boundary_base.h: $(top_srcdir)/include/base/periodic_boundary_base.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 print_trace.h: $(top_srcdir)/include/base/print_trace.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+reduced_dof_map.h: $(top_srcdir)/include/base/reduced_dof_map.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 reference_counted_object.h: $(top_srcdir)/include/base/reference_counted_object.h
@@ -1464,6 +1474,9 @@ preconditioner.h: $(top_srcdir)/include/numerics/preconditioner.h
 raw_accessor.h: $(top_srcdir)/include/numerics/raw_accessor.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+reduced_sparse_matrix.h: $(top_srcdir)/include/numerics/reduced_sparse_matrix.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 refinement_selector.h: $(top_srcdir)/include/numerics/refinement_selector.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1861,6 +1874,9 @@ petsc_linear_solver.h: $(top_srcdir)/include/solvers/petsc_linear_solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 petsc_nonlinear_solver.h: $(top_srcdir)/include/solvers/petsc_nonlinear_solver.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+petsc_solve_reduction.h: $(top_srcdir)/include/solvers/petsc_solve_reduction.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 petscdmlibmesh.h: $(top_srcdir)/include/solvers/petscdmlibmesh.h

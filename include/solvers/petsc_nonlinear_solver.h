@@ -44,6 +44,8 @@
 namespace libMesh
 {
 class ResidualContext;
+template <typename T>
+class PetscSolveReduction;
 
 // Allow users access to these functions in case they want to reuse them.  Users shouldn't
 // need access to these most of the time as they are used internally by this object.
@@ -210,7 +212,8 @@ public:
   bool computing_base_vector() const { return _computing_base_vector; }
 
   /**
-   * Abstract base class to be used to implement a custom line-search algorithm
+   * Abstract base class to be used to implement a custom line-search algorithm. The line search's
+   * vectors are those SNES solves for; \p reduction() forms full vectors from them
    */
   class ComputeLineSearchObject
   {
@@ -244,6 +247,16 @@ public:
    *  Immediately force a new preconditioner, even if reuse is set
    */
   virtual void force_new_preconditioner() override;
+
+  /**
+   * The map between the vectors SNES solves for and full vectors of the system. Built by \p init()
+   * and rebuilt by \p solve()
+   */
+  PetscSolveReduction<T> & reduction()
+  {
+    libmesh_assert(_reduction);
+    return *_reduction;
+  }
 
 protected:
 
@@ -315,6 +328,16 @@ protected:
     */
   bool _setup_reuse;
 
+  /**
+   * Builds \p _reduction for the system's current degrees of freedom
+   */
+  void setup_reduction();
+
+  /**
+   * See \p reduction()
+   */
+  std::unique_ptr<PetscSolveReduction<T>> _reduction;
+
 #if defined(LIBMESH_ENABLE_AMR) && defined(LIBMESH_HAVE_METAPHYSICL)
   /**
    * Wrapper object for interacting with the "new" libMesh PETSc DM. The new libMesh PETSc DM
@@ -330,6 +353,13 @@ private:
   friend PetscErrorCode libmesh_petsc_snes_fd_residual (SNES snes, Vec x, Vec r, void * ctx);
   friend PetscErrorCode libmesh_petsc_snes_mffd_residual (SNES snes, Vec x, Vec r, void * ctx);
   friend PetscErrorCode libmesh_petsc_snes_jacobian (SNES snes, Vec x, Mat jac, Mat pc, void * ctx);
+  friend PetscErrorCode libmesh_petsc_snes_postcheck (SNESLineSearch,
+                                                      Vec x,
+                                                      Vec y,
+                                                      Vec w,
+                                                      PetscBool * changed_y,
+                                                      PetscBool * changed_w,
+                                                      void * context);
   friend PetscErrorCode libmesh_petsc_snes_precheck (SNESLineSearch,
                                                      Vec X,
                                                      Vec Y,
