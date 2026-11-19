@@ -403,9 +403,12 @@ void lagrange_vec_nodal_soln(const Elem * elem,
             libmesh_assert_equal_to (nodal_soln.size(), 3*21);
 
             // node 20 components
-            nodal_soln[60]  = (elem_soln[27] + elem_soln[30] + elem_soln[33])/Real(3);
-            nodal_soln[61]  = (elem_soln[28] + elem_soln[31] + elem_soln[34])/Real(3);
-            nodal_soln[62]  = (elem_soln[29] + elem_soln[32] + elem_soln[35])/Real(3);
+            nodal_soln[60]  = (elem_soln[0] + elem_soln[3] + elem_soln[6] +
+                               elem_soln[9] + elem_soln[12] + elem_soln[15])/Real(6);
+            nodal_soln[61]  = (elem_soln[1] + elem_soln[4] + elem_soln[7] +
+                               elem_soln[10] + elem_soln[13] + elem_soln[16])/Real(6);
+            nodal_soln[62]  = (elem_soln[2] + elem_soln[5] + elem_soln[8] +
+                               elem_soln[11] + elem_soln[14] + elem_soln[17])/Real(6);
             libmesh_fallthrough();
           case PRISM20:
             if (type == PRISM20)
@@ -520,9 +523,9 @@ void lagrange_vec_nodal_soln(const Elem * elem,
               nodal_soln[41]  = .5*(elem_soln[14] + elem_soln[17]);
 
               // node 14 components
-              nodal_soln[42]  = .5*(elem_soln[12] + elem_soln[15]);
-              nodal_soln[43]  = .5*(elem_soln[13] + elem_soln[16]);
-              nodal_soln[44]  = .5*(elem_soln[14] + elem_soln[17]);
+              nodal_soln[42]  = .5*(elem_soln[9] + elem_soln[15]);
+              nodal_soln[43]  = .5*(elem_soln[10] + elem_soln[16]);
+              nodal_soln[44]  = .5*(elem_soln[11] + elem_soln[17]);
 
               return;
             }

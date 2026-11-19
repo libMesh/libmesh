@@ -28,6 +28,7 @@
   CPPUNIT_TEST( testFEInterface );              \
   CPPUNIT_TEST( testRefspaceNodes );            \
   CPPUNIT_TEST( testNodalSoln );                \
+  CPPUNIT_TEST( testVectorNodalSoln );          \
   CPPUNIT_TEST( testU );                        \
   CPPUNIT_TEST( testPartitionOfUnity );         \
   CPPUNIT_TEST( testUPastVertices );            \
@@ -800,6 +801,61 @@ public:
               (FEInterface::shape(fe_type, this->_elem, i,
                                   this->_elem->master_point(n)),
                nodal_soln[n], TOLERANCE*TOLERANCE);
+        }
+    }
+
+  void testVectorNodalSoln()
+    {
+      LOG_UNIT_TEST;
+
+      if (!this->_elem)
+        return;
+
+      // LAGRANGE_VEC has its own nodal_soln for 2D and 3D elements; each
+      // component must match the LAGRANGE nodal_soln
+      if (family != LAGRANGE || this->_dim < 2)
+        return;
+
+      if (this->_elem->runtime_topology())
+        return;
+
+      // LAGRANGE_VEC nodal_soln is wrong on these, see libMesh/libmesh#4665
+      if ((order == SECOND && (elem_type == TET14 || elem_type == PRISM20 ||
+                               elem_type == PRISM21 || elem_type == PYRAMID18)) ||
+          (order == FIRST && (elem_type == PYRAMID13 || elem_type == PYRAMID14 ||
+                              elem_type == PYRAMID18)))
+        return;
+
+      const FEType fe_type = this->_sys->variable_type(0);
+      const FEType vec_fe_type(fe_type.order, LAGRANGE_VEC);
+      const unsigned int dim = this->_dim;
+      const unsigned int n_dofs = FEInterface::n_dofs(fe_type, this->_elem);
+      const unsigned int n_nodes = this->_elem->n_nodes();
+
+      std::vector<Number> elem_soln(n_dofs, 0), nodal_soln,
+        vec_elem_soln(dim*n_dofs, 0), vec_nodal_soln;
+      for (auto i : make_range(n_dofs))
+        {
+          elem_soln[i] = 1;
+          FEInterface::nodal_soln(dim, fe_type, this->_elem,
+                                  elem_soln, nodal_soln);
+          elem_soln[i] = 0;
+
+          for (auto d : make_range(dim))
+            {
+              vec_elem_soln[dim*i + d] = 1;
+              FEInterface::nodal_soln(dim, vec_fe_type, this->_elem,
+                                      vec_elem_soln, vec_nodal_soln);
+              vec_elem_soln[dim*i + d] = 0;
+
+              CPPUNIT_ASSERT_EQUAL(std::size_t(dim*n_nodes),
+                                   vec_nodal_soln.size());
+              for (auto n : make_range(n_nodes))
+                for (auto c : make_range(dim))
+                  LIBMESH_ASSERT_NUMBERS_EQUAL
+                    (c == d ? nodal_soln[n] : Number(0),
+                     vec_nodal_soln[dim*n + c], TOLERANCE*TOLERANCE);
+            }
         }
     }
 
