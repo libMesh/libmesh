@@ -31,7 +31,7 @@
 #include "libmesh/rb_construction_base.h"
 
 // libMesh includes
-#include "libmesh/condensed_eigen_system.h"
+#include "libmesh/eigen_system.h"
 
 // C++ includes
 
@@ -50,7 +50,7 @@ class RBSCMEvaluation;
  * \author David J. Knezevic
  * \date 2009
  */
-class RBSCMConstruction : public RBConstructionBase<CondensedEigenSystem>
+class RBSCMConstruction : public RBConstructionBase<EigenSystem>
 {
 public:
 
@@ -81,13 +81,20 @@ public:
   /**
    * The type of the parent.
    */
-  typedef RBConstructionBase<CondensedEigenSystem> Parent;
+  typedef RBConstructionBase<EigenSystem> Parent;
 
   /**
    * Clear all the data structures associated with
    * the system.
    */
   virtual void clear () override;
+
+  /**
+   * Adds the constraints of the associated RB system, so that the eigenproblems, which
+   * eliminate constrained degrees of freedom, live in the RB system's constrained space. Both
+   * systems share the mesh and discretization, hence the degree of freedom numbering
+   */
+  virtual void user_constrain () override;
 
   /**
    * Set the RBSCMEvaluation object.
@@ -204,13 +211,13 @@ protected:
 
   /**
    * Compute the inner product between two vectors using the system's
-   * matrix_B.
+   * matrix_B. The vectors are on the unconstrained degrees of freedom.
    */
   Number B_inner_product(const NumericVector<Number> & v, const NumericVector<Number> & w) const;
 
   /**
    * Compute the inner product between two vectors using
-   * matrix Aq.
+   * matrix Aq. The vectors are on the unconstrained degrees of freedom.
    */
   Number Aq_inner_product(unsigned int q,
                           const NumericVector<Number> & v,

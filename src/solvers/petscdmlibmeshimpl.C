@@ -41,6 +41,7 @@
 #include "libmesh/petsc_matrix_base.h"
 #include "libmesh/petscdmlibmesh.h"
 #include "libmesh/dof_map.h"
+#include "libmesh/constraint_elimination_dof_map.h"
 #include "libmesh/preconditioner.h"
 #include "libmesh/elem.h"
 #include "libmesh/parallel.h"
@@ -273,6 +274,33 @@ PetscErrorCode DMlibMeshSetUpName_Private(DM dm)
 }
 
 
+/**
+ * Inserts into \p indices the local indices, in the numbering of the vectors SNES solves on, of
+ * variable \p var on \p elem: reduced indices when \p sys eliminates constrained degrees of
+ * freedom, and full ones otherwise
+ */
+static void DMlibMeshInsertLocalDofs_Private(const NonlinearImplicitSystem & sys,
+                                             const Elem * elem,
+                                             unsigned int var,
+                                             std::set<numeric_index_type> & indices)
+{
+  const DofMap & dof_map = sys.get_dof_map();
+  std::vector<dof_id_type> evindices;
+  dof_map.dof_indices(elem, evindices, var);
+
+  const ConstraintEliminationDofMap * reduced =
+    dof_map.has_constraint_elimination() ? &dof_map.get_constraint_elimination() : nullptr;
+
+  for (const auto dof : evindices)
+    if (dof_map.local_index(dof))
+      {
+        if (!reduced)
+          indices.insert(dof);
+        else if (const auto r = reduced->find_reduced_dof(dof); r != DofObject::invalid_id)
+          indices.insert(r);
+      }
+}
+
 #undef __FUNCT__
 #define __FUNCT__ "DMCreateFieldDecomposition_libMesh"
 static PetscErrorCode  DMCreateFieldDecomposition_libMesh(DM dm, PetscInt * len, char *** namelist, IS ** islist, DM ** dmlist)
@@ -287,7 +315,6 @@ static PetscErrorCode  DMCreateFieldDecomposition_libMesh(DM dm, PetscInt * len,
   if (namelist) {LibmeshPetscCallQ(PetscMalloc(*len*sizeof(char *), namelist));}
   if (islist)   {LibmeshPetscCallQ(PetscMalloc(*len*sizeof(IS),    islist));}
   if (dmlist)   {LibmeshPetscCallQ(PetscMalloc(*len*sizeof(DM),    dmlist));}
-  DofMap & dofmap = dlm->sys->get_dof_map();
   for (auto d : index_range(*dlm->decomposition)) {
     std::set<numeric_index_type>         dindices;
     std::string                          dname;
@@ -308,14 +335,7 @@ static PetscErrorCode  DMCreateFieldDecomposition_libMesh(DM dm, PetscInt * len,
         for (const auto & elem :
                as_range(sys->get_mesh().active_local_subdomain_elements_begin(sbd_id),
                         sys->get_mesh().active_local_subdomain_elements_end(sbd_id))) {
-          //unsigned int e_subdomain = elem->subdomain_id();
-          std::vector<numeric_index_type> evindices;
-          // Get the degree of freedom indices for the given variable off the current element.
-          dofmap.dof_indices(elem, evindices, v);
-          for (numeric_index_type dof : evindices) {
-            if (dof >= dofmap.first_dof() && dof < dofmap.end_dof()) // might want to use variable_first/last_local_dof instead
-              dindices.insert(dof);
-          }
+          DMlibMeshInsertLocalDofs_Private(*sys, elem, v, dindices);
         }
       }
     }
@@ -406,16 +426,9 @@ static PetscErrorCode  DMCreateDomainDecomposition_libMesh(DM dm, PetscInt * len
       const MeshBase::const_element_iterator end_el = sys->get_mesh().active_local_subdomain_elements_end(b_sbd_id);
       for ( ; el != end_el; ++el) {
         const Elem * elem = *el;
-        std::vector<numeric_index_type> evindices;
         // Iterate only over this DM's variables.
-        for (const auto & pr : *(dlm->varids)) {
-          // Get the degree of freedom indices for the given variable off the current element.
-          sys->get_dof_map().dof_indices(elem, evindices, pr.second);
-          for (const auto & dof : evindices) {
-            if (dof >= sys->get_dof_map().first_dof() && dof < sys->get_dof_map().end_dof()) // might want to use variable_first/last_local_dof instead
-              dindices.insert(dof);
-          }
-        }
+        for (const auto & pr : *(dlm->varids))
+          DMlibMeshInsertLocalDofs_Private(*sys, elem, pr.second, dindices);
       }
     }
     if (namelist) {
@@ -497,10 +510,11 @@ PetscErrorCode DMlibMeshCreateFieldDecompositionDM(DM dm, PetscInt dnumber, Pets
   LibmeshPetscCallQ(DMSetType(*ddm, DMLIBMESH));
   DM_libMesh * ddlm = (DM_libMesh *)((*ddm)->data);
   ddlm->sys = dlm->sys;
-  ddlm->varids = dlm->varids;
-  ddlm->varnames = dlm->varnames;
-  ddlm->blockids = dlm->blockids;
-  ddlm->blocknames = dlm->blocknames;
+  // Each DM owns, and DMDestroy_libMesh() deletes, its own variable and block maps
+  *ddlm->varids = *dlm->varids;
+  *ddlm->varnames = *dlm->varnames;
+  *ddlm->blockids = *dlm->blockids;
+  *ddlm->blocknames = *dlm->blocknames;
   ddlm->decomposition = new(std::vector<std::set<unsigned int>>);
   ddlm->decomposition_type = DMLIBMESH_FIELD_DECOMPOSITION;
   if (dnumber) {
@@ -552,10 +566,11 @@ PetscErrorCode DMlibMeshCreateDomainDecompositionDM(DM dm, PetscInt dnumber, Pet
   LibmeshPetscCallQ(DMSetType(*ddm, DMLIBMESH));
   DM_libMesh * ddlm = (DM_libMesh *)((*ddm)->data);
   ddlm->sys = dlm->sys;
-  ddlm->varids   = dlm->varids;
-  ddlm->varnames = dlm->varnames;
-  ddlm->blockids   = dlm->blockids;
-  ddlm->blocknames = dlm->blocknames;
+  // Each DM owns, and DMDestroy_libMesh() deletes, its own variable and block maps
+  *ddlm->varids   = *dlm->varids;
+  *ddlm->varnames = *dlm->varnames;
+  *ddlm->blockids   = *dlm->blockids;
+  *ddlm->blocknames = *dlm->blocknames;
   ddlm->decomposition = new(std::vector<std::set<unsigned int>>);
   ddlm->decomposition_type = DMLIBMESH_DOMAIN_DECOMPOSITION;
   if (dnumber) {
@@ -605,6 +620,8 @@ static PetscErrorCode DMlibMeshFunction(DM dm, Vec x, Vec r)
   NonlinearImplicitSystem * _sys;
   LibmeshPetscCallQ(DMlibMeshGetSystem(dm, _sys));
   NonlinearImplicitSystem & sys = *_sys;
+  if (sys.has_constraint_elimination())
+    SETERRQ(((PetscObject)dm)->comm, PETSC_ERR_SUP, "DMlibMesh does not evaluate residuals of systems that eliminate constraints; PetscNonlinearSolver does");
   PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
   PetscVector<Number> & R_sys = *cast_ptr<PetscVector<Number> *>(sys.rhs);
   PetscVector<Number> X_global(x, _sys->comm()), R(r, _sys->comm());
@@ -668,6 +685,8 @@ static PetscErrorCode DMlibMeshJacobian(DM dm, Vec x, Mat jac, Mat pc)
   NonlinearImplicitSystem * _sys;
   LibmeshPetscCallQ(DMlibMeshGetSystem(dm, _sys));
   NonlinearImplicitSystem & sys = *_sys;
+  if (sys.has_constraint_elimination())
+    SETERRQ(((PetscObject)dm)->comm, PETSC_ERR_SUP, "DMlibMesh does not evaluate Jacobians of systems that eliminate constraints; PetscNonlinearSolver does");
 
   libmesh_assert(pc);
   libmesh_assert(jac);
@@ -739,19 +758,42 @@ static PetscErrorCode DMVariableBounds_libMesh(DM dm, Vec xl, Vec xu)
   NonlinearImplicitSystem * _sys;
   LibmeshPetscCallQ(DMlibMeshGetSystem(dm, _sys));
   NonlinearImplicitSystem & sys = *_sys;
-  PetscVector<Number> XL(xl, sys.comm());
-  PetscVector<Number> XU(xu, sys.comm());
   PetscFunctionBegin;
   // Workaround for nonstandard Q suffix warning with quad precision
   const PetscReal petsc_inf = std::numeric_limits<PetscReal>::max() / 4;
-  LibmeshPetscCallQ(VecSet(xl, -petsc_inf));
-  LibmeshPetscCallQ(VecSet(xu, petsc_inf));
+
+  // Users compute bounds on full vectors. When eliminating constraints, SNES's xl and xu are
+  // reduced, and they take the bounds of the unconstrained degrees of freedom
+  const bool reduced = sys.has_constraint_elimination();
+  std::unique_ptr<NumericVector<Number>> full_l, full_u;
+  if (reduced)
+    {
+      full_l = sys.solution->zero_clone();
+      full_u = sys.solution->zero_clone();
+    }
+  PetscVector<Number> XL(xl, sys.comm()), XU(xu, sys.comm());
+  NumericVector<Number> & L = reduced ? *full_l : static_cast<NumericVector<Number> &>(XL);
+  NumericVector<Number> & U = reduced ? *full_u : static_cast<NumericVector<Number> &>(XU);
+  L.add(-petsc_inf);
+  U.add(petsc_inf);
+  L.close();
+  U.close();
+
   if (sys.nonlinear_solver->bounds != nullptr)
-    sys.nonlinear_solver->bounds(XL,XU,sys);
+    sys.nonlinear_solver->bounds(L,U,sys);
   else if (sys.nonlinear_solver->bounds_object != nullptr)
-    sys.nonlinear_solver->bounds_object->bounds(XL,XU, sys);
+    sys.nonlinear_solver->bounds_object->bounds(L,U, sys);
   else
     SETERRQ(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONG, "No bounds calculation in this libMesh object");
+
+  if (reduced)
+    {
+      auto & solver = cast_ref<PetscNonlinearSolver<Number> &>(*sys.nonlinear_solver);
+      L.close();
+      U.close();
+      solver.restrict_vector(L, xl);
+      solver.restrict_vector(U, xu);
+    }
 
   PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
 }
@@ -776,12 +818,17 @@ static PetscErrorCode DMCreateGlobalVector_libMesh(DM dm, Vec *x)
   NumericVector<Number> * nv = (dlm->sys->solution).get();
   PetscVector<Number> *   pv = dynamic_cast<PetscVector<Number> *>(nv);
   Vec                    v  = pv->vec();
+  const DofMap & dof_map = dlm->sys->get_dof_map();
   /* Unfortunately, currently this does not produce a ghosted vector, so nonlinear subproblem solves aren't going to be easily available.
      Should work fine for getting vectors out for linear subproblem solvers. */
-  if (dlm->embedding) {
+  if (dlm->embedding || dof_map.has_constraint_elimination()) {
+    /* The size of an embedded subproblem, or of the reduced space SNES solves on */
     PetscInt n;
     LibmeshPetscCallQ(VecCreate(((PetscObject)v)->comm, x));
-    LibmeshPetscCallQ(ISGetLocalSize(dlm->embedding, &n));
+    if (dlm->embedding)
+      LibmeshPetscCallQ(ISGetLocalSize(dlm->embedding, &n));
+    else
+      n = cast_int<PetscInt>(dof_map.get_constraint_elimination().n_local_dofs());
     LibmeshPetscCallQ(VecSetSizes(*x,n,PETSC_DETERMINE));
     LibmeshPetscCallQ(VecSetType(*x,((PetscObject)v)->type_name));
     LibmeshPetscCallQ(VecSetFromOptions(*x));

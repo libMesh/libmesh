@@ -32,7 +32,8 @@
 #include "libmesh/mesh.h"
 #include "libmesh/mesh_generation.h"
 #include "libmesh/exodusII_io.h"
-#include "libmesh/condensed_eigen_system.h"
+#include "libmesh/eigen_system.h"
+#include "libmesh/constraint_elimination_dof_map.h"
 #include "libmesh/equation_systems.h"
 #include "libmesh/fe.h"
 #include "libmesh/quadrature_gauss.h"
@@ -116,9 +117,11 @@ main(int argc, char ** argv)
   // Create an equation systems object.
   EquationSystems equation_systems(mesh);
 
-  // Create a CondensedEigenSystem named "Eigensystem" and (for convenience)
-  // use a reference to the system we create.
-  auto & eigen_system = equation_systems.add_system<CondensedEigenSystem>("Condensed Eigensystem");
+  // Create an EigenSystem named "Condensed Eigensystem" and (for convenience)
+  // use a reference to the system we create. Eliminating constraints makes
+  // SLEPc iterate on the unconstrained degrees of freedom only.
+  auto & eigen_system = equation_systems.add_system<EigenSystem>("Condensed Eigensystem");
+  eigen_system.create_constraint_elimination();
 
   // Declare the system variables.
   // Adds the variable "p" to "Eigensystem".   "p"
@@ -182,8 +185,6 @@ main(int argc, char ** argv)
   eigen_system.get_eigen_solver().set_initial_space(wrapped_initial_space);
 
   // Solve the system "Condensed Eigensystem"
-  eigen_system.initialize_condensed_matrices();
-  eigen_system.dont_create_submatrices_in_solve();
   eigen_system.assemble_before_solve = false;
   eigen_system.get_eigen_solver().set_close_matrix_before_solve(false);
   eigen_system.solve();
@@ -215,46 +216,24 @@ main(int argc, char ** argv)
 
 #ifdef LIBMESH_HAVE_SLEPC
 void
-update_current_local_solution(CondensedEigenSystem & sys, Vec x)
+update_current_local_solution(EigenSystem & sys, Vec x)
 {
-  auto & dof_map = sys.get_dof_map();
-
-  PetscVector<Number> X_global(x, sys.comm());
-
-  if (dof_map.n_constrained_dofs())
-  {
-    sys.copy_sub_to_super(X_global, *sys.solution);
-    // Set the constrained dof values
-    dof_map.enforce_constraints_exactly(sys);
-    sys.update();
-  }
-  else
-  {
-    PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
-
-    // Use the system's update() to get a good local version of the
-    // parallel solution.  This operation does not modify the incoming
-    // "x" vector, it only localizes information from "x" into
-    // sys.current_local_solution.
-    X_global.swap(X_sys);
-    sys.update();
-    X_global.swap(X_sys);
-  }
+  // SLEPc iterates on the unconstrained degrees of freedom y. The full
+  // iterate C y, which satisfies the homogeneous hanging node
+  // constraints, is what assembly sees
+  PetscVector<Number> X_reduced(x, sys.comm());
+  sys.get_dof_map().get_constraint_elimination().prolong(X_reduced, *sys.solution,
+                                                         /*homogeneous=*/true);
+  sys.update();
 }
 
-std::unique_ptr<NumericVector<Number>>
-create_wrapped_function(CondensedEigenSystem & sys, Vec f)
+void
+restrict_function(EigenSystem & sys, const NumericVector<Number> & F, Vec f)
 {
-  auto & dof_map = sys.get_dof_map();
-
-  if (dof_map.n_constrained_dofs())
-    return sys.solution->zero_clone();
-  else
-  {
-    auto F = std::make_unique<PetscVector<Number>>(f, sys.comm());
-    F->zero();
-    return F;
-  }
+  // Constraining each element vector applies C^T, so the reduced
+  // function is the unconstrained part of the full one
+  PetscVector<Number> F_reduced(f, sys.comm());
+  sys.get_dof_map().get_constraint_elimination().inject(F, F_reduced);
 }
 
 PetscErrorCode
@@ -265,7 +244,7 @@ form_functionA(SNES /*snes*/, Vec x, Vec Ax, void * ctx)
   auto & es = *static_cast<EquationSystems *>(ctx);
 
   // Get a reference to our system.
-  auto & eigen_system = es.get_system<CondensedEigenSystem>("Condensed Eigensystem");
+  auto & eigen_system = es.get_system<EigenSystem>("Condensed Eigensystem");
 
   // A reference to the DofMap object for this system.  The DofMap
   // object handles the index translation from node and element numbers
@@ -275,7 +254,7 @@ form_functionA(SNES /*snes*/, Vec x, Vec Ax, void * ctx)
   // Create our data structures correponding to both constrained and unconstrained degrees of
   // freedom
   update_current_local_solution(eigen_system, x);
-  auto AX = create_wrapped_function(eigen_system, Ax);
+  auto AX = eigen_system.solution->zero_clone();
 
   // Get a constant reference to the mesh object.
   const MeshBase & mesh = es.get_mesh();
@@ -399,11 +378,7 @@ form_functionA(SNES /*snes*/, Vec x, Vec Ax, void * ctx)
 
   AX->close();
 
-  if (dof_map.n_constrained_dofs())
-  {
-    PetscVector<Number> wrapped_Ax(Ax, eigen_system.comm());
-    eigen_system.copy_super_to_sub(*AX, wrapped_Ax);
-  }
+  restrict_function(eigen_system, *AX, Ax);
 
   PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
 }
@@ -416,7 +391,7 @@ form_functionB(SNES /*snes*/, Vec x, Vec Bx, void * ctx)
   auto & es = *static_cast<EquationSystems *>(ctx);
 
   // Get a reference to our system.
-  auto & eigen_system = es.get_system<CondensedEigenSystem>("Condensed Eigensystem");
+  auto & eigen_system = es.get_system<EigenSystem>("Condensed Eigensystem");
 
   // A reference to the DofMap object for this system.  The DofMap
   // object handles the index translation from node and element numbers
@@ -426,7 +401,7 @@ form_functionB(SNES /*snes*/, Vec x, Vec Bx, void * ctx)
   // Create our data structures correponding to both constrained and unconstrained degrees of
   // freedom
   update_current_local_solution(eigen_system, x);
-  auto BX = create_wrapped_function(eigen_system, Bx);
+  auto BX = eigen_system.solution->zero_clone();
 
   // Get a constant reference to the mesh object.
   const MeshBase & mesh = es.get_mesh();
@@ -528,11 +503,7 @@ form_functionB(SNES /*snes*/, Vec x, Vec Bx, void * ctx)
 
   BX->close();
 
-  if (dof_map.n_constrained_dofs())
-  {
-    PetscVector<Number> wrapped_Bx(Bx, eigen_system.comm());
-    eigen_system.copy_super_to_sub(*BX, wrapped_Bx);
-  }
+  restrict_function(eigen_system, *BX, Bx);
 
   PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
 }
@@ -545,7 +516,7 @@ form_matrixA(SNES /*snes*/, Vec x, Mat jac, Mat pc, void * ctx)
   auto & es = *static_cast<EquationSystems *>(ctx);
 
   // Get a reference to our system.
-  auto & eigen_system = es.get_system<CondensedEigenSystem>("Condensed Eigensystem");
+  auto & eigen_system = es.get_system<EigenSystem>("Condensed Eigensystem");
 
   // A reference to the DofMap object for this system.  The DofMap
   // object handles the index translation from node and element numbers
@@ -569,7 +540,11 @@ form_matrixA(SNES /*snes*/, Vec x, Mat jac, Mat pc, void * ctx)
   if (!jismffd)
     libmesh_error_msg("The operator should be formed matrix free");
 
-  auto & pc_super = eigen_system.get_precond_matrix();
+  // The preconditioning matrix is assembled with full dof indices into its
+  // reduced form, which is the matrix SLEPc hands us as pc
+  auto & pc_super = cast_ref<PetscMatrixBase<Number> &>(eigen_system.get_precond_matrix());
+  libmesh_assert(pc_super.mat() == pc);
+  libmesh_ignore(pc);
 
   // Get a constant reference to the mesh object.
   const MeshBase & mesh = es.get_mesh();
@@ -679,20 +654,6 @@ form_matrixA(SNES /*snes*/, Vec x, Mat jac, Mat pc, void * ctx)
   } // end of element loop
 
   pc_super.close();
-
-  if (dof_map.n_constrained_dofs())
-  {
-    // We create our libmesh matrix context using PetscObjectCompose, but versions of MatHeaderMerge
-    // in PETSc prior to 3.21.0 erase the composition list
-#if SLEPC_VERSION_LESS_THAN(3,21,0)
-    PetscMatrix<Number> sub(pc, eigen_system.comm());
-    eigen_system.copy_super_to_sub(pc_super, sub);
-#else
-    auto sub = PetscMatrixBase<Number>::get_context(pc, eigen_system.comm());
-    libmesh_assert(sub);
-    eigen_system.copy_super_to_sub(pc_super, *sub);
-#endif
-  }
 
   // The MFFD Jac still must have assemble called on it
   LibmeshPetscCallQ(MatAssemblyBegin(jac, MAT_FINAL_ASSEMBLY));

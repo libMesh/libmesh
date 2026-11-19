@@ -108,7 +108,9 @@ public:
 
   /**
    * \returns Real and imaginary part of the ith eigenvalue and copies
-   * the respective eigen vector to the solution vector.
+   * the respective eigen vector to the solution vector. With constraint
+   * elimination the solution is the prolonged eigenvector, which satisfies
+   * the homogeneous constraints.
    */
   virtual std::pair<Real, Real> get_eigenpair (dof_id_type i);
 
@@ -145,7 +147,8 @@ public:
   EigenProblemType get_eigenproblem_type () const {return _eigen_problem_type;}
 
   /**
-   * Sets an initial eigen vector
+   * Sets an initial eigen vector. With constraint elimination this is a full-space vector, whose
+   * unconstrained entries become the initial space of the reduced problem
    */
   void set_initial_space(NumericVector<Number> & initial_space_in);
 
@@ -417,6 +420,11 @@ private:
    * A boolean flag to indicate whether or not to use a shell preconditioning matrix
    */
   bool _use_shell_precond_matrix;
+
+  /**
+   * The initial space of the reduced problem when eliminating constraints
+   */
+  std::unique_ptr<NumericVector<Number>> _reduced_initial_space;
 };
 
 } // namespace libMesh
