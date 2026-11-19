@@ -58,7 +58,7 @@ namespace libMesh
  *     |         |         |         |/
  *     0 --------8 --------9 --------1
  * \endverbatim
- * 
+ *
  *
  * \verbatim
  *   HEX64 nodes by zeta slice (xi to the right, eta up the page).
@@ -264,8 +264,8 @@ public:
 
   static constexpr NodeMapTable<num_sides, nodes_per_side>
   _side_nodes = derived_side_nodes<Hex8, num_sides, nodes_per_side>
-    (_edge_nodes.values, 
-      [](unsigned int s, unsigned int q) 
+    (_edge_nodes.values,
+      [](unsigned int s, unsigned int q)
       { return q < 4 ? _first_face_node + 4 * s + q : invalid_uint; });
 
   static constexpr const unsigned int (&side_nodes_map)[num_sides][nodes_per_side] = _side_nodes.values;
