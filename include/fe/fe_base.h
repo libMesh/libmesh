@@ -31,6 +31,7 @@
 #include "libmesh/type_n_tensor.h"
 #include "libmesh/vector_value.h"
 #include "libmesh/dense_matrix.h"
+#include "libmesh/dense_vector.h"
 
 // C++ includes
 #include <cstddef>
@@ -908,6 +909,79 @@ template <typename OutputType>
 inline
 FEGenericBase<OutputType>::~FEGenericBase()
 {
+}
+
+
+
+/**
+ * \returns The adjacent vertices of each mid-edge shape function of \p elem for the transformed
+ * dual basis of compute_dual_shape_coefficients(), or an empty vector for the standard basis
+ */
+std::vector<std::vector<unsigned int>>
+dual_shape_transformed_vertices (const Elem * elem,
+                                 const FEType & fe_type,
+                                 const unsigned int n_shapes);
+
+/**
+ * Computes the dual basis coefficients \p coeff, psi_j = sum_i coeff(i,j) N_i, from the shape
+ * values \p phi and weights \p JxW of a quadrature rule. \p vertices comes from
+ * dual_shape_transformed_vertices(). \p T may be any type for which DenseMatrix<T> is
+ * instantiated, such as a dual number type.
+ */
+template <typename T>
+void compute_dual_shape_coefficients (const std::vector<T> & JxW,
+                                      const std::vector<std::vector<T>> & phi,
+                                      const std::vector<std::vector<unsigned int>> & vertices,
+                                      DenseMatrix<T> & coeff)
+{
+  const unsigned int sz = phi.size();
+  libmesh_error_msg_if(!sz, "ERROR: cannot compute dual shape coefficients with empty phi values");
+  libmesh_assert_less_equal(vertices.size(), sz);
+
+  //compute dual basis coefficient (coeff)
+  coeff.resize(sz, sz);
+  DenseMatrix<T> A(sz, sz), D(sz, sz);
+
+  for (const auto i : index_range(phi))
+    for (const auto qp : index_range(phi[i]))
+    {
+      D(i,i) += JxW[qp]*phi[i][qp];
+      for (const auto j : index_range(phi))
+        A(i,j) += JxW[qp]*phi[i][qp]*phi[j][qp];
+    }
+
+  // The integral positivity condition on the dual basis (Popp, Wohlmuth, Gee and Wall, SIAM J. Sci.
+  // Comput. 34(4):B421-B446, 2012, Eq. (4.2)) fails on QUAD8 and TRI6: D(k,k) = \int N_k is -1/3 at a
+  // QUAD8 corner and exactly 0 at a TRI6 vertex (their Eqs. (4.3) and (4.4)), the latter leaving those
+  // dual shape functions identically zero. Biorthogonalize instead against the locally quadratic
+  // transformed basis Ntilde = T N of their Sec. 4.4.1, in which each vertex absorbs a fraction alpha
+  // of its adjacent mid-edge shapes. That replaces D by T^-1 diag(T d), which for this T is the sparse
+  // update below. alpha = 1/5 is recommended there, and makes the weights strictly positive (QUAD8
+  // 1/5 and 4/5, TRI6 1/15 and 1/10) while preserving the partition of unity. T = I elsewhere.
+  const Real alpha = Real(1)/5;
+  // Mid-edge nodes are the trailing indices, and only vertex entries are written, so D(m,m) here
+  // is never a value an earlier iteration modified.
+  for (const auto k : index_range(vertices))
+    {
+      const auto m = sz - vertices.size() + k;
+      for (const auto vertex : vertices[k])
+        {
+          D(vertex, vertex) += alpha*D(m,m);
+          D(vertex, m)      -= alpha*D(m,m);
+        }
+    }
+
+  // coeff = A^-1*D
+  for (const auto j : index_range(phi))
+  {
+    DenseVector<T> Dcol(sz), coeffcol(sz);
+    for (const auto i : index_range(phi))
+      Dcol(i) = D(i, j);
+    A.cholesky_solve(Dcol, coeffcol);
+
+    for (const auto row : index_range(phi))
+      coeff(row, j)=coeffcol(row);
+  }
 }
 
 } // namespace libMesh
