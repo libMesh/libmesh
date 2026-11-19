@@ -47,6 +47,7 @@
 #include <fstream>
 #include <iomanip>
 #include <map>
+#include <tuple>
 #include <sstream>
 #include <unordered_map>
 
@@ -678,6 +679,20 @@ void UnstructuredMesh::copy_nodes_and_elements(const MeshBase & other_mesh,
   // find_neighbors specifically.
   libmesh_assert(!skip_preparation || skip_find_neighbors);
 
+#ifdef LIBMESH_ENABLE_PERIODIC
+  // Shift the disjoint neighbor node keys of other_mesh past the keys
+  // on this mesh, so that keys from the two meshes stay distinct.
+  dof_id_type node_key_offset = 0;
+  if (this->has_disjoint_neighbor_node_keys())
+    {
+      for (const Node * node : this->node_ptr_range())
+        if (const dof_id_type key = this->disjoint_neighbor_node_key(*node);
+            key != DofObject::invalid_id)
+          node_key_offset = std::max(node_key_offset, key + 1);
+      this->comm().max(node_key_offset);
+    }
+#endif
+
   std::pair<std::vector<unsigned int>, std::vector<unsigned int>>
     extra_int_maps = this->merge_extra_integer_names(other_mesh);
 
@@ -724,6 +739,13 @@ void UnstructuredMesh::copy_nodes_and_elements(const MeshBase & other_mesh,
         for (unsigned int i = 0; i != n_old_node_ints; ++i)
           newn->set_extra_integer(extra_int_maps.second[i],
                                   oldn->get_extra_integer(i));
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+        if (node_key_offset)
+          if (const dof_id_type key = this->disjoint_neighbor_node_key(*newn);
+              key != DofObject::invalid_id)
+            this->set_disjoint_neighbor_node_key(*newn, key + node_key_offset);
+#endif
 
 #ifdef LIBMESH_ENABLE_UNIQUE_ID
         newn->set_unique_id(oldn->unique_id() + unique_id_offset);
@@ -1157,7 +1179,92 @@ void UnstructuredMesh::find_neighbors (const bool reset_remote_elements,
   // Get the disjoint neighbor boundary pairs object (from periodic BCs)
   auto * db = this->get_disjoint_neighbor_boundary_pairs();
 
-  if (db)
+  if (db && this->has_disjoint_neighbor_node_keys())
+    {
+      // Match sides across disjoint neighbor boundary pairs by their
+      // sorted vertex keys. The keys are independent of the node
+      // coordinates, so this gives the same neighbors on a deformed mesh.
+      typedef std::tuple<Elem *, unsigned int, boundary_id_type> side_type;
+      std::map<std::vector<dof_id_type>, std::vector<side_type>> key_to_sides;
+
+      // Collect the sides on disjoint neighbor boundaries by their keys
+      for (const auto & [elem, side_bcid] : this->get_boundary_info().get_sideset_map())
+        {
+          const auto [side, bcid] = side_bcid;
+          if (elem->is_remote() || !db->boundary(bcid))
+            continue;
+
+          // Refinement creates nodes without keys
+          if (elem->has_children())
+            libmesh_not_implemented_msg("Disjoint neighbor node keys don't support refined meshes");
+
+          std::vector<dof_id_type> key;
+          for (const auto n : elem->nodes_on_side(side))
+            if (elem->is_vertex(n))
+              {
+                const dof_id_type node_key =
+                  this->disjoint_neighbor_node_key(elem->node_ref(n));
+                libmesh_error_msg_if(node_key == DofObject::invalid_id,
+                                     "Node " << elem->node_id(n) << " on side " << side
+                                     << " of element " << elem->id()
+                                     << " on disjoint neighbor boundary " << bcid
+                                     << " has no disjoint neighbor node key");
+                key.push_back(node_key);
+              }
+          std::sort(key.begin(), key.end());
+          // Distinct vertices of one side must have distinct keys
+          libmesh_assert(std::adjacent_find(key.begin(), key.end()) == key.end());
+          key_to_sides[std::move(key)].emplace_back(this->elem_ptr(elem->id()), side, bcid);
+        }
+
+      for (const auto & [_, sides] : key_to_sides)
+        for (const auto & [elem, side, bcid] : sides)
+          {
+            const boundary_id_type paired_bcid = db->boundary(bcid)->pairedboundary;
+            Elem * neigh = nullptr;
+            for (const auto & [candidate_elem, candidate_side, candidate_bcid] : sides)
+              if (candidate_elem != elem && candidate_bcid == paired_bcid)
+                {
+                  libmesh_error_msg_if(neigh,
+                                       "Side " << side << " of element " << elem->id()
+                                       << " on disjoint neighbor boundary " << bcid
+                                       << " matches elements " << neigh->id() << " and "
+                                       << candidate_elem->id() << " on boundary " << paired_bcid);
+                  neigh = candidate_elem;
+                }
+
+            // A local element must have its disjoint neighbor at least
+            // ghosted. A ghost element may have a remote one.
+            libmesh_error_msg_if(!neigh && (this->is_serial() ||
+                                            elem->processor_id() == this->processor_id()),
+                                 "Disjoint neighbor not found for side " << side
+                                 << " of element " << elem->id()
+                                 << " on disjoint neighbor boundary " << bcid);
+
+            // Sides that share all their vertices are conforming
+            // neighbors. A disjoint neighbor boundary pair must separate
+            // distinct copies of the interface nodes.
+            if (neigh)
+              {
+                bool conforming = true;
+                for (const auto n : elem->nodes_on_side(side))
+                  if (elem->is_vertex(n) &&
+                      neigh->get_node_index(elem->node_ptr(n)) == invalid_uint)
+                    {
+                      conforming = false;
+                      break;
+                    }
+                libmesh_error_msg_if(conforming,
+                                     "Side " << side << " of element " << elem->id()
+                                     << " on disjoint neighbor boundary " << bcid
+                                     << " shares its nodes with element " << neigh->id()
+                                     << " on boundary " << paired_bcid);
+              }
+
+            elem->set_neighbor(side, neigh ? neigh : const_cast<RemoteElem *>(remote_elem));
+          }
+    }
+  else if (db)
     {
       // Obtain a point locator
       std::unique_ptr<PointLocatorBase> point_locator = this->sub_point_locator();
