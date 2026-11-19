@@ -35,6 +35,7 @@
 #include <cstddef>
 #include <string>
 #include <memory>
+#include <optional>
 
 #include "libmesh/vector_value.h"
 
@@ -1506,6 +1507,11 @@ public:
 
   /**
    * Default ghosting functor
+   *
+   * Periodic constraints on a distributed mesh currently need every
+   * element point neighbor of a periodic vertex and its image.  The
+   * default ghosting functor ghosts those elements, using every set
+   * registered with add_periodic_boundaries().
    */
   GhostingFunctor & default_ghosting() { return *_default_ghosting; }
 
@@ -2137,6 +2143,39 @@ public:
 
   void remove_disjoint_boundary_pair(const boundary_id_type b1,
                                      const boundary_id_type b2);
+
+  /**
+   * Registers a set of periodic boundaries, e.g. a DofMap's.  The
+   * caller keeps ownership of \p periodic_bcs and must remove the
+   * set from the mesh before the set is destroyed.  The caller should
+   * call \p invalidate_periodic_boundary_sets() after it changes the
+   * contents of the set.
+   */
+  void add_periodic_boundaries(const PeriodicBoundaries & periodic_bcs);
+
+  /**
+   * Removes a periodic boundary set registered with
+   * add_periodic_boundaries().
+   */
+  void remove_periodic_boundaries(const PeriodicBoundaries & periodic_bcs);
+
+  /**
+   * Marks \p _reduced_periodic_boundary_sets as out of date. Call
+   * this after the contents of a registered set change.
+   */
+  void invalidate_periodic_boundary_sets()
+  { _reduced_periodic_boundary_sets.reset(); }
+
+  /**
+   * \returns The sets registered with \p add_periodic_boundaries(),
+   * reduced by \p PeriodicBoundaries::remove_redundant_sets(), recorded
+   * in the cache data member \p _reduced_periodic_boundary_sets.
+   *
+   * The list is rebuilt after it is invalidated.  The rebuild is not
+   * thread-safe, so the first call after a change must happen outside
+   * of threaded code.
+   */
+  const std::vector<const PeriodicBoundaries *> & periodic_boundary_sets() const;
 #endif
 
   /**
@@ -2186,6 +2225,18 @@ protected:
 #ifdef LIBMESH_ENABLE_PERIODIC
   /// @brief The disjoint neighbor boundary id pairs.
   std::unique_ptr<PeriodicBoundaries> _disjoint_neighbor_boundary_pairs;
+
+  /**
+   * The periodic boundary sets registered with add_periodic_boundaries().
+   */
+  std::vector<const PeriodicBoundaries *> _periodic_boundary_sets;
+
+  /**
+   * \p _periodic_boundary_sets reduced by
+   * PeriodicBoundaries::remove_redundant_sets(), built on demand by
+   * \p periodic_boundary_sets().  It has no value when it is out of date.
+   */
+  mutable std::optional<std::vector<const PeriodicBoundaries *>> _reduced_periodic_boundary_sets;
 #endif
 
   /**

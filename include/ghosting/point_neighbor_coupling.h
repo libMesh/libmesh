@@ -50,9 +50,6 @@ public:
    */
   PointNeighborCoupling() :
     _dof_coupling(nullptr),
-#ifdef LIBMESH_ENABLE_PERIODIC
-    _periodic_bcs(nullptr),
-#endif
     _n_levels(0)
   {}
 
@@ -62,9 +59,6 @@ public:
   PointNeighborCoupling(const PointNeighborCoupling & other) :
     GhostingFunctor(other),
     _dof_coupling(other._dof_coupling),
-#ifdef LIBMESH_ENABLE_PERIODIC
-    _periodic_bcs(other._periodic_bcs),
-#endif
     _n_levels(other._n_levels)
   {}
 
@@ -86,17 +80,6 @@ public:
   // Change number of levels of point neighbors to couple.
   void set_n_levels(unsigned int n_levels)
   { _n_levels = n_levels; }
-
-#ifdef LIBMESH_ENABLE_PERIODIC
-  // Set PeriodicBoundaries to couple.
-  //
-  // FIXME: This capability is not currently implemented.
-  void set_periodic_boundaries(const PeriodicBoundaries * periodic_bcs) override
-  { _periodic_bcs = periodic_bcs; }
-
-  const PeriodicBoundaries * get_periodic_boundaries() override
-  { return _periodic_bcs; }
-#endif
 
   /**
    * If we have periodic boundaries, then we'll need the mesh to have
@@ -125,9 +108,6 @@ public:
 private:
 
   const CouplingMatrix * _dof_coupling;
-#ifdef LIBMESH_ENABLE_PERIODIC
-  const PeriodicBoundaries * _periodic_bcs;
-#endif
   unsigned int _n_levels;
 };
 

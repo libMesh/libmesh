@@ -26,6 +26,7 @@
 #include "libmesh/libmesh_logging.h"
 
 // C++ Includes
+#include <algorithm>
 #include <unordered_set>
 
 namespace libMesh
@@ -36,7 +37,10 @@ void PointNeighborCoupling::mesh_reinit()
   // Unless we have periodic boundary conditions, we don't need
   // anything precomputed.
 #ifdef LIBMESH_ENABLE_PERIODIC
-  if (_periodic_bcs && !_periodic_bcs->empty())
+  const std::vector<const PeriodicBoundaries *> & periodic_bc_sets =
+    this->periodic_boundary_sets();
+  if (std::any_of(periodic_bc_sets.begin(), periodic_bc_sets.end(),
+                  [](const PeriodicBoundaries * pbs) { return !pbs->empty(); }))
 #endif
     {
       // If we do have periodic boundary conditions, we'll need a master
@@ -63,8 +67,11 @@ void PointNeighborCoupling::operator()
   //libmesh_assert(_mesh);
 
 #ifdef LIBMESH_ENABLE_PERIODIC
+  const std::vector<const PeriodicBoundaries *> & periodic_bc_sets =
+    this->periodic_boundary_sets();
   bool check_periodic_bcs =
-    (_periodic_bcs && !_periodic_bcs->empty());
+    std::any_of(periodic_bc_sets.begin(), periodic_bc_sets.end(),
+                [](const PeriodicBoundaries * pbs) { return !pbs->empty(); });
   std::unique_ptr<PointLocatorBase> point_locator;
   if (check_periodic_bcs)
     {
