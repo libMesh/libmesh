@@ -148,6 +148,9 @@ int main (int argc, char ** argv)
     if (elem->infinite())
       elem->subdomain_id() = 1;
 
+  // Update subdomain info caches
+  mesh.cache_elem_data();
+
   // Print information about the mesh to the screen.
   mesh.print_info();
 
