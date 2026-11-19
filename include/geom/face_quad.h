@@ -234,7 +234,9 @@ protected:
   static const unsigned short int _second_order_vertex_child_index[9];
 
   /**
-   * Master element node locations
+   * Master element node locations, on QUAD4 through QUAD9.
+   * Nested node locations on those elements make this possible;
+   * future subclasses may need their own arrays.
    */
   static const Real _master_points[9][3];
 

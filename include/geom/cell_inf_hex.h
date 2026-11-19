@@ -260,7 +260,9 @@ protected:
   static const unsigned short int _second_order_vertex_child_index[18];
 
   /**
-   * Master element node locations
+   * Master element node locations, on INFHEX8 through INFHEX18.
+   * Nested node locations on those elements make this possible;
+   * future subclasses may need their own arrays.
    */
   static const Real _master_points[18][3];
 

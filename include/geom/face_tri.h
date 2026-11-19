@@ -203,7 +203,9 @@ protected:
   Elem * _elemlinks_data[4+(LIBMESH_DIM>2)];
 
   /**
-   * Master element node locations
+   * Master element node locations, on TRI3 through TRI7.
+   * Nested node locations on those elements make this possible;
+   * future subclasses may need their own arrays.
    */
   static const Real _master_points[7][3];
 

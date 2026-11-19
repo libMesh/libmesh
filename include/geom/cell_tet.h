@@ -230,7 +230,9 @@ protected:
   Elem * _elemlinks_data[5+(LIBMESH_DIM>3)];
 
   /**
-   * Master element node locations
+   * Master element node locations, on TET4 through TET14.
+   * Nested node locations on those elements make this possible;
+   * future subclasses may need their own arrays.
    */
   static const Real _master_points[14][3];
 
