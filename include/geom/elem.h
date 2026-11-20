@@ -722,6 +722,7 @@ public:
       invalid_uint,  // C0POLYHEDRON
 
       16, // QUAD16
+      64, // HEX64
 
     };
 
