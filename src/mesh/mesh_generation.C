@@ -155,6 +155,11 @@ unsigned int idx(const ElemType type,
         return i + (2*nx+1)*(j + k*(2*ny+1));
       }
 
+    case HEX64:
+      {
+        return i + (3*nx+1)*(j + k*(3*ny+1));
+      }
+
     default:
       libmesh_error_msg("ERROR: Unrecognized element type == " << Utility::enum_to_string(type));
     }
@@ -1244,6 +1249,7 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
           case HEX8:
           case HEX20:
           case HEX27:
+          case HEX64:
           case C0POLYHEDRON:
           case TET4:  // TET4's are created from an initial HEX27 discretization
           case TET10: // TET10's are created from an initial HEX27 discretization
@@ -1313,6 +1319,12 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
               // nodes once the additional mid-edge nodes for the HEX27 discretization
               // have been deleted.
               mesh.reserve_nodes( (2*nx+1)*(2*ny+1)*(2*nz+1) );
+              break;
+            }
+
+          case HEX64:
+            {
+              mesh.reserve_nodes( (3*nx+1)*(3*nx+1)*(3*nz+1) );
               break;
             }
 
@@ -1447,6 +1459,33 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                         }
                 }
 
+              break;
+            } // end HEX20-PRISM21
+
+          case HEX64:
+            {
+              for (unsigned int k=0; k<=(3*nz); k++)
+                for (unsigned int j=0; j<=(3*ny); j++)
+                  for (unsigned int i=0; i<=(3*nx); i++)
+                    {
+                      const Node * const node =
+                        mesh.add_point(Point(static_cast<Real>(i) / static_cast<Real>(3*nx),
+                                             static_cast<Real>(j) / static_cast<Real>(3*ny),
+                                             static_cast<Real>(k) / static_cast<Real>(3*nz)),
+                                       node_id++);
+                      if (k == 0)
+                        boundary_info.add_node(node, 0);
+                      if (k == 3*nz)
+                        boundary_info.add_node(node, 5);
+                      if (j == 0)
+                        boundary_info.add_node(node, 1);
+                      if (j == 3*ny)
+                        boundary_info.add_node(node, 3);
+                      if (i == 0)
+                        boundary_info.add_node(node, 4);
+                      if (i == 3*nx)
+                        boundary_info.add_node(node, 2);
+                    }
               break;
             }
 
@@ -1694,8 +1733,88 @@ void MeshTools::Generation::build_cube(UnstructuredMesh & mesh,
                         boundary_info.add_side(elem, 2, 2);
                     }
               break;
-            }
+            } // end HEX20-PYRAMID18
 
+          case HEX64:
+            {
+              static const int c[8][3] =
+                {{0,0,0},{3,0,0},{3,3,0},{0,3,0},
+                 {0,0,3},{3,0,3},{3,3,3},{0,3,3}};
+              static const int e[12][2] =
+                {{0,1},{1,2},{2,3},{3,0},{0,4},{1,5},
+                 {2,6},{3,7},{4,5},{5,6},{6,7},{7,4}};
+              static const int f[6][4] =
+                {{0,3,2,1},{0,1,5,4},{1,2,6,5},
+                 {2,3,7,6},{3,0,4,7},{4,5,6,7}};
+              static const int uv[4][2] = {{1,1},{2,1},{2,2},{1,2}};
+
+              // -1, 0, or +1 step from one corner coordinate to another
+              std::function<int(int,int)> step =
+                [](int from, int to) { return (to > from) - (to < from); };
+
+              for (unsigned int k=0; k<(3*nz); k += 3)
+                for (unsigned int j=0; j<(3*ny); j += 3)
+                  for (unsigned int i=0; i<(3*nx); i += 3)
+                    {
+                      Elem * elem = mesh.add_elem(Elem::build_with_id(HEX64, elem_id++));
+
+                      // Node at local grid position (a,b,d), each in 0..3
+                      std::function<Node *(int,int,int)> N =
+                        [&](int a, int b, int d)
+                        {
+                          libmesh_assert(a >= 0 && a <= 3);
+                          libmesh_assert(b >= 0 && b <= 3);
+                          libmesh_assert(d >= 0 && d <= 3);
+                          return mesh.node_ptr(idx(type,nx,ny,
+                                                   i + static_cast<unsigned int>(a),
+                                                   j + static_cast<unsigned int>(b),
+                                                   k + static_cast<unsigned int>(d)));
+                        };
+
+                      // Corners 0-7
+                      for (unsigned int n=0; n<8; n++)
+                        elem->set_node(n, N(c[n][0], c[n][1], c[n][2]));
+
+                      // Edge nodes 8-31
+                      for (unsigned int ed=0; ed<12; ed++)
+                        {
+                          const int * a = c[e[ed][0]];
+                          const int * b = c[e[ed][1]];
+                          for (int t=1; t<=2; t++)
+                            elem->set_node(8 + 2*ed + static_cast<unsigned int>(t-1),
+                                           N(a[0] + t*step(a[0],b[0]),
+                                             a[1] + t*step(a[1],b[1]),
+                                             a[2] + t*step(a[2],b[2])));
+                        }
+
+                      // Face nodes 32-55
+                      for (unsigned int s=0; s<6; s++)
+                        {
+                          const int * o  = c[f[s][0]];
+                          const int * pu = c[f[s][1]];
+                          const int * pv = c[f[s][3]];
+                          for (unsigned int q=0; q<4; q++)
+                            elem->set_node(32 + 4*s + q,
+                                           N(o[0] + uv[q][0]*step(o[0],pu[0]) + uv[q][1]*step(o[0],pv[0]),
+                                             o[1] + uv[q][0]*step(o[1],pu[1]) + uv[q][1]*step(o[1],pv[1]),
+                                             o[2] + uv[q][0]*step(o[2],pu[2]) + uv[q][1]*step(o[2],pv[2])));
+                        }
+
+                      // Interior nodes 56-63
+                      for (int l=1; l<=2; l++)
+                        for (unsigned int q=0; q<4; q++)
+                          elem->set_node(56 + 4*static_cast<unsigned int>(l-1) + q,
+                                         N(uv[q][0], uv[q][1], l));
+
+                      if (k == 0)        boundary_info.add_side(elem, 0, 0);
+                      if (k == 3*(nz-1)) boundary_info.add_side(elem, 5, 5);
+                      if (j == 0)        boundary_info.add_side(elem, 1, 1);
+                      if (j == 3*(ny-1)) boundary_info.add_side(elem, 3, 3);
+                      if (i == 0)        boundary_info.add_side(elem, 4, 4);
+                      if (i == 3*(nx-1)) boundary_info.add_side(elem, 2, 2);
+                    }
+              break;
+            } // end HEX64
 
 
 

@@ -113,6 +113,7 @@ std::map<std::string, ElemType> elem_type_to_enum {
    {"HEX8"           , HEX8},
    {"HEX20"          , HEX20},
    {"HEX27"          , HEX27},
+   {"HEX64"          , HEX64},
 
    {"PRISM"          , PRISM6},
    {"PRISM6"         , PRISM6},
