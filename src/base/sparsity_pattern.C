@@ -103,8 +103,8 @@ void Build::sorted_connected_dofs(const Elem * elem,
     // we have the data necessary to init the reduced system matrix
     dofs_vi.clear();
 
-    // Unretained dofs still couple their constraining dofs, which constrained element matrices
-    // and vectors act on
+    // We'll record unretained dofs because we must check whether they're constrained later.
+    // If they're constrained we must be sure to add the constraining dofs to dofs_vi
     dummy_unretained.clear();
 
     auto total_and_retained_from_scalar_dofs_functor =

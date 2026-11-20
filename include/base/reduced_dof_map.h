@@ -40,20 +40,18 @@ class Node;
 /**
  * A degree of freedom map for a reduced space: a subset of the degrees of freedom of a full \p
  * DofMap, renumbered contiguously. Each retained degree of freedom keeps the rank that owns it in
- * the full space, so the reduced numbering on each rank preserves the full numbering order.
+ * the full space, so the reduced numbering on each rank preserves the full rank-major numbering
+ * order.
  *
- * Subclasses select the retained degrees of freedom through \p retain_field_dof() and \p
- * retain_scalar_dof(). Static condensation, for instance, retains the degrees of freedom on
- * element boundaries, and constraint elimination retains the unconstrained ones. The constraining
- * degrees of freedom of every constrained degree of freedom on an element are retained as well,
- * whether or not the constrained one is, because constrained element matrices and vectors couple
- * them.
+ * Subclasses select the retained degrees of freedom through \p accepts_field_dof() and \p
+ * accepts_scalar_dof(). Static condensation, for instance, retains the degrees of freedom on
+ * element boundaries, and constraint elimination retains the unconstrained degrees of freedom.
  *
  * This class provides the reduced numbering (\p reduced_dof()), the reduced degrees of freedom of
  * each local element and variable (\p dof_indices()), the variables present in the reduced space
- * along with a stand-in \p System for them, and the sparsity pattern of matrices in the reduced
- * space. This is the information needed to assemble reduced matrices and to build field splits
- * of the reduced space.
+ * along with a \p System for them, and the sparsity pattern of matrices in the reduced space. This
+ * is the information needed to assemble reduced matrices and to build field splits of the reduced
+ * space.
  */
 class ReducedDofMap : public DofMapBase
 {
@@ -78,8 +76,8 @@ public:
 
   /**
    * Fills \p di with the reduced degree of freedom indices of variable \p vn on the active local
-   * element \p elem, including the constraining degrees of freedom of its constrained degrees of
-   * freedom
+   * element \p elem. These include the retained constraining degrees of freedom of variable \p vn
+   * that the element's constrained degrees of freedom of any variable depend on
    */
   virtual void dof_indices(const Elem * const elem,
                            std::vector<dof_id_type> & di,
@@ -87,7 +85,8 @@ public:
                            int p_level = -12345) const override;
 
   /**
-   * Reduced degree of freedom maps are queried by element only
+   * Reduced degree of freedom map queries are currently only supported for elements; this overload
+   * errors.
    */
   virtual void dof_indices(const Node * const node,
                            std::vector<dof_id_type> & di,
@@ -100,21 +99,22 @@ public:
   dof_id_type reduced_dof(dof_id_type full_dof) const;
 
   /**
-   * \returns The local retained degrees of freedom in the full numbering, sorted. The reduced
-   * index of entry \p i is <tt>first_dof() + i</tt>
+   * \returns The local retained degrees of freedom in the full numbering, sorted. The reduced index
+   * of entry \p i is <tt>first_dof() + i</tt>
    */
   const std::vector<dof_id_type> & local_retained_dofs() const { return _local_retained_dofs; }
 
   /**
    * Nests this reduced space in \p parent's, or in the full space if \p parent is null. Only
    * degrees of freedom that \p parent retains can be retained, and the parent space is the space
-   * this one reduces: its vectors are the ones operators on this space are prolonged to and
-   * restricted from. Takes effect at the next \p reinit(), which must follow the parent's
+   * this one reduces, e.g. \p this space prolongs to and restricts from the parent space. \p
+   * reinit() on \p this object should follow a call to \p set_parent() as well as the parent's \p
+   * reinit() call.
    */
   void set_parent(const ReducedDofMap * parent) { _parent = parent; }
 
   /**
-   * \returns The reduced space this one is nested in, or null for the full space
+   * \returns The reduced space this one is nested in, or null if we reduce the full space
    */
   const ReducedDofMap * parent() const { return _parent; }
 
@@ -152,8 +152,8 @@ public:
   const std::vector<dof_id_type> & parent_send_list() const;
 
   /**
-   * Whether field degree of freedom \p field_dof is retained: the parent retains it and \p
-   * retain_field_dof() accepts it
+   * Whether field degree of freedom \p field_dof is retained: requires that both the parent retains
+   * it (if non-null) and that we accept it via the \p accepts_field_dof() implementation
    */
   bool retains_field_dof(const Elem & elem,
                          unsigned int node_num,
@@ -161,20 +161,13 @@ public:
                          dof_id_type field_dof) const;
 
   /**
-   * Whether SCALAR degree of freedom \p scalar_dof is retained: the parent retains it and \p
-   * retain_scalar_dof() accepts it
+   * Whether SCALAR degree of freedom \p scalar_dof is retained: requires that both the parent
+   * retains it (if non-null) and that we accept it via the \p accepts_scalar_dof() implementation
    */
   bool retains_scalar_dof(dof_id_type scalar_dof) const;
 
   /**
-   * \returns The reduced degree of freedom indices on the active local element with id \p
-   * elem_id, by reduced variable number. Concatenated, these are in the order in which \p
-   * retained_dof_added() saw them
-   */
-  const std::vector<std::vector<dof_id_type>> & elem_dof_indices(dof_id_type elem_id) const;
-
-  /**
-   * \returns The stand-in system that holds the variables of the reduced space
+   * \returns The system that holds the variables of the reduced space
    */
   const System & reduced_system() const;
 
@@ -184,8 +177,12 @@ public:
   const MeshBase & mesh() const { return _mesh; }
 
   /**
-   * \returns The sparsity pattern of matrices in the reduced space. Its rows are indexed by the
-   * local full degrees of freedom; use \p reduced_n_nz() and \p reduced_n_oz() for preallocation
+   * \returns The sparsity pattern of matrices in the reduced space, in the full numbering: its rows
+   * and columns are full degree of freedom indices, and the rows of unretained degrees of freedom
+   * are empty. The pattern classifies on- and off-processor entries correctly because each degree
+   * of freedom retained in the reduced space uses the same processor ID as the corresponding dof in
+   * the full space. Use \p reduced_n_nz() and \p reduced_n_oz() to preallocate reduced-space
+   * matrices; they hold the row counts by local reduced index
    */
   const SparsityPattern::Build & reduced_sparsity() const;
 
@@ -200,30 +197,32 @@ public:
   const std::vector<dof_id_type> & reduced_n_oz() const { return _reduced_noz; }
 
   /**
-   * \returns The reduced index of \p full_dof, or \p DofObject::invalid_id if \p full_dof is
-   * not retained. \p full_dof must be local or used by an active local element
+   * \returns The reduced index of \p full_dof, or \p DofObject::invalid_id if \p full_dof is not
+   * retained. \p full_dof must be local or used by an active local element
    */
   dof_id_type find_reduced_dof(dof_id_type full_dof) const;
 
   /**
    * This space's rule for retaining field degree of freedom \p field_dof of variable \p var_num on
-   * \p elem, among those the parent retains. \p node_num is the element-local node holding it, or
-   * \p invalid_uint for an element degree of freedom
+   * \p elem. \p node_num is the element-local node holding the degree of freedom or \p invalid_uint
+   * for an element degree of freedom
    */
-  virtual bool retain_field_dof(const Elem & elem,
-                                unsigned int node_num,
-                                unsigned int var_num,
-                                dof_id_type field_dof) const = 0;
+  virtual bool accepts_field_dof(const Elem & elem,
+                                 unsigned int node_num,
+                                 unsigned int var_num,
+                                 dof_id_type field_dof) const = 0;
 
   /**
-   * This space's rule for retaining degree of freedom \p scalar_dof of a SCALAR variable, among
-   * those the parent retains
+   * This space's rule for retaining degree of freedom \p scalar_dof of a SCALAR variable
    */
-  virtual bool retain_scalar_dof(dof_id_type /*scalar_dof*/) const { return true; }
+  virtual bool accepts_scalar_dof(dof_id_type /*scalar_dof*/) const { return true; }
 
 protected:
   /**
-   * @param reduced_system_name The name of the stand-in system holding the reduced variables
+   * @param mesh The mesh
+   * @param system The system for the full degree-of-freedom space
+   * @param dof_map The map for the full degree-of-freedom space
+   * @param reduced_system_name The name of the system holding the reduced variables
    */
   ReducedDofMap(MeshBase & mesh,
                 System & system,
@@ -231,46 +230,49 @@ protected:
                 std::string reduced_system_name);
 
   /**
-   * Called by \p reinit() each time \p full_dof is first retained on \p elem, in the order of the
-   * element's reduced indices
+   * Called by \p reinit() each time \p full_dof is first retained on \p elem. \p full_dof is a
+   * retained field or SCALAR degree of freedom of \p elem, or a retained constraining degree of
+   * freedom of one of them, which may belong to a different variable
    */
   virtual void retained_dof_added(const Elem & elem, dof_id_type full_dof);
 
   /**
    * Called by \p reinit() for each field degree of freedom on \p elem that the parent retains and
-   * \p retain_field_dof() rejects
+   * \p accepts_field_dof() rejects
    */
   virtual void unretained_dof_found(const Elem & elem, dof_id_type full_dof);
 
   MeshBase & _mesh;
+  /// The full-space system
   System & _system;
+  /// The full-space degree of freedom map
   const DofMap & _dof_map;
 
 private:
   /**
    * Retain \p full_dof on \p elem, along with its constraining degrees of freedom, recursively
-   * @param elem_seen The full degrees of freedom already retained on \p elem
-   * @param elem_var_dofs The retained full degrees of freedom of the current variable on \p elem
+   * @param dofs_seen_on_elem The full degrees of freedom already visited on \p elem
+   * @param elem_retained_dofs The retained full degrees of freedom on \p elem, of all variables
    */
   void retain_dof_and_constraining_dofs(const Elem * elem,
                                         dof_id_type full_dof,
-                                        std::unordered_set<dof_id_type> & elem_seen,
-                                        std::vector<dof_id_type> & elem_var_dofs);
+                                        std::unordered_set<dof_id_type> & dofs_seen_on_elem,
+                                        std::vector<dof_id_type> & elem_retained_dofs);
 
   /**
    * Retain on \p elem the constraining degrees of freedom of \p full_dof, if it is constrained
    */
   void retain_constraining_dofs(const Elem * elem,
                                 dof_id_type full_dof,
-                                std::unordered_set<dof_id_type> & elem_seen,
-                                std::vector<dof_id_type> & elem_var_dofs);
+                                std::unordered_set<dof_id_type> & dofs_seen_on_elem,
+                                std::vector<dof_id_type> & elem_retained_dofs);
 
   /**
-   * Record that \p full_dof is retained, on this rank or on its owner
+   * Record that \p full_dof is retained
    */
-  void retain_dof(dof_id_type full_dof);
+  void record_retained_dof(dof_id_type full_dof);
 
-  /// The name of the stand-in reduced system
+  /// The name of the reduced system
   const std::string _reduced_system_name;
 
   /// The reduced space this one is nested in, or null for the full space
@@ -288,8 +290,8 @@ private:
   /// The local retained degrees of freedom in the full numbering, sorted
   std::vector<dof_id_type> _local_retained_dofs;
 
-  /// The reduced index of each local full degree of freedom, offset by the first local full degree
-  /// of freedom. Unretained degrees of freedom map to \p DofObject::invalid_id
+  /// Entry \p i is the reduced index of full degree of freedom <tt>_dof_map.first_dof() + i</tt>,
+  /// or \p DofObject::invalid_id if that degree of freedom is not retained
   std::vector<dof_id_type> _local_full_to_reduced;
 
   /// The reduced indices of the nonlocal degrees of freedom on local elements, \p
@@ -308,7 +310,7 @@ private:
   /// The variables in the reduced space
   std::vector<Variable> _reduced_vars;
 
-  /// A stand-in system to give the reduced variables a system number
+  /// A system giving reduced variables a valid system number
   System * _reduced_system;
 
   /// The reduced space sparsity pattern

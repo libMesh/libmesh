@@ -31,15 +31,15 @@ ConstraintEliminationDofMap::ConstraintEliminationDofMap(MeshBase & mesh,
 
 ConstraintEliminationDofMap::~ConstraintEliminationDofMap() = default;
 
-bool ConstraintEliminationDofMap::retain_field_dof(const Elem &,
-                                                   unsigned int,
-                                                   unsigned int,
-                                                   const dof_id_type field_dof) const
+bool ConstraintEliminationDofMap::accepts_field_dof(const Elem &,
+                                                    unsigned int,
+                                                    unsigned int,
+                                                    const dof_id_type field_dof) const
 {
   return this->is_unconstrained(field_dof);
 }
 
-bool ConstraintEliminationDofMap::retain_scalar_dof(const dof_id_type scalar_dof) const
+bool ConstraintEliminationDofMap::accepts_scalar_dof(const dof_id_type scalar_dof) const
 {
   return this->is_unconstrained(scalar_dof);
 }

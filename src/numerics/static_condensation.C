@@ -205,11 +205,8 @@ void StaticCondensation::close()
     }
 
   DenseMatrix<Number> shim;
-  std::vector<dof_id_type> reduced_space_indices;
   for (auto & [elem_id, matrix_data] : _elem_to_matrix_data)
     {
-      reduced_space_indices.clear();
-
       // The result matrix is either a Schur complement or it's simply the result of summing element
       // matrices of the uncondensed degrees of freedom
       EigenMatrix result = matrix_data.Auu;
@@ -222,11 +219,8 @@ void StaticCondensation::close()
       for (const auto i : make_range(result.rows()))
         for (const auto j : make_range(result.cols()))
           shim(i, j) = result(i, j);
-      for (const auto & var_reduced_space_indices : _reduced_dof_map.elem_dof_indices(elem_id))
-        reduced_space_indices.insert(reduced_space_indices.end(),
-                                     var_reduced_space_indices.begin(),
-                                     var_reduced_space_indices.end());
-      _reduced_sys_mat->add_matrix(shim, reduced_space_indices);
+      const auto & dof_data = libmesh_map_find(_reduced_dof_map._elem_to_dof_data, elem_id);
+      _reduced_sys_mat->add_matrix(shim, dof_data.uncondensed_reduced_dofs);
     }
 
   _reduced_sys_mat->close();
@@ -407,24 +401,18 @@ void StaticCondensation::forward_elimination(const NumericVector<Number> & paren
   parent_rhs.create_subvector(
       *_reduced_rhs, _reduced_dof_map.local_retained_parent_dofs(), /*all_global_entries=*/false);
 
-  std::vector<dof_id_type> reduced_space_indices;
   for (auto elem : _mesh.active_local_element_ptr_range())
     {
       auto & matrix_data = libmesh_map_find(_elem_to_matrix_data, elem->id());
-      reduced_space_indices.clear();
       const auto & dof_data = libmesh_map_find(_reduced_dof_map._elem_to_dof_data, elem->id());
-      for (const auto & var_reduced_space_indices : _reduced_dof_map.elem_dof_indices(elem->id()))
-        reduced_space_indices.insert(reduced_space_indices.end(),
-                                     var_reduced_space_indices.begin(),
-                                     var_reduced_space_indices.end());
 
       set_local_vectors(
           parent_rhs, dof_data.condensed_parent_dofs, elem_condensed_rhs_vec, elem_condensed_rhs);
       elem_uncondensed_rhs = -matrix_data.Auc * matrix_data.AccFactor.solve(elem_condensed_rhs);
 
       libmesh_assert(cast_int<std::size_t>(elem_uncondensed_rhs.size()) ==
-                     reduced_space_indices.size());
-      _reduced_rhs->add_vector(elem_uncondensed_rhs.data(), reduced_space_indices);
+                     dof_data.uncondensed_reduced_dofs.size());
+      _reduced_rhs->add_vector(elem_uncondensed_rhs.data(), dof_data.uncondensed_reduced_dofs);
     }
   _reduced_rhs->close();
 }

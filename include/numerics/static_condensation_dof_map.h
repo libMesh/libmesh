@@ -81,10 +81,10 @@ public:
    * Degrees of freedom on element boundaries and degrees of freedom of uncondensed variables are
    * retained
    */
-  virtual bool retain_field_dof(const Elem & elem,
-                                unsigned int node_num,
-                                unsigned int var_num,
-                                dof_id_type field_dof) const override;
+  virtual bool accepts_field_dof(const Elem & elem,
+                                 unsigned int node_num,
+                                 unsigned int var_num,
+                                 dof_id_type field_dof) const override;
 
 protected:
   virtual void retained_dof_added(const Elem & elem, dof_id_type full_dof) override;
@@ -112,6 +112,8 @@ private:
     /// local number
     std::vector<dof_id_type> uncondensed_parent_dofs;
     std::vector<dof_id_type> condensed_parent_dofs;
+    /// The reduced-space indices of the uncondensed degrees of freedom, by element local number
+    std::vector<dof_id_type> uncondensed_reduced_dofs;
   };
 
   /// Friend the static condensation matrix class so they can inspect our degree of freedom data

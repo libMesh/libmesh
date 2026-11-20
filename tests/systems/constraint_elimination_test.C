@@ -1,26 +1,29 @@
-#include <libmesh/constraint_elimination_dof_map.h>
+#include <libmesh/boundary_info.h>
 #include <libmesh/const_function.h>
+#include <libmesh/constraint_elimination_dof_map.h>
 #include <libmesh/dense_matrix.h>
+#include <libmesh/dense_vector.h>
 #include <libmesh/dirichlet_boundaries.h>
 #include <libmesh/dof_map.h>
 #include <libmesh/elem.h>
 #include <libmesh/equation_systems.h>
 #include <libmesh/fe.h>
 #include <libmesh/linear_implicit_system.h>
-#include <libmesh/nonlinear_implicit_system.h>
-#include <libmesh/nonlinear_solver.h>
-#include <libmesh/numeric_vector.h>
-#include <libmesh/dense_vector.h>
-#include <tuple>
 #include <libmesh/mesh.h>
 #include <libmesh/mesh_generation.h>
 #include <libmesh/mesh_refinement.h>
+#include <libmesh/nonlinear_implicit_system.h>
+#include <libmesh/nonlinear_solver.h>
+#include <libmesh/numeric_vector.h>
 #include <libmesh/periodic_boundary.h>
 #include <libmesh/petsc_matrix.h>
 #include <libmesh/quadrature_gauss.h>
 #include <libmesh/reduced_sparse_matrix.h>
-#include <libmesh/static_condensation_dof_map.h>
 #include <libmesh/static_condensation.h>
+#include <libmesh/static_condensation_dof_map.h>
+
+#include <set>
+#include <tuple>
 
 #include "test_comm.h"
 #include "libmesh_cppunit.h"
@@ -191,6 +194,33 @@ private:
 };
 
 /**
+ * Constrains the first variable to equal the second at the nodes on one boundary, so that the
+ * constrained degrees of freedom of one variable depend on those of another
+ */
+class CrossVariableConstraint : public System::Constraint
+{
+public:
+  CrossVariableConstraint(System & sys, boundary_id_type bid) : _sys(sys), _bid(bid) {}
+
+  virtual void constrain() override
+  {
+    const auto sys_num = _sys.number();
+    const MeshBase & mesh = _sys.get_mesh();
+    for (const Node * node : mesh.node_ptr_range())
+      if (mesh.get_boundary_info().has_boundary_id(node, _bid))
+        {
+          DofConstraintRow row;
+          row[node->dof_number(sys_num, 1, 0)] = 1.;
+          _sys.get_dof_map().add_constraint_row(node->dof_number(sys_num, 0, 0), row);
+        }
+  }
+
+private:
+  System & _sys;
+  const boundary_id_type _bid;
+};
+
+/**
  * Assembles the matrix of the linear operator -div(grad u) + u_x into \p mat outside of any solve,
  * with homogeneous constraints. The advection term makes the operator non-symmetric, so that the
  * test can tell a constrained row of C^T K C from a constrained column. The
@@ -239,6 +269,7 @@ public:
 
   CPPUNIT_TEST(testReducedOperator);
   CPPUNIT_TEST(testReducedSolve);
+  CPPUNIT_TEST(testCrossVariableConstraintDofs);
   CPPUNIT_TEST(testReducedBounds);
   CPPUNIT_TEST(testReducedNullSpace);
 #ifdef LIBMESH_HAVE_EIGEN
@@ -608,6 +639,46 @@ private:
     for (const auto i : make_range(dof_map.first_dof(), dof_map.end_dof()))
       LIBMESH_ASSERT_NUMBERS_EQUAL(
           (*plain_sys.solution)(i), (*condensed_sys.solution)(i), std::sqrt(TOLERANCE) * TOLERANCE);
+  }
+
+  /**
+   * The reduced degrees of freedom of a variable on an element must belong to that variable, even
+   * when they constrain degrees of freedom of another variable
+   */
+  void testCrossVariableConstraintDofs()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    MeshTools::Generation::build_square(mesh, 4, 4, 0., 1., 0., 1., QUAD4);
+
+    EquationSystems es(mesh);
+    auto & sys = es.add_system<NonlinearImplicitSystem>("sys");
+    sys.create_constraint_elimination();
+    const auto u = sys.add_variable("u", FIRST, LAGRANGE);
+    const auto v = sys.add_variable("v", FIRST, LAGRANGE);
+    CrossVariableConstraint constraint(sys, 3);
+    sys.attach_constraint_object(constraint);
+    es.init();
+
+    const DofMap & dof_map = sys.get_dof_map();
+    const auto & reduced_map = dof_map.get_constraint_elimination();
+    CPPUNIT_ASSERT_EQUAL(2u, reduced_map.n_variables());
+
+    // The reduced degrees of freedom of each variable on the element, from the full numbering
+    std::vector<dof_id_type> full_dofs, reduced_dofs;
+    for (const Elem * elem : mesh.active_local_element_ptr_range())
+      for (const unsigned int var : {u, v})
+        {
+          dof_map.dof_indices(elem, full_dofs, var);
+          std::set<dof_id_type> expected;
+          for (const auto dof : full_dofs)
+            if (!dof_map.is_constrained_dof(dof))
+              expected.insert(reduced_map.reduced_dof(dof));
+          reduced_map.dof_indices(elem, reduced_dofs, var);
+          CPPUNIT_ASSERT(std::set<dof_id_type>(reduced_dofs.begin(), reduced_dofs.end()) ==
+                         expected);
+        }
   }
 };
 

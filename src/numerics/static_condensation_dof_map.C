@@ -32,10 +32,10 @@ StaticCondensationDofMap::StaticCondensationDofMap(MeshBase & mesh,
 
 StaticCondensationDofMap::~StaticCondensationDofMap() = default;
 
-bool StaticCondensationDofMap::retain_field_dof(const Elem & elem,
-                                                const unsigned int node_num,
-                                                const unsigned int var_num,
-                                                dof_id_type /*field_dof*/) const
+bool StaticCondensationDofMap::accepts_field_dof(const Elem & elem,
+                                                 const unsigned int node_num,
+                                                 const unsigned int var_num,
+                                                 dof_id_type /*field_dof*/) const
 {
   if (_uncondensed_vars.count(var_num))
     {
@@ -74,6 +74,15 @@ void StaticCondensationDofMap::reinit()
   // any degrees of freedom
   for (const auto * const elem : _mesh.active_local_element_ptr_range())
     _elem_to_dof_data[elem->id()];
+
+  for (auto & [elem_id, dof_data] : _elem_to_dof_data)
+    {
+      libmesh_ignore(elem_id);
+      const auto & map = dof_data.uncondensed_global_to_local_map;
+      dof_data.uncondensed_reduced_dofs.resize(map.size());
+      for (const auto & [full_dof, local_number] : map)
+        dof_data.uncondensed_reduced_dofs[local_number] = this->reduced_dof(full_dof);
+    }
 }
 
 void StaticCondensationDofMap::clear()

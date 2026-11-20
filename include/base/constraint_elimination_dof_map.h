@@ -27,12 +27,21 @@ namespace libMesh
  * The reduced space of the unconstrained degrees of freedom of a \p DofMap.
  *
  * Every \p DofMap constraint is affine: the full solution is \f$ x = C y + h \f$, where \f$ y \f$
- * holds the unconstrained degrees of freedom, \f$ C \f$ is the identity on them and holds the
- * constraint coefficients on constrained rows, and \f$ h \f$ holds the constraint values. The
- * reduced residual and Jacobian are \f$ C^T F(C y + h) \f$ and \f$ C^T J C \f$. Element matrices
- * and vectors constrained with \p DofMap::constrain_element_matrix() and its relatives are \f$ C^T
- * K C \f$ and \f$ C^T F \f$ on their unconstrained rows and columns, so dropping their constrained
- * rows and columns at insertion assembles the reduced system exactly.
+ * holds the unconstrained degrees of freedom and \f$ h \f$ holds the constraint values. Index both
+ * the rows and the columns of \f$ C \f$ by full degree of freedom. The row for an unconstrained
+ * degree of freedom is then a unit row whose only nonzero is the diagonal entry. The row for a
+ * constrained degree of freedom holds its constraint coefficients, and the column for a
+ * constrained degree of freedom is zero. The reduced residual and Jacobian are
+ * \f$ C^T F(C y + h) \f$ and \f$ C^T J C \f$.
+ *
+ * \p DofMap::constrain_element_matrix() and its relatives transform an element matrix \f$ K_e \f$
+ * and vector \f$ F_e \f$ to \f$ C_e^T K_e C_e \f$ and \f$ C_e^T F_e \f$. \f$ C_e \f$ is the block
+ * of \f$ C \f$ for the element's degrees of freedom and their constraining degrees of freedom.
+ * These functions then overwrite each constrained row with its constraint equation, which leaves
+ * the unconstrained rows unchanged. The constrained columns of \f$ C_e \f$ are zero, so the
+ * unconstrained rows and columns of the result are the element contribution to the reduced
+ * system. Insertion that drops the constrained rows and columns therefore assembles the reduced
+ * system exactly.
  */
 class ConstraintEliminationDofMap : public ReducedDofMap
 {
@@ -40,18 +49,12 @@ public:
   ConstraintEliminationDofMap(MeshBase & mesh, System & system, const DofMap & dof_map);
   virtual ~ConstraintEliminationDofMap();
 
-  /**
-   * Unconstrained degrees of freedom are retained
-   */
-  virtual bool retain_field_dof(const Elem & elem,
-                                unsigned int node_num,
-                                unsigned int var_num,
-                                dof_id_type field_dof) const override;
+  virtual bool accepts_field_dof(const Elem & elem,
+                                 unsigned int node_num,
+                                 unsigned int var_num,
+                                 dof_id_type field_dof) const override;
 
-  /**
-   * Unconstrained degrees of freedom are retained
-   */
-  virtual bool retain_scalar_dof(dof_id_type scalar_dof) const override;
+  virtual bool accepts_scalar_dof(dof_id_type scalar_dof) const override;
 
 private:
   bool is_unconstrained(dof_id_type dof) const;
