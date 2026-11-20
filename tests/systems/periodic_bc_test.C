@@ -362,7 +362,7 @@ private:
         const Number left = sys.point_value(0, Point(0., y));
         const Number right = sys.point_value(0, Point(1., y));
         LIBMESH_ASSERT_NUMBERS_EQUAL(left, right, TOLERANCE*TOLERANCE);
-        const Real err = std::min(std::abs(left - y * y), std::abs(left - 1 - y * y));
+        const Real err = std::min(std::abs(left - y * y), std::abs(left - Real(1) - y * y));
         LIBMESH_ASSERT_FP_EQUAL(0, err, TOLERANCE*TOLERANCE);
       }
   }
