@@ -98,6 +98,7 @@ std::map<std::string, ElemType> elem_type_to_enum {
    {"QUADSHELL8"     , QUADSHELL8},
    {"QUAD9"          , QUAD9},
    {"QUADSHELL9"     , QUADSHELL9},
+   {"QUAD16"         , QUAD16},
 
    {"C0POLYGON"      , C0POLYGON},
 
