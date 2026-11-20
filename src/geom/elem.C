@@ -3650,6 +3650,13 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
         return QUADSHELL9;
       }
 
+    case QUAD16:
+      {
+        // full_ordered not relevant
+        return QUAD16;
+      }
+
+
     case TET4:
     case TET10:
       {
@@ -3801,6 +3808,9 @@ ElemType Elem::complete_order_equivalent_type (const ElemType et)
     case QUADSHELL8:
     case QUADSHELL9:
       return QUADSHELL9;
+
+    case QUAD16:
+      return QUAD16;
 
     case TET4:
     case TET10:
