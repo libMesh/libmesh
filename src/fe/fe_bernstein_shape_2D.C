@@ -149,7 +149,14 @@ Real FE<2,BERNSTEIN>::shape(const Elem * elem,
                 FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[8], eta));
 
       }
+    case QUAD16:
+      {
+        // Compute quad shape functions as a tensor-product
+        auto [i0, i1] = quad_i0_i1(i, totalorder, *elem);
 
+        return (FE<1,BERNSTEIN>::shape(EDGE4, totalorder, i0, p(0))*
+                FE<1,BERNSTEIN>::shape(EDGE4, totalorder, i1, p(1)));
+      }
     case TRI3:
     case TRISHELL3:
       libmesh_assert_less (totalorder, 2);
@@ -492,6 +499,27 @@ Real FE<2,BERNSTEIN>::shape_deriv(const Elem * elem,
             libmesh_error_msg("Invalid shape function derivative j = " << j);
           }
       }
+    case QUAD16:
+      {
+        // Compute quad shape functions as a tensor-product
+        auto [i0, i1] = quad_i0_i1(i, totalorder, *elem);
+
+        switch (j)
+          {
+            // d()/dxi
+          case 0:
+            return (FE<1,BERNSTEIN>::shape_deriv(EDGE4, totalorder, i0, 0, p(0))*
+                    FE<1,BERNSTEIN>::shape      (EDGE4, totalorder, i1,    p(1)));
+
+            // d()/deta
+          case 1:
+            return (FE<1,BERNSTEIN>::shape      (EDGE4, totalorder, i0,    p(0))*
+                    FE<1,BERNSTEIN>::shape_deriv(EDGE4, totalorder, i1, 0, p(1)));
+
+          default:
+            libmesh_error_msg("Invalid shape function derivative j = " << j);
+          }
+      }
 
     case TRI3:
     case TRISHELL3:
@@ -581,6 +609,33 @@ Real FE<2,BERNSTEIN>::shape_second_deriv(const Elem * elem,
           case 2:
             return (FE<1,BERNSTEIN>::shape             (EDGE3, totalorder, i0,    p(0))*
                     FE<1,BERNSTEIN>::shape_second_deriv(EDGE3, totalorder, i1, 0, p(1)));
+
+          default:
+            libmesh_error_msg("Invalid shape function derivative j = " << j);
+          }
+      }
+
+    case QUAD16:
+      {
+        // Compute quad shape functions as a tensor-product
+        auto [i0, i1] = quad_i0_i1(i, totalorder, *elem);
+
+        switch (j)
+          {
+            // d^2() / dxi^2
+          case 0:
+            return (FE<1,BERNSTEIN>::shape_second_deriv(EDGE4, totalorder, i0, 0, p(0))*
+                    FE<1,BERNSTEIN>::shape             (EDGE4, totalorder, i1,    p(1)));
+
+            // d^2() / dxi deta
+          case 1:
+            return (FE<1,BERNSTEIN>::shape_deriv(EDGE4, totalorder, i0, 0, p(0))*
+                    FE<1,BERNSTEIN>::shape_deriv(EDGE4, totalorder, i1, 0, p(1)));
+
+            // d^2() / deta^2
+          case 2:
+            return (FE<1,BERNSTEIN>::shape             (EDGE4, totalorder, i0,    p(0))*
+                    FE<1,BERNSTEIN>::shape_second_deriv(EDGE4, totalorder, i1, 0, p(1)));
 
           default:
             libmesh_error_msg("Invalid shape function derivative j = " << j);

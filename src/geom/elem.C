@@ -40,6 +40,7 @@
 #include "libmesh/face_quad8_shell.h"
 #include "libmesh/face_quad9.h"
 #include "libmesh/face_quad9_shell.h"
+#include "libmesh/face_quad16.h"
 #include "libmesh/face_inf_quad4.h"
 #include "libmesh/face_inf_quad6.h"
 #include "libmesh/cell_tet4.h"
@@ -48,6 +49,7 @@
 #include "libmesh/cell_hex8.h"
 #include "libmesh/cell_hex20.h"
 #include "libmesh/cell_hex27.h"
+#include "libmesh/cell_hex64.h"
 #include "libmesh/cell_inf_hex8.h"
 #include "libmesh/cell_inf_hex16.h"
 #include "libmesh/cell_inf_hex18.h"
@@ -158,6 +160,10 @@ const unsigned int Elem::type_to_dim_map [] =
 
     2,  // C0POLYGON
     3,  // C0POLYHEDRON
+
+    2,  // QUAD16
+
+    3,  // HEX64
   };
 
 const unsigned int Elem::max_n_nodes;
@@ -221,6 +227,10 @@ const unsigned int Elem::type_to_n_sides_map [] =
 
     invalid_uint,  // C0POLYGON
     invalid_uint,  // C0POLYHEDRON
+
+    4,  // QUAD16
+
+    6,  // HEX64
   };
 
 const unsigned int Elem::type_to_n_edges_map [] =
@@ -282,6 +292,10 @@ const unsigned int Elem::type_to_n_edges_map [] =
 
     invalid_uint,  // C0POLYGON
     invalid_uint,  // C0POLYHEDRON
+
+    4,   // QUAD16
+
+    12,  // HEX64
   };
 
 const Order Elem::type_to_default_order_map [] =
@@ -343,6 +357,9 @@ const Order Elem::type_to_default_order_map [] =
 
     FIRST,    // C0POLYGON
     FIRST,    // C0POLYHEDRON
+
+    THIRD,   // QUAD16
+    THIRD,   // HEX64
   };
 
 // ------------------------------------------------------------
@@ -419,6 +436,8 @@ std::unique_ptr<Elem> Elem::build(const ElemType type,
       return std::make_unique<Quad9>(p);
     case QUADSHELL9:
       return std::make_unique<QuadShell9>(p);
+    case QUAD16:
+      return std::make_unique<Quad16>(p);
 
     // Well, a hexagon is *a* polygon...
     case C0POLYGON:
@@ -443,6 +462,8 @@ std::unique_ptr<Elem> Elem::build(const ElemType type,
       return std::make_unique<Hex20>(p);
     case HEX27:
       return std::make_unique<Hex27>(p);
+    case HEX64:
+      return std::make_unique<Hex64>(p);
     case PRISM6:
       return std::make_unique<Prism6>(p);
     case PRISM15:
@@ -3298,6 +3319,8 @@ ElemType Elem::side_type (const ElemType t,
     case QUAD9:
     case QUADSHELL9:
       return EDGE3;
+    case QUAD16:
+      return EDGE4;
     case TET4:
       return TRI3;
     case TET10:
@@ -3310,6 +3333,8 @@ ElemType Elem::side_type (const ElemType t,
       return QUAD8;
     case HEX27:
       return QUAD9;
+    case HEX64:
+      return QUAD16;
       // Sides 0 and 4 of a prism are its triangles
     case PRISM6:
       return (s == 0 || s == 4) ? TRI3 : QUAD4;
@@ -3397,6 +3422,7 @@ ElemType Elem::edge_type (const ElemType t)
     case QUADSHELL8:
     case QUAD9:
     case QUADSHELL9:
+    case QUAD16:
     case C0POLYGON:
       return side_type(t, 0);
       // A first-order 3D element's edges hold their two vertices
@@ -3419,6 +3445,9 @@ ElemType Elem::edge_type (const ElemType t)
     case PYRAMID14:
     case PYRAMID18:
       return EDGE3;
+     // third order adds another vertex
+    case HEX64:
+      return EDGE4;
     default:
       libmesh_error_msg("No edge type for element type " << Utility::enum_to_string(t));
     }
@@ -3462,6 +3491,8 @@ unsigned int Elem::local_side_node (const ElemType t,
     case QUAD8:
     case QUADSHELL8:
       return Quad8::side_nodes_map[side][side_node];
+    case QUAD16:
+      return Quad16::side_nodes_map[side][side_node];
     case QUAD9:
     case QUADSHELL9:
       return Quad9::side_nodes_map[side][side_node];
@@ -3528,6 +3559,7 @@ unsigned int Elem::local_edge_node (const ElemType t,
     case QUADSHELL8:
     case QUAD9:
     case QUADSHELL9:
+    case QUAD16:
       return local_side_node(t, edge, edge_node);
     case TET4:
       return Tet4::edge_nodes_map[edge][edge_node];
@@ -3540,6 +3572,8 @@ unsigned int Elem::local_edge_node (const ElemType t,
     case HEX20:
       return Hex20::edge_nodes_map[edge][edge_node];
     case HEX27:
+      return Hex27::edge_nodes_map[edge][edge_node];
+    case HEX64:
       return Hex27::edge_nodes_map[edge][edge_node];
     case PRISM6:
       return Prism6::edge_nodes_map[edge][edge_node];
@@ -3633,6 +3667,13 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
         return QUADSHELL9;
       }
 
+    case QUAD16:
+      {
+        // full_ordered not relevant
+        return QUAD16;
+      }
+
+
     case TET4:
     case TET10:
       {
@@ -3657,6 +3698,11 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
       {
         // full_ordered not relevant
         return HEX27;
+      }
+    case HEX64:
+      {
+        // full_ordered not relevant
+        return HEX64;
       }
 
     case PRISM6:
@@ -3785,6 +3831,9 @@ ElemType Elem::complete_order_equivalent_type (const ElemType et)
     case QUADSHELL9:
       return QUADSHELL9;
 
+    case QUAD16:
+      return QUAD16;
+
     case TET4:
     case TET10:
     case TET14:
@@ -3794,6 +3843,9 @@ ElemType Elem::complete_order_equivalent_type (const ElemType et)
     case HEX20:
     case HEX27:
       return HEX27;
+
+    case HEX64:
+      return HEX64;
 
     // We don't strictly need the 21st node for DoFs, but some code
     // depends on it for e.g. refinement patterns

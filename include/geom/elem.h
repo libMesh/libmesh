@@ -721,6 +721,9 @@ public:
       invalid_uint,  // C0POLYGON
       invalid_uint,  // C0POLYHEDRON
 
+      16, // QUAD16
+      64, // HEX64
+
     };
 
   /**
@@ -732,7 +735,7 @@ public:
    * The maximum number of nodes *any* element can contain.
    * This is useful for replacing heap vectors with stack arrays.
    */
-  static const unsigned int max_n_nodes = 27;
+  static const unsigned int max_n_nodes = 64;
 
   /**
    * \returns An integer range from 0 up to (but not including)

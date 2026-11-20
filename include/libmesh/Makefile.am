@@ -102,6 +102,7 @@ BUILT_SOURCES = \
         cell_hex.h \
         cell_hex20.h \
         cell_hex27.h \
+        cell_hex64.h \
         cell_hex8.h \
         cell_inf.h \
         cell_inf_hex.h \
@@ -147,6 +148,7 @@ BUILT_SOURCES = \
         face_inf_quad6.h \
         face_polygon.h \
         face_quad.h \
+        face_quad16.h \
         face_quad4.h \
         face_quad4_shell.h \
         face_quad8.h \
@@ -918,6 +920,9 @@ cell_hex20.h: $(top_srcdir)/include/geom/cell_hex20.h
 cell_hex27.h: $(top_srcdir)/include/geom/cell_hex27.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+cell_hex64.h: $(top_srcdir)/include/geom/cell_hex64.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 cell_hex8.h: $(top_srcdir)/include/geom/cell_hex8.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
@@ -1051,6 +1056,9 @@ face_polygon.h: $(top_srcdir)/include/geom/face_polygon.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_quad.h: $(top_srcdir)/include/geom/face_quad.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+face_quad16.h: $(top_srcdir)/include/geom/face_quad16.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 face_quad4.h: $(top_srcdir)/include/geom/face_quad4.h

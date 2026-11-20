@@ -65,22 +65,45 @@ constexpr unsigned int no_face_node (const unsigned int)
 }
 
 /**
- * \returns The edge_nodes_map of the second-order element whose
+ * \returns The edge_nodes_map of the second-order, or higher, element whose
  * first-order equivalent is \p FirstOrder: each edge's two vertices, then
- * its mid-edge node, numbered after the vertices in edge order.
+ * its interior $\p K edge node, numbered after the vertices in edge order.
  */
-template <class FirstOrder, unsigned int Edges>
-constexpr NodeMapTable<Edges, 3>
+template <class FirstOrder, unsigned int Edges, unsigned int K = 1>
+constexpr NodeMapTable<Edges, 2 + K>
 derived_edge_nodes ()
 {
-  NodeMapTable<Edges, 3> t {};
+  NodeMapTable<Edges, 2 + K> t {};
   for (unsigned int e = 0; e != Edges; ++e)
     {
       t.values[e][0] = FirstOrder::edge_nodes_map[e][0];
       t.values[e][1] = FirstOrder::edge_nodes_map[e][1];
-      t.values[e][2] = FirstOrder::num_nodes + e;
+      for (unsigned int k = 0; k != K; ++k)
+        t.values[e][2 + k] = FirstOrder::num_nodes + K * e + k;
     }
   return t;
+}
+
+/**
+ * \returns The \p k-th interior node of the edge joining vertices \p from
+ * and \p to, counted in the direction from \p from towards \p to, or
+ * \p invalid_uint if no row of \p edges joins those two vertices.
+ */
+template <unsigned int Edges, unsigned int EdgeCols>
+constexpr unsigned int edge_node (const unsigned int (&edges)[Edges][EdgeCols],
+                                  const unsigned int from,
+                                  const unsigned int to,
+                                  const unsigned int k)
+{
+  constexpr unsigned int K = EdgeCols - 2;
+  for (unsigned int e = 0; e != Edges; ++e)
+    {
+      if (edges[e][0] == from && edges[e][1] == to)
+        return edges[e][2 + k];
+      if (edges[e][0] == to && edges[e][1] == from)
+        return edges[e][2 + (K - 1 - k)];
+    }
+  return invalid_uint;
 }
 
 /**
@@ -97,6 +120,35 @@ constexpr unsigned int n_side_vertices (const unsigned int s)
       ++n;
   return n;
 }
+
+template <class FirstOrder, unsigned int Sides, unsigned int Cols,
+          unsigned int Edges, unsigned int EdgeCols, class FaceNode>
+constexpr NodeMapTable<Sides, Cols>
+derived_side_nodes (const unsigned int (&edges)[Edges][EdgeCols],
+                    FaceNode face_node)          // face_node(s, q)
+{
+  constexpr unsigned int K = EdgeCols - 2;
+  NodeMapTable<Sides, Cols> t {};
+  for (unsigned int s = 0; s != Sides; ++s)
+    {
+      const unsigned int nv = n_side_vertices<FirstOrder>(s);
+      unsigned int n = 0;
+      for (unsigned int k = 0; k != nv; ++k)
+        t.values[s][n++] = FirstOrder::side_nodes_map[s][k];
+      for (unsigned int k = 0; k != nv; ++k)
+        for (unsigned int j = 0; j != K; ++j)
+          t.values[s][n++] = edge_node(edges,
+                                       FirstOrder::side_nodes_map[s][k],
+                                       FirstOrder::side_nodes_map[s][(k+1) % nv],
+                                       j);
+      for (unsigned int q = 0; n != Cols && face_node(s, q) != invalid_uint; ++q)
+        t.values[s][n++] = face_node(s, q);
+      for (; n != Cols; ++n)
+        t.values[s][n] = unused_side_node;
+    }
+  return t;
+}
+
 
 /**
  * \returns The third entry of the row of \p edges joining vertices \p a

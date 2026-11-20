@@ -31,60 +31,65 @@ namespace libMesh {
  * reducing header file dependencies.
  */
 enum ElemType : int {
-               // 1D
-               EDGE2 = 0,
-               EDGE3 = 1,
-               EDGE4 = 2,
-               // 2D
-               TRI3 = 3,
-               TRI6 = 4,
-               QUAD4 = 5,
-               QUAD8 = 6,
-               QUAD9 = 7,
-               // 3D
-               TET4 = 8,
-               TET10 = 9,
-               HEX8 = 10,
-               HEX20 = 11,
-               HEX27 = 12,
-               PRISM6 = 13,
-               PRISM15 = 14,
-               PRISM18 = 15,
-               PYRAMID5 = 16,
-               PYRAMID13 = 17,
-               PYRAMID14 = 18,
-               // Infinite Elems
-               INFEDGE2 = 19,
-               INFQUAD4 = 20,
-               INFQUAD6 = 21,
-               INFHEX8 = 22,
-               INFHEX16 = 23,
-               INFHEX18 = 24,
-               INFPRISM6 = 25,
-               INFPRISM12 = 26,
-               // 0D
-               NODEELEM = 27,
-               // Miscellaneous Elems
-               REMOTEELEM = 28,
-               TRI3SUBDIVISION = 29,
-               // Shell Elems
-               TRISHELL3 = 30,
-               QUADSHELL4 = 31,
-               QUADSHELL8 = 32,
-               // Elems with Tri7 (Tri with mid-face node) faces
-               TRI7 = 33,
-               TET14 = 34,
-               PRISM20 = 35,
-               PRISM21 = 36,
-               PYRAMID18 = 37,
-               // Another shell elem
-               QUADSHELL9 = 38,
-               // An arbitrary polygon with N EDGE2 sides
-               C0POLYGON = 39,
-               // An arbitrary polyhedron with C0POLYGON sides
-               C0POLYHEDRON = 40,
-               // Invalid
-               INVALID_ELEM};   // should always be last
+  // 1D
+  EDGE2 = 0,
+  EDGE3 = 1,
+  EDGE4 = 2,
+  // 2D
+  TRI3 = 3,
+  TRI6 = 4,
+  QUAD4 = 5,
+  QUAD8 = 6,
+  QUAD9 = 7,
+  // 3D
+  TET4 = 8,
+  TET10 = 9,
+  HEX8 = 10,
+  HEX20 = 11,
+  HEX27 = 12,
+  PRISM6 = 13,
+  PRISM15 = 14,
+  PRISM18 = 15,
+  PYRAMID5 = 16,
+  PYRAMID13 = 17,
+  PYRAMID14 = 18,
+  // Infinite Elems
+  INFEDGE2 = 19,
+  INFQUAD4 = 20,
+  INFQUAD6 = 21,
+  INFHEX8 = 22,
+  INFHEX16 = 23,
+  INFHEX18 = 24,
+  INFPRISM6 = 25,
+  INFPRISM12 = 26,
+  // 0D
+  NODEELEM = 27,
+  // Miscellaneous Elems
+  REMOTEELEM = 28,
+  TRI3SUBDIVISION = 29,
+  // Shell Elems
+  TRISHELL3 = 30,
+  QUADSHELL4 = 31,
+  QUADSHELL8 = 32,
+  // Elems with Tri7 (Tri with mid-face node) faces
+  TRI7 = 33,
+  TET14 = 34,
+  PRISM20 = 35,
+  PRISM21 = 36,
+  PYRAMID18 = 37,
+  // Another shell elem
+  QUADSHELL9 = 38,
+  // An arbitrary polygon with N EDGE2 sides
+  C0POLYGON = 39,
+  // An arbitrary polyhedron with C0POLYGON sides
+  C0POLYHEDRON = 40,
+  QUAD16 = 41,
+  // higher-order hexahedra
+  HEX64 = 42,
+  // Invalid
+  INVALID_ELEM,
+
+};   // should always be last
 
 /**
  * Enumeration of possible element master->physical mapping types.

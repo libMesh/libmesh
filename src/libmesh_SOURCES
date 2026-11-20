@@ -135,6 +135,7 @@ libmesh_SOURCES =  \
         src/geom/cell_hex.C \
         src/geom/cell_hex20.C \
         src/geom/cell_hex27.C \
+        src/geom/cell_hex64.C \
         src/geom/cell_hex8.C \
         src/geom/cell_inf.C \
         src/geom/cell_inf_hex.C \
@@ -183,6 +184,7 @@ libmesh_SOURCES =  \
         src/geom/face_quad8_shell.C \
         src/geom/face_quad9.C \
         src/geom/face_quad9_shell.C \
+        src/geom/face_quad16.C \
         src/geom/face_tri.C \
         src/geom/face_tri3.C \
         src/geom/face_tri3_shell.C \
