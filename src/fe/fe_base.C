@@ -1926,7 +1926,8 @@ compute_periodic_constraints (DofConstraints & constraints,
   // We don't need to constrain discontinuous elements
   if (cont == DISCONTINUOUS)
     return;
-  libmesh_assert (cont == C_ZERO || cont == C_ONE);
+  libmesh_assert (cont == C_ZERO || cont == C_ONE ||
+                  cont == SIDE_DISCONTINUOUS);
 
   // We'll use element size to generate relative tolerances later
   const Real primary_hmin = elem->hmin();
@@ -1949,7 +1950,7 @@ compute_periodic_constraints (DofConstraints & constraints,
   std::vector<dof_id_type> my_dof_indices, neigh_dof_indices;
   std::vector<unsigned int> my_side_dofs, neigh_side_dofs;
 
-  if (cont != C_ZERO)
+  if (cont == C_ONE)
     {
       const std::vector<Point> & ref_face_normals =
         my_fe->get_normals();
@@ -2099,7 +2100,7 @@ compute_periodic_constraints (DofConstraints & constraints,
                           Ke(is,js) += JxW[qp] *
                             TensorTools::inner_product(phi[i][qp],
                                                        phi[j][qp]);
-                          if (cont != C_ZERO)
+                          if (cont == C_ONE)
                             Ke(is,js) += JxW[qp] *
                               TensorTools::inner_product((*dphi)[i][qp] *
                                                          (*face_normals)[qp],
@@ -2123,7 +2124,7 @@ compute_periodic_constraints (DofConstraints & constraints,
                           Fe(js) += JxW[qp] *
                             TensorTools::inner_product(neigh_phi[i][qp],
                                                        phi[j][qp]);
-                          if (cont != C_ZERO)
+                          if (cont == C_ONE)
                             Fe(js) += JxW[qp] *
                               TensorTools::inner_product((*neigh_dphi)[i][qp] *
                                                          (*face_normals)[qp],
