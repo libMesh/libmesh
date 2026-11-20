@@ -648,11 +648,7 @@ void VTKIO::nodes_to_vtk()
       _local_node_map[node.id()] = local_node_counter;
 
       // add point
-#if VTK_VERSION_LESS_THAN(7,1,0)
-      pcoords->InsertNextTupleValue(pnt);
-#else
-      pcoords->InsertNextTuple(pnt);
-#endif
+      pcoords->SetTuple(local_node_counter, pnt);
 #if !VTK_VERSION_LESS_THAN(9,0,0)
       if (have_weights)
       {
