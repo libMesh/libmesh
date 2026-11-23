@@ -85,9 +85,9 @@ public:
   bool initialized () const { return _is_initialized; }
 
   /**
-   * Release all memory and clear data structures.
+   * Reset data
    */
-  virtual void clear () {}
+  virtual void clear ();
 
   /**
    * Initialize data structures if not done so already.
@@ -127,6 +127,13 @@ public:
    * Sets the type of preconditioner to use.
    */
   void set_preconditioner_type (const PreconditionerType pct);
+
+  /**
+   * \returns a default PreconditionerType suitable for
+   * \p n_procs processors, overrideable with a
+   * --preconditioner pctype command line argument
+   */
+  static PreconditionerType default_preconditioner_type (processor_id_type n_procs);
 
   /**
    * Attaches a Preconditioner object to be used

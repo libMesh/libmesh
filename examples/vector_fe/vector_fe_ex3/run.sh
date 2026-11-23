@@ -21,17 +21,17 @@ run_example_no_extra_options "$example_name" "$options"
 options="element_type=QUAD9 -pc_type hypre -pc_hypre_type ams"
 run_example_no_extra_options "$example_name" "$options"
 
-options="element_type=QUAD9 grid_size=5 refine=2 -pc_type lu"
+options="element_type=QUAD9 grid_size=5 refine=2 --preconditioner lu"
 run_example_no_extra_options "$example_name" "$options"
 
-options="order=2 element_type=TRI6 -pc_type lu"
+options="order=2 element_type=TRI6 --preconditioner lu"
 run_example_no_extra_options "$example_name" "$options"
 
-options="order=2 element_type=TRI7 -pc_type lu"
+options="order=2 element_type=TRI7 --preconditioner lu"
 run_example_no_extra_options "$example_name" "$options"
 
-options="order=2 element_type=QUAD8 -pc_type lu"
+options="order=2 element_type=QUAD8 --preconditioner lu"
 run_example_no_extra_options "$example_name" "$options"
 
-options="order=2 element_type=QUAD9 -pc_type lu"
+options="order=2 element_type=QUAD9 --preconditioner lu"
 run_example_no_extra_options "$example_name" "$options"
