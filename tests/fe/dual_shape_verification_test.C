@@ -105,6 +105,14 @@ public:
     CPPUNIT_ASSERT_EQUAL(std::size_t(n), phi.size());
     CPPUNIT_ASSERT_EQUAL(std::size_t(n), dual_phi.size());
 
+    // The free function reproduces the coefficients that reinit() computed with the same rule
+    DenseMatrix<Real> coeff;
+    compute_dual_shape_coefficients(qrule.get_weights(), phi,
+                                    dual_shape_transformed_vertices(elem, fe_type, n), coeff);
+    for (const auto i : make_range(n))
+      for (const auto j : make_range(n))
+        CPPUNIT_ASSERT_EQUAL(fe->get_dual_coeff()(i,j), coeff(i,j));
+
     // TOLERANCE*TOLERANCE works with double but not float128
     const Real my_tol = TOLERANCE*std::sqrt(TOLERANCE);
 
