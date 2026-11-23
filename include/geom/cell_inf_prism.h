@@ -220,7 +220,9 @@ protected:
   Elem * _elemlinks_data[5+(LIBMESH_DIM>3)];
 
   /**
-   * Master element node locations
+   * Master element node locations, on INFPRISM6 and INFPRISM12.
+   * Nested node locations on those elements make this possible;
+   * future subclasses may need their own arrays.
    */
   static const Real _master_points[12][3];
 

@@ -218,7 +218,9 @@ protected:
   Elem * _elemlinks_data[6+(LIBMESH_DIM>3)];
 
   /**
-   * Master element node locations
+   * Master element node locations, on PYRAMID5 through PYRAMID18.
+   * Nested node locations on those elements make this possible;
+   * future subclasses may need their own arrays.
    */
   static const Real _master_points[18][3];
 
