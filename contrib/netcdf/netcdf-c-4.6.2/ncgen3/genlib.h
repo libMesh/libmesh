@@ -9,6 +9,10 @@
 #include <stdlib.h>
 #include <limits.h>
 
+#ifndef HAVE_UNISTD_H
+#define YY_NO_UNISTD_H
+#endif
+
 extern const char *progname;	/* for error messages */
 extern const char *cdlname;	/* for error messages */
 

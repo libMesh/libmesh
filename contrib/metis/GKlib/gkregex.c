@@ -21,6 +21,15 @@
 /* this is for removing a compiler warning */
 void gkfooo() { return; }
 
+#if defined(_MSC_VER)
+#define __MSC__
+#endif
+#if defined(__ICC)
+#define __ICC__
+#endif
+
+#include "gk_arch.h"
+
 #ifdef USE_GKREGEX
 
 #ifdef HAVE_CONFIG_H
