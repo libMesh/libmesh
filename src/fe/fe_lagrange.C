@@ -631,6 +631,9 @@ unsigned int lagrange_n_dofs(const ElemType t, const Elem * e, const Order o)
           case QUAD16:
             return 16;
 
+          case HEX64:
+            return 64;
+
           case PRISM20:
             return 20;
 

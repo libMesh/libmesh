@@ -1462,11 +1462,39 @@ Real fe_lagrange_3D_shape(const ElemType type,
                 default:
                   libmesh_error_msg("Invalid i = " << i);
                 }
+            } // end TET14
+
+          case HEX64:
+            {
+              libmesh_assert_less (i, 64);
+
+              // Tensor product of 1D cubic Lagrange functions.  The index
+              // arrays give each node's 1D node number along xi, eta and
+              // zeta, in EDGE4 numbering (0: -1, 1: +1, 2: -1/3, 3: +1/3).
+              static const unsigned int i0[] = {
+                0, 1, 1, 0, 0, 1, 1, 0, 2, 3, 1, 1, 3, 2, 0, 0,
+                0, 0, 1, 1, 1, 1, 0, 0, 2, 3, 1, 1, 3, 2, 0, 0,
+                2, 2, 3, 3, 2, 3, 3, 2, 1, 1, 1, 1, 3, 2, 2, 3,
+                0, 0, 0, 0, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3, 2};
+              static const unsigned int i1[] = {
+                0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 2, 3, 1, 1, 3, 2,
+                0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 2, 3, 1, 1, 3, 2,
+                2, 3, 3, 2, 0, 0, 0, 0, 2, 3, 3, 2, 1, 1, 1, 1,
+                3, 2, 2, 3, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3};
+              static const unsigned int i2[] = {
+                0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+                2, 3, 2, 3, 2, 3, 2, 3, 1, 1, 1, 1, 1, 1, 1, 1,
+                0, 0, 0, 0, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3,
+                2, 2, 3, 3, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3};
+
+              return (fe_lagrange_1D_cubic_shape(i0[i], p(0)) *
+                      fe_lagrange_1D_cubic_shape(i1[i], p(1)) *
+                      fe_lagrange_1D_cubic_shape(i2[i], p(2)));
             }
 
           default:
             libmesh_error_msg("ERROR: Unsupported 3D element type!: " << Utility::enum_to_string(type));
-          }
+          } // end Third order
       }
 
       // unsupported order

@@ -35,6 +35,7 @@
 #include "libmesh/tensor_value.h"
 #include "libmesh/threads.h"
 #include "libmesh/enum_to_string.h"
+#include "libmesh/cell_hex8.h"
 
 #ifdef LIBMESH_ENABLE_INFINITE_ELEMENTS
 #include "libmesh/inf_fe.h"
@@ -545,6 +546,43 @@ void FEAbstract::get_refspace_nodes(const ElemType itemType, std::vector<Point> 
         nodes[1] = Point (1.,0.,0.);
         nodes[2] = Point (0.,1.,0.);
         nodes[3] = Point (0.,0.,1.);
+        return;
+      }
+    case HEX64:
+      {
+        // Vertices come from the existing HEX8 case.
+        std::vector<Point> v;
+        get_refspace_nodes(HEX8, v);
+
+        for (unsigned int i = 0; i != 8; ++i)
+          nodes[i] = v[i];
+
+        // Edge nodes: 2 per edge, at 1/3 and 2/3 of the way from the
+        // edge's first vertex to its second.
+        for (unsigned int e = 0; e != 12; ++e)
+          {
+            const Point & a = v[Hex8::edge_nodes_map[e][0]];
+            const Point & b = v[Hex8::edge_nodes_map[e][1]];
+            nodes[8 + 2*e]     = a + (b - a) / 3.;
+            nodes[8 + 2*e + 1] = a + (b - a) * (2. / 3.);
+          }
+
+        // Face nodes: 4 per side, node q sits next to corner q of the
+        // side's corner list, one third of the way towards each neighbour
+        // corner on that face.
+        for (unsigned int s = 0; s != 6; ++s)
+          for (unsigned int q = 0; q != 4; ++q)
+            {
+              const Point & c = v[Hex8::side_nodes_map[s][q]];
+              const Point & n = v[Hex8::side_nodes_map[s][(q+1) % 4]];
+              const Point & p = v[Hex8::side_nodes_map[s][(q+3) % 4]];
+              nodes[32 + 4*s + q] = c + (n - c) / 3. + (p - c) / 3.;
+            }
+
+        // Interior nodes: 56+v is the one nearest vertex v.
+        for (unsigned int i = 0; i != 8; ++i)
+          nodes[56 + i] = v[i] / 3.;
+
         return;
       }
     case HEX27:
