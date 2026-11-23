@@ -45,11 +45,7 @@ namespace libMesh
 {
 class ResidualContext;
 template <typename T>
-class NumericVector;
-void libmesh_petsc_snes_finish_residual (ResidualContext & rc,
-                                         Vec x,
-                                         Vec r,
-                                         NumericVector<Number> & R);
+class PetscSolveReduction;
 
 // Allow users access to these functions in case they want to reuse them.  Users shouldn't
 // need access to these most of the time as they are used internally by this object.
@@ -216,9 +212,7 @@ public:
   bool computing_base_vector() const { return _computing_base_vector; }
 
   /**
-   * Abstract base class to be used to implement a custom line-search algorithm. When the system
-   * eliminates constrained degrees of freedom, the line search's vectors are reduced; \p prolong()
-   * forms full vectors from them
+   * Abstract base class to be used to implement a custom line-search algorithm
    */
   class ComputeLineSearchObject
   {
@@ -254,35 +248,15 @@ public:
   virtual void force_new_preconditioner() override;
 
   /**
-   * Builds \p _retained_is from the system's \p ConstraintEliminationDofMap, or clears it when
-   * the system does not eliminate constraints
+   * The map between the vectors SNES solves for and full vectors of the system. \p init() builds
+   * it, and \p clear() removes it. \p NonlinearImplicitSystem::reinit() calls \p clear(), so a
+   * change of the degrees of freedom rebuilds the reduction at the next \p init()
    */
-  void setup_constraint_elimination();
-
-  /**
-   * Whether the solve eliminates constrained degrees of freedom
-   */
-  bool eliminating_constraints() const { return static_cast<IS>(_retained_is) != nullptr; }
-
-  /**
-   * Makes the system's \p current_local_solution the full iterate that \p x represents: \p x
-   * itself, with constraints enforced exactly if requested, or \f$ C x + h \f$ when eliminating
-   * constraints. When eliminating constraints the system's \p solution is set as well
-   */
-  void localize_solution(Vec x);
-
-  /**
-   * Prolongs the reduced vector \p y into the full vector \p x, which must be parallel. With \p
-   * homogeneous false this forms \f$ x = C y + h \f$; with \p homogeneous true, as for a step or
-   * a search direction, \f$ x = C y \f$
-   */
-  void prolong(Vec y, NumericVector<T> & x, bool homogeneous) const;
-
-  /**
-   * Restricts the full vector \p x into the reduced vector \p y by taking its retained entries
-   */
-  void restrict_vector(const NumericVector<T> & x, Vec y) const;
-
+  PetscSolveReduction<T> & reduction()
+  {
+    libmesh_assert(_reduction);
+    return *_reduction;
+  }
 
 protected:
 
@@ -355,11 +329,14 @@ protected:
   bool _setup_reuse;
 
   /**
-   * The local retained degrees of freedom of the system's \p ConstraintEliminationDofMap, in the
-   * full numbering, when the solve eliminates constrained degrees of freedom. Entry \p i is the
-   * full index of the \p i-th local entry of a reduced vector. Null otherwise
+   * Builds \p _reduction for the system's current degrees of freedom
    */
-  WrappedPetsc<IS> _retained_is;
+  void setup_reduction();
+
+  /**
+   * See \p reduction()
+   */
+  std::unique_ptr<PetscSolveReduction<T>> _reduction;
 
 #if defined(LIBMESH_ENABLE_AMR) && defined(LIBMESH_HAVE_METAPHYSICL)
   /**
@@ -371,11 +348,7 @@ protected:
 #endif
 
 private:
-  friend ResidualContext libmesh_petsc_snes_residual_helper (SNES snes, Vec x, void * ctx);
-  friend void libmesh_petsc_snes_finish_residual (ResidualContext & rc,
-                                                  Vec x,
-                                                  Vec r,
-                                                  NumericVector<Number> & R);
+  friend ResidualContext libmesh_petsc_snes_residual_helper (SNES snes, void * ctx);
   friend PetscErrorCode libmesh_petsc_snes_residual (SNES snes, Vec x, Vec r, void * ctx);
   friend PetscErrorCode libmesh_petsc_snes_fd_residual (SNES snes, Vec x, Vec r, void * ctx);
   friend PetscErrorCode libmesh_petsc_snes_mffd_residual (SNES snes, Vec x, Vec r, void * ctx);

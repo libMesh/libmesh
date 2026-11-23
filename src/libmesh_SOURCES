@@ -419,10 +419,13 @@ libmesh_SOURCES =  \
         src/solvers/nonlinear_solver.C \
         src/solvers/optimization_solver.C \
         src/solvers/petsc_auto_fieldsplit.C \
+        src/solvers/petsc_constraint_elimination_reduction.C \
         src/solvers/petsc_diff_solver.C \
         src/solvers/petsc_dm_wrapper.C \
+        src/solvers/petsc_identity_reduction.C \
         src/solvers/petsc_linear_solver.C \
         src/solvers/petsc_nonlinear_solver.C \
+        src/solvers/petsc_solve_reduction.C \
         src/solvers/petscdmlibmesh.C \
         src/solvers/petscdmlibmeshimpl.C \
         src/solvers/second_order_unsteady_solver.C \

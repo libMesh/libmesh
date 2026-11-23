@@ -416,10 +416,13 @@ BUILT_SOURCES = \
         nonlinear_solver.h \
         optimization_solver.h \
         petsc_auto_fieldsplit.h \
+        petsc_constraint_elimination_reduction.h \
         petsc_diff_solver.h \
         petsc_dm_wrapper.h \
+        petsc_identity_reduction.h \
         petsc_linear_solver.h \
         petsc_nonlinear_solver.h \
+        petsc_solve_reduction.h \
         petscdmlibmesh.h \
         second_order_unsteady_solver.h \
         slepc_eigen_solver.h \
@@ -1863,16 +1866,25 @@ optimization_solver.h: $(top_srcdir)/include/solvers/optimization_solver.h
 petsc_auto_fieldsplit.h: $(top_srcdir)/include/solvers/petsc_auto_fieldsplit.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+petsc_constraint_elimination_reduction.h: $(top_srcdir)/include/solvers/petsc_constraint_elimination_reduction.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 petsc_diff_solver.h: $(top_srcdir)/include/solvers/petsc_diff_solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 petsc_dm_wrapper.h: $(top_srcdir)/include/solvers/petsc_dm_wrapper.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
+petsc_identity_reduction.h: $(top_srcdir)/include/solvers/petsc_identity_reduction.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
 petsc_linear_solver.h: $(top_srcdir)/include/solvers/petsc_linear_solver.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 petsc_nonlinear_solver.h: $(top_srcdir)/include/solvers/petsc_nonlinear_solver.h
+	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
+
+petsc_solve_reduction.h: $(top_srcdir)/include/solvers/petsc_solve_reduction.h
 	$(AM_V_GEN)rm -f $@ && $(LN_S) -f $< $@
 
 petscdmlibmesh.h: $(top_srcdir)/include/solvers/petscdmlibmesh.h
