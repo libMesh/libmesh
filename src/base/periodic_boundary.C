@@ -72,6 +72,24 @@ std::unique_ptr<PeriodicBoundaryBase> PeriodicBoundary::clone(TransformationType
 }
 
 
+
+bool PeriodicBoundary::same_mapping(const PeriodicBoundaryBase & other) const
+{
+#ifndef LIBMESH_HAVE_RTTI
+  libmesh_ignore(other);
+  return false;
+#else
+  const auto * const other_pb = dynamic_cast<const PeriodicBoundary *>(&other);
+  if (!other_pb)
+    return false;
+
+  return myboundary == other_pb->myboundary &&
+    pairedboundary == other_pb->pairedboundary &&
+    translation_vector == other_pb->translation_vector;
+#endif
+}
+
+
 } // namespace libMesh
 
 

@@ -27,8 +27,13 @@
 #include "libmesh/reference_counted_object.h"
 #include "libmesh/dof_object.h"
 
+#ifdef LIBMESH_ENABLE_PERIODIC
+#include "libmesh/periodic_boundaries.h"
+#endif
+
 // C++ Includes
 #include <unordered_map>
+#include <vector>
 
 namespace libMesh
 {
@@ -201,6 +206,9 @@ public:
   GhostingFunctor(const GhostingFunctor & other) :
    ReferenceCountedObject<GhostingFunctor>(other),
    _mesh (other._mesh)
+#ifdef LIBMESH_ENABLE_PERIODIC
+   , _use_mesh_periodic_bcs (other._use_mesh_periodic_bcs)
+#endif
   {}
 
   /**
@@ -227,14 +235,32 @@ public:
   virtual void set_mesh(const MeshBase * mesh) { _mesh = mesh; }
 
 #ifdef LIBMESH_ENABLE_PERIODIC
-  // Set/get PeriodicBoundaries being coupled.
-  // This will eventually be replaced with methods for handling
-  // multiple PeriodicBoundaries sets (e.g. from multiple systems on
-  // the same mesh)
-  virtual void set_periodic_boundaries(const PeriodicBoundaries *) {}
+  /**
+   * Sets the one periodic boundary set this functor searches for
+   * periodic neighbors.  It is an error to set a different set later,
+   * or to set one on a functor that uses the mesh's sets.
+   */
+  virtual void set_periodic_boundaries(const PeriodicBoundaries * periodic_bcs);
 
-  virtual const PeriodicBoundaries * get_periodic_boundaries()
-  {return nullptr;}
+  /**
+   * \returns The set given to set_periodic_boundaries(), or \p nullptr
+   * if there is none.  It is an error to call this on a functor that
+   * uses the mesh's sets.
+   */
+  virtual const PeriodicBoundaries * get_periodic_boundaries();
+
+  /**
+   * If \p use is true, this functor searches every periodic boundary
+   * set registered with MeshBase::add_periodic_boundaries() instead
+   * of one set given to set_periodic_boundaries().  The default
+   * geometric ghosting functor does this.
+   *
+   * Periodic constraints on a distributed mesh currently need every
+   * element point neighbor of a periodic vertex and its image.  A
+   * functor that replaces the default ghosting functor should ghost
+   * those elements and should use the mesh's sets.
+   */
+  void use_mesh_periodic_boundaries(bool use);
 #endif
 
   /**
@@ -269,7 +295,7 @@ public:
    * relevant Mesh has changed, but before remote elements on a
    * distributed mesh are deleted.
    */
-  virtual void mesh_reinit () {};
+  virtual void mesh_reinit () {}
 
   /**
    * For algebraic ghosting or coupling functors we also call
@@ -277,7 +303,7 @@ public:
    * new mesh but before the functors have been queried for send_list
    * or sparsity pattern calculations.
    */
-  virtual void dofmap_reinit () {};
+  virtual void dofmap_reinit () {}
 
   /**
    * GhostingFunctor subclasses with relatively long-lasting caches
@@ -289,18 +315,85 @@ public:
    * elements have not yet been deleted by the processors which
    * previously held them..
    */
-  virtual void redistribute () {};
+  virtual void redistribute () {}
 
   /**
    * GhostingFunctor subclasses with relatively long-lasting caches
    * may want to delete the no-longer-relevant parts of those caches
    * after a redistribution is complete.
    */
-  virtual void delete_remote_elements () {};
+  virtual void delete_remote_elements () {}
 
 protected:
   const MeshBase * _mesh;
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+  /**
+   * \returns The periodic boundary sets this functor searches for
+   * periodic neighbors: either the mesh's reduced sets or this
+   * functor's own set.  The result may hold an empty set.
+   */
+  const std::vector<const PeriodicBoundaries *> & periodic_boundary_sets() const;
+
+  /**
+   * The set given to set_periodic_boundaries(), if any.  A vector
+   * lets periodic_boundary_sets() return the set by reference.
+   */
+  std::vector<const PeriodicBoundaries *> _periodic_bcs;
+
+  /**
+   * Whether this functor uses the mesh's periodic boundary sets.
+   */
+  bool _use_mesh_periodic_bcs = false;
+#endif
 };
+
+
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+inline
+void
+GhostingFunctor::set_periodic_boundaries(const PeriodicBoundaries * periodic_bcs)
+{
+  libmesh_error_msg_if(_use_mesh_periodic_bcs,
+                       "This ghosting functor uses the mesh's periodic boundary sets");
+  libmesh_error_msg_if(!_periodic_bcs.empty() && _periodic_bcs.front() != periodic_bcs,
+                       "This ghosting functor already has a periodic boundary set");
+  if (periodic_bcs)
+    _periodic_bcs = {periodic_bcs};
+}
+
+inline
+const PeriodicBoundaries *
+GhostingFunctor::get_periodic_boundaries()
+{
+  libmesh_error_msg_if(_use_mesh_periodic_bcs,
+                       "This ghosting functor uses the mesh's periodic boundary sets");
+  return _periodic_bcs.empty() ? nullptr : _periodic_bcs.front();
+}
+
+inline
+void
+GhostingFunctor::use_mesh_periodic_boundaries(bool use)
+{
+  libmesh_error_msg_if(use && !_periodic_bcs.empty(),
+                       "This ghosting functor already has a periodic boundary set");
+  _use_mesh_periodic_bcs = use;
+}
+
+inline
+const std::vector<const PeriodicBoundaries *> &
+GhostingFunctor::periodic_boundary_sets() const
+{
+  if (_use_mesh_periodic_bcs)
+    {
+      libmesh_assert(_mesh);
+      return _mesh->periodic_boundary_sets();
+    }
+
+  return _periodic_bcs;
+}
+#endif
 
 } // namespace libMesh
 

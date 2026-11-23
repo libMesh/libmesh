@@ -106,6 +106,13 @@ DofMap::build_sparsity (const MeshBase & mesh,
      calculate_constrained,
      sc);
 
+#ifdef LIBMESH_ENABLE_PERIODIC
+  // Coupling functors may read the mesh's periodic boundary sets, and
+  // a rebuild of that list is not thread-safe so we do it here outside
+  // of the threaded range.
+  mesh.periodic_boundary_sets();
+#endif
+
   Threads::parallel_reduce (mesh.active_local_element_stored_range(), *sp);
 
   sp->parallel_sync();
@@ -194,14 +201,9 @@ DofMap::DofMap(const unsigned int number,
   _default_coupling->set_periodic_boundaries(_periodic_boundaries.get());
   _default_evaluating->set_periodic_boundaries(_periodic_boundaries.get());
 
-  for (auto & gf : as_range(_mesh.ghosting_functors_begin(),
-                            _mesh.ghosting_functors_end()))
-  {
-    // FIXME - we need to handle multiple systems properly here, not
-    // just "assume the first system has every PBC".
-    if (!gf->get_periodic_boundaries())
-      gf->set_periodic_boundaries(_periodic_boundaries.get());
-  }
+  // Mesh ghosting functors that use every set, e.g. the default
+  // ghosting functor, can now see this DofMap's periodic boundaries
+  _mesh.add_periodic_boundaries(*_periodic_boundaries);
 #endif
 
   this->add_coupling_functor(*_default_coupling);
@@ -219,10 +221,27 @@ DofMap::~DofMap()
   // need to remove those from the mesh too before we die.
   _mesh.remove_ghosting_functor(*_default_coupling);
   _mesh.remove_ghosting_functor(*_default_evaluating);
+
+#ifdef LIBMESH_ENABLE_PERIODIC
+  _mesh.remove_periodic_boundaries(*_periodic_boundaries);
+#endif
 }
 
 
 #ifdef LIBMESH_ENABLE_PERIODIC
+
+#ifdef LIBMESH_ENABLE_DEPRECATED
+PeriodicBoundaries * DofMap::get_periodic_boundaries()
+{
+  libmesh_deprecated();
+
+  // The caller may change the set through the returned pointer
+  _mesh.invalidate_periodic_boundary_sets();
+  return _periodic_boundaries.get();
+}
+#endif
+
+
 
 bool DofMap::is_periodic_boundary (const boundary_id_type boundaryid) const
 {
