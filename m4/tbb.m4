@@ -54,7 +54,7 @@ AC_DEFUN([CONFIGURE_TBB],
                   TBB_INCLUDE=-I$TBB_INCLUDE_PATH
 
                   dnl Add rpath flags to the link line.
-                  AS_IF([test "x$RPATHFLAG" != "x" && test -d $TBB_LIBS], [TBB_LIBRARY="${RPATHFLAG}${TBB_LIBS} $TBB_LIBRARY"])
+                  AS_IF([test "x$RPATHFLAG" != "x" && test -d "$TBB_LIBS"], [TBB_LIBRARY="${RPATHFLAG}${TBB_LIBS} $TBB_LIBRARY"])
 
                   dnl Extract TBB_VERSION_MAJOR and TBB_VERSION_MINOR from the era-appropriate header.
                   dnl oneTBB: tbb/version.h   Legacy TBB: tbb/tbb_stddef.h

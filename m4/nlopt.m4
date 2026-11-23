@@ -143,7 +143,7 @@ return 0;
       AS_IF([test "x$enablenlopt" = "xyes"],
             [
               dnl add the NLOPT_LIB dir to the linker run path if it is a directory
-              AS_IF([test "x$RPATHFLAG" != "x" && test -d $NLOPT_LIB],
+              AS_IF([test "x$RPATHFLAG" != "x" && test -d "$NLOPT_LIB"],
                     [NLOPT_LIBRARY="${RPATHFLAG}${NLOPT_LIB} $NLOPT_LIBRARY"])
 
               AC_DEFINE(HAVE_NLOPT, 1, [Flag indicating whether the library will be compiled with NLOPT support])

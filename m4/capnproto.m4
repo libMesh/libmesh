@@ -129,7 +129,7 @@ AC_DEFUN([CONFIGURE_CAPNPROTO],
                   CAPNPROTO_LIBRARY="-L$CAPNPROTO_LIB -lcapnp -lkj"
 
                   dnl add the CAPNPROTO_LIB dir to the linker run path if it is a directory
-                  AS_IF([test "x$RPATHFLAG" != "x" && test -d $CAPNPROTO_LIB],
+                  AS_IF([test "x$RPATHFLAG" != "x" && test -d "$CAPNPROTO_LIB"],
                         [CAPNPROTO_LIBRARY="${RPATHFLAG}${CAPNPROTO_LIB} $CAPNPROTO_LIBRARY"])
 
                   AC_DEFINE(HAVE_CAPNPROTO, 1, [Flag indicating whether the library will be compiled with CAPNPROTO support])
