@@ -40,6 +40,7 @@
 #include "libmesh/face_quad8_shell.h"
 #include "libmesh/face_quad9.h"
 #include "libmesh/face_quad9_shell.h"
+#include "libmesh/face_quad16.h"
 #include "libmesh/face_inf_quad4.h"
 #include "libmesh/face_inf_quad6.h"
 #include "libmesh/cell_tet4.h"
@@ -158,6 +159,8 @@ const unsigned int Elem::type_to_dim_map [] =
 
     2,  // C0POLYGON
     3,  // C0POLYHEDRON
+
+    2,  // QUAD16
   };
 
 const unsigned int Elem::max_n_nodes;
@@ -221,6 +224,8 @@ const unsigned int Elem::type_to_n_sides_map [] =
 
     invalid_uint,  // C0POLYGON
     invalid_uint,  // C0POLYHEDRON
+
+    4,  // QUAD16
   };
 
 const unsigned int Elem::type_to_n_edges_map [] =
@@ -282,6 +287,8 @@ const unsigned int Elem::type_to_n_edges_map [] =
 
     invalid_uint,  // C0POLYGON
     invalid_uint,  // C0POLYHEDRON
+
+    4,   // QUAD16
   };
 
 const Order Elem::type_to_default_order_map [] =
@@ -343,6 +350,8 @@ const Order Elem::type_to_default_order_map [] =
 
     FIRST,    // C0POLYGON
     FIRST,    // C0POLYHEDRON
+
+    THIRD,   // QUAD16
   };
 
 // ------------------------------------------------------------
@@ -419,6 +428,8 @@ std::unique_ptr<Elem> Elem::build(const ElemType type,
       return std::make_unique<Quad9>(p);
     case QUADSHELL9:
       return std::make_unique<QuadShell9>(p);
+    case QUAD16:
+      return std::make_unique<Quad16>(p);
 
     // Well, a hexagon is *a* polygon...
     case C0POLYGON:
@@ -3298,6 +3309,8 @@ ElemType Elem::side_type (const ElemType t,
     case QUAD9:
     case QUADSHELL9:
       return EDGE3;
+    case QUAD16:
+      return EDGE4;
     case TET4:
       return TRI3;
     case TET10:
@@ -3397,6 +3410,7 @@ ElemType Elem::edge_type (const ElemType t)
     case QUADSHELL8:
     case QUAD9:
     case QUADSHELL9:
+    case QUAD16:
     case C0POLYGON:
       return side_type(t, 0);
       // A first-order 3D element's edges hold their two vertices
@@ -3462,6 +3476,8 @@ unsigned int Elem::local_side_node (const ElemType t,
     case QUAD8:
     case QUADSHELL8:
       return Quad8::side_nodes_map[side][side_node];
+    case QUAD16:
+      return Quad16::side_nodes_map[side][side_node];
     case QUAD9:
     case QUADSHELL9:
       return Quad9::side_nodes_map[side][side_node];
@@ -3528,6 +3544,7 @@ unsigned int Elem::local_edge_node (const ElemType t,
     case QUADSHELL8:
     case QUAD9:
     case QUADSHELL9:
+    case QUAD16:
       return local_side_node(t, edge, edge_node);
     case TET4:
       return Tet4::edge_nodes_map[edge][edge_node];
@@ -3632,6 +3649,13 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
         // full_ordered not relevant
         return QUADSHELL9;
       }
+
+    case QUAD16:
+      {
+        // full_ordered not relevant
+        return QUAD16;
+      }
+
 
     case TET4:
     case TET10:
@@ -3750,6 +3774,39 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
     }
 }
 
+ElemType Elem::nth_order_equivalent_type (const ElemType et,
+                                             const bool full_ordered,
+                                             unsigned int n)
+{
+  switch(n)
+    {
+      case 1:
+        return Elem::first_order_equivalent_type(et);
+      case 2:
+        return Elem::second_order_equivalent_type(et, full_ordered);
+      case 3:
+        switch (et)
+          {
+            case QUAD4:
+            case QUAD8:
+            case QUAD9:
+              {
+                return QUAD16;
+              }
+            default:
+              {
+                libmesh_error_msg("No equivalent element type of order: "<< n
+                                  << " for et =  " << Utility::enum_to_string(et));
+              }
+
+          }
+      default:
+        {
+          libmesh_error_msg("No equivalent element type of order: "<< n
+                            << " for et =  " << Utility::enum_to_string(et));
+        }
+    }
+}
 
 
 ElemType Elem::complete_order_equivalent_type (const ElemType et)
@@ -3784,6 +3841,9 @@ ElemType Elem::complete_order_equivalent_type (const ElemType et)
     case QUADSHELL8:
     case QUADSHELL9:
       return QUADSHELL9;
+
+    case QUAD16:
+      return QUAD16;
 
     case TET4:
     case TET10:
