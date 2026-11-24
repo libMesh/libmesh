@@ -1496,6 +1496,23 @@ public:
                                                 const bool full_ordered=true);
 
   /**
+   * \returns The ElemType of the associated nth-order element
+   * (which will be the same as the input if the input is already a
+   * second-order ElemType) or INVALID_ELEM for elements that cannot be
+   * converted into higher order equivalents.
+   *
+   * For example, when \p this is a \p QUAD4, and \p n is 3, then \p QUAD16  is returned.
+   *
+   * For some elements, there exist multiple higher-order equivalents, e.g.
+   * for \p Quad4, \p n=2, there is \p Quad8 and \p Quad9.  When the optional
+   * \p full_ordered is \p true, then \p QUAD9 is returned.  When
+   * \p full_ordered is \p false, then \p QUAD8 is returned.
+   */
+  static ElemType nth_order_equivalent_type (const ElemType et,
+                                                const bool full_ordered=true,
+                                                const unsigned int n=3);
+
+  /**
    * \returns The element type of the associated first-order element,
    * or \p INVALID_ELEM for first-order or other elements that cannot be
    * converted into lower order equivalents.

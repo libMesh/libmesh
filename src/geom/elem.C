@@ -3774,6 +3774,39 @@ ElemType Elem::second_order_equivalent_type (const ElemType et,
     }
 }
 
+ElemType Elem::nth_order_equivalent_type (const ElemType et,
+                                             const bool full_ordered,
+                                             unsigned int n)
+{
+  switch(n)
+    {
+      case 1:
+        return Elem::first_order_equivalent_type(et);
+      case 2:
+        return Elem::second_order_equivalent_type(et, full_ordered);
+      case 3:
+        switch (et)
+          {
+            case QUAD4:
+            case QUAD8:
+            case QUAD9:
+              {
+                return QUAD16;
+              }
+            default:
+              {
+                libmesh_error_msg("No equivalent element type of order: "<< n
+                                  << " for et =  " << Utility::enum_to_string(et));
+              }
+
+          }
+      default:
+        {
+          libmesh_error_msg("No equivalent element type of order: "<< n
+                            << " for et =  " << Utility::enum_to_string(et));
+        }
+    }
+}
 
 
 ElemType Elem::complete_order_equivalent_type (const ElemType et)
