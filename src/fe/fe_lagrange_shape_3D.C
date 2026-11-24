@@ -663,6 +663,24 @@ Real FE<3,L2_LAGRANGE>::shape_second_deriv(const FEType fet,
 } // namespace libMesh
 
 
+// Tensor product of 1D cubic Lagrange functions. for Hex64 The index
+// arrays give each node's 1D node number along xi, eta and
+// zeta, in EDGE4 numbering (0: -1, 1: +1, 2: -1/3, 3: +1/3).
+constexpr unsigned int hex64_lagrange_1d_node_i0[] = {
+0, 1, 1, 0, 0, 1, 1, 0, 2, 3, 1, 1, 3, 2, 0, 0,
+0, 0, 1, 1, 1, 1, 0, 0, 2, 3, 1, 1, 3, 2, 0, 0,
+2, 2, 3, 3, 2, 3, 3, 2, 1, 1, 1, 1, 3, 2, 2, 3,
+0, 0, 0, 0, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3, 2};
+constexpr unsigned int hex64_lagrange_1d_node_i1[] = {
+0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 2, 3, 1, 1, 3, 2,
+0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 2, 3, 1, 1, 3, 2,
+2, 3, 3, 2, 0, 0, 0, 0, 2, 3, 3, 2, 1, 1, 1, 1,
+3, 2, 2, 3, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3};
+constexpr unsigned int hex64_lagrange_1d_node_i2[] = {
+0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+2, 3, 2, 3, 2, 3, 2, 3, 1, 1, 1, 1, 1, 1, 1, 1,
+0, 0, 0, 0, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3,
+2, 2, 3, 3, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3};
 
 namespace
 {
@@ -1467,29 +1485,9 @@ Real fe_lagrange_3D_shape(const ElemType type,
           case HEX64:
             {
               libmesh_assert_less (i, 64);
-
-              // Tensor product of 1D cubic Lagrange functions.  The index
-              // arrays give each node's 1D node number along xi, eta and
-              // zeta, in EDGE4 numbering (0: -1, 1: +1, 2: -1/3, 3: +1/3).
-              static const unsigned int i0[] = {
-                0, 1, 1, 0, 0, 1, 1, 0, 2, 3, 1, 1, 3, 2, 0, 0,
-                0, 0, 1, 1, 1, 1, 0, 0, 2, 3, 1, 1, 3, 2, 0, 0,
-                2, 2, 3, 3, 2, 3, 3, 2, 1, 1, 1, 1, 3, 2, 2, 3,
-                0, 0, 0, 0, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3, 2};
-              static const unsigned int i1[] = {
-                0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 2, 3, 1, 1, 3, 2,
-                0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 2, 3, 1, 1, 3, 2,
-                2, 3, 3, 2, 0, 0, 0, 0, 2, 3, 3, 2, 1, 1, 1, 1,
-                3, 2, 2, 3, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3};
-              static const unsigned int i2[] = {
-                0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
-                2, 3, 2, 3, 2, 3, 2, 3, 1, 1, 1, 1, 1, 1, 1, 1,
-                0, 0, 0, 0, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3,
-                2, 2, 3, 3, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3};
-
-              return (fe_lagrange_1D_cubic_shape(i0[i], p(0)) *
-                      fe_lagrange_1D_cubic_shape(i1[i], p(1)) *
-                      fe_lagrange_1D_cubic_shape(i2[i], p(2)));
+              return (fe_lagrange_1D_cubic_shape(hex64_lagrange_1d_node_i0[i], p(0)) *
+                      fe_lagrange_1D_cubic_shape(hex64_lagrange_1d_node_i1[i], p(1)) *
+                      fe_lagrange_1D_cubic_shape(hex64_lagrange_1d_node_i2[i], p(2)));
             }
 
           default:
@@ -3245,6 +3243,21 @@ Real fe_lagrange_3D_shape_deriv(const ElemType type,
           case PYRAMID18:
             {
               return fe_fdm_deriv(type, order, elem, i, j, p, fe_lagrange_3D_shape<T>);
+            }
+
+          case HEX64:
+            {
+              const Real fx = fe_lagrange_1D_cubic_shape(hex64_lagrange_1d_node_i0[i], p(0));
+              const Real fy = fe_lagrange_1D_cubic_shape(hex64_lagrange_1d_node_i1[i], p(1));
+              const Real fz = fe_lagrange_1D_cubic_shape(hex64_lagrange_1d_node_i2[i], p(2));
+
+              switch (j)
+                {
+                case 0: return fe_lagrange_1D_cubic_shape_deriv(hex64_lagrange_1d_node_i0[i], 0, p(0)) * fy * fz;
+                case 1: return fx * fe_lagrange_1D_cubic_shape_deriv(hex64_lagrange_1d_node_i1[i], 0, p(1)) * fz;
+                case 2: return fx * fy * fe_lagrange_1D_cubic_shape_deriv(hex64_lagrange_1d_node_i2[i], 0, p(2));
+                default: libmesh_error_msg("Invalid derivative index j = " << j);
+                }
             }
 
           default:
