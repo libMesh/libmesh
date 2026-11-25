@@ -108,6 +108,14 @@ public:
   Hex64 & operator= (Hex64 &&) = delete;
   virtual ~Hex64() = default;
 
+  virtual Point master_point (const unsigned int i) const override final
+  {
+    libmesh_assert_less(i, this->n_nodes());
+    return Point(_master_points[i][0],
+                 _master_points[i][1],
+                 _master_points[i][2]);
+  }
+
   /**
    * \returns \p HEX64.
    */
@@ -261,6 +269,11 @@ public:
   static constexpr const unsigned int (&edge_nodes_map)[num_edges][nodes_per_edge] = _edge_nodes.values;
 
   static constexpr unsigned int _first_face_node = Hex8::num_nodes + (nodes_per_edge - 2) * num_edges;
+
+  /**
+   * Master element node locations
+   */
+  static const Real _master_points[64][3];
 
   static constexpr NodeMapTable<num_sides, nodes_per_side>
   _side_nodes = derived_side_nodes<Hex8, num_sides, nodes_per_side>
