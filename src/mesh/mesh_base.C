@@ -2614,8 +2614,8 @@ void MeshBase::detect_interior_parents()
    * Register a pair of boundaries as disjoint neighbor boundary pairs.
    */
   void MeshBase::add_disjoint_neighbor_boundary_pairs(const boundary_id_type b1,
-                                             const boundary_id_type b2,
-                                             const RealVectorValue & translation)
+                                                      const boundary_id_type b2,
+                                                      const RealVectorValue & translation)
     {
       // Lazily allocate the container the first time it’s needed
       if (!_disjoint_neighbor_boundary_pairs)
@@ -2675,6 +2675,35 @@ void MeshBase::detect_interior_parents()
       erase_if_match(b1, b2, pairs);
       erase_if_match(b2, b1, pairs);
     }
+
+namespace
+{
+const std::string disjoint_neighbor_node_key_name = "disjoint_neighbor_node_key";
+}
+
+void MeshBase::add_disjoint_neighbor_boundary_pair(const boundary_id_type b1,
+                                                   const boundary_id_type b2)
+{
+  // Temporarily reuse the three-argument overload code before it's deprecated
+  // and then removed
+  this->add_disjoint_neighbor_boundary_pairs(b1, b2, RealVectorValue());
+  this->add_node_integer(disjoint_neighbor_node_key_name);
+}
+
+bool MeshBase::has_disjoint_neighbor_node_keys() const
+{
+  return this->has_node_integer(disjoint_neighbor_node_key_name);
+}
+
+dof_id_type MeshBase::disjoint_neighbor_node_key(const Node & node) const
+{
+  return node.get_extra_integer(this->get_node_integer_index(disjoint_neighbor_node_key_name));
+}
+
+void MeshBase::set_disjoint_neighbor_node_key(Node & node, const dof_id_type key) const
+{
+  node.set_extra_integer(this->get_node_integer_index(disjoint_neighbor_node_key_name), key);
+}
 
 
 #endif
