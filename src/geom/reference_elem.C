@@ -204,6 +204,7 @@ void init_ref_elem_table()
     ref_elem_file[HEX8]     = ElemDataStrings::one_hex;
     ref_elem_file[HEX20]    = ElemDataStrings::one_hex20;
     ref_elem_file[HEX27]    = ElemDataStrings::one_hex27;
+    ref_elem_file[HEX64]    = ElemDataStrings::one_hex64;
 
     ref_elem_file[TET4]     = ElemDataStrings::one_tet;
     ref_elem_file[TET10]    = ElemDataStrings::one_tet10;
