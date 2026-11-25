@@ -130,6 +130,14 @@ unsigned int BERNSTEIN_n_dofs(const ElemType t, const Order o)
     case QUAD9:
     case QUADSHELL9:
       return ((o+1)*(o+1));
+    case QUAD16:
+      {
+        if (o == 3)
+          return 16;
+        else
+          libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(o) << " selected for BERNSTEIN FE family!");
+      }
+
     case HEX8:
       libmesh_assert_less (o, 2);
       libmesh_fallthrough();
@@ -144,6 +152,14 @@ unsigned int BERNSTEIN_n_dofs(const ElemType t, const Order o)
       }
     case HEX27:
       return ((o+1)*(o+1)*(o+1));
+    case HEX64:
+      {
+        if (o == 3)
+          return 64;
+        else
+          libmesh_error_msg("ERROR: Invalid Order " << Utility::enum_to_string(o) << " selected for BERNSTEIN FE family!");
+      }
+
     case TRI3:
     case TRISHELL3:
       libmesh_assert_less (o, 2);
@@ -269,6 +285,12 @@ unsigned int BERNSTEIN_n_dofs_at_node(const ElemType t,
             libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for QUAD9!");
           }
       }
+      // only some orders make sense for o > 3. Just avoiding that for now.
+    case QUAD16:
+      libmesh_assert_less (n, 16);
+      libmesh_assert_equal_to (o, 3);
+      return 1;
+
     case HEX8:
       libmesh_assert_less (n, 8);
       libmesh_assert_less (o, 2);
@@ -318,6 +340,10 @@ unsigned int BERNSTEIN_n_dofs_at_node(const ElemType t,
         default:
           libmesh_error_msg("ERROR: Invalid node ID " << n << " selected for HEX27!");
         }
+    case HEX64:
+      libmesh_assert_less (n, 64);
+      libmesh_assert_equal_to (o, 3);
+      return 1;
     case TET4:
       libmesh_assert_less (n, 4);
       libmesh_assert_less (o, 2);
@@ -383,6 +409,7 @@ unsigned int BERNSTEIN_n_dofs_per_elem(const ElemType t, const Order o)
     case TRISHELL3:
     case QUAD4:
     case QUADSHELL4:
+    case QUAD16:
       return 0;
     case TRI6:
       return ((o-1)*(o-2)/2);
@@ -403,6 +430,7 @@ unsigned int BERNSTEIN_n_dofs_per_elem(const ElemType t, const Order o)
       libmesh_assert_less (o, 3);
       return 0;
     case HEX27:
+    case HEX64:
       return 0;
     case TET4:
       libmesh_assert_less (o, 2);

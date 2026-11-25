@@ -40,6 +40,7 @@ void QGauss::init_3D()
     case HEX8:
     case HEX20:
     case HEX27:
+    case HEX64:
       {
         // We compute the 3D quadrature rule as a tensor
         // product of the 1D quadrature rule.
