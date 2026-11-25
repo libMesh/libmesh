@@ -335,15 +335,24 @@ Hex64::permute(unsigned int perm_num)
   libmesh_assert_less (perm_num, 24);
   const unsigned int side = perm_num % 6;
   const unsigned int rotate = perm_num / 6;
-
   for (unsigned int i = 0; i != rotate; ++i)
     {
       swap4nodes(0,1,2,3);
       swap4nodes(4,5,6,7);
-      swap4nodes(8,9,10,11);
-      swap4nodes(12,13,14,15);
-      swap4nodes(16,17,18,19);
-      swap4nodes(21,22,23,24);
+      swap4nodes(8,10,12,14);
+      swap4nodes(9,11,13,15);
+      swap4nodes(16,18,20,22);
+      swap4nodes(17,19,21,23);
+      swap4nodes(24,26,28,30);
+      swap4nodes(25,27,29,31);
+      swap4nodes(32,35,34,33);
+      swap4nodes(36,40,44,48);
+      swap4nodes(37,41,45,49);
+      swap4nodes(38,42,46,50);
+      swap4nodes(39,43,47,51);
+      swap4nodes(52,53,54,55);
+      swap4nodes(56,57,58,59);
+      swap4nodes(60,61,62,63);
       swap4neighbors(1,2,3,4);
     }
 
@@ -352,76 +361,164 @@ Hex64::permute(unsigned int perm_num)
     break;
   case 1:
     swap4nodes(3,7,4,0);
-    swap4nodes(11,15,19,12);
-    swap4nodes(10,18,16,8);
     swap4nodes(2,6,5,1);
-    swap4nodes(9,14,17,13);
-    swap4nodes(20,23,25,21);
+    swap4nodes(8,13,29,24);
+    swap4nodes(9,12,28,25);
+    swap4nodes(10,20,27,19);
+    swap4nodes(11,21,26,18);
+    swap4nodes(14,23,31,16);
+    swap4nodes(15,22,30,17);
+    swap4nodes(32,45,55,39);
+    swap4nodes(33,46,52,36);
+    swap4nodes(34,47,53,37);
+    swap4nodes(35,44,54,38);
+    swap4nodes(40,41,42,43);
+    swap4nodes(48,51,50,49);
+    swap4nodes(56,59,63,60);
+    swap4nodes(57,58,62,61);
     swap4neighbors(0,3,5,1);
     break;
   case 2:
     swap4nodes(0,4,5,1);
-    swap4nodes(8,12,16,13);
     swap4nodes(3,7,6,2);
-    swap4nodes(10,15,18,14);
-    swap4nodes(11,19,17,9);
-    swap4nodes(20,24,25,22);
+    swap4nodes(8,17,25,18);
+    swap4nodes(9,16,24,19);
+    swap4nodes(10,15,31,26);
+    swap4nodes(11,14,30,27);
+    swap4nodes(12,22,29,21);
+    swap4nodes(13,23,28,20);
+    swap4nodes(32,50,53,40);
+    swap4nodes(33,51,54,41);
+    swap4nodes(34,48,55,42);
+    swap4nodes(35,49,52,43);
+    swap4nodes(36,39,38,37);
+    swap4nodes(44,45,46,47);
+    swap4nodes(56,60,61,57);
+    swap4nodes(58,59,63,62);
     swap4neighbors(0,4,5,2);
     break;
   case 3:
     swap4nodes(0,4,7,3);
-    swap4nodes(12,19,15,11);
-    swap4nodes(8,16,18,10);
     swap4nodes(1,5,6,2);
-    swap4nodes(13,17,14,9);
-    swap4nodes(20,21,25,23);
+    swap4nodes(8,24,29,13);
+    swap4nodes(9,25,28,12);
+    swap4nodes(10,19,27,20);
+    swap4nodes(11,18,26,21);
+    swap4nodes(14,16,31,23);
+    swap4nodes(15,17,30,22);
+    swap4nodes(32,39,55,45);
+    swap4nodes(33,36,52,46);
+    swap4nodes(34,37,53,47);
+    swap4nodes(35,38,54,44);
+    swap4nodes(40,43,42,41);
+    swap4nodes(48,49,50,51);
+    swap4nodes(56,60,63,59);
+    swap4nodes(57,61,62,58);
     swap4neighbors(0,1,5,3);
     break;
   case 4:
     swap4nodes(1,5,4,0);
-    swap4nodes(8,13,16,12);
-    swap4nodes(9,17,19,11);
     swap4nodes(2,6,7,3);
-    swap4nodes(10,14,18,15);
-    swap4nodes(20,22,25,24);
+    swap4nodes(8,18,25,17);
+    swap4nodes(9,19,24,16);
+    swap4nodes(10,26,31,15);
+    swap4nodes(11,27,30,14);
+    swap4nodes(12,21,29,22);
+    swap4nodes(13,20,28,23);
+    swap4nodes(32,40,53,50);
+    swap4nodes(33,41,54,51);
+    swap4nodes(34,42,55,48);
+    swap4nodes(35,43,52,49);
+    swap4nodes(36,37,38,39);
+    swap4nodes(44,47,46,45);
+    swap4nodes(56,57,61,60);
+    swap4nodes(58,62,63,59);
     swap4neighbors(0,2,5,4);
     break;
   case 5:
     swap2nodes(0,7);
-    swap2nodes(8,18);
     swap2nodes(1,6);
     swap2nodes(2,5);
-    swap2nodes(10,16);
     swap2nodes(3,4);
-    swap2nodes(11,19);
-    swap2nodes(12,15);
-    swap2nodes(9,17);
-    swap2nodes(13,14);
-    swap2nodes(20,25);
-    swap2nodes(21,23);
+    swap2nodes(8,29);
+    swap2nodes(9,28);
+    swap2nodes(10,27);
+    swap2nodes(11,26);
+    swap2nodes(12,25);
+    swap2nodes(13,24);
+    swap2nodes(14,31);
+    swap2nodes(15,30);
+    swap2nodes(16,23);
+    swap2nodes(17,22);
+    swap2nodes(18,21);
+    swap2nodes(19,20);
+    swap2nodes(32,55);
+    swap2nodes(33,52);
+    swap2nodes(34,53);
+    swap2nodes(35,54);
+    swap2nodes(36,46);
+    swap2nodes(37,47);
+    swap2nodes(38,44);
+    swap2nodes(39,45);
+    swap2nodes(40,42);
+    swap2nodes(41,43);
+    swap2nodes(48,50);
+    swap2nodes(49,51);
+    swap2nodes(56,63);
+    swap2nodes(57,62);
+    swap2nodes(58,61);
+    swap2nodes(59,60);
     swap2neighbors(0,5);
     swap2neighbors(1,3);
     break;
-  default:
-    libmesh_error();
   }
 }
 
-//TODO
 void
 Hex64::flip(BoundaryInfo * boundary_info)
 {
   libmesh_assert(boundary_info);
 
+  // vertices
   swap2nodes(0,1);
   swap2nodes(2,3);
   swap2nodes(4,5);
   swap2nodes(6,7);
-  swap2nodes(9,11);
+
+  // edge nodes
+  swap2nodes(8,9);
+  swap2nodes(10,15);
+  swap2nodes(11,14);
   swap2nodes(12,13);
-  swap2nodes(14,15);
+  swap2nodes(16,18);
   swap2nodes(17,19);
-  swap2nodes(22,24);
+  swap2nodes(20,22);
+  swap2nodes(21,23);
+  swap2nodes(24,25);
+  swap2nodes(26,31);
+  swap2nodes(27,30);
+  swap2nodes(28,29);
+
+  // face nodes
+  swap2nodes(32,35);
+  swap2nodes(33,34);
+  swap2nodes(36,37);
+  swap2nodes(38,39);
+  swap2nodes(40,49);
+  swap2nodes(41,48);
+  swap2nodes(42,51);
+  swap2nodes(43,50);
+  swap2nodes(44,45);
+  swap2nodes(46,47);
+  swap2nodes(52,53);
+  swap2nodes(54,55);
+
+  // interior nodes
+  swap2nodes(56,57);
+  swap2nodes(58,59);
+  swap2nodes(60,61);
+  swap2nodes(62,63);
+
   swap2neighbors(2,4);
   swap2boundarysides(2,4,boundary_info);
   swap2boundaryedges(1,3,boundary_info);
@@ -429,7 +526,6 @@ Hex64::flip(BoundaryInfo * boundary_info)
   swap2boundaryedges(6,7,boundary_info);
   swap2boundaryedges(9,11,boundary_info);
 }
-
 
 ElemType
 Hex64::side_type (const unsigned int libmesh_dbg_var(s)) const
