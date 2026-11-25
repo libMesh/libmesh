@@ -52,6 +52,15 @@ namespace {
   static const Real hex20_scal25[] =     {0,     0,     0,     0,     -0.25, -0.25, -0.25, -0.25, 0,     0,     0,     0,     0,     0,     0,     0,     0.5,   0.5,   0.5,   0.5};
   static const Real hex20_scal26[] =     {-0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, -0.25, 0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25,  0.25};
 
+  // Indices for HEX64
+  // 1D EDGE4 node index per axis: 0:-1, 1:+1, 2:-1/3, 3:+1/3
+static const unsigned int HEX64_i0[] = {0,1,1,0,0,1,1,0,2,3,1,1,2,3,0,0, 0,0,1,1,1,1,0,0,2,3,1,1,2,3,0,0,
+                                  2,3,2,3,2,3,2,3,1,1,1,1,2,3,2,3, 0,0,0,0,2,3,2,3,2,3,2,3,2,3,2,3};
+static const unsigned int HEX64_i1[] = {0,0,1,1,0,0,1,1,0,0,2,3,1,1,2,3, 0,0,0,0,1,1,1,1,0,0,2,3,1,1,2,3,
+                                  2,2,3,3,0,0,0,0,2,3,2,3,1,1,1,1, 2,3,2,3,2,2,3,3,2,2,3,3,2,2,3,3};
+static const unsigned int HEX64_i2[] = {0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0, 2,3,2,3,2,3,2,3,1,1,1,1,1,1,1,1,
+                                  0,0,0,0,2,2,3,3,2,2,3,3,2,2,3,3, 2,2,3,3,1,1,1,1,2,2,2,2,3,3,3,3};
+
   Point get_min_point(const Elem * elem,
                       unsigned int a, unsigned int b,
                       unsigned int c, unsigned int d)
@@ -837,6 +846,14 @@ Real FE<3,BERNSTEIN>::shape(const Elem * elem,
               return (FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i0[i], p_mapped(0))*
                       FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i1[i], p_mapped(1))*
                       FE<1,BERNSTEIN>::shape(EDGE3, totalorder, i2[i], p_mapped(2)));
+            }
+
+          case HEX64:
+            {
+              const Point p_mapped = hex_remap(p, HEX64_i0, HEX64_i1, HEX64_i2);
+              return (FE<1,BERNSTEIN>::shape(EDGE4, totalorder, HEX64_i0[i], p_mapped(0)) *
+                     FE<1,BERNSTEIN>::shape(EDGE4, totalorder, HEX64_i1[i], p_mapped(1)) *
+                     FE<1,BERNSTEIN>::shape(EDGE4, totalorder, HEX64_i2[i], p_mapped(2)));
             }
 
           default:
@@ -1757,6 +1774,47 @@ Real FE<3,BERNSTEIN>::shape_deriv(const Elem * elem,
             // libmesh_error_msg("Invalid derivative index j = " << j);
             // }
 
+        case HEX64:
+          {
+            // HEX64 has exactly (3+1)^3 nodes, so third order is the only
+            // order it supports.
+            libmesh_assert_equal_to (totalorder, THIRD);
+            libmesh_assert_less (i, 64);
+            libmesh_assert_less (j, 3);
+
+            const Real xi   = p(0);
+            const Real eta  = p(1);
+            const Real zeta = p(2);
+
+            // 1D Bernstein mode index along each axis for node i
+            const unsigned int a = HEX64_i0[i];
+            const unsigned int b = HEX64_i1[i];
+            const unsigned int c = HEX64_i2[i];
+
+            switch (j)
+              {
+                // d()/dxi
+              case 0:
+                return (FE<1,BERNSTEIN>::shape_deriv(EDGE4, totalorder, a, 0, xi)*
+                        FE<1,BERNSTEIN>::shape      (EDGE4, totalorder, b,    eta)*
+                        FE<1,BERNSTEIN>::shape      (EDGE4, totalorder, c,    zeta));
+
+                // d()/deta
+              case 1:
+                return (FE<1,BERNSTEIN>::shape      (EDGE4, totalorder, a,    xi)*
+                        FE<1,BERNSTEIN>::shape_deriv(EDGE4, totalorder, b, 0, eta)*
+                        FE<1,BERNSTEIN>::shape      (EDGE4, totalorder, c,    zeta));
+
+                // d()/dzeta
+              case 2:
+                return (FE<1,BERNSTEIN>::shape      (EDGE4, totalorder, a,    xi)*
+                        FE<1,BERNSTEIN>::shape      (EDGE4, totalorder, b,    eta)*
+                        FE<1,BERNSTEIN>::shape_deriv(EDGE4, totalorder, c, 0, zeta));
+
+              default:
+                libmesh_error_msg("Invalid derivative index j = " << j);
+              }
+          }
 
           default:
             libmesh_error_msg("Invalid element type = " << Utility::enum_to_string(type));

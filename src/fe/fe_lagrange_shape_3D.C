@@ -5340,11 +5340,84 @@ Real fe_lagrange_3D_shape_second_deriv(const ElemType type,
               return fe_fdm_second_deriv(type, order, elem, i, j, p,
                                          fe_lagrange_3D_shape_deriv<T>);
             }
+        case HEX64:
+          {
+            libmesh_assert_less (i, 64);
+            libmesh_assert_less (j, 6);
+
+            const Real xi   = p(0);
+            const Real eta  = p(1);
+            const Real zeta = p(2);
+
+            // 1D cubic index (0: -1, 1: +1, 2: -1/3, 3: +1/3) of node i
+            // along each reference axis. Generated from the HEX64 reference
+            // node positions.
+            static const unsigned int i0[] = {
+              0, 1, 1, 0, 0, 1, 1, 0, 2, 3, 1, 1, 3, 2, 0, 0,
+              0, 0, 1, 1, 1, 1, 0, 0, 2, 3, 1, 1, 3, 2, 0, 0,
+              2, 2, 3, 3, 2, 3, 3, 2, 1, 1, 1, 1, 3, 2, 2, 3,
+              0, 0, 0, 0, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3, 2
+            };
+            static const unsigned int i1[] = {
+              0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 2, 3, 1, 1, 3, 2,
+              0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 2, 3, 1, 1, 3, 2,
+              2, 3, 3, 2, 0, 0, 0, 0, 2, 3, 3, 2, 1, 1, 1, 1,
+              3, 2, 2, 3, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3
+            };
+            static const unsigned int i2[] = {
+              0, 0, 0, 0, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+              2, 3, 2, 3, 2, 3, 2, 3, 1, 1, 1, 1, 1, 1, 1, 1,
+              0, 0, 0, 0, 2, 2, 3, 3, 2, 2, 3, 3, 2, 2, 3, 3,
+              2, 2, 3, 3, 1, 1, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3
+            };
+
+            switch (j)
+              {
+                // d^2()/dxi^2
+              case 0:
+                return (fe_lagrange_1D_cubic_shape_second_deriv(i0[i], 0, xi)*
+                        fe_lagrange_1D_cubic_shape(i1[i], eta)*
+                        fe_lagrange_1D_cubic_shape(i2[i], zeta));
+
+                // d^2()/dxideta
+              case 1:
+                return (fe_lagrange_1D_cubic_shape_deriv(i0[i], 0, xi)*
+                        fe_lagrange_1D_cubic_shape_deriv(i1[i], 0, eta)*
+                        fe_lagrange_1D_cubic_shape(i2[i], zeta));
+
+                // d^2()/deta^2
+              case 2:
+                return (fe_lagrange_1D_cubic_shape(i0[i], xi)*
+                        fe_lagrange_1D_cubic_shape_second_deriv(i1[i], 0, eta)*
+                        fe_lagrange_1D_cubic_shape(i2[i], zeta));
+
+                // d^2()/dxidzeta
+              case 3:
+                return (fe_lagrange_1D_cubic_shape_deriv(i0[i], 0, xi)*
+                        fe_lagrange_1D_cubic_shape(i1[i], eta)*
+                        fe_lagrange_1D_cubic_shape_deriv(i2[i], 0, zeta));
+
+                // d^2()/detadzeta
+              case 4:
+                return (fe_lagrange_1D_cubic_shape(i0[i], xi)*
+                        fe_lagrange_1D_cubic_shape_deriv(i1[i], 0, eta)*
+                        fe_lagrange_1D_cubic_shape_deriv(i2[i], 0, zeta));
+
+                // d^2()/dzeta^2
+              case 5:
+                return (fe_lagrange_1D_cubic_shape(i0[i], xi)*
+                        fe_lagrange_1D_cubic_shape(i1[i], eta)*
+                        fe_lagrange_1D_cubic_shape_second_deriv(i2[i], 0, zeta));
+
+              default:
+                libmesh_error_msg("Invalid j = " << j);
+              }
+          }
 
           default:
             libmesh_error_msg("ERROR: Unsupported 3D element type!: " << Utility::enum_to_string(type));
-          }
-      }
+          } //end third order
+      } // end order
 
       // unsupported order
     default:
