@@ -41,6 +41,7 @@
 #include "libmesh/petsc_matrix_base.h"
 #include "libmesh/petscdmlibmesh.h"
 #include "libmesh/dof_map.h"
+#include "libmesh/petsc_solve_reduction.h"
 #include "libmesh/preconditioner.h"
 #include "libmesh/elem.h"
 #include "libmesh/parallel.h"
@@ -272,6 +273,14 @@ PetscErrorCode DMlibMeshSetUpName_Private(DM dm)
   PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
 }
 
+
+/**
+ * \returns The map between the vectors SNES solves for and full vectors of \p sys
+ */
+static PetscSolveReduction<Number> & DMlibMeshGetReduction_Private(const NonlinearImplicitSystem & sys)
+{
+  return cast_ref<PetscNonlinearSolver<Number> &>(*sys.nonlinear_solver).reduction();
+}
 
 #undef __FUNCT__
 #define __FUNCT__ "DMCreateFieldDecomposition_libMesh"
@@ -595,163 +604,36 @@ struct token {
 
 
 #undef __FUNCT__
-#define __FUNCT__ "DMlibMeshFunction"
-static PetscErrorCode DMlibMeshFunction(DM dm, Vec x, Vec r)
-{
-  PetscFunctionBegin;
-  libmesh_assert(x);
-  libmesh_assert(r);
-
-  NonlinearImplicitSystem * _sys;
-  LibmeshPetscCallQ(DMlibMeshGetSystem(dm, _sys));
-  NonlinearImplicitSystem & sys = *_sys;
-  PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
-  PetscVector<Number> & R_sys = *cast_ptr<PetscVector<Number> *>(sys.rhs);
-  PetscVector<Number> X_global(x, _sys->comm()), R(r, _sys->comm());
-
-  // Use the systems update() to get a good local version of the parallel solution
-  X_global.swap(X_sys);
-  R.swap(R_sys);
-
-  _sys->get_dof_map().enforce_constraints_exactly(*_sys);
-  _sys->update();
-
-  // Swap back
-  X_global.swap(X_sys);
-  R.swap(R_sys);
-  R.zero();
-
-  // if the user has provided both function pointers and objects only the pointer
-  // will be used, so catch that as an error
-  libmesh_error_msg_if(_sys->nonlinear_solver->residual && _sys->nonlinear_solver->residual_object,
-                       "ERROR: cannot specify both a function and object to compute the Residual!");
-
-  libmesh_error_msg_if(_sys->nonlinear_solver->matvec && _sys->nonlinear_solver->residual_and_jacobian_object,
-                       "ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!");
-
-  if (_sys->nonlinear_solver->residual != nullptr)
-    _sys->nonlinear_solver->residual(*(_sys->current_local_solution.get()), R, *_sys);
-
-  else if (_sys->nonlinear_solver->residual_object != nullptr)
-    _sys->nonlinear_solver->residual_object->residual(*(_sys->current_local_solution.get()), R, *_sys);
-
-  else if (_sys->nonlinear_solver->matvec   != nullptr)
-    _sys->nonlinear_solver->matvec(*(_sys->current_local_solution.get()), &R, nullptr, *_sys);
-
-  else if (_sys->nonlinear_solver->residual_and_jacobian_object != nullptr)
-    _sys->nonlinear_solver->residual_and_jacobian_object->residual_and_jacobian(*(_sys->current_local_solution.get()), &R, nullptr, *_sys);
-
-  else
-    libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");
-
-  R.close();
-  X_global.close();
-  PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
-}
-
-#undef __FUNCT__
-#define __FUNCT__ "SNESFunction_DMlibMesh"
-static PetscErrorCode SNESFunction_DMlibMesh(SNES, Vec x, Vec r, void * ctx)
-{
-  DM dm = (DM)ctx;
-  PetscFunctionBegin;
-  LibmeshPetscCallQ(DMlibMeshFunction(dm,x,r));
-  PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
-}
-
-
-#undef __FUNCT__
-#define __FUNCT__ "DMlibMeshJacobian"
-static PetscErrorCode DMlibMeshJacobian(DM dm, Vec x, Mat jac, Mat pc)
-{
-  PetscFunctionBegin;
-  NonlinearImplicitSystem * _sys;
-  LibmeshPetscCallQ(DMlibMeshGetSystem(dm, _sys));
-  NonlinearImplicitSystem & sys = *_sys;
-
-  libmesh_assert(pc);
-  libmesh_assert(jac);
-  PetscMatrixBase<Number> & the_pc = *PetscMatrixBase<Number>::get_context(pc, sys.comm());
-  PetscMatrixBase<Number> & Jac = *PetscMatrixBase<Number>::get_context(jac, sys.comm());
-  PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
-  PetscMatrixBase<Number> & Jac_sys = *cast_ptr<PetscMatrixBase<Number> *>(sys.matrix);
-  PetscVector<Number> X_global(x, sys.comm());
-
-  // Set the dof maps
-  the_pc.attach_dof_map(sys.get_dof_map());
-  Jac.attach_dof_map(sys.get_dof_map());
-
-  // Use the systems update() to get a good local version of the parallel solution
-  X_global.swap(X_sys);
-  Jac.swap(Jac_sys);
-
-  sys.get_dof_map().enforce_constraints_exactly(sys);
-  sys.update();
-
-  X_global.swap(X_sys);
-  Jac.swap(Jac_sys);
-
-  the_pc.zero();
-
-  // if the user has provided both function pointers and objects only the pointer
-  // will be used, so catch that as an error
-  libmesh_error_msg_if(sys.nonlinear_solver->jacobian && sys.nonlinear_solver->jacobian_object,
-                       "ERROR: cannot specify both a function and object to compute the Jacobian!");
-
-  libmesh_error_msg_if(sys.nonlinear_solver->matvec && sys.nonlinear_solver->residual_and_jacobian_object,
-                       "ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!");
-
-  if (sys.nonlinear_solver->jacobian != nullptr)
-    sys.nonlinear_solver->jacobian(*(sys.current_local_solution.get()), the_pc, sys);
-
-  else if (sys.nonlinear_solver->jacobian_object != nullptr)
-    sys.nonlinear_solver->jacobian_object->jacobian(*(sys.current_local_solution.get()), the_pc, sys);
-
-  else if (sys.nonlinear_solver->matvec != nullptr)
-    sys.nonlinear_solver->matvec(*(sys.current_local_solution.get()), nullptr, &the_pc, sys);
-
-  else if (sys.nonlinear_solver->residual_and_jacobian_object != nullptr)
-    sys.nonlinear_solver->residual_and_jacobian_object->residual_and_jacobian(*(sys.current_local_solution.get()), nullptr, &the_pc, sys);
-
-  else
-    libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");
-
-  the_pc.close();
-  Jac.close();
-  X_global.close();
-  PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
-}
-
-#undef  __FUNCT__
-#define __FUNCT__ "SNESJacobian_DMlibMesh"
-static PetscErrorCode SNESJacobian_DMlibMesh(SNES, Vec x, Mat jac, Mat pc, void * ctx)
-{
-  DM dm = (DM)ctx;
-  PetscFunctionBegin;
-  LibmeshPetscCallQ(DMlibMeshJacobian(dm,x,jac,pc));
-  PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
-}
-
-#undef __FUNCT__
 #define __FUNCT__ "DMVariableBounds_libMesh"
 static PetscErrorCode DMVariableBounds_libMesh(DM dm, Vec xl, Vec xu)
 {
   NonlinearImplicitSystem * _sys;
   LibmeshPetscCallQ(DMlibMeshGetSystem(dm, _sys));
   NonlinearImplicitSystem & sys = *_sys;
-  PetscVector<Number> XL(xl, sys.comm());
-  PetscVector<Number> XU(xu, sys.comm());
   PetscFunctionBegin;
   // Workaround for nonstandard Q suffix warning with quad precision
   const PetscReal petsc_inf = std::numeric_limits<PetscReal>::max() / 4;
-  LibmeshPetscCallQ(VecSet(xl, -petsc_inf));
-  LibmeshPetscCallQ(VecSet(xu, petsc_inf));
+
+  // Users compute bounds on full vectors, and SNES's xl and xu take their injection
+  const auto full_l = sys.solution->zero_clone();
+  const auto full_u = sys.solution->zero_clone();
+  NumericVector<Number> & L = *full_l;
+  NumericVector<Number> & U = *full_u;
+  L = -petsc_inf;
+  U = petsc_inf;
+
   if (sys.nonlinear_solver->bounds != nullptr)
-    sys.nonlinear_solver->bounds(XL,XU,sys);
+    sys.nonlinear_solver->bounds(L,U,sys);
   else if (sys.nonlinear_solver->bounds_object != nullptr)
-    sys.nonlinear_solver->bounds_object->bounds(XL,XU, sys);
+    sys.nonlinear_solver->bounds_object->bounds(L,U, sys);
   else
     SETERRQ(((PetscObject)dm)->comm, PETSC_ERR_ARG_WRONG, "No bounds calculation in this libMesh object");
+
+  L.close();
+  U.close();
+  auto & reduction = DMlibMeshGetReduction_Private(sys);
+  reduction.inject(L, xl);
+  reduction.inject(U, xu);
 
   PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
 }
@@ -787,9 +669,9 @@ static PetscErrorCode DMCreateGlobalVector_libMesh(DM dm, Vec *x)
     LibmeshPetscCallQ(VecSetFromOptions(*x));
     LibmeshPetscCallQ(VecSetUp(*x));
   }
-  else {
-    LibmeshPetscCallQ(VecDuplicate(v,x));
-  }
+  else
+    /* The vectors SNES solves for */
+    *x = DMlibMeshGetReduction_Private(*dlm->sys).create_vector();
 
 #if PETSC_VERSION_LESS_THAN(3,13,0)
   LibmeshPetscCallQ(PetscObjectCompose((PetscObject)*x,"DM",(PetscObject)dm));
@@ -899,11 +781,9 @@ static PetscErrorCode  DMSetUp_libMesh(DM dm)
   if (!dlm->sys)
     SETERRQ(PETSC_COMM_WORLD, PETSC_ERR_ARG_WRONGSTATE, "No libMesh system set for DM_libMesh");
   /*
-    Do not evaluate function, Jacobian or bounds for an embedded DM -- the subproblem might not have enough information for that.
+    Do not evaluate bounds for an embedded DM -- the subproblem might not have enough information for that.
   */
   if (!dlm->embedding) {
-    LibmeshPetscCallQ(DMSNESSetFunction(dm, SNESFunction_DMlibMesh, (void *)dm));
-    LibmeshPetscCallQ(DMSNESSetJacobian(dm, SNESJacobian_DMlibMesh, (void *)dm));
     if (dlm->sys->nonlinear_solver->bounds || dlm->sys->nonlinear_solver->bounds_object)
       LibmeshPetscCallQ(DMSetVariableBounds(dm, DMVariableBounds_libMesh));
   }

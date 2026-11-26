@@ -1,0 +1,687 @@
+#include <libmesh/boundary_info.h>
+#include <libmesh/const_function.h>
+#include <libmesh/constraint_elimination_dof_map.h>
+#include <libmesh/dense_matrix.h>
+#include <libmesh/dense_vector.h>
+#include <libmesh/dirichlet_boundaries.h>
+#include <libmesh/dof_map.h>
+#include <libmesh/elem.h>
+#include <libmesh/equation_systems.h>
+#include <libmesh/fe.h>
+#include <libmesh/linear_implicit_system.h>
+#include <libmesh/mesh.h>
+#include <libmesh/mesh_generation.h>
+#include <libmesh/mesh_refinement.h>
+#include <libmesh/nonlinear_implicit_system.h>
+#include <libmesh/nonlinear_solver.h>
+#include <libmesh/numeric_vector.h>
+#include <libmesh/periodic_boundary.h>
+#include <libmesh/petsc_matrix.h>
+#include <libmesh/quadrature_gauss.h>
+#include <libmesh/reduced_sparse_matrix.h>
+#include <libmesh/static_condensation.h>
+#include <libmesh/static_condensation_dof_map.h>
+
+#include <set>
+#include <tuple>
+
+#include "test_comm.h"
+#include "libmesh_cppunit.h"
+
+using namespace libMesh;
+
+// The tests use PETSc solvers and a mesh with hanging nodes, periodic and Dirichlet constraints
+#if defined(LIBMESH_HAVE_PETSC) && defined(LIBMESH_ENABLE_AMR) &&                                  \
+    defined(LIBMESH_ENABLE_PERIODIC) && defined(LIBMESH_ENABLE_DIRICHLET) && LIBMESH_DIM > 1
+
+namespace
+{
+/**
+ * Residual and Jacobian of -div((1 + u^2) grad u) + u_x = 1, a nonlinear problem whose Newton
+ * iterates pass through states that violate no constraint only if the solver forms C y + h
+ */
+class NonlinearDiffusion : public NonlinearImplicitSystem::ComputeResidualandJacobian
+{
+public:
+  virtual void residual_and_jacobian(const NumericVector<Number> & soln,
+                                     NumericVector<Number> * residual,
+                                     SparseMatrix<Number> * jacobian,
+                                     NonlinearImplicitSystem & sys) override
+  {
+    const DofMap & dof_map = sys.get_dof_map();
+    const FEType fe_type = dof_map.variable_type(0);
+    std::unique_ptr<FEBase> fe(FEBase::build(2, fe_type));
+    QGauss qrule(2, fe_type.default_quadrature_order());
+    fe->attach_quadrature_rule(&qrule);
+    const auto & JxW = fe->get_JxW();
+    const auto & phi = fe->get_phi();
+    const auto & dphi = fe->get_dphi();
+
+    std::vector<dof_id_type> dofs;
+    DenseVector<Number> Re;
+    DenseMatrix<Number> Ke;
+    for (const Elem * elem : sys.get_mesh().active_local_element_ptr_range())
+      {
+        dof_map.dof_indices(elem, dofs);
+        fe->reinit(elem);
+        const auto n = dofs.size();
+        Re.resize(n);
+        Ke.resize(n, n);
+        for (const auto qp : index_range(JxW))
+          {
+            Number u = 0;
+            Gradient grad_u;
+            for (const auto j : make_range(n))
+              {
+                u += phi[j][qp] * soln(dofs[j]);
+                grad_u.add_scaled(dphi[j][qp], soln(dofs[j]));
+              }
+            const Number k = 1. + u * u;
+            for (const auto i : make_range(n))
+              {
+                Re(i) += JxW[qp] * (k * grad_u * dphi[i][qp] + (grad_u(0) - 1.) * phi[i][qp]);
+                for (const auto j : make_range(n))
+                  Ke(i, j) += JxW[qp] * (k * dphi[j][qp] * dphi[i][qp] +
+                                         2. * u * phi[j][qp] * (grad_u * dphi[i][qp]) +
+                                         dphi[j][qp](0) * phi[i][qp]);
+              }
+          }
+        dof_map.constrain_element_matrix_and_vector(Ke, Re, dofs, false);
+        if (residual)
+          residual->add_vector(Re, dofs);
+        if (jacobian)
+          {
+#ifdef LIBMESH_HAVE_EIGEN
+            // A statically condensed Jacobian accumulates element matrices by element
+            if (auto * sc = dynamic_cast<StaticCondensation *>(jacobian))
+              sc->set_current_elem(*elem);
+#endif
+            jacobian->add_matrix(Ke, dofs);
+          }
+      }
+  }
+};
+
+/**
+ * Caps the solution from above, so a variational inequality solve has active bounds
+ */
+class UpperBound : public NonlinearImplicitSystem::ComputeBounds
+{
+public:
+  explicit UpperBound(Real cap) : _cap(cap) {}
+
+  virtual void bounds(NumericVector<Number> &,
+                      NumericVector<Number> & XU,
+                      NonlinearImplicitSystem &) override
+  {
+    for (const auto i : make_range(XU.first_local_index(), XU.last_local_index()))
+      XU.set(i, _cap);
+    XU.close();
+  }
+
+private:
+  const Real _cap;
+};
+
+/**
+ * The residual and Jacobian of the Laplacian with a zero-mean source, -div(grad u) = x - 1/2, whose
+ * fully periodic solutions differ by constants
+ */
+class PeriodicPoisson : public NonlinearImplicitSystem::ComputeResidualandJacobian
+{
+public:
+  virtual void residual_and_jacobian(const NumericVector<Number> & soln,
+                                     NumericVector<Number> * residual,
+                                     SparseMatrix<Number> * jacobian,
+                                     NonlinearImplicitSystem & sys) override
+  {
+    const DofMap & dof_map = sys.get_dof_map();
+    const FEType fe_type = dof_map.variable_type(0);
+    std::unique_ptr<FEBase> fe(FEBase::build(2, fe_type));
+    QGauss qrule(2, fe_type.default_quadrature_order());
+    fe->attach_quadrature_rule(&qrule);
+    const auto & JxW = fe->get_JxW();
+    const auto & phi = fe->get_phi();
+    const auto & dphi = fe->get_dphi();
+    const auto & xyz = fe->get_xyz();
+
+    std::vector<dof_id_type> dofs;
+    DenseVector<Number> Re;
+    DenseMatrix<Number> Ke;
+    for (const Elem * elem : sys.get_mesh().active_local_element_ptr_range())
+      {
+        dof_map.dof_indices(elem, dofs);
+        fe->reinit(elem);
+        const auto n = dofs.size();
+        Re.resize(n);
+        Ke.resize(n, n);
+        for (const auto qp : index_range(JxW))
+          for (const auto i : make_range(n))
+            {
+              Re(i) -= JxW[qp] * (xyz[qp](0) - 0.5) * phi[i][qp];
+              for (const auto j : make_range(n))
+                {
+                  Ke(i, j) += JxW[qp] * dphi[j][qp] * dphi[i][qp];
+                  Re(i) += JxW[qp] * dphi[j][qp] * dphi[i][qp] * soln(dofs[j]);
+                }
+            }
+        dof_map.constrain_element_matrix_and_vector(Ke, Re, dofs, false);
+        if (residual)
+          residual->add_vector(Re, dofs);
+        if (jacobian)
+          jacobian->add_matrix(Ke, dofs);
+      }
+  }
+};
+
+/**
+ * The constants, the null space of the fully periodic Laplacian
+ */
+class Constants : public NonlinearImplicitSystem::ComputeVectorSubspace
+{
+public:
+  virtual void operator()(std::vector<NumericVector<Number> *> & sp,
+                          NonlinearImplicitSystem & sys) override
+  {
+    _mode = sys.solution->zero_clone();
+    _mode->add(1.);
+    _mode->close();
+    sp.push_back(_mode.get());
+  }
+
+private:
+  std::unique_ptr<NumericVector<Number>> _mode;
+};
+
+/**
+ * Constrains the first variable to equal the second at the nodes on one boundary, so that the
+ * constrained degrees of freedom of one variable depend on those of another
+ */
+class CrossVariableConstraint : public System::Constraint
+{
+public:
+  CrossVariableConstraint(System & sys, boundary_id_type bid) : _sys(sys), _bid(bid) {}
+
+  virtual void constrain() override
+  {
+    const auto sys_num = _sys.number();
+    const MeshBase & mesh = _sys.get_mesh();
+    for (const Node * node : mesh.node_ptr_range())
+      if (mesh.get_boundary_info().has_boundary_id(node, _bid))
+        {
+          DofConstraintRow row;
+          row[node->dof_number(sys_num, 1, 0)] = 1.;
+          _sys.get_dof_map().add_constraint_row(node->dof_number(sys_num, 0, 0), row);
+        }
+  }
+
+private:
+  System & _sys;
+  const boundary_id_type _bid;
+};
+
+/**
+ * Assembles the matrix of the linear operator -div(grad u) + u_x into \p mat outside of any solve,
+ * with homogeneous constraints. The advection term makes the operator non-symmetric, so that the
+ * test can tell a constrained row of C^T K C from a constrained column. The
+ * ComputeResidualandJacobian objects above instead assemble a residual and its Jacobian for
+ * nonlinear solves
+ */
+void assemble_operator(const System & sys, SparseMatrix<Number> & mat)
+{
+  const MeshBase & mesh = sys.get_mesh();
+  const DofMap & dof_map = sys.get_dof_map();
+  const FEType fe_type = dof_map.variable_type(0);
+
+  std::unique_ptr<FEBase> fe(FEBase::build(2, fe_type));
+  QGauss qrule(2, fe_type.default_quadrature_order());
+  fe->attach_quadrature_rule(&qrule);
+  const auto & JxW = fe->get_JxW();
+  const auto & phi = fe->get_phi();
+  const auto & dphi = fe->get_dphi();
+
+  std::vector<dof_id_type> dof_indices;
+  DenseMatrix<Number> Ke;
+
+  for (const Elem * elem : mesh.active_local_element_ptr_range())
+    {
+      dof_map.dof_indices(elem, dof_indices);
+      fe->reinit(elem);
+      Ke.resize(dof_indices.size(), dof_indices.size());
+      for (const auto qp : index_range(JxW))
+        for (const auto i : index_range(dof_indices))
+          for (const auto j : index_range(dof_indices))
+            Ke(i, j) += JxW[qp] * (dphi[i][qp] * dphi[j][qp] + phi[i][qp] * dphi[j][qp](0));
+
+      // Homogeneous condensation: the element matrix becomes C^T K C on unconstrained rows and
+      // columns
+      dof_map.constrain_element_matrix(Ke, dof_indices, false);
+      mat.add_matrix(Ke, dof_indices);
+    }
+  mat.close();
+}
+}
+
+class ConstraintEliminationTest : public CppUnit::TestCase
+{
+public:
+  LIBMESH_CPPUNIT_TEST_SUITE(ConstraintEliminationTest);
+
+  CPPUNIT_TEST(testReducedOperator);
+  CPPUNIT_TEST(testReducedSolve);
+  CPPUNIT_TEST(testCrossVariableConstraintDofs);
+  CPPUNIT_TEST(testReducedBounds);
+  CPPUNIT_TEST(testReducedNullSpace);
+#ifdef LIBMESH_HAVE_EIGEN
+  CPPUNIT_TEST(testCondensedReducedSolve);
+#endif
+
+  CPPUNIT_TEST_SUITE_END();
+
+private:
+  /**
+   * On a mesh with hanging nodes, a periodic pair of sides and a Dirichlet side, the reduced
+   * matrix assembled with full indices must equal the unconstrained rows and columns of the full
+   * constrained matrix, and every constrained degree of freedom must be eliminated
+   */
+  void testReducedOperator()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    // A distributed mesh keeps periodic neighbors only if it knows the periodic boundaries before
+    // it deletes remote elements
+    mesh.allow_remote_element_removal(false);
+    MeshTools::Generation::build_square(mesh, 4, 4, 0., 1., 0., 1., QUAD9);
+
+    // build_square's boundary ids: 0 bottom, 1 right, 2 top, 3 left
+    EquationSystems es(mesh);
+    auto & full_sys = es.add_system<LinearImplicitSystem>("full");
+    auto & reduced_sys = es.add_system<LinearImplicitSystem>("reduced_sys");
+    reduced_sys.create_constraint_elimination();
+
+    for (System * sys : {static_cast<System *>(&full_sys), static_cast<System *>(&reduced_sys)})
+      {
+        const auto u = sys->add_variable("u", SECOND, LAGRANGE);
+        PeriodicBoundary periodic(RealVectorValue(0., 1.));
+        periodic.myboundary = 0;
+        periodic.pairedboundary = 2;
+        sys->get_dof_map().add_periodic_boundary(periodic);
+        sys->get_dof_map().add_dirichlet_boundary(
+            DirichletBoundary({3}, {u}, ConstFunction<Number>(1.)));
+      }
+
+    // Ghost the point neighbors of periodic images, which periodic constraints need on a
+    // distributed mesh. Both systems have the same periodic boundaries.
+    mesh.default_ghosting().set_periodic_boundaries(
+        full_sys.get_dof_map().get_periodic_boundaries());
+
+    // Refine one element to create hanging nodes
+    mesh.allow_remote_element_removal(true);
+    mesh.delete_remote_elements();
+
+    if (Elem * elem = mesh.query_elem_ptr(5); elem && elem->active())
+      elem->set_refinement_flag(Elem::REFINE);
+    MeshRefinement(mesh).refine_elements();
+
+    es.init();
+
+    const DofMap & dof_map = full_sys.get_dof_map();
+    const auto & reduced_map = reduced_sys.get_dof_map().get_constraint_elimination();
+    CPPUNIT_ASSERT(dof_map.n_constrained_dofs() > 0);
+    CPPUNIT_ASSERT_EQUAL(dof_map.n_dofs() - dof_map.n_constrained_dofs(), reduced_map.n_dofs());
+
+    assemble_operator(full_sys, *full_sys.matrix);
+    assemble_operator(reduced_sys, *reduced_sys.matrix);
+
+    // Both systems number their full dofs alike, so the reduced matrix's rows and columns are
+    // the unconstrained rows and columns of the full matrix
+    const std::vector<numeric_index_type> retained(reduced_map.local_retained_dofs().begin(),
+                                                   reduced_map.local_retained_dofs().end());
+    auto expected = SparseMatrix<Number>::build(full_sys.comm());
+    full_sys.matrix->create_submatrix(*expected, retained, retained);
+
+    const auto & reduced = cast_ref<ReducedSparseMatrix<Number> &>(*reduced_sys.matrix);
+    std::vector<numeric_index_type> cols;
+    std::vector<Number> vals;
+    for (const auto i : index_range(retained))
+      {
+        expected->get_row(expected->row_start() + i, cols, vals);
+        for (const auto k : index_range(cols))
+          LIBMESH_ASSERT_NUMBERS_EQUAL(
+              vals[k], reduced(reduced_map.first_dof() + i, cols[k]), TOLERANCE * TOLERANCE);
+      }
+
+    // The reduced operator has no other entries
+    LIBMESH_ASSERT_FP_EQUAL(expected->l1_norm(), reduced.l1_norm(), TOLERANCE * TOLERANCE);
+  }
+
+  /**
+   * Solves a nonlinear problem on the same constrained mesh with and without eliminating the
+   * constrained degrees of freedom. Both must converge to the same solution, and eliminating must
+   * keep every iterate on the constraints, including a nonzero Dirichlet value
+   */
+  void testReducedSolve()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    // A distributed mesh keeps periodic neighbors only if it knows the periodic boundaries before
+    // it deletes remote elements
+    mesh.allow_remote_element_removal(false);
+    MeshTools::Generation::build_square(mesh, 4, 4, 0., 1., 0., 1., QUAD9);
+
+    EquationSystems es(mesh);
+    auto & full_sys = es.add_system<NonlinearImplicitSystem>("full");
+    auto & reduced_sys = es.add_system<NonlinearImplicitSystem>("reduced_sys");
+    reduced_sys.create_constraint_elimination();
+
+    NonlinearDiffusion assembly;
+    for (auto * sys : {&full_sys, &reduced_sys})
+      {
+        const auto u = sys->add_variable("u", SECOND, LAGRANGE);
+        PeriodicBoundary periodic(RealVectorValue(0., 1.));
+        periodic.myboundary = 0;
+        periodic.pairedboundary = 2;
+        sys->get_dof_map().add_periodic_boundary(periodic);
+        sys->get_dof_map().add_dirichlet_boundary(
+            DirichletBoundary({3}, {u}, ConstFunction<Number>(2.)));
+        sys->nonlinear_solver->residual_and_jacobian_object = &assembly;
+        sys->nonlinear_solver->relative_residual_tolerance = TOLERANCE * TOLERANCE;
+      }
+
+    // Ghost the point neighbors of periodic images, which periodic constraints need on a
+    // distributed mesh. Both systems have the same periodic boundaries.
+    mesh.default_ghosting().set_periodic_boundaries(
+        full_sys.get_dof_map().get_periodic_boundaries());
+    mesh.allow_remote_element_removal(true);
+    mesh.delete_remote_elements();
+
+    if (Elem * elem = mesh.query_elem_ptr(5); elem && elem->active())
+      elem->set_refinement_flag(Elem::REFINE);
+    MeshRefinement(mesh).refine_elements();
+
+    es.init();
+
+    for (auto * sys : {&full_sys, &reduced_sys})
+      {
+        // Start away from the Dirichlet value, so constrained entries must be imposed
+        sys->solution->zero();
+        sys->solution->close();
+        sys->update();
+        sys->solve();
+        CPPUNIT_ASSERT(sys->nonlinear_solver->converged);
+      }
+
+    const auto & dof_map = full_sys.get_dof_map();
+    for (const auto i : make_range(dof_map.first_dof(), dof_map.end_dof()))
+      LIBMESH_ASSERT_NUMBERS_EQUAL(
+          (*full_sys.solution)(i), (*reduced_sys.solution)(i), std::sqrt(TOLERANCE) * TOLERANCE);
+  }
+
+  /**
+   * A variational inequality solve with an active upper bound must give the same solution with
+   * and without eliminating constraints, so the bounds a user computes on full vectors must reach
+   * the reduced solve as the bounds of the unconstrained degrees of freedom.
+   *
+   * Elimination bounds only the unconstrained values y. The constrained values C y + h are not
+   * bounded, and SNES variational inequalities accept only box bounds, so the general constraint
+   * C y + h <= U is out of reach. A SECOND order LAGRANGE hanging node value has negative weights,
+   * for example -1/8 on the far edge vertex, so it can exceed the bound when every y it depends
+   * on satisfies the bound. A full solve instead bounds the hanging node value directly. The two
+   * formulations therefore agree generally only when the bound is inactive at constrained degrees of
+   * freedom, and so this test refines away from the bounded region for that reason.
+   */
+  void testReducedBounds()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    MeshTools::Generation::build_square(mesh, 4, 4, 0., 1., 0., 1., QUAD9);
+
+    EquationSystems es(mesh);
+    auto & full_sys = es.add_system<NonlinearImplicitSystem>("full");
+    auto & reduced_sys = es.add_system<NonlinearImplicitSystem>("reduced_sys");
+    reduced_sys.create_constraint_elimination();
+
+    // The unbounded solution peaks near 1.2, above this cap
+    const Real cap_value = 1.1;
+    NonlinearDiffusion assembly;
+    UpperBound cap(cap_value);
+    for (auto * sys : {&full_sys, &reduced_sys})
+      {
+        const auto u = sys->add_variable("u", SECOND, LAGRANGE);
+        sys->get_dof_map().add_dirichlet_boundary(
+            DirichletBoundary({3}, {u}, ConstFunction<Number>(1.)));
+        sys->nonlinear_solver->residual_and_jacobian_object = &assembly;
+        sys->nonlinear_solver->bounds_object = &cap;
+        sys->nonlinear_solver->relative_residual_tolerance = TOLERANCE * TOLERANCE;
+      }
+
+    // Refine at the Dirichlet side, away from where the unbounded solution peaks, so that the
+    // bound is inactive at the hanging nodes. Element ids depend on the partitioning of a
+    // distributed mesh, so the element is chosen by position
+    for (Elem * elem : mesh.active_element_ptr_range())
+      if (const Point c = elem->vertex_average(); c(0) < 0.25 && c(1) > 0.5 && c(1) < 0.75)
+        elem->set_refinement_flag(Elem::REFINE);
+    MeshRefinement(mesh).refine_elements();
+    es.init();
+
+    LibmeshPetscCall2(mesh.comm(), PetscOptionsSetValue(nullptr, "-snes_type", "vinewtonrsls"));
+    for (auto * sys : {&full_sys, &reduced_sys})
+      {
+        sys->solution->zero();
+        sys->solution->close();
+        sys->update();
+        sys->solve();
+        CPPUNIT_ASSERT(sys->nonlinear_solver->converged);
+      }
+    LibmeshPetscCall2(mesh.comm(), PetscOptionsClearValue(nullptr, "-snes_type"));
+
+    const auto & dof_map = full_sys.get_dof_map();
+    Real max_u = 0;
+    for (const auto i : make_range(dof_map.first_dof(), dof_map.end_dof()))
+      {
+        LIBMESH_ASSERT_NUMBERS_EQUAL(
+            (*full_sys.solution)(i), (*reduced_sys.solution)(i), std::sqrt(TOLERANCE) * TOLERANCE);
+        max_u = std::max(max_u, std::abs((*reduced_sys.solution)(i)));
+      }
+    mesh.comm().max(max_u);
+    // The bound is active
+    LIBMESH_ASSERT_FP_EQUAL(cap_value, max_u, TOLERANCE);
+  }
+
+  /**
+   * A fully periodic Laplacian is singular, with the constants as its null space. A user computes
+   * that null space on full vectors; the reduced Jacobian must carry its restriction, which the
+   * reduced Jacobian annihilates, and the solve must converge
+   */
+  void testReducedNullSpace()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    // A distributed mesh keeps periodic neighbors only if it knows the periodic boundaries before
+    // it deletes remote elements
+    mesh.allow_remote_element_removal(false);
+    MeshTools::Generation::build_square(mesh, 4, 4, 0., 1., 0., 1., QUAD9);
+
+    EquationSystems es(mesh);
+    auto & sys = es.add_system<NonlinearImplicitSystem>("sys");
+    sys.create_constraint_elimination();
+    sys.add_variable("u", SECOND, LAGRANGE);
+    for (const auto & [mine, paired, offset] :
+         {std::make_tuple(0, 2, RealVectorValue(0., 1.)),
+          std::make_tuple(3, 1, RealVectorValue(1., 0.))})
+      {
+        PeriodicBoundary periodic(offset);
+        periodic.myboundary = mine;
+        periodic.pairedboundary = paired;
+        sys.get_dof_map().add_periodic_boundary(periodic);
+      }
+
+    PeriodicPoisson assembly;
+    Constants constants;
+    sys.nonlinear_solver->residual_and_jacobian_object = &assembly;
+    sys.nonlinear_solver->nullspace_object = &constants;
+    sys.nonlinear_solver->relative_residual_tolerance = TOLERANCE * TOLERANCE;
+
+    // Ghost the point neighbors of periodic images, which periodic constraints need on a
+    // distributed mesh
+    mesh.default_ghosting().set_periodic_boundaries(sys.get_dof_map().get_periodic_boundaries());
+    mesh.allow_remote_element_removal(true);
+    mesh.delete_remote_elements();
+
+    if (Elem * elem = mesh.query_elem_ptr(5); elem && elem->active())
+      elem->set_refinement_flag(Elem::REFINE);
+    MeshRefinement(mesh).refine_elements();
+    es.init();
+
+    CPPUNIT_ASSERT(sys.get_dof_map().n_constrained_dofs() > 0);
+
+    sys.solution->zero();
+    sys.solution->close();
+    sys.update();
+    sys.solve();
+    CPPUNIT_ASSERT(sys.nonlinear_solver->converged);
+
+    // The solver attaches the null space to the system matrix, which is the reduced Jacobian
+    const auto & reduced = cast_ref<ReducedSparseMatrix<Number> &>(*sys.matrix);
+    MatNullSpace nullspace;
+    LibmeshPetscCall2(mesh.comm(), MatGetNullSpace(reduced.mat(), &nullspace));
+    CPPUNIT_ASSERT(nullspace);
+    PetscBool is_null;
+    LibmeshPetscCall2(mesh.comm(), MatNullSpaceTest(nullspace, reduced.mat(), &is_null));
+    CPPUNIT_ASSERT(is_null);
+  }
+
+  /**
+   * Static condensation nested in constraint elimination: the outer Krylov solve acts on the
+   * unconstrained degrees of freedom and the condensed solve on their element boundary subset.
+   * Condensing exactly must reproduce the eliminated solve without condensation
+   */
+  void testCondensedReducedSolve()
+  {
+    LOG_UNIT_TEST;
+
+#if !defined(LIBMESH_PETSC_HAVE_MUMPS) && !defined(LIBMESH_PETSC_HAVE_SUPERLU_DIST)
+    // The solves use LU, which needs a parallel direct solver when the matrices are distributed
+    if (TestCommWorld->size() > 1)
+      return;
+#endif
+
+    Mesh mesh(*TestCommWorld);
+    // A distributed mesh keeps periodic neighbors only if it knows the periodic boundaries before
+    // it deletes remote elements
+    mesh.allow_remote_element_removal(false);
+    MeshTools::Generation::build_square(mesh, 4, 4, 0., 1., 0., 1., QUAD9);
+
+    EquationSystems es(mesh);
+    auto & plain_sys = es.add_system<NonlinearImplicitSystem>("plain");
+    auto & condensed_sys = es.add_system<NonlinearImplicitSystem>("sc");
+    plain_sys.create_constraint_elimination();
+    condensed_sys.create_constraint_elimination();
+    condensed_sys.create_static_condensation();
+
+    NonlinearDiffusion assembly;
+    for (auto * sys : {&plain_sys, &condensed_sys})
+      {
+        // Third order hierarchic shape functions have interior dofs to condense
+        const auto u = sys->add_variable("u", THIRD, HIERARCHIC);
+        PeriodicBoundary periodic(RealVectorValue(0., 1.));
+        periodic.myboundary = 0;
+        periodic.pairedboundary = 2;
+        sys->get_dof_map().add_periodic_boundary(periodic);
+        sys->get_dof_map().add_dirichlet_boundary(
+            DirichletBoundary({3}, {u}, ConstFunction<Number>(2.)));
+        sys->nonlinear_solver->residual_and_jacobian_object = &assembly;
+        sys->nonlinear_solver->relative_residual_tolerance = TOLERANCE * TOLERANCE;
+      }
+
+    // Ghost the point neighbors of periodic images, which periodic constraints need on a
+    // distributed mesh. Both systems have the same periodic boundaries.
+    mesh.default_ghosting().set_periodic_boundaries(
+        plain_sys.get_dof_map().get_periodic_boundaries());
+    mesh.allow_remote_element_removal(true);
+    mesh.delete_remote_elements();
+
+    if (Elem * elem = mesh.query_elem_ptr(5); elem && elem->active())
+      elem->set_refinement_flag(Elem::REFINE);
+    MeshRefinement(mesh).refine_elements();
+    es.init();
+
+    // The condensed problem is solved exactly, so the outer Krylov solve needs one iteration. The
+    // statically condensed operator has no action of its own, which the default line search needs.
+    // The solver of the condensed problem appends "condensed_" to the system prefix "sc_"
+    LibmeshPetscCall2(mesh.comm(), PetscOptionsSetValue(nullptr, "-sc_ksp_type", "preonly"));
+    LibmeshPetscCall2(mesh.comm(),
+                      PetscOptionsSetValue(nullptr, "-sc_snes_linesearch_type", "basic"));
+    LibmeshPetscCall2(mesh.comm(), PetscOptionsSetValue(nullptr, "-sc_condensed_pc_type", "lu"));
+    LibmeshPetscCall2(mesh.comm(), PetscOptionsSetValue(nullptr, "-plain_pc_type", "lu"));
+    for (auto * sys : {&plain_sys, &condensed_sys})
+      {
+        sys->prefix_with_name(true);
+        sys->solution->zero();
+        sys->solution->close();
+        sys->update();
+        sys->solve();
+        CPPUNIT_ASSERT(sys->nonlinear_solver->converged);
+      }
+    for (const char * option : {"-sc_ksp_type",
+                                "-sc_snes_linesearch_type",
+                                "-sc_condensed_pc_type",
+                                "-plain_pc_type"})
+      LibmeshPetscCall2(mesh.comm(), PetscOptionsClearValue(nullptr, option));
+
+    const auto & dof_map = plain_sys.get_dof_map();
+    CPPUNIT_ASSERT(condensed_sys.get_dof_map().get_static_condensation().n_dofs() <
+                   dof_map.get_constraint_elimination().n_dofs());
+    for (const auto i : make_range(dof_map.first_dof(), dof_map.end_dof()))
+      LIBMESH_ASSERT_NUMBERS_EQUAL(
+          (*plain_sys.solution)(i), (*condensed_sys.solution)(i), std::sqrt(TOLERANCE) * TOLERANCE);
+  }
+
+  /**
+   * The reduced degrees of freedom of a variable on an element must belong to that variable, even
+   * when they constrain degrees of freedom of another variable
+   */
+  void testCrossVariableConstraintDofs()
+  {
+    LOG_UNIT_TEST;
+
+    Mesh mesh(*TestCommWorld);
+    MeshTools::Generation::build_square(mesh, 4, 4, 0., 1., 0., 1., QUAD4);
+
+    EquationSystems es(mesh);
+    auto & sys = es.add_system<NonlinearImplicitSystem>("sys");
+    sys.create_constraint_elimination();
+    const auto u = sys.add_variable("u", FIRST, LAGRANGE);
+    const auto v = sys.add_variable("v", FIRST, LAGRANGE);
+    CrossVariableConstraint constraint(sys, 3);
+    sys.attach_constraint_object(constraint);
+    es.init();
+
+    const DofMap & dof_map = sys.get_dof_map();
+    const auto & reduced_map = dof_map.get_constraint_elimination();
+    CPPUNIT_ASSERT_EQUAL(2u, reduced_map.n_variables());
+
+    // The reduced degrees of freedom of each variable on the element, from the full numbering
+    std::vector<dof_id_type> full_dofs, reduced_dofs;
+    for (const Elem * elem : mesh.active_local_element_ptr_range())
+      for (const unsigned int var : {u, v})
+        {
+          dof_map.dof_indices(elem, full_dofs, var);
+          std::set<dof_id_type> expected;
+          for (const auto dof : full_dofs)
+            if (!dof_map.is_constrained_dof(dof))
+              expected.insert(reduced_map.reduced_dof(dof));
+          reduced_map.dof_indices(elem, reduced_dofs, var);
+          CPPUNIT_ASSERT(std::set<dof_id_type>(reduced_dofs.begin(), reduced_dofs.end()) ==
+                         expected);
+        }
+  }
+};
+
+CPPUNIT_TEST_SUITE_REGISTRATION(ConstraintEliminationTest);
+
+#endif
