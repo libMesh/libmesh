@@ -200,6 +200,8 @@ public:
   CPPUNIT_TEST( testPeriodicLagrange2 );
 #endif
   CPPUNIT_TEST( testRedistributeToGhosts );
+  CPPUNIT_TEST( testPeriodicSideHierarchicQuad9 );
+  CPPUNIT_TEST( testPeriodicSideHierarchicTri6 );
 #endif // LIBMESH_DIM > 1
 
   CPPUNIT_TEST_SUITE_END();
@@ -329,6 +331,44 @@ private:
         CPPUNIT_ASSERT_EQUAL(processor_id_type(row == 0 || row == 2), elem->processor_id());
       }
   }
+
+  // Project a function that is not periodic in x onto a side-only
+  // space with x-periodic constraints.  The constrained traces on the
+  // left side must equal the traces on the right side, and each must
+  // reproduce one side's data exactly.
+  void testPeriodicSideHierarchic(const ElemType elem_type, const Order order)
+  {
+    Mesh mesh(*TestCommWorld);
+    EquationSystems es(mesh);
+    System & sys = es.add_system<System>("PBCSys");
+    sys.add_variable("u", FEType(order, SIDE_HIERARCHIC));
+
+    // build_square() numbers the right and left sides 1 and 3
+    PeriodicBoundary horz(RealVectorValue(1., 0.));
+    horz.myboundary = 3;
+    horz.pairedboundary = 1;
+    sys.get_dof_map().add_periodic_boundary(horz);
+
+    MeshTools::Generation::build_square(mesh, 3, 3, 0., 1., 0., 1., elem_type);
+    es.init();
+
+    // The trace space holds y^2 exactly at order >= 2
+    auto f = +[](const Point & p, const Parameters &, const std::string &, const std::string &)
+      -> Number { return p(0) + p(1) * p(1); };
+    sys.project_solution(f, nullptr, es.parameters);
+
+    for (Real y = 0.05; y < 1; y += 0.1)
+      {
+        const Number left = sys.point_value(0, Point(0., y));
+        const Number right = sys.point_value(0, Point(1., y));
+        LIBMESH_ASSERT_NUMBERS_EQUAL(left, right, TOLERANCE*TOLERANCE);
+        const Real err = std::min(std::abs(left - y * y), std::abs(left - Real(1) - y * y));
+        LIBMESH_ASSERT_FP_EQUAL(0, err, TOLERANCE*TOLERANCE);
+      }
+  }
+
+  void testPeriodicSideHierarchicQuad9() { LOG_UNIT_TEST; testPeriodicSideHierarchic(QUAD9, SECOND); }
+  void testPeriodicSideHierarchicTri6() { LOG_UNIT_TEST; testPeriodicSideHierarchic(TRI6, THIRD); }
 
   void testPeriodicLagrange2() { LOG_UNIT_TEST; testPeriodicBC(FEType(SECOND, LAGRANGE)); }
 };
