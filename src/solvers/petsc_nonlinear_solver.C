@@ -29,6 +29,8 @@
 #include "libmesh/petsc_vector.h"
 #include "libmesh/petsc_mffd_matrix.h"
 #include "libmesh/dof_map.h"
+#include "libmesh/constraint_elimination_dof_map.h"
+#include "libmesh/petsc_solve_reduction.h"
 #include "libmesh/preconditioner.h"
 #include "libmesh/solver_configuration.h"
 #include "libmesh/petscdmlibmesh.h"
@@ -76,28 +78,7 @@ libmesh_petsc_snes_residual_helper (SNES snes, Vec x, void * ctx)
     solver->_current_nonlinear_iteration_number = cast_int<unsigned>(n_iterations);
   }
 
-  NonlinearImplicitSystem & sys = solver->system();
-
-  PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
-
-  PetscVector<Number> X_global(x, sys.comm());
-
-  // Use the system's update() to get a good local version of the
-  // parallel solution.  This operation does not modify the incoming
-  // "x" vector, it only localizes information from "x" into
-  // sys.current_local_solution.
-  X_global.swap(X_sys);
-  sys.update();
-  X_global.swap(X_sys);
-
-  // Enforce constraints (if any) exactly on the
-  // current_local_solution.  This is the solution vector that is
-  // actually used in the computation of the residual below, and is
-  // not locked by debug-enabled PETSc the way that "x" is.
-  if (solver->_exact_constraint_enforcement)
-    sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
-
-  return ResidualContext(solver, sys);
+  return ResidualContext(solver, solver->system());
 }
 
 //--------------------------------------------------------------------
@@ -162,10 +143,6 @@ extern "C"
     libmesh_parallel_only(rc.sys.comm());
 
     libmesh_assert(r);
-    PetscVector<Number> R(r, rc.sys.comm());
-
-    if (rc.solver->_zero_out_residual)
-      R.zero();
 
     //-----------------------------------------------------------------------------
     // if the user has provided both function pointers and objects only the pointer
@@ -175,6 +152,14 @@ extern "C"
 
     libmesh_error_msg_if(rc.solver->matvec && rc.solver->residual_and_jacobian_object,
                          "ERROR: cannot specify both a function and object to compute the combined Residual & Jacobian!");
+
+    const bool zero_out_residual = rc.solver->_zero_out_residual;
+    const bool zero_out_jacobian = rc.solver->_zero_out_jacobian;
+    auto & reduction = rc.solver->reduction();
+
+    const bool evaluated = reduction.residual(x, r, [&](NumericVector<Number> & R) {
+    if (zero_out_residual)
+      R.zero();
 
     if (rc.solver->residual != nullptr)
       rc.solver->residual(*rc.sys.current_local_solution.get(), R, rc.sys);
@@ -189,39 +174,24 @@ extern "C"
     {
       auto & jac = rc.sys.get_system_matrix();
 
-      if (rc.solver->_zero_out_jacobian)
+      if (zero_out_jacobian)
         jac.zero();
 
       rc.solver->residual_and_jacobian_object->residual_and_jacobian(
           *rc.sys.current_local_solution.get(), &R, &jac, rc.sys);
 
       jac.close();
-      if (rc.solver->_exact_constraint_enforcement)
-        {
-          rc.sys.get_dof_map().enforce_constraints_on_jacobian(rc.sys, &jac);
-          jac.close();
-        }
+      reduction.finish_jacobian(jac);
     }
 
     else
       libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");
+    });
 
-
-    // Synchronize PETSc x to local solution since the local solution may be changed due to the constraints
-    PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(rc.sys.solution.get());
-    PetscVector<Number> X_global(x, rc.sys.comm());
-
-    X_global.swap(X_sys);
-    rc.sys.update();
-    X_global.swap(X_sys);
-
-    R.close();
-
-    if (rc.solver->_exact_constraint_enforcement)
-      {
-        rc.sys.get_dof_map().enforce_constraints_on_residual(rc.sys, &R, rc.sys.current_local_solution.get(), /*homogeneous=*/false);
-        R.close();
-      }
+    // The reduction cannot form the full iterate, e.g. a local solve failed. The line search then
+    // backtracks
+    if (!evaluated)
+      LibmeshPetscCall2(rc.sys.comm(), SNESSetFunctionDomainError(snes));
 
     PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
   }
@@ -238,9 +208,11 @@ extern "C"
     libmesh_parallel_only(rc.sys.comm());
 
     libmesh_assert(r);
-    PetscVector<Number> R(r, rc.sys.comm());
 
-    if (rc.solver->_zero_out_residual)
+    const bool zero_out_residual = rc.solver->_zero_out_residual;
+
+    const bool evaluated = rc.solver->reduction().residual(x, r, [&](NumericVector<Number> & R) {
+    if (zero_out_residual)
       R.zero();
 
     if (rc.solver->fd_residual_object != nullptr)
@@ -251,22 +223,10 @@ extern "C"
 
     else
       libmesh_error_msg("Error! Unable to compute residual for forming finite difference Jacobian!");
+    });
 
-    // Synchronize PETSc x to local solution since the local solution may be changed due to the constraints
-    PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(rc.sys.solution.get());
-    PetscVector<Number> X_global(x, rc.sys.comm());
-
-    X_global.swap(X_sys);
-    rc.sys.update();
-    X_global.swap(X_sys);
-
-    R.close();
-
-    if (rc.solver->_exact_constraint_enforcement)
-      {
-        rc.sys.get_dof_map().enforce_constraints_on_residual(rc.sys, &R, rc.sys.current_local_solution.get(), /*homogeneous=*/false);
-        R.close();
-      }
+    if (!evaluated)
+      LibmeshPetscCall2(rc.sys.comm(), SNESSetFunctionDomainError(snes));
 
     PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
   }
@@ -284,9 +244,11 @@ extern "C"
     libmesh_parallel_only(rc.sys.comm());
 
     libmesh_assert(r);
-    PetscVector<Number> R(r, rc.sys.comm());
 
-    if (rc.solver->_zero_out_residual)
+    const bool zero_out_residual = rc.solver->_zero_out_residual;
+
+    const bool evaluated = rc.solver->reduction().residual(x, r, [&](NumericVector<Number> & R) {
+    if (zero_out_residual)
       R.zero();
 
     if (rc.solver->mffd_residual_object != nullptr)
@@ -298,22 +260,10 @@ extern "C"
     else
       libmesh_error_msg("Error! Unable to compute residual for forming finite differenced"
                         "Jacobian-vector products!");
+    });
 
-    // Synchronize PETSc x to local solution since the local solution may be changed due to the constraints
-    PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(rc.sys.solution.get());
-    PetscVector<Number> X_global(x, rc.sys.comm());
-
-    X_global.swap(X_sys);
-    rc.sys.update();
-    X_global.swap(X_sys);
-
-    R.close();
-
-    if (rc.solver->_exact_constraint_enforcement)
-      {
-        rc.sys.get_dof_map().enforce_constraints_on_residual(rc.sys, &R, rc.sys.current_local_solution.get(), /*homogeneous=*/false);
-        R.close();
-      }
+    if (!evaluated)
+      LibmeshPetscCall2(rc.sys.comm(), SNESSetFunctionDomainError(snes));
 
     PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
   }
@@ -437,8 +387,6 @@ extern "C"
 
     PetscMatrixBase<Number> * const PC = pc ? PetscMatrixBase<Number>::get_context(pc, sys.comm()) : nullptr;
     PetscMatrixBase<Number> * Jac = jac ? PetscMatrixBase<Number>::get_context(jac, sys.comm()) : nullptr;
-    PetscVector<Number> & X_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
-    PetscVector<Number> X_global(x, sys.comm());
 
     PetscMFFDMatrix<Number> mffd_jac(sys.comm());
     PetscBool p_is_shell = PETSC_FALSE;
@@ -476,48 +424,28 @@ extern "C"
     PC->attach_dof_map(sys.get_dof_map());
     Jac->attach_dof_map(sys.get_dof_map());
 
-    // Use the systems update() to get a good local version of the parallel solution
-    X_global.swap(X_sys);
-    sys.update();
-    X_global.swap(X_sys);
+    const bool zero_out_jacobian = solver->_zero_out_jacobian;
 
-    // Enforce constraints (if any) exactly on the
-    // current_local_solution.  This is the solution vector that is
-    // actually used in the computation of the residual below, and is
-    // not locked by debug-enabled PETSc the way that "x" is.
-    if (solver->_exact_constraint_enforcement)
-      sys.get_dof_map().enforce_constraints_exactly(sys, sys.current_local_solution.get());
-
-    if (solver->_zero_out_jacobian)
-      PC->zero();
+    const bool evaluated = solver->reduction().jacobian(x, *Jac, *PC, [&](SparseMatrix<Number> & J) {
+    if (zero_out_jacobian)
+      J.zero();
 
 
     if (solver->jacobian != nullptr)
-      solver->jacobian(*sys.current_local_solution.get(), *PC, sys);
+      solver->jacobian(*sys.current_local_solution.get(), J, sys);
 
     else if (solver->jacobian_object != nullptr)
-      solver->jacobian_object->jacobian(*sys.current_local_solution.get(), *PC, sys);
+      solver->jacobian_object->jacobian(*sys.current_local_solution.get(), J, sys);
 
     else if (solver->matvec != nullptr)
-      solver->matvec(*sys.current_local_solution.get(), nullptr, PC, sys);
+      solver->matvec(*sys.current_local_solution.get(), nullptr, &J, sys);
 
     else
       libmesh_error_msg("Error! Unable to compute residual and/or Jacobian!");
+    });
 
-    PC->close();
-    if (solver->_exact_constraint_enforcement)
-      {
-        sys.get_dof_map().enforce_constraints_on_jacobian(sys, PC);
-        PC->close();
-      }
-
-    if (Jac != PC)
-      {
-        // Assume that shells know what they're doing
-        libmesh_assert(!solver->_exact_constraint_enforcement || (j_is_mffd == PETSC_TRUE) ||
-                       (j_is_shell == PETSC_TRUE));
-        Jac->close();
-      }
+    if (!evaluated)
+      LibmeshPetscCall2(sys.comm(), SNESSetJacobianDomainError(snes));
 
     PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
   }
@@ -583,36 +511,48 @@ extern "C"
     if (!solver->postcheck && !solver->postcheck_object)
       PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
 
-    // We definitely need to wrap at least "w"
-    PetscVector<Number> petsc_w(w, sys.comm());
-
     // The user sets these flags in his/her postcheck function to
     // indicate whether they changed something.
     bool
       changed_search_direction = false,
       changed_new_soln = false;
 
-    if (solver->postcheck || solver->postcheck_object)
-      {
-        PetscVector<Number> petsc_x(x, sys.comm());
-        PetscVector<Number> petsc_y(y, sys.comm());
+    auto call_postcheck = [&](const NumericVector<Number> & old_soln,
+                              NumericVector<Number> & search_direction,
+                              NumericVector<Number> & new_soln) {
+      if (solver->postcheck)
+        solver->postcheck(old_soln,
+                          search_direction,
+                          new_soln,
+                          changed_search_direction,
+                          changed_new_soln,
+                          sys);
+      else
+        solver->postcheck_object->postcheck(old_soln,
+                                            search_direction,
+                                            new_soln,
+                                            changed_search_direction,
+                                            changed_new_soln,
+                                            sys);
+    };
 
-        if (solver->postcheck)
-          solver->postcheck(petsc_x,
-                            petsc_y,
-                            petsc_w,
-                            changed_search_direction,
-                            changed_new_soln,
-                            sys);
+    // The user sees the full iterates P(x) and P(w) and the full step P' y. Injecting the user's
+    // changes keeps each change to an entry SNES solves for
+    auto & reduction = solver->reduction();
+    const auto old_soln = reduction.prolong_iterate(x);
+    libmesh_error_msg_if(!old_soln, "The reduction cannot form the full previous iterate");
+    const auto search_direction = reduction.prolong_step(y);
+    const auto new_soln = reduction.prolong_iterate(w);
+    // P(w) does not exist. The evaluation of the residual at w reports it to the line search
+    if (!new_soln)
+      PetscFunctionReturn(LIBMESH_PETSC_SUCCESS);
 
-        else if (solver->postcheck_object)
-          solver->postcheck_object->postcheck(petsc_x,
-                                              petsc_y,
-                                              petsc_w,
-                                              changed_search_direction,
-                                              changed_new_soln,
-                                              sys);
-      }
+    call_postcheck(*old_soln, *search_direction, *new_soln);
+
+    if (changed_search_direction)
+      reduction.inject(*search_direction, y);
+    if (changed_new_soln)
+      reduction.inject(*new_soln, w);
 
     // Record whether the user changed the solution or the search direction.
     if (changed_search_direction)
@@ -653,28 +593,17 @@ extern "C"
       petsc_changed = false;
 
     auto & sys = solver->system();
-    auto & x_sys = *cast_ptr<PetscVector<Number> *>(sys.solution.get());
-    PetscVector<Number> petsc_x(X, sys.comm());
-    PetscVector<Number> petsc_y(Y, sys.comm());
 
-    // Use the systems update() to get a good local version of the parallel solution
-    petsc_x.swap(x_sys);
-    sys.update();
-    petsc_x.swap(x_sys);
-
-    // Enforce constraints (if any) exactly on the
-    // current_local_solution.  This is the solution vector that is
-    // actually used in the computation of residuals and Jacobians, and is
-    // not locked by debug-enabled PETSc the way that "x" is.
+    // The user sees the full iterate in the system's current_local_solution and the full search
+    // direction P' Y. A change to the search direction is injected back
+    auto & reduction = solver->reduction();
+    libmesh_error_msg_if(!reduction.prolong(X), "The reduction cannot form the full iterate");
     libmesh_assert(sys.current_local_solution.get());
     auto & local_soln = *sys.current_local_solution.get();
-    if (solver->_exact_constraint_enforcement)
-      sys.get_dof_map().enforce_constraints_exactly(sys, &local_soln);
-
-    solver->precheck_object->precheck(local_soln,
-                                      petsc_y,
-                                      petsc_changed,
-                                      sys);
+    const auto search_direction = reduction.prolong_step(Y);
+    solver->precheck_object->precheck(local_soln, *search_direction, petsc_changed, sys);
+    if (petsc_changed)
+      reduction.inject(*search_direction, Y);
 
     // Record whether the user changed the solution or the search direction.
     if (petsc_changed)
@@ -763,6 +692,9 @@ void PetscNonlinearSolver<T>::init (const char * name)
           LibmeshPetscCall(SNESSetOptionsPrefix(_snes, name));
         }
 
+      // The DM sizes its vectors by the reduction
+      this->setup_reduction();
+
       // Attaching a DM to SNES.
 #if defined(LIBMESH_ENABLE_AMR) && defined(LIBMESH_HAVE_METAPHYSICL)
       bool use_petsc_dm = libMesh::on_command_line(
@@ -797,7 +729,7 @@ void PetscNonlinearSolver<T>::init (const char * name)
           this->_solver_configuration->set_options_during_init();
         }
 
-      if (this->_preconditioner)
+      if (this->_preconditioner && this->reduction().uses_linear_preconditioner())
         {
           KSP ksp;
           LibmeshPetscCall(SNESGetKSP (_snes, &ksp));
@@ -873,9 +805,9 @@ PetscNonlinearSolver<T>::build_mat_null_space(NonlinearImplicitSystem::ComputeVe
         {
           auto pv = cast_ptr<PetscVector<T> *>(sp[i]);
 
-          LibmeshPetscCall(VecDuplicate(pv->vec(), &modes[i]));
-
-          LibmeshPetscCall(VecCopy(pv->vec(), modes[i]));
+          // A full mode v = P' y of the reduced operator gives the reduced mode y = R v
+          modes[i] = this->reduction().create_vector();
+          this->reduction().inject(*pv, modes[i]);
         }
 
       // Normalize.
@@ -932,6 +864,15 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // Jacobian operator
   PetscVector<T> * x   = cast_ptr<PetscVector<T> *>(&x_in);
   PetscVector<T> * r   = cast_ptr<PetscVector<T> *>(&r_in);
 
+  // SNES iterates on y, from which the reduction forms the full iterate for every evaluation. The
+  // full x_in and r_in remain the system's assembly vectors
+  // The degrees of freedom may have changed since init()
+  this->setup_reduction();
+  auto & reduction = this->reduction();
+  reduction.begin_solve(*x, *r);
+  const Vec snes_x = reduction.snes_solution();
+  const Vec snes_r = reduction.snes_residual();
+
   PetscInt n_iterations =0;
   // Should actually be a PetscReal, but I don't know which version of PETSc first introduced PetscReal
   Real final_residual_norm=0.;
@@ -964,12 +905,15 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // Jacobian operator
         }
     }
 
-  LibmeshPetscCall(SNESSetFunction (_snes, r->vec(), libmesh_petsc_snes_residual, this));
+  LibmeshPetscCall(SNESSetFunction (_snes, snes_r, libmesh_petsc_snes_residual, this));
 
   // Only set the jacobian function if we've been provided with something to call.
   // This allows a user to set their own jacobian function if they want to
-  if (this->jacobian || this->jacobian_object || this->residual_and_jacobian_object)
-    LibmeshPetscCall(SNESSetJacobian (_snes, jac->mat(), pre->mat(), libmesh_petsc_snes_jacobian, this));
+  if (this->jacobian || this->jacobian_object || this->matvec || this->residual_and_jacobian_object)
+    {
+      const auto [snes_jac, snes_pre] = reduction.operators(jac->mat(), pre->mat());
+      LibmeshPetscCall(SNESSetJacobian (_snes, snes_jac, snes_pre, libmesh_petsc_snes_jacobian, this));
+    }
 
   // Have the Krylov subspace method use our good initial guess rather than 0
   KSP ksp;
@@ -1025,7 +969,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // Jacobian operator
     this->user_presolve(this->system());
 
   //Set the preconditioning matrix
-  if (this->_preconditioner)
+  if (this->_preconditioner && reduction.uses_linear_preconditioner())
     {
       this->_preconditioner->set_matrix(pre_in);
       this->_preconditioner->init();
@@ -1049,7 +993,7 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // Jacobian operator
   // (petsc/petsc@154060b), so this code block should be safe to use
   // in 3.5.0 and later.
 #if !PETSC_VERSION_LESS_THAN(3,6,0)
-  LibmeshPetscCall(SNESSetSolution(_snes, x->vec()));
+  LibmeshPetscCall(SNESSetSolution(_snes, snes_x));
 #endif
   LibmeshPetscCall(SNESSetUp(_snes));
 
@@ -1128,7 +1072,9 @@ PetscNonlinearSolver<T>::solve (SparseMatrix<T> &  jac_in,  // Jacobian operator
 #endif
   }
 
-  LibmeshPetscCall(SNESSolve (_snes, LIBMESH_PETSC_NULLPTR, x->vec()));
+  LibmeshPetscCall(SNESSolve (_snes, LIBMESH_PETSC_NULLPTR, snes_x));
+
+  reduction.end_solve();
 
   LibmeshPetscCall(SNESGetIterationNumber(_snes, &n_iterations));
 
@@ -1209,6 +1155,28 @@ void PetscNonlinearSolver<T>::force_new_preconditioner()
   this->_is_initialized = false;
   _snes.destroy();
   _setup_reuse = false;
+}
+
+template <typename T>
+void PetscNonlinearSolver<T>::setup_reduction()
+{
+  sys_type & sys = this->system();
+  if (sys.get_dof_map().has_constraint_elimination())
+    _reduction = std::make_unique<PetscConstraintEliminationReduction<T>>(sys);
+  else
+    _reduction = std::make_unique<PetscIdentityReduction<T>>(sys,
+                                                             this->_exact_constraint_enforcement);
+
+  if (this->elimination_object && sys.has_static_condensation())
+    {
+#ifdef LIBMESH_HAVE_EIGEN
+      _reduction = std::make_unique<PetscNonlinearStaticCondensationReduction<T>>(
+          sys, *this->elimination_object, std::move(_reduction));
+#else
+      libmesh_error_msg("Nonlinear elimination of statically condensed degrees of freedom "
+                        "requires Eigen");
+#endif
+    }
 }
 
 //------------------------------------------------------------------

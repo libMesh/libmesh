@@ -41,6 +41,7 @@
 #include "libmesh/sparsity_pattern.h"
 #include "libmesh/threads.h"
 #include "libmesh/static_condensation_dof_map.h"
+#include "libmesh/constraint_elimination_dof_map.h"
 #include "libmesh/system.h"
 #include "libmesh/parallel_fe_type.h"
 
@@ -63,7 +64,7 @@ namespace libMesh
 std::unique_ptr<SparsityPattern::Build>
 DofMap::build_sparsity (const MeshBase & mesh,
                         const bool calculate_constrained,
-                        const bool use_condensed_system) const
+                        const ReducedDofMap * const reduced) const
 {
   libmesh_assert (mesh.is_prepared());
 
@@ -82,13 +83,6 @@ DofMap::build_sparsity (const MeshBase & mesh,
   // between neighbor dofs
   bool implicit_neighbor_dofs = this->use_coupled_neighbor_dofs(mesh);
 
-  const StaticCondensationDofMap * sc = nullptr;
-  if (use_condensed_system)
-    {
-      libmesh_assert(this->has_static_condensation());
-      sc = _sc.get();
-    }
-
   // We can compute the sparsity pattern in parallel on multiple
   // threads.  The goal is for each thread to compute the full sparsity
   // pattern for a subset of elements.  These sparsity patterns can
@@ -104,7 +98,7 @@ DofMap::build_sparsity (const MeshBase & mesh,
      implicit_neighbor_dofs,
      _need_full_sparsity_pattern,
      calculate_constrained,
-     sc);
+     reduced);
 
   Threads::parallel_reduce (mesh.active_local_element_stored_range(), *sp);
 
@@ -967,6 +961,8 @@ void DofMap::clear()
   _matrices.clear();
   if (_sc)
     _sc->clear();
+  if (_constraint_elimination)
+    _constraint_elimination->clear();
 }
 
 
@@ -3170,7 +3166,23 @@ void DofMap::create_static_condensation(MeshBase & mesh, System & sys)
 void DofMap::reinit_static_condensation()
 {
   if (_sc)
-    _sc->reinit();
+    {
+      // Static condensation reduces the space SNES solves on, which excludes constrained dofs when
+      // they are eliminated
+      _sc->set_parent(_constraint_elimination.get());
+      _sc->reinit();
+    }
+}
+
+void DofMap::create_constraint_elimination(MeshBase & mesh, System & sys)
+{
+  _constraint_elimination = std::make_unique<ConstraintEliminationDofMap>(mesh, sys, *this);
+}
+
+void DofMap::reinit_constraint_elimination()
+{
+  if (_constraint_elimination)
+    _constraint_elimination->reinit();
 }
 
 unsigned int DofMap::add_variable(System & sys,
